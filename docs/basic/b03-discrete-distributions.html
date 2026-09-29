@@ -1,0 +1,1591 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.42">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Lecture 3: Discrete distributions, expectation, and variance – Quantitative Methods to Understand E&amp;BI</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../basic/t01-exam-prep.html" rel="next">
+<link href="../basic/b02-probability-foundations.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-ecf4e518a83458a2bb67b2a9bf74271b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar docked">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../basic/overview.html">QM Basic: Course overview</a></li><li class="breadcrumb-item"><a href="../basic/b03-discrete-distributions.html"><span class="chapter-title">Lecture 3: Discrete distributions, expectation, and variance</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Quantitative Methods to Understand E&amp;BI</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Welcome</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../basic/overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">QM Basic: Course overview</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b01-introduction-data-analysis.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 1: Introduction to Data Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b02-probability-foundations.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 2: Probability foundations and random variables</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b03-discrete-distributions.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">Lecture 3: Discrete distributions, expectation, and variance</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/t01-exam-prep.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Tutorial 1: Evidence and probability foundations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b04-conditioning-bayes-independence.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 4: Conditioning, Bayes’ rule, and independence</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b05-joint-covariance-correlation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 5: Joint random variables, covariance, and correlation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/t02-exam-prep.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Tutorial 2: Conditioning and relationships</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b06-continuous-normal.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 6: Continuous distributions and the normal model</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b07-samples-estimators.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 7: Samples, parameters, and estimators</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b08-sampling-distributions.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 8: Sampling distributions and the central limit theorem</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/t03-exam-prep.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Tutorial 3: Normal models, sampling, and standard errors</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b09-t-confidence-intervals.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 9: The t distribution, confidence intervals, and the two-sided test</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b10-testing-errors-power.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 10: Testing decisions, errors, power, and the road to regression</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/t04-exam-prep.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Tutorial 4: Inference and tests against zero</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/formula-sheet.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">QM Basic Formula Sheet</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/mock-exam.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Mock Exam: QM Basic</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../intermediate/overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">QM Intermediate: Course overview</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/i01-simple-linear-regression.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 1: Simple linear regression</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/i02-assumptions-diagnostics.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 2: What the model assumes and how residuals betray it</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/i03-inference-fit-ftest.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 3: Coefficient inference, fit, and the F-test</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/t01-exam-prep.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Tutorial 1: Simple regression, diagnostics, and model usefulness</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/i04-multiple-regression.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 4: Multiple regression and what controls do</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/i05-categories-joint-tests.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 5: Categories as predictors and joint tests</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/i06-interactions-curvature.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 6: Interactions and curvature</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/t02-exam-prep.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Tutorial 2: Multiple regression and extensions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/code-sheet.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">QM Intermediate Code Sheet</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/mock-exam.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Mock Exam: QM Intermediate</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <span class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">QM Advanced: Course overview</span></span>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Supplementary resources</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../resources/how-to-succeed.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">How to succeed in this course</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../resources/r-refresher.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">R Refresher</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../resources/math-refresher.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Mathematics Refresher</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../resources/video-guide.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">External Video Guide</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../resources/reading-ladder.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Reading research papers</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul class="collapse">
+  <li><a href="#before-class" id="toc-before-class" class="nav-link active" data-scroll-target="#before-class">Before class</a></li>
+  <li><a href="#in-class" id="toc-in-class" class="nav-link" data-scroll-target="#in-class">In class</a></li>
+  <li><a href="#after-class" id="toc-after-class" class="nav-link" data-scroll-target="#after-class">After class</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../basic/overview.html">QM Basic: Course overview</a></li><li class="breadcrumb-item"><a href="../basic/b03-discrete-distributions.html"><span class="chapter-title">Lecture 3: Discrete distributions, expectation, and variance</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="b03" class="quarto-section-identifier"><span class="chapter-title">Lecture 3: Discrete distributions, expectation, and variance</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="outcomes">
+<p><span class="label">By the end of Lecture 3, you can</span></p>
+<ul>
+<li>construct, check, and interpret a probability mass function;</li>
+<li>construct and interpret a discrete cumulative distribution function;</li>
+<li>calculate and interpret expectation and the expectation of a function;</li>
+<li>calculate and interpret variance and standard deviation, including the Bernoulli case <span class="math inline">\(p(1-p)\)</span>;</li>
+<li>connect model expectation to an empirical mean, and distribution variance to sample variance, without confusing them.</li>
+</ul>
+</div>
+<div class="driving-question">
+<p><span class="label">Driving question</span></p>
+<p class="dq-context">
+Anyone preparing a pitch wants to know what to expect: the typical outcome, and how far reality tends to stray from it. Centre and spread are the two numbers every summary of business risk starts from.
+</p>
+<p>What does a typical recorded pitch look like, and how much do pitches differ from that typical value?</p>
+</div>
+<section id="before-class" class="level2 course-phase phase-before">
+<h2 class="anchored" data-anchor-id="before-class">Before class</h2>
+<p><span class="time-budget">Total preparation time: about 30 minutes.</span></p>
+<div class="video-prep">
+<p><span class="label">Video preparation (20 minutes)</span><br> Watch <a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/probability-mass-functions/">Probability Mass Functions</a>, <a href="https://www.youtube.com/watch?v=4QeL1ma_XJ0">Cumulative Distribution Functions</a>, and <a href="https://www.youtube.com/watch?v=_yJsO5955ZE">Expectation</a>. Be ready to explain what <span class="math inline">\(p_X(x)\)</span> and <span class="math inline">\(F_X(a)\)</span> measure and why an expected value need not be a possible realised value. All links are also listed in the <a href="../resources/video-guide.html">External Video Guide</a>.</p>
+</div>
+<p><strong>Reactivate (5 minutes).</strong> Lecture 2 ended with random variables on the uniform record-selection experiment. Define <span class="math inline">\(X=1\)</span> if the selected pitch reached an on-air deal and <span class="math inline">\(X=0\)</span> otherwise. Define <span class="math inline">\(S\)</span> as its season number.</p>
+<ol type="1">
+<li>What are the possible values of <span class="math inline">\(X\)</span> and of <span class="math inline">\(S\)</span>?</li>
+<li>Do these possible values tell us how likely each value is?</li>
+</ol>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check your answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li><span class="math inline">\(X\)</span> can take the values 0 and 1. <span class="math inline">\(S\)</span> can take the values <span class="math inline">\(1,2,\ldots,16\)</span>.</li>
+<li>No.&nbsp;The support lists the possible values. A probability distribution must also assign probability to them — that is what this lecture adds.</li>
+</ol>
+</div>
+</div>
+</div>
+<p><strong>Predict (5 minutes).</strong> Answer the one-click Mentimeter question posted on Canvas before you come to class: can the <strong>expected season</strong> be a number that is not a whole season — yes or no? Commit to an answer; the lecture resolves it.</p>
+<p>If functions, support, or summation notation are unfamiliar, review <a href="../resources/math-refresher.html">Mathematics Refresher: functions and sums</a>.</p>
+</section>
+<section id="in-class" class="level2 course-phase phase-in-class">
+<h2 class="anchored" data-anchor-id="in-class">In class</h2>
+<p>The session opens with the usual four-minute entry quiz on the prep videos, then turns to the driving question. On screen is a figure with sixteen probability masses, one per season, heights unlabelled — by the end of the first block you can name every height, and by the end of the session you can compress all sixteen into two numbers: a centre and a spread.</p>
+<section id="a-pmf-assigns-probability-to-each-possible-value" class="level3">
+<h3 class="anchored" data-anchor-id="a-pmf-assigns-probability-to-each-possible-value">A PMF assigns probability to each possible value</h3>
+<p class="concept-video">
+<strong>MIT explanation (review):</strong> <a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/probability-mass-functions/">05.3 Probability Mass Functions</a>.
+</p>
+<p>A random variable identifies the numerical values that may be observed. Its distribution adds the missing information: how probability is divided among those values.</p>
+<p>For a discrete random variable <span class="math inline">\(X\)</span>, the <strong>probability mass function (PMF)</strong> is</p>
+<p><span class="math display">\[p_X(x)=P(X=x).\]</span></p>
+<p>Read this notation in parts:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Symbol</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(X\)</span></td>
+<td>the random variable</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(x\)</span></td>
+<td>one possible numerical value</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(p_X\)</span></td>
+<td>the PMF belonging to <span class="math inline">\(X\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(p_X(x)\)</span></td>
+<td>the probability that <span class="math inline">\(X\)</span> equals exactly <span class="math inline">\(x\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>A valid PMF must satisfy</p>
+<p><span class="math display">\[
+p_X(x)\ge 0\quad\text{for every }x,
+\qquad
+\sum_{x\in\mathcal X}p_X(x)=1,
+\]</span></p>
+<p>where <span class="math inline">\(\mathcal X\)</span> is the support of <span class="math inline">\(X\)</span>. The first rule prevents negative probability. The second says that one of the possible values must occur.</p>
+<div id="exm-b03-deal-pmf" class="theorem example">
+<p><span class="theorem-title"><strong>Example 3.1 (Worked example: the deal-indicator PMF, checked)</strong></span> Under the uniform selection experiment from Lecture 2, the deal indicator <span class="math inline">\(X\)</span> has support <span class="math inline">\(\{0,1\}\)</span>. From the counts — 882 deals among 1,441 records —</p>
+<p><span class="math display">\[
+p_X(0)=\frac{559}{1441}\approx 0.388,
+\qquad
+p_X(1)=\frac{882}{1441}\approx 0.612.
+\]</span></p>
+<p>Check both rules: each mass is non-negative, and</p>
+<p><span class="math display">\[
+\frac{559}{1441}+\frac{882}{1441}=\frac{1441}{1441}=1.
+\]</span></p>
+<p>This is a valid PMF.</p>
+</div>
+<p>The same objects in R — the data, the deal proportion <code>p_hat</code>, and the PMF are all built in visible code:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>p_hat <span class="ot">&lt;-</span> <span class="fu">mean</span>(sharks<span class="sc">$</span>deal_on_show)   <span class="co"># 882/1441</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>deal_pmf <span class="ot">&lt;-</span> <span class="fu">prop.table</span>(</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">table</span>(<span class="fu">factor</span>(sharks<span class="sc">$</span>deal_on_show, <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>)))</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(deal_pmf) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"0: no on-air deal"</span>, <span class="st">"1: on-air deal"</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>deal_pmf</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>0: no on-air deal    1: on-air deal 
+        0.3879251         0.6120749 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(deal_pmf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1</code></pre>
+</div>
+</div>
+<p>For season <span class="math inline">\(S\)</span>, the empirical PMF assigns each season its relative frequency under the uniform record-selection experiment:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>season_pmf <span class="ot">&lt;-</span> <span class="fu">prop.table</span>(<span class="fu">table</span>(sharks<span class="sc">$</span>season))</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(season_pmf, <span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+     1      2      3      4      5      6      7      8      9     10     11 
+0.0444 0.0250 0.0416 0.0715 0.0805 0.0805 0.0805 0.0666 0.0666 0.0638 0.0666 
+    12     13     14     15     16 
+0.0694 0.0666 0.0604 0.0604 0.0555 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(season_pmf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1</code></pre>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>See the R code for this figure</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>season_pmf <span class="ot">&lt;-</span> <span class="fu">prop.table</span>(<span class="fu">table</span>(sharks<span class="sc">$</span>season))</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>pmf_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">season =</span> <span class="fu">as.numeric</span>(<span class="fu">names</span>(season_pmf)),</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">probability =</span> <span class="fu">as.numeric</span>(season_pmf)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(pmf_df, <span class="fu">aes</span>(<span class="at">x =</span> season, <span class="at">y =</span> probability)) <span class="sc">+</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="fu">aes</span>(<span class="at">xend =</span> season, <span class="at">yend =</span> <span class="dv">0</span>),</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>               <span class="at">linewidth =</span> <span class="fl">1.1</span>, <span class="at">colour =</span> <span class="st">"#009E73"</span>) <span class="sc">+</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="fl">2.6</span>, <span class="at">colour =</span> <span class="st">"#009E73"</span>) <span class="sc">+</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">16</span>) <span class="sc">+</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">expand =</span> <span class="fu">expansion</span>(<span class="at">mult =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.05</span>))) <span class="sc">+</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Season s"</span>, <span class="at">y =</span> <span class="fu">expression</span>(p[S](s))) <span class="sc">+</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#5B6976"</span>),</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>)</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-b03-season-pmf" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-b03-season-pmf-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="b03-discrete-distributions_files/figure-html/fig-b03-season-pmf-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-b03-season-pmf-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.1: The PMF of season under uniform record selection: sixteen separated probability masses, one per possible value.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The probability mass above season 5 in <a href="#fig-b03-season-pmf" class="quarto-xref">Figure&nbsp;<span>3.1</span></a> has height <span class="math inline">\(p_S(5)=P(S=5)=116/1441\approx0.080\)</span>. A PMF is represented by separated probability masses because <span class="math inline">\(S\)</span> can take only the listed discrete values. The term <strong>probability density function (PDF)</strong> is reserved for continuous random variables and is introduced later in the course.</p>
+</section>
+<section id="a-cdf-accumulates-probability-up-to-a-threshold" class="level3">
+<h3 class="anchored" data-anchor-id="a-cdf-accumulates-probability-up-to-a-threshold">A CDF accumulates probability up to a threshold</h3>
+<p class="concept-video">
+<strong>MIT explanation (review):</strong> <a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/cumulative-distribution-functions/">08.7 Cumulative Distribution Functions</a>.
+</p>
+<p>The PMF asks about one exact value. The <strong>cumulative distribution function (CDF)</strong> asks how much probability has accumulated at or below a chosen threshold. Imagine moving from left to right across the PMF and keeping a running total.</p>
+<p>For any random variable <span class="math inline">\(X\)</span>,</p>
+<p><span class="math display">\[F_X(a)=P(X\le a).\]</span></p>
+<p>Here <span class="math inline">\(a\)</span> is a threshold, not necessarily a value in the support. For a discrete random variable,</p>
+<p><span class="math display">\[F_X(a)=\sum_{x\le a}p_X(x).\]</span></p>
+<div id="exm-b03-cdf-hand" class="theorem example">
+<p><span class="theorem-title"><strong>Example 3.2 (Worked example: F(3) for season, by hand)</strong></span> “<span class="math inline">\(S\le 3\)</span>” collects the first three seasons, so add the first three probability masses of the PMF. The season counts are 64, 36, and 60:</p>
+<p><span class="math display">\[
+F_S(3)=p_S(1)+p_S(2)+p_S(3)
+=\frac{64}{1441}+\frac{36}{1441}+\frac{60}{1441}
+=\frac{160}{1441}\approx0.111.
+\]</span></p>
+<p>About 11% of the probability sits at or below season 3.</p>
+</div>
+<p>The full running total in R — each CDF value is the current PMF value plus all earlier PMF values:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>s_values <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">names</span>(season_pmf))</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>p_values <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(season_pmf)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>season_distribution <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">season =</span> s_values,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">pmf =</span> <span class="fu">round</span>(p_values, <span class="dv">4</span>),</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">cdf =</span> <span class="fu">round</span>(<span class="fu">cumsum</span>(p_values), <span class="dv">4</span>)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>season_distribution</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   season    pmf    cdf
+1       1 0.0444 0.0444
+2       2 0.0250 0.0694
+3       3 0.0416 0.1110
+4       4 0.0715 0.1825
+5       5 0.0805 0.2630
+6       6 0.0805 0.3435
+7       7 0.0805 0.4240
+8       8 0.0666 0.4906
+9       9 0.0666 0.5573
+10     10 0.0638 0.6211
+11     11 0.0666 0.6877
+12     12 0.0694 0.7571
+13     13 0.0666 0.8237
+14     14 0.0604 0.8841
+15     15 0.0604 0.9445
+16     16 0.0555 1.0000</code></pre>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>See the R code for this figure</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>season_pmf <span class="ot">&lt;-</span> <span class="fu">prop.table</span>(<span class="fu">table</span>(sharks<span class="sc">$</span>season))</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>cdf_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">threshold =</span> <span class="fu">as.numeric</span>(<span class="fu">names</span>(season_pmf)),</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">cdf =</span> <span class="fu">cumsum</span>(<span class="fu">as.numeric</span>(season_pmf))</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(cdf_df, <span class="fu">aes</span>(<span class="at">x =</span> threshold, <span class="at">y =</span> cdf)) <span class="sc">+</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_step</span>(<span class="at">linewidth =</span> <span class="fl">0.9</span>, <span class="at">colour =</span> <span class="st">"#009E73"</span>) <span class="sc">+</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="fl">1.9</span>, <span class="at">colour =</span> <span class="st">"#17324D"</span>) <span class="sc">+</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">16</span>) <span class="sc">+</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Threshold a"</span>, <span class="at">y =</span> <span class="fu">expression</span>(F[S](a))) <span class="sc">+</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#5B6976"</span>),</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>)</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-b03-season-cdf" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-b03-season-cdf-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="b03-discrete-distributions_files/figure-html/fig-b03-season-cdf-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-b03-season-cdf-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.2: The CDF of season: a step graph that never falls, jumping at each possible value by that value’s probability mass.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>A CDF accumulates probability as the threshold moves from left to right. It can stay flat or rise, but it cannot fall. It begins near 0 before any possible values and reaches 1 after all possible values have been included.</p>
+<p>For a discrete variable, the CDF is a step graph. It stays flat between possible values and jumps at each value that has positive probability. A larger jump means that more probability is attached to that value.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check: read F(8) off the step graph
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><span class="math inline">\(F_S(8)=P(S\le 8)\)</span> is the height of the step graph at threshold 8: the first eight seasons contain <span class="math inline">\(64+36+60+103+116+116+116+96=707\)</span> records, so <span class="math inline">\(F_S(8)=707/1441\approx0.491\)</span>. Just under half of the probability lies in Seasons 1–8 — consistent with Lecture 2, where the early-period event <span class="math inline">\(L^c\)</span> had probability <span class="math inline">\(707/1441\)</span>.</p>
+</div>
+</div>
+</div>
+<p>For the deal indicator:</p>
+<p><span class="math display">\[
+F_X(a)=
+\begin{cases}
+0, &amp; a&lt;0,\\
+1-p, &amp; 0\le a&lt;1,\\
+1, &amp; a\ge1,
+\end{cases}
+\]</span></p>
+<p>where <span class="math inline">\(p=P(X=1)\)</span>. Thus <span class="math inline">\(p_X(1)=P(X=1)=p\)</span>, while <span class="math inline">\(F_X(1)=P(X\le1)=1\)</span>. The PMF measures mass at exactly 1; the CDF includes all mass through 1.</p>
+</section>
+<section id="expectation-is-the-distributions-weighted-centre" class="level3">
+<h3 class="anchored" data-anchor-id="expectation-is-the-distributions-weighted-centre">Expectation is the distribution’s weighted centre</h3>
+<p class="concept-video">
+<strong>MIT explanation (review):</strong> <a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/expectation/">05.8 Expectation</a>.
+</p>
+<p>A distribution can contain many possible values and probabilities. <strong>Expectation</strong> summarises its centre in one number. Values with larger probabilities receive more weight:</p>
+<p><span class="math display">\[E[X]=\sum_{x\in\mathcal X}x\,p_X(x).\]</span></p>
+<p>This definition applies when the probability-weighted sum is well defined and finite. The notation <span class="math inline">\(E[X]\)</span> is read “the expected value of <span class="math inline">\(X\)</span>.” The calculation multiplies each possible value by its probability and adds the contributions. It can also be viewed as the balance point of the probability distribution.</p>
+<p>Before touching the Shark Tank data, run the calculation once on a distribution small enough to hold in your head.</p>
+<div id="exm-b03-tiny-expectation" class="theorem example">
+<p><span class="theorem-title"><strong>Example 3.3 (Worked example: expectation of a tiny PMF)</strong></span> Let <span class="math inline">\(Y\)</span> have support <span class="math inline">\(\{0,1,2\}\)</span> with masses</p>
+<p><span class="math display">\[p_Y(0)=0.2,\qquad p_Y(1)=0.5,\qquad p_Y(2)=0.3.\]</span></p>
+<p>(Valid: all non-negative, and <span class="math inline">\(0.2+0.5+0.3=1\)</span>.) Write every product:</p>
+<p><span class="math display">\[
+E[Y]
+=0\times0.2 \;+\; 1\times0.5 \;+\; 2\times0.3
+=0 + 0.5 + 0.6
+=1.1.
+\]</span></p>
+<p>Each possible value contributes its value times its probability; the sum, 1.1, is the balance point. Note that 1.1 is not in the support — <span class="math inline">\(Y\)</span> never equals 1.1.</p>
+</div>
+<p>Now the same recipe on the Shark Tank distributions. For the deal indicator,</p>
+<p><span class="math display">\[E[X]=0\times(1-p)+1\times p=p.\]</span></p>
+<p>This identity explains why the mean of a 0/1 variable equals its proportion of 1s: here <span class="math inline">\(E[X]=882/1441\approx0.612\)</span>.</p>
+<p>For season, sixteen products instead of two:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>s <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">names</span>(season_pmf))</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>p_s <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(season_pmf)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">E_X =</span> <span class="dv">0</span> <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> p_hat) <span class="sc">+</span> <span class="dv">1</span> <span class="sc">*</span> p_hat,</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">E_S_from_pmf =</span> <span class="fu">sum</span>(s <span class="sc">*</span> p_s),</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">observed_mean_season =</span> <span class="fu">mean</span>(sharks<span class="sc">$</span>season)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                 E_X         E_S_from_pmf observed_mean_season 
+           0.6120749            8.7959750            8.7959750 </code></pre>
+</div>
+</div>
+<p>The expected season is about <strong>8.8</strong> — and there is no Season 8.8. This resolves the prediction from your prep: an expectation is a probability-weighted average, so it need not be a possible value of the random variable.</p>
+<p>Under independent repetitions of the same distribution, provided <span class="math inline">\(E[|X|]&lt;\infty\)</span>, the sample average tends to become close to <span class="math inline">\(E[X]\)</span> as the number of observations grows. This long-run interpretation does not make the expected value a guarantee for a single observation.</p>
+</section>
+<section id="expectation-after-transforming-a-variable" class="level3">
+<h3 class="anchored" data-anchor-id="expectation-after-transforming-a-variable">Expectation after transforming a variable</h3>
+<p>If <span class="math inline">\(g\)</span> transforms each possible value of <span class="math inline">\(X\)</span>, the expected transformed value is</p>
+<p><span class="math display">\[E[g(X)]=\sum_{x\in\mathcal X}g(x)\,p_X(x).\]</span></p>
+<p>The probabilities do not change: apply <span class="math inline">\(g\)</span> to each possible value, weight the transformed values by the original PMF, and add.</p>
+<div class="callout callout-style-default callout-caution callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Try it: E[Y²] for the tiny PMF
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>In class this is the pair task before the break. Same distribution as the worked example: <span class="math inline">\(Y\in\{0,1,2\}\)</span> with masses <span class="math inline">\(0.2,0.5,0.3\)</span>, and <span class="math inline">\(g(y)=y^2\)</span>.</p>
+<p><em>Step 1 (given).</em> Square each possible value: <span class="math inline">\(0^2=0\)</span>, <span class="math inline">\(1^2=1\)</span>, <span class="math inline">\(2^2=4\)</span>.</p>
+<p><em>Step 2 (you).</em> Weight each squared value by its <strong>original</strong> probability and write the three products.</p>
+<p><em>Step 3 (you).</em> Add them to obtain <span class="math inline">\(E[Y^2]\)</span>. Is it equal to <span class="math inline">\(\left(E[Y]\right)^2=1.1^2\)</span>?</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check your answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><span class="math display">\[
+E[Y^2]=0\times0.2+1\times0.5+4\times0.3=0+0.5+1.2=1.7.
+\]</span></p>
+<p>It is <strong>not</strong> <span class="math inline">\(\left(E[Y]\right)^2=1.21\)</span>: squaring then averaging differs from averaging then squaring. The gap between the two, <span class="math inline">\(1.7-1.21=0.49\)</span>, is about to get a name.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>The same rule for season in R:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">E_S =</span> <span class="fu">sum</span>(s <span class="sc">*</span> p_s),</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">E_S_squared =</span> <span class="fu">sum</span>(s<span class="sc">^</span><span class="dv">2</span> <span class="sc">*</span> p_s)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>        E_S E_S_squared 
+   8.795975   95.505205 </code></pre>
+</div>
+</div>
+</section>
+<section id="variance-and-standard-deviation" class="level3">
+<h3 class="anchored" data-anchor-id="variance-and-standard-deviation">Variance and standard deviation</h3>
+<p class="concept-video">
+<strong>MIT explanation (review):</strong> <a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/variance/">06.2 Variance</a>.
+</p>
+<p>Expectation locates the centre of a distribution, but it does not describe how tightly values cluster around that centre. Two distributions can have the same expectation and very different spreads — this is the Mentimeter question posed before the break: both distributions in <a href="#fig-b03-same-mean-spread" class="quarto-xref">Figure&nbsp;<span>3.3</span></a> have expectation 1, so which is riskier, and why?</p>
+<div class="cell">
+<details class="code-fold">
+<summary>See the R code for this figure</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>spread_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="fu">rep</span>(<span class="dv">0</span><span class="sc">:</span><span class="dv">2</span>, <span class="at">times =</span> <span class="dv">2</span>),</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">probability =</span> <span class="fu">c</span>(<span class="fl">0.10</span>, <span class="fl">0.80</span>, <span class="fl">0.10</span>,    <span class="co"># Distribution A</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>                  <span class="fl">0.45</span>, <span class="fl">0.10</span>, <span class="fl">0.45</span>),   <span class="co"># Distribution B</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">distribution =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"Distribution A (variance = 0.20)"</span>,</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Distribution B (variance = 0.90)"</span>), <span class="at">each =</span> <span class="dv">3</span>)</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(spread_df, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> probability)) <span class="sc">+</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">1</span>, <span class="at">colour =</span> <span class="st">"#C98B2E"</span>,</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>             <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="fu">aes</span>(<span class="at">xend =</span> x, <span class="at">yend =</span> <span class="dv">0</span>),</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>               <span class="at">linewidth =</span> <span class="fl">1.1</span>, <span class="at">colour =</span> <span class="st">"#009E73"</span>) <span class="sc">+</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="fl">2.6</span>, <span class="at">colour =</span> <span class="st">"#009E73"</span>) <span class="sc">+</span></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="fl">1.1</span>, <span class="at">y =</span> <span class="fl">0.87</span>, <span class="at">label =</span> <span class="st">"mean = 1"</span>,</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>           <span class="at">hjust =</span> <span class="dv">0</span>, <span class="at">colour =</span> <span class="st">"#17324D"</span>, <span class="at">size =</span> <span class="fl">3.4</span>) <span class="sc">+</span></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> distribution) <span class="sc">+</span></span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.9</span>),</span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>                     <span class="at">expand =</span> <span class="fu">expansion</span>(<span class="at">mult =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.05</span>))) <span class="sc">+</span></span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Possible value of X"</span>, <span class="at">y =</span> <span class="st">"Probability"</span>) <span class="sc">+</span></span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#5B6976"</span>),</span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>),</span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">strip.text =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>, <span class="at">face =</span> <span class="st">"bold"</span>)</span>
+<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-b03-same-mean-spread" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-b03-same-mean-spread-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="b03-discrete-distributions_files/figure-html/fig-b03-same-mean-spread-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-b03-same-mean-spread-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.3: Two distributions with the same expectation and very different spreads. The dashed line marks the common mean, 1.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The horizontal axis lists the possible values and the vertical axis gives their probabilities. The centre is the same, but Distribution B has greater spread because values 0 and 2 receive much more probability. If these were payoffs, most students call B riskier — variance is the number that backs that intuition.</p>
+<p>To measure spread, start with the deviation <span class="math inline">\(X-\mu\)</span>, where <span class="math inline">\(\mu=E[X]\)</span>. Positive and negative deviations would cancel if they were averaged directly, so variance squares each deviation before taking its probability-weighted average:</p>
+<p><span class="math display">\[
+\operatorname{Var}(X)
+=E[(X-\mu)^2]
+=\sum_x (x-\mu)^2\,p_X(x).
+\]</span></p>
+<p>Read the calculation as four steps:</p>
+<ol type="1">
+<li>locate the centre, <span class="math inline">\(\mu=E[X]\)</span>;</li>
+<li>measure each possible deviation, <span class="math inline">\(x-\mu\)</span>;</li>
+<li>square the deviation, <span class="math inline">\((x-\mu)^2\)</span>;</li>
+<li>weight it by <span class="math inline">\(p_X(x)\)</span> and add across the support.</li>
+</ol>
+<p>Large deviations therefore contribute more than small deviations. Variance is zero only when all probability is concentrated at one value.</p>
+<p>The equivalent <strong>computational form</strong> is</p>
+<p><span class="math display">\[\operatorname{Var}(X)=E[X^2]-\left(E[X]\right)^2.\]</span></p>
+<p>It gives the same result, but the definition <span class="math inline">\(E[(X-\mu)^2]\)</span> is usually easier to interpret.</p>
+<p>The <strong>standard deviation</strong> is</p>
+<p><span class="math display">\[\operatorname{SD}(X)=\sqrt{\operatorname{Var}(X)}.\]</span></p>
+<p>Variance has squared units; standard deviation returns to the units of <span class="math inline">\(X\)</span>. If <span class="math inline">\(X\)</span> is measured in seasons, <span class="math inline">\(\operatorname{Var}(X)\)</span> is in seasons squared — a unit nobody can picture — while <span class="math inline">\(\operatorname{SD}(X)\)</span> is back in seasons.</p>
+<div id="exm-b03-tiny-variance" class="theorem example">
+<p><span class="theorem-title"><strong>Example 3.4 (Worked example: variance of the tiny PMF, both ways)</strong></span> Same <span class="math inline">\(Y\)</span> as before: values <span class="math inline">\(0,1,2\)</span> with masses <span class="math inline">\(0.2,0.5,0.3\)</span>, and <span class="math inline">\(\mu=E[Y]=1.1\)</span>.</p>
+<p><strong>By the definition</strong> — the four steps:</p>
+<p><span class="math display">\[
+\operatorname{Var}(Y)
+=(0-1.1)^2(0.2)+(1-1.1)^2(0.5)+(2-1.1)^2(0.3)
+\]</span> <span class="math display">\[
+=1.21\times0.2+0.01\times0.5+0.81\times0.3
+=0.242+0.005+0.243
+=0.49.
+\]</span></p>
+<p><strong>By the computational form</strong> — using <span class="math inline">\(E[Y^2]=1.7\)</span> from the faded task:</p>
+<p><span class="math display">\[
+\operatorname{Var}(Y)=E[Y^2]-\left(E[Y]\right)^2=1.7-1.21=0.49.
+\]</span></p>
+<p>Both routes give 0.49, so <span class="math inline">\(\operatorname{SD}(Y)=\sqrt{0.49}=0.7\)</span> — in the same units as <span class="math inline">\(Y\)</span>.</p>
+</div>
+<p>For a Bernoulli variable (the deal indicator), the computational form gives a formula worth memorising. Since <span class="math inline">\(X^2=X\)</span> when <span class="math inline">\(X\)</span> is 0 or 1, <span class="math inline">\(E[X^2]=E[X]=p\)</span>, so</p>
+<p><span class="math display">\[
+\operatorname{Var}(X)=p-p^2=p(1-p).
+\]</span></p>
+<p>With <span class="math inline">\(p=882/1441\approx0.612\)</span>, the variance is <span class="math inline">\(0.612\times0.388\approx0.237\)</span> and the standard deviation is about 0.49.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>mu_s <span class="ot">&lt;-</span> <span class="fu">sum</span>(s <span class="sc">*</span> p_s)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>var_s <span class="ot">&lt;-</span> <span class="fu">sum</span>((s <span class="sc">-</span> mu_s)<span class="sc">^</span><span class="dv">2</span> <span class="sc">*</span> p_s)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">Var_X =</span> p_hat <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> p_hat),</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">SD_X =</span> <span class="fu">sqrt</span>(p_hat <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> p_hat)),</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">Var_S =</span> var_s,</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">SD_S =</span> <span class="fu">sqrt</span>(var_s)</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     Var_X       SD_X      Var_S       SD_S 
+ 0.2374392  0.4872773 18.1360282  4.2586416 </code></pre>
+</div>
+</div>
+<p>Season has variance of about 18.1 seasons squared and standard deviation of about <strong>4.3 seasons</strong>: the typical distance between a randomly selected pitch’s season and the expected season 8.8 is roughly four seasons.</p>
+</section>
+<section id="model-expectation-and-the-sample-mean" class="level3">
+<h3 class="anchored" data-anchor-id="model-expectation-and-the-sample-mean">Model expectation and the sample mean</h3>
+<p>For observed values <span class="math inline">\(x_1,\ldots,x_n\)</span>, the sample mean is</p>
+<p><span class="math display">\[\bar{x}=\frac{1}{n}\sum_{i=1}^n x_i.\]</span></p>
+<p>If the empirical distribution assigns probability <span class="math inline">\(1/n\)</span> to every observed row, its expectation is</p>
+<p><span class="math display">\[\sum_{i=1}^n x_i\,\frac{1}{n}=\bar{x}.\]</span></p>
+<p>The numerical answers agree, but the terms identify different objects. Expectation describes a probability distribution; the sample mean summarises observed data.</p>
+<p>The same split exists for spread. The <strong>empirical-distribution variance</strong> weights each of the <span class="math inline">\(n\)</span> observations by <span class="math inline">\(1/n\)</span> — it divides by <span class="math inline">\(n\)</span>. The usual <strong>sample variance</strong> instead divides by <span class="math inline">\(n-1\)</span>:</p>
+<p><span class="math display">\[s^2=\frac{1}{n-1}\sum_{i=1}^n\left(x_i-\bar{x}\right)^2.\]</span></p>
+<p>R’s <code>var()</code> and <code>sd()</code> use the <span class="math inline">\(n-1\)</span> denominator. Why <span class="math inline">\(n-1\)</span> is the right choice when estimating a population variance is a Lecture 7 question; for now, only recognise which convention a number uses. Live in R, on the description word counts:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>w <span class="ot">&lt;-</span> sharks<span class="sc">$</span>description_words</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">mean_words =</span> <span class="fu">mean</span>(w),</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">empirical_expectation =</span> <span class="fu">sum</span>(w <span class="sc">*</span> <span class="fu">rep</span>(<span class="dv">1</span> <span class="sc">/</span> <span class="fu">length</span>(w), <span class="fu">length</span>(w))),</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">empirical_variance_divide_n =</span> <span class="fu">mean</span>((w <span class="sc">-</span> <span class="fu">mean</span>(w))<span class="sc">^</span><span class="dv">2</span>),</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">sample_variance_divide_n_minus_1 =</span> <span class="fu">var</span>(w),</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">sample_sd =</span> <span class="fu">sd</span>(w)</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                      mean_words            empirical_expectation 
+                        4.995142                         4.995142 
+     empirical_variance_divide_n sample_variance_divide_n_minus_1 
+                        3.646749                         3.649282 
+                       sample_sd 
+                        1.910309 </code></pre>
+</div>
+</div>
+<p>Both centre calculations give about 5.0 words for these 1,441 records, and the two variance conventions differ only in the third decimal because <span class="math inline">\(n\)</span> is large. These are different summaries of the same observations; calling any of them an estimate for a wider population additionally requires a sampling model.</p>
+<div class="caveat-box">
+<p><span class="label">What an expected value can and cannot promise</span></p>
+<ul>
+<li><strong>Expectation is not a guarantee.</strong> <span class="math inline">\(E[X]=0.612\)</span> does not mean any single pitch gets “0.612 of a deal,” and an expected season of 8.8 belongs to no actual season. Expectation describes the distribution’s balance point; single realisations can sit far from it — how far, on typical, is exactly what the standard deviation measures.</li>
+<li><strong>File values are not forecasts.</strong> Every number in this lecture is computed under the model “select one of the 1,441 recorded pitches uniformly at random.” Treating 0.612, 8.8, or 4.3 as statements about future pitches or new entrepreneurs requires the population, selection, stability, and outcome-definition assumptions from Lecture 2 — the file cannot supply them.</li>
+</ul>
+</div>
+</section>
+<section id="answering-the-driving-question" class="level3">
+<h3 class="anchored" data-anchor-id="answering-the-driving-question">Answering the driving question</h3>
+<p>A typical recorded pitch, in two numbers per variable: it reaches an on-air deal with probability <span class="math inline">\(0.612\)</span> (a Bernoulli distribution with variance <span class="math inline">\(0.612\times0.388\approx0.24\)</span>), and it comes from around season <span class="math inline">\(E[S]\approx8.8\)</span> — with a standard deviation of about <span class="math inline">\(4.3\)</span> seasons, so “typical” spans a wide stretch of the show’s history. Centre and spread together describe the distribution; either alone misleads.</p>
+<p><strong>Next:</strong> We can now say what a typical pitch looks like and how much pitches vary around it. But those are answers about a pitch we know <em>nothing</em> about — and in practice we always know something: its season, its industry, a flag from a screening model. Lecture 4 asks how probabilities change when information arrives: conditional probability, the total-probability rule that rebuilds an overall rate from group rates, Bayes’ rule for reversing the direction of a question, and independence — the exact case in which information changes nothing.</p>
+</section>
+</section>
+<section id="after-class" class="level2 course-phase phase-after">
+<h2 class="anchored" data-anchor-id="after-class">After class</h2>
+<p><span class="time-budget">Total practice time: about 60 minutes.</span></p>
+<section id="retrieval-10-minutes" class="level3">
+<h3 class="anchored" data-anchor-id="retrieval-10-minutes">Retrieval (10 minutes)</h3>
+<ol type="1">
+<li>What information does a PMF add to the support of a random variable?</li>
+<li>What two requirements must every PMF satisfy?</li>
+<li>What is the difference between <span class="math inline">\(p_X(x)\)</span> and <span class="math inline">\(F_X(x)\)</span>?</li>
+<li>Why can an expectation be a value the random variable never takes?</li>
+<li>What does variance average, and why are deviations squared first?</li>
+<li>Why do variance and standard deviation have different units, and which one is easier to interpret?</li>
+</ol>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check your answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>The support lists possible values; the PMF assigns probability to each value.</li>
+<li>Every probability mass is non-negative, and the masses sum to 1.</li>
+<li><span class="math inline">\(p_X(x)=P(X=x)\)</span> is the mass at exactly <span class="math inline">\(x\)</span>; <span class="math inline">\(F_X(x)=P(X\le x)\)</span> is all probability accumulated through <span class="math inline">\(x\)</span>.</li>
+<li>Expectation is a probability-weighted average and need not belong to the support.</li>
+<li>Variance averages squared deviations from the distribution mean; the probability-weighted raw deviations sum to zero, so squaring stops positive and negative deviations from cancelling.</li>
+<li>Variance is in squared units of <span class="math inline">\(X\)</span>; the standard deviation is its square root and returns to the units of <span class="math inline">\(X\)</span>, which makes it the easier summary to interpret.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="from-worked-to-faded-10-minutes" class="level3">
+<h3 class="anchored" data-anchor-id="from-worked-to-faded-10-minutes">From worked to faded (10 minutes)</h3>
+<p>Re-read the two tiny-PMF worked examples (<a href="#exm-b03-tiny-expectation" class="quarto-xref">Example&nbsp;<span>3.3</span></a> and <a href="#exm-b03-tiny-variance" class="quarto-xref">Example&nbsp;<span>3.4</span></a>). Then run the full ladder on a new distribution: let <span class="math inline">\(W\)</span> have support <span class="math inline">\(\{0,1,2\}\)</span> with masses <span class="math inline">\(0.3\)</span>, <span class="math inline">\(0.4\)</span>, and <span class="math inline">\(0.3\)</span>.</p>
+<p><em>Step 1 (given).</em> Validity: all masses are non-negative and <span class="math inline">\(0.3+0.4+0.3=1\)</span>.</p>
+<p><em>Step 2 (you).</em> Calculate <span class="math inline">\(F_W(1)\)</span>.</p>
+<p><em>Step 3 (you).</em> Calculate <span class="math inline">\(E[W]\)</span>, writing each product.</p>
+<p><em>Step 4 (you).</em> Calculate <span class="math inline">\(E[W^2]\)</span>, then <span class="math inline">\(\operatorname{Var}(W)\)</span> with the computational form, then <span class="math inline">\(\operatorname{SD}(W)\)</span>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check your answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><span class="math inline">\(F_W(1)=P(W\le1)=0.3+0.4=0.7\)</span>. <span class="math inline">\(E[W]=0(0.3)+1(0.4)+2(0.3)=1.0\)</span>. <span class="math inline">\(E[W^2]=0(0.3)+1(0.4)+4(0.3)=1.6\)</span>, so <span class="math inline">\(\operatorname{Var}(W)=1.6-1.0^2=0.6\)</span> and <span class="math inline">\(\operatorname{SD}(W)=\sqrt{0.6}\approx0.77\)</span>. Note <span class="math inline">\(W\)</span> has the same expectation as a coin-like centre of 1 but a larger spread than <span class="math inline">\(Y\)</span> from class (<span class="math inline">\(0.6&gt;0.49\)</span>): more mass sits at the ends.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="practice-10-minutes" class="level3">
+<h3 class="anchored" data-anchor-id="practice-10-minutes">Practice (10 minutes)</h3>
+<p>Now unassisted, using the Shark Tank distributions built in class.</p>
+<ol type="1">
+<li>For the deal indicator with <span class="math inline">\(p=882/1441\)</span>, calculate <span class="math inline">\(F_X(0.4)\)</span>.</li>
+<li>Use the season CDF table to calculate <span class="math inline">\(P(3&lt;S\le6)\)</span>.</li>
+<li>A Bernoulli variable has <span class="math inline">\(p=0.25\)</span>. Calculate its variance and standard deviation.</li>
+<li>The standard deviation of season is about 4.3. Write one sentence interpreting this number, naming its units.</li>
+<li>Why is <span class="math inline">\(\operatorname{Var}(S)\approx18.1\)</span> harder to interpret than <span class="math inline">\(\operatorname{SD}(S)\approx4.3\)</span>?</li>
+</ol>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check your answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>Because <span class="math inline">\(0\le0.4&lt;1\)</span>, <span class="math inline">\(F_X(0.4)=P(X=0)=559/1441\approx0.388\)</span>.</li>
+<li><span class="math inline">\(P(3&lt;S\le6)=F_S(6)-F_S(3)=(495-160)/1441=335/1441\approx0.232\)</span>.</li>
+<li><span class="math inline">\(\operatorname{Var}=0.25\times0.75=0.1875\)</span>; <span class="math inline">\(\operatorname{SD}=\sqrt{0.1875}\approx0.43\)</span>.</li>
+<li>The season of a randomly selected pitch typically differs from the expected season (about 8.8) by roughly 4.3 <strong>seasons</strong>.</li>
+<li>Variance is measured in seasons squared, a unit without a direct picture; the standard deviation is back in seasons.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="spaced-review-one-item-from-lecture-2-5-minutes" class="level3">
+<h3 class="anchored" data-anchor-id="spaced-review-one-item-from-lecture-2-5-minutes">Spaced review: one item from Lecture 2 (5 minutes)</h3>
+<p>Using the Lecture 2 counts table (<span class="math inline">\(|D^c|=559\)</span>, <span class="math inline">\(|L|=734\)</span>, <span class="math inline">\(|D^c\cap L|=229\)</span>, <span class="math inline">\(n=1441\)</span>), calculate <span class="math inline">\(P(D^c\cup L)\)</span> and interpret it in one sentence.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check your answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><span class="math inline">\(P(D^c\cup L)=(559+734-229)/1441=1064/1441\approx0.738\)</span>: about 74% of the recorded pitches failed to reach an on-air deal, came from Seasons 9–16, or both. The overlap (229 late-season no-deal records) is subtracted once so no record is counted twice.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="worked-exam-interpretation-10-minutes" class="level3">
+<h3 class="anchored" data-anchor-id="worked-exam-interpretation-10-minutes">Worked exam interpretation (10 minutes)</h3>
+<p><strong>Question.</strong> R reports <code>mean(deal_on_show) = 0.612</code>. Explain this number as both a sample mean and an empirical expectation.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check a model answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Because the indicator equals 1 for an on-air agreement, its sample mean is the observed deal proportion: 61.2% of the 1,441 records. If the empirical distribution assigns mass <span class="math inline">\(1/1441\)</span> to each record, its expectation is the same weighted average, 0.612. This does not show later venture success or guarantee the probability for a future pitch.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="exam-practice-a-full-moment-set-10-minutes" class="level3">
+<h3 class="anchored" data-anchor-id="exam-practice-a-full-moment-set-10-minutes">Exam practice: a full moment set (10 minutes)</h3>
+<p><strong>Question.</strong> A venture sells one product per customer at three price points. Let <span class="math inline">\(V\)</span> be the price paid by a randomly selected customer, in euros, with PMF <span class="math inline">\(p_V(10)=0.5\)</span>, <span class="math inline">\(p_V(20)=0.3\)</span>, <span class="math inline">\(p_V(40)=0.2\)</span>. (a) Verify that this is a valid PMF. (b) Calculate <span class="math inline">\(F_V(20)\)</span>. (c) Calculate <span class="math inline">\(E[V]\)</span> and <span class="math inline">\(E[V^2]\)</span>. (d) Calculate <span class="math inline">\(\operatorname{Var}(V)\)</span> and <span class="math inline">\(\operatorname{SD}(V)\)</span>, stating the units of each.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check a model answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>All masses are non-negative and <span class="math inline">\(0.5+0.3+0.2=1\)</span>.</li>
+<li><span class="math inline">\(F_V(20)=P(V\le20)=0.5+0.3=0.8\)</span>.</li>
+<li><span class="math inline">\(E[V]=10(0.5)+20(0.3)+40(0.2)=5+6+8=19\)</span> euros; <span class="math inline">\(E[V^2]=100(0.5)+400(0.3)+1600(0.2)=50+120+320=490\)</span>.</li>
+<li><span class="math inline">\(\operatorname{Var}(V)=490-19^2=490-361=129\)</span> euros squared; <span class="math inline">\(\operatorname{SD}(V)=\sqrt{129}\approx11.4\)</span> euros. The expected revenue per customer is 19 euros, with a typical deviation of about 11 euros.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="make-it-yours-5-minutes" class="level3">
+<h3 class="anchored" data-anchor-id="make-it-yours-5-minutes">Make it yours (5 minutes)</h3>
+<div class="utility-prompt">
+<p><span class="label">Utility: two sentences</span></p>
+<p>Think of your EiA venture — or any business you know well. Pick one uncertain quantity with a handful of possible values (units sold next week, price a customer picks, orders per day) and write two sentences: first sketch its rough PMF and expected value, then say whether the centre or the spread matters more for a real decision you would take, and why. There is no wrong answer; the point is connecting today’s tools to something you care about.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+See an example, then write your own
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Take a student-run campus meal-prep box venture. “Daily orders next week are roughly 20 with probability 0.2, 30 with probability 0.5, and 40 with probability 0.3, so the expected value is about 31. The spread matters more than the centre for me, because I prep ingredients in advance — a 40-order day with 20-order stock hurts more than an average day helps.”</p>
+</div>
+</div>
+</div>
+<p>You can discuss this task — and any other task in this chapter — with <strong>Tilly</strong>, the course AI assistant on Canvas: ask it to check whether your sketched PMF is valid and to compute its standard deviation with you.</p>
+</div>
+<p>Continue to Lecture 4: Conditioning, total probability, Bayes, and independence.</p>
+<p>Formula sheet: Lecture 3 formulas.</p>
+<p>For a more formal explanation, consult <a href="https://tilburguniversity.on.worldcat.org/oclc/317545871">Nieuwenhuis, <em>Statistical Methods for Business and Economics</em></a>, Chapter 8.</p>
+</section>
+</section>
+
+
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/valentinamel\.github\.io\/textbook-qm-ebi\/");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../basic/b02-probability-foundations.html" class="pagination-link" aria-label="Lecture 2: Probability foundations and random variables">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">Lecture 2: Probability foundations and random variables</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../basic/t01-exam-prep.html" class="pagination-link" aria-label="Tutorial 1: Evidence and probability foundations">
+        <span class="nav-page-text"><span class="chapter-title">Tutorial 1: Evidence and probability foundations</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

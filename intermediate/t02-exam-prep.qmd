@@ -1,0 +1,290 @@
+# Tutorial 2: Multiple regression and extensions {#i-ep02}
+
+```{r}
+#| label: iep02-setup
+#| include: false
+# Chunk options only. Every object used in this chapter is constructed in
+# visible code on this page, so that copying the code always works.
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
+                      fig.width = 7, fig.height = 4.2)
+```
+
+::: {.outcomes}
+<span class="label">By the end of Tutorial 2, you can</span>
+
+- fit and interpret multiple regression in R;
+- test individual and grouped coefficients against zero;
+- interpret dummy, interaction, and polynomial terms correctly;
+- compare nested models with a partial F-test;
+- write a complete TestVision-ready analysis with design limits.
+:::
+
+Tutorials are **exam preparation sessions**: every task below follows the
+format of the final exam. The standing routine for each task is the same ---
+the TA states the task, pairs work on it first for a few minutes with AI use
+allowed, and the solution is then discussed in plenary, starting from the
+pair attempts.
+
+One note on the order. The tasks run in course order: Task 1 rests on
+Lecture 4, Task 2 on Lecture 5, and Tasks 3--4 on yesterday's Lecture 6.
+This is deliberate --- the tutorial meets the day after Lecture 6, so you
+warm up on settled material before testing what you learned yesterday.
+
+::: {.course-phase .phase-before}
+
+## Before class
+
+Complete the after-class practice from Lectures 4--6. Use the complete
+[QM Intermediate Code Sheet](#intermediate-code-sheet) while working, and
+review
+[Mathematics Refresher: multivariable equations, indicators, products, and powers](../resources/math-refresher.html)
+if needed.
+
+Complete from memory:
+
+1. A multiple-regression slope is interpreted while ...
+2. A dummy coefficient compares ...
+3. An interaction coefficient is a difference in ...
+4. A partial F-test compares ...
+
+::: {.callout-note collapse="true"}
+## Check your preparation
+
+1. Holding the other included predictors fixed.
+2. A category with the named reference category.
+3. Slopes.
+4. A reduced nested model with a complete model on the same observations.
+:::
+
+:::
+
+::: {.course-phase .phase-in-class}
+
+## In class
+
+Attempt each task in R before opening the answer. All tasks use the Shark
+Tank teaching file and the running money unit of **thousands of dollars**.
+Build the analysis data once --- the same constructions as Lectures 4--6:
+
+```{r}
+#| label: iep02-load
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+sharks$ask_1k <- sharks$ask_amount_usd / 1000
+known_gender <- subset(sharks, pitcher_gender_group != "unknown")
+known_gender$gender <- relevel(factor(known_gender$pitcher_gender_group),
+                               ref = "all_men")
+known_gender$ask_1k <- known_gender$ask_amount_usd / 1000
+known_gender$women <- as.integer(
+  known_gender$pitcher_gender_group %in% c("all_women", "mixed")
+)
+known_gender$season_c <- known_gender$season - mean(known_gender$season)
+```
+
+### Task 1 --- Multiple-regression coefficients (Lecture 4)
+
+Fit:
+
+```{r}
+#| label: iep02-base-model
+m1 <- lm(
+  equity_offered_pct ~ season + ask_1k + description_words,
+  data = sharks
+)
+summary(m1)
+```
+
+1. Interpret all three slopes with units and conditioning.
+2. Identify which 95% coefficient interval includes zero.
+3. Interpret adjusted $R^2$ and the overall F-test.
+4. State two threats to causal interpretation.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+At fixed values of the other included predictors, among the 1,441 recorded
+pitches: one later season is associated with about 0.836 percentage points
+less initial equity; an extra \$1,000 requested with about 0.0029
+percentage points less equity (about 0.29 points per \$100,000); and one
+additional description word with about 0.128 percentage points less equity.
+The description-word interval, about $(-0.351,\; 0.095)$, includes zero.
+Adjusted $R^2\approx0.186$, and the overall F-test
+($F\approx110.6$ on 3 and 1437 df) rejects the joint zero-slope null.
+Selection into the show, unmeasured venture quality, reverse relationships,
+and measurement choices are all possible causal threats.
+:::
+
+### Task 2 --- Dummy variables and a partial F-test (Lecture 5)
+
+```{r}
+#| label: iep02-gender-models
+reduced <- lm(equity_offered_pct ~ season + ask_1k,
+              data = known_gender)
+complete <- lm(equity_offered_pct ~ season + ask_1k + gender,
+               data = known_gender)
+summary(complete)
+anova(reduced, complete)
+```
+
+1. Name the reference category.
+2. Interpret both dummy coefficients.
+3. State and decide the partial F-test.
+4. Explain why the partial test and the individual t-tests answer different
+   questions.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+The reference is all-men. At the same season and requested amount,
+all-women presenting teams are fitted to offer about 1.28 equity percentage
+points more, and mixed teams about 0.12 points more, than all-men teams ---
+percentage points, not percent. The partial null is that both dummy
+coefficients equal zero; $F\approx3.76$, p $\approx$ 0.023, so reject at
+5%: the terms are jointly useful even though the mixed dummy's own t-test
+(p $\approx$ 0.82) is far from significant. The F-test asks whether the
+pair improves the model together; each t-test asks about one
+reference-group contrast. The broad source coding and observational design
+prohibit a causal gender claim.
+:::
+
+### Task 3 --- Interaction (Lecture 6)
+
+```{r}
+#| label: iep02-interaction
+m_interaction <- lm(
+  equity_offered_pct ~ season_c * women + ask_1k,
+  data = known_gender
+)
+summary(m_interaction)
+```
+
+1. Write the fitted line for `women = 0` and `women = 1` at a fixed
+   request.
+2. Calculate both season slopes.
+3. Interpret the interaction estimate and p-value without overclaiming in
+   either direction.
+4. Explain the role of centering.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+For all-men teams the season slope is about $-0.799$ percentage points per
+season; for teams with women represented it is
+$-0.799-0.061=-0.861$. The estimated slope difference is $-0.061$
+percentage points per season with p $\approx$ 0.520: this model provides no
+evidence of different season trends between the two source-defined groups
+--- and no proof of equal trends, since the estimate is imprecise.
+Centering makes the lower-order group coefficient compare the groups at the
+average season (about 8.8) instead of at the unobserved Season 0; it
+changes neither the fitted values nor the interaction estimate.
+:::
+
+### Task 4 --- Polynomial term (Lecture 6)
+
+```{r}
+#| label: iep02-polynomial
+m_linear <- lm(equity_offered_pct ~ season + ask_1k, data = sharks)
+m_quadratic <- lm(
+  equity_offered_pct ~ season + I(season^2) + ask_1k,
+  data = sharks
+)
+summary(m_quadratic)
+anova(m_linear, m_quadratic)
+```
+
+1. Why must `I(season^2)` be used in the R formula?
+2. Decide whether the quadratic term adds fit under the classical test.
+3. Calculate the fitted change from Season 10 to Season 11.
+4. State why the curve should not be extrapolated beyond Season 16.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+`I()` tells R to square arithmetically rather than read `^` as formula
+syntax. The partial F-test gives $F\approx20.1$ with p $<$ 0.001, so the
+quadratic term adds detectable fit. With $b_1\approx-1.713$ and
+$b_2\approx0.051$, the change from Season 10 to 11 is
+$b_1+b_2(2\times10+1)=b_1+21b_2\approx-0.64$ percentage points --- never
+read $b_1$ alone while the squared term is in the model. Beyond Season 16
+the fitted parabola turns upward with no data support; polynomials can
+behave sharply outside the observed range.
+:::
+
+:::
+
+::: {.course-phase .phase-after}
+
+## After class
+
+### Timed integrated task --- 30 minutes
+
+Develop one model of `equity_offered_pct` using season, the requested
+amount in $1,000s, the three known source gender groups, and one justified
+extension.
+
+Your submission must include:
+
+1. a precise research question;
+2. reproducible data preparation;
+3. one pre-model visual;
+4. the R formula and model summary;
+5. coefficient interpretations with units and reference groups;
+6. an individual t-test and an overall or partial F-test;
+7. $R^2$, adjusted $R^2$, and residual diagnostics;
+8. one graph of fitted conditional predictions;
+9. a 150-word conclusion separating association, uncertainty, and causal
+   limits.
+
+::: {.callout-note collapse="true"}
+## Check a model structure
+
+A defensible solution could fit
+
+```r
+m <- lm(
+  equity_offered_pct ~ season * gender + ask_1k,
+  data = known_gender
+)
+```
+
+or a quadratic-season model with group dummies. Keep lower-order terms,
+name the reference group, interpret combined slopes or fitted contrasts,
+compare a nested reduced model with `anova(reduced, complete)`, inspect
+residuals (including `rstandard()` and Cook's distance), and plot
+predictions within Seasons 1--16. The conclusion must state that the
+source's broad presenter classification and the selected televised records
+do not identify a causal effect of gender or season.
+:::
+
+### Make it yours (5 minutes)
+
+:::: {.utility-prompt}
+<span class="label">Utility: two sentences</span>
+
+Think of your EiA3 venture --- or any business you know well. Sketch, in
+two sentences, the integrated analysis you would actually run on its data:
+first name the outcome, two predictors, and the one extension (a dummy set,
+an interaction, or a quadratic) that a real question motivates, then say
+which single caveat --- selection, measurement, or omitted variables ---
+would headline your 150-word conclusion. There is no wrong answer; the
+point is noticing that you now own the entire pipeline.
+
+::: {.callout-note collapse="true"}
+## See an example, then write your own
+
+Take a student-run campus meal-prep box venture. "Outcome: weekly orders; predictors: ad spend and price, plus an exam-week dummy interacted with ad spend, because I believe ads work mainly when students are on campus. The headlining caveat is omitted variables: weather drives both my flyer effort and campus foot traffic, and nothing in my data measures it."
+:::
+
+You can discuss this task --- and any other task in this tutorial --- with
+**Tilly**, the course AI assistant on Canvas: ask it to referee your
+two-sentence design before you invest a weekend in the data.
+::::
+
+QM Intermediate is complete. Review the
+[QM Intermediate Code Sheet](#intermediate-code-sheet), attempt the
+[QM Intermediate Mock Exam](#intermediate-mock-exam), then return to the
+[R Refresher](../resources/r-refresher.html),
+[Mathematics Refresher](../resources/math-refresher.html), or the
+[External Video Guide](../resources/video-guide.html) whenever you need a
+targeted review.
+
+:::

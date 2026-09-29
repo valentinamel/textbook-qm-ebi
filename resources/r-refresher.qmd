@@ -1,0 +1,135 @@
+# R Refresher {#r-refresher}
+
+These resources remain available throughout all three courses.
+
+You first learned R in
+[Programming for E&BI](https://walshc.github.io/ebi-prog/). This page is a
+routing map: open the topic you need, try the reminder, and return to the
+current quantitative-methods task.
+
+## If R or RStudio is not ready
+
+- [Getting Started](https://walshc.github.io/ebi-prog/getting-started.html):
+  installation and the RStudio interface.
+- [R as a Calculator](https://walshc.github.io/ebi-prog/r-as-a-calculator.html):
+  arithmetic, precedence, and functions.
+
+## If you cannot reproduce your work
+
+- [R Scripts](https://walshc.github.io/ebi-prog/r-scripts.html): create, save,
+  run, and correct a script.
+- In this course, keep one project folder with `data/`, `scripts/`, and
+  `outputs/`. Do not depend on a working directory that exists only on your
+  laptop.
+
+## If the data will not load
+
+- [Loading a CSV Dataset](https://walshc.github.io/ebi-prog/reading-csv-datasets.html)
+- [R Packages](https://walshc.github.io/ebi-prog/packages.html)
+- [Dataframes: Indexing](https://walshc.github.io/ebi-prog/dataframes-indexing.html)
+
+Minimal diagnostic:
+
+```r
+getwd()
+file.exists("data/shark_tank_teaching.csv")
+sharks <- read.csv("data/shark_tank_teaching.csv")
+dim(sharks)
+names(sharks)
+```
+
+## If you forgot summaries or plots
+
+- [Dataframes: Summary Statistics](https://walshc.github.io/ebi-prog/dataframes-summary-statistics.html)
+- [Introduction to Plotting](https://walshc.github.io/ebi-prog/intro-to-plotting.html)
+- [Data Visualization with ggplot](https://walshc.github.io/ebi-prog/plotting-with-ggplot.html)
+- [Aggregating by Group](https://walshc.github.io/ebi-prog/aggregating.html)
+
+## If regression commands are unfamiliar
+
+Use the same object-first workflow throughout Intermediate:
+
+```r
+model <- lm(y ~ x1 + x2, data = my_data)
+summary(model)
+confint(model)
+fitted(model)
+residuals(model)
+plot(model)
+```
+
+- `lm()` fits the model specified to the right of `~` and uses the outcome on
+  the left.
+- `summary()` reports coefficients, their classical tests, model fit, and the
+  overall F-test.
+- `confint()` reports coefficient confidence intervals.
+- `fitted()` and `residuals()` return one value for each analysis row.
+- `plot(model)` opens the standard diagnostic plots.
+
+Write the fitted object to a meaningful name and inspect the analysis sample
+before interpreting output. R silently omits rows containing missing values in
+variables used by `lm()` unless instructed otherwise. The
+[Intermediate code sheet](../intermediate/code-sheet.qmd) collects the full
+course workflow in one place.
+
+## A five-minute return-to-R check
+
+Run this without copying the displayed answer:
+
+```r
+sharks <- read.csv("data/shark_tank_teaching.csv")
+nrow(sharks)
+mean(sharks$deal_on_show)
+median(sharks$description_words)
+table(sharks$season)
+```
+
+Then explain each output in words. If the code runs but you cannot explain the
+quantity, the remaining problem is statistical rather than programming.
+
+::: {.callout-important}
+## Assessment reminder
+
+Basic uses a written exam in which you may verify, interpret, or describe
+supplied R code and output. Intermediate and Advanced use TestVision with live
+data work in R, so this refresher becomes increasingly important later in the
+course line.
+:::
+
+## How the figures in this book are made
+
+Every data figure in this textbook carries its own R code --- click
+"See the R code for this figure" above any graph to unfold it. Each code
+block is self-contained: copy it into a fresh R session in your course
+project and it reproduces the figure exactly. Install the plotting packages
+once:
+
+```r
+install.packages(c("ggplot2", "patchwork"))
+```
+
+The figures follow a small set of principles worth stealing for your own
+tutorials, reports, and thesis:
+
+- **One message per graph.** The caption states it; everything that does not
+  serve it is removed (no boxes, no minor gridlines, no decoration).
+- **Counts start at zero, and there is only ever one vertical axis.**
+- **Colour is spent, not sprinkled.** One colour carries the data
+  (`#009E73`), a second marks contrast or a fitted line (`#D55E00`), grey
+  holds context; reference values (means, benchmarks, zero lines) are gold
+  dashed lines with the value written next to them. The palette is
+  colourblind-safe by construction.
+- **Label directly where possible** instead of forcing the reader through a
+  legend, and always name axes with their units.
+- **PMFs are drawn as stick-and-dot (lollipop) charts**, histograms with
+  stated bin widths, model curves as smooth lines with shaded probability
+  areas.
+
+If you want to go further --- and for your thesis you will --- three free
+references are the course's recommended path: Wickham, Çetinkaya-Rundel &
+Grolemund, [*R for Data Science*, Chapter 1](https://r4ds.hadley.nz/data-visualize)
+for ggplot2 itself; Healy,
+[*Data Visualization: A Practical Introduction*](https://socviz.co/) for
+building good graphs in R end to end; and Wilke,
+[*Fundamentals of Data Visualization*](https://clauswilke.com/dataviz/) for
+the design principles behind every choice above.

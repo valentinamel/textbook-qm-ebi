@@ -1,0 +1,914 @@
+# Lecture 1: Introduction to Data Analysis {#b01}
+
+```{r}
+#| label: b01-setup
+#| include: false
+# Chunk options only. Every object used in this chapter is constructed in
+# visible code on this page, so that copying the code always works.
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
+                      fig.width = 7, fig.height = 4.5)
+```
+
+::: {.outcomes}
+<span class="label">By the end of Lecture 1, you can</span>
+
+- organise a reproducible R analysis and verify AI-assisted work;
+- distinguish categorical, discrete, continuous, and identifier variables;
+- identify a sample, a target population, sampling variability, and selection
+  bias;
+- inspect, validate, and qualify a real dataset;
+- describe one variable with frequency tables, bar charts, and histograms;
+- read a histogram by hand, including locating the median interval from
+  cumulative bar counts.
+:::
+
+::: {.driving-question}
+<span class="label">Driving question</span>
+
+<p class="dq-context">Shark Tank turns a business decision --- fund this venture or not --- into recorded data: 1,441 pitches, each with an ask, an equity offer, and an outcome. Learning from records like these is how investors, founders, and analysts figure out what works.</p>
+
+1,441 televised pitches are on our screen. What can this dataset tell us
+about entrepreneurship --- and what can it never tell us?
+:::
+
+::: {.course-phase .phase-before}
+
+## Before class
+
+<span class="time-budget">Total preparation time: about 30 minutes.</span>
+
+**Read (5 minutes).** Read *How to use this book* at the start of this book
+and locate the sections called **Before class**, **In class**, and
+**After class** in this chapter.
+
+**Set up (15 minutes).** Open RStudio through an R project. Create a new
+script and save it before writing code. Then
+[download `shark_tank_teaching.csv`](../data/shark_tank_teaching.csv){download="shark_tank_teaching.csv"}
+and place it in a folder called `data` inside your project. Keep the
+downloaded file unchanged. Run the following commands and bring the output
+to class:
+
+```{r}
+#| label: b01-preparation
+#| eval: false
+sharks <- read.csv("data/shark_tank_teaching.csv",
+                   stringsAsFactors = FALSE)
+
+dim(sharks)
+names(sharks)
+head(
+  sharks[c(
+    "pitch_id", "startup_name", "season", "industry",
+    "pitcher_gender_group", "deal_on_show"
+  )],
+  3
+)
+```
+
+**Predict (5 minutes).** Write one sentence answering: **what do you think
+one row in this dataset represents?** Commit to an answer; the lecture
+resolves it. It is fine if your answer changes during class.
+
+<div class="r-refresher">
+<span class="label">R reactivation</span><br>
+You used scripts, CSV files, data frames, summaries, and plots in
+<a href="https://walshc.github.io/ebi-prog/">Programming for E&amp;BI</a>.
+If the commands above feel unfamiliar, revisit its chapters on
+<a href="https://walshc.github.io/ebi-prog/r-scripts.html">R scripts</a>,
+<a href="https://walshc.github.io/ebi-prog/reading-csv-datasets.html">reading CSV files</a>, and
+<a href="https://walshc.github.io/ebi-prog/dataframes-summary-statistics.html">summarising data frames</a>.
+</div>
+
+If percentages, units, or graph axes are unfamiliar, review
+[Mathematics Refresher: numbers, percentages, and graphs](../resources/math-refresher.html).
+
+:::
+
+::: {.course-phase .phase-in-class}
+
+## In class
+
+The session opens with the usual four-minute entry quiz --- in this first
+week, on the preparation reading and setup --- then turns to the driving
+question: what can 1,441 recorded pitches tell us about entrepreneurship,
+and what can they never tell us? The hook for the whole session is a graph
+the class builds itself: the anonymous class map from the Mentimeter risk
+activity below.
+
+### How the course works
+
+Every lecture uses the same rhythm:
+
+1. **Prepare before class.** Encounter the question, notation, data, or short
+   explanation before the lecture.
+2. **Participate during class.** Predict results, discuss choices, run code,
+   and revise your reasoning with the teaching team.
+3. **Practise after class.** Retrieve ideas from memory, reproduce the
+   analysis, and explain results without copying a model answer.
+4. **Use the exam preparation sessions.** Bring your attempts and questions;
+   work in groups with classmates and teaching assistants.
+
+Complete the **Before class** section before each lecture; use
+**After class** to check that you can reproduce and explain the analysis
+independently.
+
+### Data analysis with R and AI
+
+#### Reproducible scripts
+
+A reproducible script recreates the analysis in a new R session, without
+depending on objects created earlier at the Console.
+
+Use these habits from the start:
+
+- open the project rather than changing the working directory with `setwd()`;
+- keep downloaded data unchanged;
+- use relative paths such as `data/shark_tank_teaching.csv`;
+- record importing, checking, transforming, plotting, and modelling in
+  scripts;
+- give objects meaningful names;
+- keep code and written interpretation together; and
+- restart R and run the complete script before sharing the analysis.
+
+#### The analysis cycle
+
+Data analysis is iterative:
+
+1. Ask a focused question.
+2. Define the unit and decide how each idea will be measured.
+3. Obtain or create the data and document their provenance.
+4. Inspect and validate before calculating.
+5. Summarise and visualise patterns.
+6. Interpret the result in context and state its limits.
+
+#### Use AI as a fallible assistant
+
+AI systems generate plausible responses; they do not certify that a
+calculation, source, or interpretation is correct. Use:
+
+**Attempt → Ask → Verify → Explain**
+
+1. **Attempt** the question and identify where you are stuck.
+2. **Ask** for a hint, diagnostic question, counterexample, or code review.
+3. **Verify** every claim against the data, R output, course notation, and
+   reliable sources.
+4. **Explain** the result in your own words and ask for feedback on that
+   explanation.
+
+Do not share confidential, personal, or assessment-restricted material. You
+remain responsible for every submitted claim.
+
+### Collecting our own data
+
+The class creates its first dataset through an anonymous Mentimeter
+activity.
+
+#### A choice with money at risk
+
+Imagine receiving EUR 100 and making one choice:
+
+| Choice | Amount placed at risk | Possible final amounts |
+|---|---:|---|
+| Keep it | EUR 0 | EUR 100 for certain |
+| Split it | EUR 50 | EUR 50 or EUR 150, each with 50% chance |
+| Go all-in | EUR 100 | EUR 0 or EUR 200, each with 50% chance |
+
+All three choices have the same average monetary payoff across many
+repetitions: EUR 100. The options differ in how uncertain the one-time
+result is.
+
+Next, answer:
+
+> How do you see yourself in general? Use 0 for "not at all willing to take
+> risks" and 10 for "very willing to take risks."
+
+Finally, give your current belief:
+
+> What is the probability that you will start or co-found a business at
+> least once during the next ten years?
+
+Before the class map appears on screen, **predict its shape**: will students
+who place more money at risk also report a higher founder probability? The
+map places general risk willingness on the horizontal axis and the
+subjective founder probability on the vertical axis. One anonymous point
+represents one responding student.
+
+#### From ideas to variables
+
+| Variable | What is recorded | Type |
+|---|---|---|
+| `respondent_id` | anonymous row label | identifier |
+| `amount_at_risk` | 0, 50, or 100 euros | discrete quantitative |
+| `risk_willingness` | one selected point from 0 to 10 | ordered discrete rating |
+| `founder_probability` | belief from 0% to 100% | continuous concept recorded on a finite-precision slider |
+
+**Risk attitude** is a theoretical construct. The monetary choice and the
+0--10 response are two imperfect measurements of it. They may disagree
+because risk taking depends on context, hypothetical choices differ from
+real stakes, and self-perceptions are imperfect. A single response is not a
+diagnosis of a permanent personality type.
+
+The first two responses offer separate allowable points. Founder probability
+is conceptualised on the continuum from 0% to 100%, although the software
+stores a rounded value.
+
+### Sample and target population
+
+The **sample** consists of students who are present and respond. Plausible
+target populations include:
+
+- the responding students;
+- everyone attending this lecture;
+- all students enrolled in QM Basic;
+- all first-year business students in the Netherlands; or
+- all young adults in the Netherlands.
+
+::: {.callout-note collapse="true"}
+## Check: which of the five candidate populations can our responses describe directly?
+
+Only the first: the responding students. Everyone else --- absent
+classmates, other QM Basic students, Dutch first-years, young adults ---
+enters the picture only through assumptions, because attendance and
+participation were not random. The data describe the respondents; they do
+not automatically represent wider groups.
+:::
+
+### Sampling variability versus selection bias
+
+Two uncertainties must not be confused:
+
+- **Sampling variability:** even a genuinely random sample can contain an
+  unusual number of highly risk-tolerant students by chance. Larger random
+  samples usually reduce this chance variation.
+- **Selection bias:** a convenience sample can systematically exclude
+  certain people. Collecting more responses from the same selected group
+  does not necessarily repair that bias.
+
+::: {#exm-b01-bias-contrast}
+## Worked example: two scenarios, classified aloud
+
+*Scenario 1.* A researcher draws 40 students **at random** from the full
+programme enrolment list. By chance, the sample contains an unusually large
+number of students who chose "go all-in."
+
+*Scenario 2.* A survey about founding a business is shared **in the group
+chat of the entrepreneurship club**, and 400 members respond.
+
+Scenario 1 is sampling variability: the selection mechanism was random, so
+the oddity is chance variation, and a larger random sample would usually
+tame it. Scenario 2 is selection bias: club members are systematically more
+interested in founding than the average student, and collecting 4,000
+responses from the same chat would not repair the distortion --- it would
+make a biased estimate more precise.
+:::
+
+A probability sample of Dutch students would require a defined population,
+a suitable sampling frame, and random selection. Non-response and
+measurement error could still remain.
+
+### Meet the Shark Tank data
+
+The first block used data the class created; this block turns to the data
+the whole course runs on.
+
+#### Context and unit of observation
+
+*Shark Tank US* is a television programme in which entrepreneurs present a
+venture or product to a panel of investors known as sharks. Entrepreneurs
+may ask for money in exchange for an ownership share. The investors question
+them, negotiate, and may announce a deal during the episode.
+
+The recorded outcome is an **on-air agreement**. It does not establish that
+an investment was completed or that the venture later succeeded.
+
+The teaching file contains 1,441 televised pitches from completed Seasons
+1--16 and 19 variables. The table below introduces the variables used most
+often in this course.
+
+| Variable | Meaning | Type |
+|---|---|---|
+| `pitch_id` | row identifier | identifier |
+| `startup_name` | venture or product name | categorical label |
+| `deal_on_show` | 1 for an on-air agreement; 0 otherwise | binary categorical, stored as 0/1 |
+| `season` | television season, 1--16 | ordered discrete/time index |
+| `episode` | episode number within season | discrete identifier within season |
+| `industry` | source industry category | categorical |
+| `description_words` | words in the written dataset description | discrete quantitative count |
+| `pitcher_gender_group` | `all_women`, `all_men`, `mixed`, or `unknown`, based on the source classification | categorical |
+| `women_represented` | 1 for `all_women` or `mixed`; 0 for `all_men`; missing for `unknown` | binary categorical, stored as 0/1 |
+| `multiple_entrepreneurs` | source indicator for more than one entrepreneur | binary categorical, with missing values |
+| `ask_amount_usd` | amount requested | quantitative, USD |
+| `equity_offered_pct` | ownership percentage initially offered | quantitative, percentage points |
+| `requested_valuation_usd` | valuation implied by the initial ask | quantitative, USD |
+| `deal_amount_usd`, `deal_equity_pct`, `deal_valuation_usd` | recorded deal terms | quantitative; structurally missing without a deal |
+
+Gender describes the people presenting the pitch, not necessarily every
+founder or employee. `women_represented` is not the share of women: the
+source does not report the presenter counts needed to calculate that share
+for mixed teams. Names were not used to infer gender.
+
+Note carefully what `description_words` measures: the length of the
+**written description in the source dataset**, not anything about the pitch
+itself. It counts words typed by whoever compiled the file, not words spoken
+in the tank. The file also does not measure the spoken pitch, completed
+investment, or later venture performance.
+
+#### Inspect and validate
+
+This is the live-coding part of the lecture: each output appears on screen,
+and you read it **before** the interpretation is given. Run the code
+yourself --- everything on this page starts from the visible import below.
+
+```{r}
+#| label: b01-inspect
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+dim(sharks)
+names(sharks)
+str(sharks)
+```
+
+There are 1,441 rows and 19 columns. This resolves the prediction from your
+prep: **one row represents one recorded televised pitch** from Seasons 1--16
+of *Shark Tank US*.
+
+```{r}
+#| label: b01-validate
+colSums(is.na(sharks))
+sort(unique(sharks$deal_on_show))
+range(sharks$season)
+range(sharks$episode)
+range(sharks$description_words)
+table(sharks$pitcher_gender_group, useNA = "ifany")
+anyDuplicated(sharks$pitch_id)
+```
+
+Pitch identifiers are unique, deal status contains only 0 and 1, and seasons
+run from 1 to 16. Written descriptions contain from 1 to 13 words. Missing
+deal terms are expected for pitches without a deal; seven records have an
+unknown source gender classification, and the source does not report
+`multiple_entrepreneurs` consistently. Missing does not mean zero. These
+checks establish internal plausibility, not that the source captured every
+pitch or measured every concept well.
+
+#### Summarise in context
+
+```{r}
+#| label: b01-deal-rate
+deal_count <- sum(sharks$deal_on_show)
+pitch_count <- nrow(sharks)
+deal_rate <- mean(sharks$deal_on_show)
+
+c(
+  on_air_deals = deal_count,
+  recorded_pitches = pitch_count,
+  recorded_deal_rate = deal_rate
+)
+```
+
+Because a 0/1 variable has mean equal to its proportion of 1s,
+`mean(deal_on_show)` is 61.2%. A defensible sentence is:
+
+> In this dataset, 882 of 1,441 recorded pitches (61.2%) reached an on-air
+> agreement.
+
+This sentence names the dataset and outcome. It does not claim that a
+randomly selected entrepreneur has the same chance of completed investment.
+
+### Describing one variable
+
+Before comparing groups or fitting models, learn to describe **one**
+variable well. The right tool depends on the variable's type.
+
+#### Frequency tables and bar charts for discrete categories
+
+An **empirical distribution** records how often values occur in a dataset.
+For a categorical or discrete variable, a **frequency table** gives counts
+and a **relative-frequency table** gives proportions:
+
+```{r}
+#| label: b01-season-table
+season_counts <- table(sharks$season)
+season_counts
+round(prop.table(season_counts), 3)
+```
+
+```{r}
+#| label: fig-b01-season-bar
+#| code-fold: true
+#| code-summary: "See the R code for this figure"
+#| fig-cap: "Number of recorded pitches per season. Later seasons contain more records, so an overall percentage gives those seasons more weight."
+library(ggplot2)
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+season_counts <- as.data.frame(table(sharks$season))
+names(season_counts) <- c("season", "pitches")
+season_counts$season <- as.integer(as.character(season_counts$season))
+
+ggplot(season_counts, aes(x = season, y = pitches)) +
+  geom_col(fill = "#009E73", alpha = 0.85, colour = "white") +
+  scale_x_continuous(breaks = 1:16) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
+  labs(x = "Season", y = "Number of recorded pitches") +
+  theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    plot.caption = element_text(colour = "#5B6976"),
+    axis.title = element_text(colour = "#17324D")
+  )
+```
+
+In @fig-b01-season-bar the horizontal axis lists the discrete season
+categories; each bar's height on the vertical count scale is the number of
+recorded pitches in that season. The later seasons contain more records, so
+an overall percentage gives those seasons more weight.
+
+#### Histograms for quantitative variables
+
+For a quantitative variable, a **histogram** groups nearby values into
+intervals and counts how many observations fall in each.
+
+```{r}
+#| label: fig-b01-word-hist
+#| code-fold: true
+#| code-summary: "See the R code for this figure"
+#| fig-cap: "Distribution of the number of words in the written dataset description. The dashed vertical line marks the median, 5 words."
+library(ggplot2)
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+word_median <- median(sharks$description_words)   # 5 words
+
+ggplot(sharks, aes(x = description_words)) +
+  geom_histogram(breaks = seq(0.5, 13.5, by = 1),
+                 fill = "#009E73", alpha = 0.85, colour = "white") +
+  geom_vline(xintercept = word_median, colour = "#C98B2E",
+             linetype = "dashed", linewidth = 0.9) +
+  annotate("text", x = word_median + 0.4, y = 300,
+           label = "median = 5 words", hjust = 0,
+           colour = "#17324D", size = 3.4) +
+  scale_x_continuous(breaks = 1:13) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
+  labs(x = "Words in the written dataset description",
+       y = "Number of recorded pitches") +
+  theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    plot.caption = element_text(colour = "#5B6976"),
+    axis.title = element_text(colour = "#17324D")
+  )
+```
+
+In @fig-b01-word-hist the horizontal axis measures description length in
+words and the vertical axis counts pitches in each one-word interval. The
+distribution is mildly right-skewed: most descriptions contain 3--7 words,
+with a small number extending farther to the right. The median is 5 words.
+Remember what this variable measures: the source text about the pitch, not
+the pitch itself.
+
+The histogram the rest of this section works with shows the equity initially
+offered:
+
+```{r}
+#| label: fig-b01-equity-hist
+#| code-fold: true
+#| code-summary: "See the R code for this figure"
+#| fig-cap: "Distribution of the equity initially offered across the 1,441 recorded pitches, in 5-point intervals. The dashed vertical line marks the median, 10%."
+library(ggplot2)
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+equity_median <- median(sharks$equity_offered_pct)   # 10%
+
+ggplot(sharks, aes(x = equity_offered_pct)) +
+  geom_histogram(breaks = seq(0, 100, by = 5),
+                 fill = "#009E73", alpha = 0.85, colour = "white") +
+  geom_vline(xintercept = equity_median, colour = "#C98B2E",
+             linetype = "dashed", linewidth = 0.9) +
+  annotate("text", x = equity_median + 2, y = 530,
+           label = "median = 10%", hjust = 0,
+           colour = "#17324D", size = 3.4) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
+  labs(x = "Equity initially offered (%)",
+       y = "Number of recorded pitches") +
+  theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    plot.caption = element_text(colour = "#5B6976"),
+    axis.title = element_text(colour = "#17324D")
+  )
+```
+
+Each bar counts pitches within an offered-equity interval. Most initial
+offers are below 20%, while a small number are much larger. Changing the
+interval width can reveal or conceal patterns, so a histogram is an
+analytical choice rather than decoration.
+
+### Reading a histogram by hand
+
+The exam gives you a printed histogram and no computer, so this skill is
+practised by hand. Every graph in this course is read with the same
+**five-step sequence**:
+
+1. **Unit and variables.** What does one observation represent, and what is
+   on each axis, in which units?
+2. **Scales.** Read the axis scales, including where they start and how wide
+   each interval is.
+3. **One element.** Put one bar (or point) into a full sentence.
+4. **Pattern.** Describe the overall shape: where values concentrate,
+   whether the distribution is symmetric or skewed, whether there are
+   outliers.
+5. **Limits.** State one thing the graph cannot tell you.
+
+::: {#exm-b01-histogram-read}
+## Worked example: the five steps and the median interval
+
+Apply the sequence to @fig-b01-equity-hist.
+
+1. One observation is one recorded pitch; the horizontal axis is equity
+   initially offered in percentage points, the vertical axis is the number
+   of pitches.
+2. The horizontal axis runs from 0 to 100 in intervals of width 5; the
+   vertical axis counts pitches.
+3. The tallest bar covers 5--10%: 560 pitches offered more than 5% and at
+   most 10% equity.
+4. The distribution is strongly right-skewed: most offers are at or below
+   20%, with a thin tail stretching towards 100%.
+5. The histogram cannot say why offers cluster there, and it hides the exact
+   values inside each interval.
+
+**Locating the median interval.** With 1,441 ordered observations, the
+median is the 721st value. Add bar counts from the left until the running
+total reaches 721:
+
+| Interval (%) | Count | Cumulative count |
+|---:|---:|---:|
+| 0--5   | 293 | 293 |
+| 5--10  | 560 | 853 |
+| 10--15 | 194 | 1,047 |
+| 15--20 | 241 | 1,288 |
+
+After the first bar only 293 observations are covered --- not yet 721. After
+the second bar the running total is $293+560=853\ge721$, so the 721st
+observation lies in the **5--10% interval**: the median interval. (R
+confirms: the exact median is 10%, which this histogram counts in the 5--10
+bar because each bar includes its right endpoint.) The same cumulative-count
+reading is tested in Mock Exam Question 1.
+:::
+
+::: {.callout-caution collapse="true"}
+## Try it: locate the upper-quartile interval
+
+In class this is the pair task. The upper quartile is the value with
+three-quarters of the observations at or below it.
+
+*Step 1 (given).* Three-quarters of 1,441 observations is about 1,081, so
+you are looking for the interval containing the 1,081st ordered value.
+
+*Step 2 (you).* Extend the cumulative counts in the table above until the
+running total first reaches 1,081.
+
+*Step 3 (you).* Name the upper-quartile interval.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+Through 10--15% the cumulative count is $293+560+194=1{,}047$, still below
+1,081. Adding the 15--20% bar gives $1{,}047+241=1{,}288\ge1{,}081$, so the
+upper quartile lies in the **15--20% interval**. (R confirms:
+`quantile(sharks$equity_offered_pct, 0.75)` returns 20, on the upper edge
+of that bar.)
+:::
+:::
+
+### Comparing raw observations and group means
+
+```{r}
+#| label: fig-b01-raw-points
+#| code-fold: true
+#| code-summary: "See the R code for this figure"
+#| fig-cap: "Equity initially offered by season, one point per recorded pitch, jittered horizontally to reduce overlap. Colour and shape mark on-air deal status."
+library(ggplot2)
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+sharks$deal_status <- factor(sharks$deal_on_show, levels = c(0, 1),
+                             labels = c("No on-air deal", "On-air deal"))
+set.seed(2026)
+sharks$season_jittered <- jitter(sharks$season, amount = 0.16)
+
+ggplot(sharks, aes(x = season_jittered, y = equity_offered_pct,
+                   colour = deal_status, shape = deal_status)) +
+  geom_point(alpha = 0.45, size = 1.6) +
+  scale_colour_manual(values = c("No on-air deal" = "#009E73",
+                                 "On-air deal" = "#D55E00")) +
+  scale_shape_manual(values = c("No on-air deal" = 16,
+                                "On-air deal" = 17)) +
+  scale_x_continuous(breaks = c(seq(1, 15, by = 2), 16)) +
+  labs(x = "Season", y = "Equity initially offered (%)",
+       colour = NULL, shape = NULL) +
+  theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    plot.caption = element_text(colour = "#5B6976"),
+    axis.title = element_text(colour = "#17324D"),
+    legend.position = "top"
+  )
+```
+
+Season is a discrete ordered time index, so the points in
+@fig-b01-raw-points are moved slightly left or right only to reduce overlap.
+The vertical spread within every season warns us that a group mean will not
+describe every pitch.
+
+```{r}
+#| label: fig-b01-season-means
+#| code-fold: true
+#| code-summary: "See the R code for this figure"
+#| fig-cap: "Mean equity initially offered per season, separately for pitches with and without an on-air deal."
+library(ggplot2)
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+season_means <- aggregate(
+  equity_offered_pct ~ season + deal_on_show,
+  data = sharks,
+  FUN = mean
+)
+season_means$deal_status <- factor(season_means$deal_on_show,
+                                   levels = c(0, 1),
+                                   labels = c("No on-air deal",
+                                              "On-air deal"))
+
+ggplot(season_means, aes(x = season, y = equity_offered_pct,
+                         colour = deal_status, shape = deal_status,
+                         linetype = deal_status)) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2.4) +
+  scale_colour_manual(values = c("No on-air deal" = "#009E73",
+                                 "On-air deal" = "#D55E00")) +
+  scale_shape_manual(values = c("No on-air deal" = 16,
+                                "On-air deal" = 17)) +
+  scale_linetype_manual(values = c("No on-air deal" = "solid",
+                                   "On-air deal" = "dashed")) +
+  scale_x_continuous(breaks = 1:16) +
+  scale_y_continuous(limits = c(0, NA),
+                     expand = expansion(mult = c(0, 0.05))) +
+  labs(x = "Season", y = "Mean equity initially offered (%)",
+       colour = NULL, shape = NULL, linetype = NULL) +
+  theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    plot.caption = element_text(colour = "#5B6976"),
+    axis.title = element_text(colour = "#17324D"),
+    legend.position = "top"
+  )
+```
+
+Mean initially offered equity in @fig-b01-season-means is lower in later
+seasons for both deal groups. The graph describes selected televised
+pitches; it does not establish why the offers changed or what would happen
+if an entrepreneur changed only the offered equity.
+
+A clear graph matches the variable types, labels its axes and groups, and
+makes the claim inspectable. Colour is reinforced here by point shape and
+line type, so the groups remain distinguishable without relying on colour
+alone.
+
+::: {.caveat-box}
+<span class="label">What these records can and cannot say</span>
+
+The Shark Tank file describes **1,441 recorded televised pitches**, nothing
+more, for three structural reasons:
+
+- **Selection into television.** Producers choose which pitches are filmed
+  and aired. The file is not a random sample of startups, entrepreneurs, or
+  even Shark Tank applicants.
+- **On-air deal is not investment.** `deal_on_show` records an on-air
+  agreement. It does not establish that money changed hands or that the
+  venture later succeeded.
+- **Measured is not the same as meant.** `description_words` counts words in
+  the source's written description, not the spoken pitch;
+  `women_represented` is a category, not a share; the file does not measure
+  later performance at all.
+
+The same discipline applies to the class dataset: it describes the students
+who responded, and a bigger convenience sample would not make it describe
+Dutch students in general.
+:::
+
+### Answering the driving question
+
+The dataset can tell us, precisely and reproducibly, what happened in these
+1,441 recorded pitches: 882 of them (61.2%) reached an on-air agreement,
+most initial offers gave up at most 20% equity with a median in the 5--10%
+interval, and mean offers drifted downward across seasons. It can never tell
+us, by itself, what would happen to a new entrepreneur, whether an on-air
+agreement became a completed investment, or why any of these patterns arose
+--- those questions need assumptions about selection, measurement, and
+causality that the file cannot supply.
+
+**Next:** We can now describe what happened in these 1,441 pitches: counts,
+shares, and shapes. But description alone cannot answer the chance questions
+an investor actually asks --- how likely is a deal if I pick a pitch at
+random, how likely is a late-season pitch, how likely are both at once.
+Lecture 2 builds the tool for exactly such questions, a probability model:
+select one record at random so that every pitch is equally likely, define
+events such as "reached a deal" and "late season", and compute how likely each
+is --- with rules that say when chances may simply be added.
+
+:::
+
+::: {.course-phase .phase-after}
+
+## After class
+
+<span class="time-budget">Total practice time: about 75 minutes.</span>
+
+### Reproduce the workflow (15 minutes)
+
+Save the script. In RStudio, choose **Session > Restart R** to clear objects
+from memory. Run the complete script from top to bottom. It should import
+the data, perform the checks, calculate the deal rate, and recreate at least
+one graph without relying on commands run earlier at the Console.
+
+::: {.callout-note collapse="true"}
+## Check the result
+
+A successful clean run reports 1,441 rows and 19 variables, a recorded
+on-air deal rate of 882/1,441 (61.2%), the stated ranges, and recreates the
+graph without an "object not found" error.
+:::
+
+### Retrieval (10 minutes)
+
+Answer without reopening the chapter, then check your answers.
+
+1. What does one row represent, and which population can it describe
+   directly?
+2. Why is `pitch_id` an identifier rather than a quantitative measurement?
+3. What is the difference between sampling variability and selection bias?
+4. What exactly does `description_words` measure?
+5. How do you locate the median interval of a histogram by hand?
+
+::: {.callout-note collapse="true"}
+## Check your answers
+
+1. One row is one recorded televised pitch; the file directly describes
+   these 1,441 records from completed Seasons 1--16.
+2. `pitch_id` labels a record. Arithmetic differences between its values
+   have no substantive meaning.
+3. Sampling variability is chance variation across random samples; selection
+   bias is systematic distortion from how units enter the sample.
+4. The number of words in the written dataset description --- the source
+   text about the pitch, not the spoken pitch itself.
+5. Find the position of the median (about $n/2$), then add bar counts from
+   the left; the first interval whose cumulative count reaches that position
+   contains the median.
+:::
+
+### Explain one graph (10 minutes)
+
+Write four sentences about either Shark Tank graph
+(@fig-b01-raw-points or @fig-b01-season-means):
+
+1. name the variables and units;
+2. describe the main visible pattern;
+3. state one defensible interpretation; and
+4. state one important limitation or next question.
+
+::: {.callout-note collapse="true"}
+## Check a model answer
+
+Each point in the raw-data graph represents one recorded pitch, with season
+on the horizontal axis and initially offered equity on the vertical axis.
+Offers vary within every season and are generally lower in later seasons.
+This is evidence of an association between season and the recorded initial
+offer. It does not show why offers changed or identify the causal effect of
+changing an offer.
+:::
+
+### From worked to faded: finish a histogram reading (10 minutes)
+
+Re-read the worked histogram reading (@exm-b01-histogram-read). Now finish
+the same reading for the description-words histogram
+(@fig-b01-word-hist). The bar counts, from 1 word upward, are:
+
+| Words | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Count | 4 | 113 | 217 | 285 | 292 | 241 | 146 | 85 | 36 | 9 | 4 | 6 | 3 |
+
+*Step 1 (given).* One observation is one recorded pitch; the axes show
+description length in words and the pitch count. With 1,441 observations,
+the median is the 721st ordered value.
+
+*Step 2 (you).* Build the cumulative counts and locate the bar containing
+the 721st observation.
+
+*Step 3 (you).* Describe the shape and state one limit of the graph.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+Cumulative counts: 4, 117, 334, 619, 911, ... The running total first
+reaches 721 at the 5-word bar ($619+292=911\ge721$), so the median is 5
+words --- matching `median(sharks$description_words)`. The distribution is
+mildly right-skewed, concentrated at 3--7 words with a thin right tail. The
+graph cannot say anything about the pitch itself: it describes the source's
+written text.
+:::
+
+### Audit an AI answer (10 minutes)
+
+An AI assistant writes:
+
+> "The dataset contains 1,441 successful companies and proves that offering
+> less equity makes investors fund startups."
+
+Use **Attempt → Ask → Verify → Explain** to correct it. Your final response
+must use the observed count or percentage, name the measured outcome, and
+state why the causal claim is unsupported.
+
+::: {.callout-note collapse="true"}
+## Check a model correction after writing your own
+
+The file contains 1,441 recorded televised pitches, of which 882 reached an
+on-air agreement. It does not measure completed investment or later company
+success. `equity_offered_pct` records the initial ownership percentage
+offered, not a randomly assigned treatment, and the observational records do
+not establish that changing only this offer would cause an investor
+decision.
+:::
+
+### Worked exam interpretation (5 minutes)
+
+**Question (mirrors Mock Exam Q1).** A startup accelerator records, for each
+of 240 applications: `funding_requested_k` (euros, in thousands),
+`team_size`, `sector` (four categories), and `accepted` (0/1). Classify each
+variable. A histogram of `funding_requested_k` has equal-width intervals of
+EUR 20,000 with counts 58, 88, 54, 24, 10, 6. Which interval contains the
+median?
+
+::: {.callout-note collapse="true"}
+## Check a model answer
+
+`funding_requested_k` is quantitative continuous; `team_size` is
+quantitative discrete; `sector` is categorical; `accepted` is categorical
+binary, even though it is coded 0/1. With 240 observations, the median lies
+between the 120th and 121st ordered values. Cumulative counts: 58 below
+EUR 20,000, then $58+88=146$ below EUR 40,000 --- so observations 120 and
+121, and hence the median, lie in the **EUR 20,000--40,000 interval**.
+:::
+
+### From the reading ladder (10 minutes)
+
+This course trains you to read real research, one bounded piece at a time
+--- the [reading ladder](../resources/reading-ladder.qmd) explains the plan
+and the six-question protocol. First rung: open
+[Ajzen (1991), the Theory of Planned Behavior](https://doi.org/10.1016/0749-5978(91)90020-T)
+via the university library and read only the **title and abstract**. List
+two theoretical constructs the theory uses (for example attitude toward the
+behaviour, subjective norm, perceived behavioural control, intention), and
+for each propose one concrete measurable variable you could actually record
+from a survey of E&BI students --- then classify each proposed variable as
+categorical, discrete quantitative, or continuous quantitative.
+
+::: {.callout-note collapse="true"}
+## Check an example answer
+
+The construct *entrepreneurial intention* could be measured as the answer to
+"do you plan to start a business within five years?" --- a categorical
+(binary) variable; the construct *attitude toward entrepreneurship* could be
+measured as agreement with "running my own business appeals to me" on a
+1--7 scale --- a discrete quantitative measurement of a construct no single
+question fully captures. The gap between the construct and the variable is
+exactly the imperfect-measurement point from today's lecture.
+:::
+
+### Make it yours (5 minutes)
+
+:::: {.utility-prompt}
+<span class="label">Utility: two sentences</span>
+
+Think of your EiA venture --- or any business you know well. Write two
+sentences: first name one number you would genuinely want to know about it
+(a rate, a count, an amount), then state what data you would need to collect
+to measure that number and one way the collection could be biased. There is
+no wrong answer; the point is connecting today's tools to something you care
+about.
+
+::: {.callout-note collapse="true"}
+## See an example, then write your own
+
+Take a student-run campus meal-prep box venture. "The number I most want is the share of first-order customers who order again within 30 days. I would need order records linked over time, and counting only app users would bias the share upward, because the most committed customers are the ones who install the app."
+:::
+
+You can discuss this task --- and any other task in this chapter --- with
+**Tilly**, the course AI assistant on Canvas: ask it to poke holes in your
+data-collection plan or to suggest a selection bias you have not thought of.
+::::
+
+Continue to Lecture 2: Probability foundations and random variables.
+
+Formula sheet: Lecture 1 formulas.
+
+For a more formal explanation, consult
+[Nieuwenhuis, *Statistical Methods for Business and Economics*](https://tilburguniversity.on.worldcat.org/oclc/317545871),
+Chapters 1--5.
+
+:::

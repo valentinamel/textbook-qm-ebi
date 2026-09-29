@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.42">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Lecture 3: Coefficient inference, fit, and the F-test – Quantitative Methods to Understand E&amp;BI</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../intermediate/t01-exam-prep.html" rel="next">
+<link href="../intermediate/i02-assumptions-diagnostics.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-ecf4e518a83458a2bb67b2a9bf74271b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar docked">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../intermediate/overview.html">QM Intermediate: Course overview</a></li><li class="breadcrumb-item"><a href="../intermediate/i03-inference-fit-ftest.html"><span class="chapter-title">Lecture 3: Coefficient inference, fit, and the F-test</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Quantitative Methods to Understand E&amp;BI</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Welcome</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../basic/overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">QM Basic: Course overview</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b01-introduction-data-analysis.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 1: Introduction to Data Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b02-probability-foundations.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 2: Probability foundations and random variables</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b03-discrete-distributions.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 3: Discrete distributions, expectation, and variance</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/t01-exam-prep.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Tutorial 1: Evidence and probability foundations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b04-conditioning-bayes-independence.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 4: Conditioning, Bayes’ rule, and independence</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b05-joint-covariance-correlation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 5: Joint random variables, covariance, and correlation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/t02-exam-prep.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Tutorial 2: Conditioning and relationships</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b06-continuous-normal.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 6: Continuous distributions and the normal model</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b07-samples-estimators.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 7: Samples, parameters, and estimators</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b08-sampling-distributions.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 8: Sampling distributions and the central limit theorem</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/t03-exam-prep.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Tutorial 3: Normal models, sampling, and standard errors</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b09-t-confidence-intervals.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 9: The t distribution, confidence intervals, and the two-sided test</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b10-testing-errors-power.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 10: Testing decisions, errors, power, and the road to regression</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/t04-exam-prep.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Tutorial 4: Inference and tests against zero</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/formula-sheet.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">QM Basic Formula Sheet</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/mock-exam.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Mock Exam: QM Basic</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../intermediate/overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">QM Intermediate: Course overview</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/i01-simple-linear-regression.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 1: Simple linear regression</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/i02-assumptions-diagnostics.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 2: What the model assumes and how residuals betray it</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/i03-inference-fit-ftest.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">Lecture 3: Coefficient inference, fit, and the F-test</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/t01-exam-prep.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Tutorial 1: Simple regression, diagnostics, and model usefulness</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/i04-multiple-regression.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 4: Multiple regression and what controls do</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/i05-categories-joint-tests.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 5: Categories as predictors and joint tests</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/i06-interactions-curvature.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 6: Interactions and curvature</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/t02-exam-prep.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Tutorial 2: Multiple regression and extensions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/code-sheet.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">QM Intermediate Code Sheet</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/mock-exam.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Mock Exam: QM Intermediate</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <span class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">QM Advanced: Course overview</span></span>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Supplementary resources</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../resources/how-to-succeed.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">How to succeed in this course</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../resources/r-refresher.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">R Refresher</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../resources/math-refresher.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Mathematics Refresher</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../resources/video-guide.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">External Video Guide</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../resources/reading-ladder.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Reading research papers</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul class="collapse">
+  <li><a href="#before-class" id="toc-before-class" class="nav-link active" data-scroll-target="#before-class">Before class</a></li>
+  <li><a href="#in-class" id="toc-in-class" class="nav-link" data-scroll-target="#in-class">In class</a></li>
+  <li><a href="#after-class" id="toc-after-class" class="nav-link" data-scroll-target="#after-class">After class</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../intermediate/overview.html">QM Intermediate: Course overview</a></li><li class="breadcrumb-item"><a href="../intermediate/i03-inference-fit-ftest.html"><span class="chapter-title">Lecture 3: Coefficient inference, fit, and the F-test</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="i03" class="quarto-section-identifier"><span class="chapter-title">Lecture 3: Coefficient inference, fit, and the F-test</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="outcomes">
+<p><span class="label">By the end of Lecture 3, you can</span></p>
+<ul>
+<li>read a coefficient’s standard error and build its confidence interval by hand, using the correct degrees of freedom;</li>
+<li>test a regression coefficient against zero and say what the p-value does and does not establish;</li>
+<li>decompose outcome variation into explained and residual components;</li>
+<li>calculate and interpret <span class="math inline">\(R^2\)</span> — and correct four common misreadings;</li>
+<li>state and interpret the overall F-test for model usefulness;</li>
+<li>connect the simple-regression F-test to the slope t-test;</li>
+<li>distinguish fit, statistical evidence, prediction, and causality.</li>
+</ul>
+</div>
+<div class="driving-question">
+<p><span class="label">Driving question</span></p>
+<p class="dq-context">
+A slope is an estimate, not a fact. Before a number goes into a pitch deck or a report, we need to know how precise it is and whether the model behind it earns its keep.
+</p>
+<p>The ask–deal slope is about 1.01. How precisely do we know that number, how much of the outcome does the line explain, and is the model useful at all?</p>
+</div>
+<section id="before-class" class="level2 course-phase phase-before">
+<h2 class="anchored" data-anchor-id="before-class">Before class</h2>
+<p><span class="time-budget">Total preparation time: about 30 minutes.</span></p>
+<div class="video-prep">
+<p><span class="label">Video preparation (10 minutes)</span><br> Watch Stanford Statistical Learning <a href="https://www.youtube.com/watch?v=50sv4UTjE90&amp;list=PLoROMvodv4rOzrYsAxzQyHb8n_RWNuS1e&amp;index=12">3.4 Some Important Questions</a>. Focus on the questions “Is there a relationship?” and “How accurately can we predict the response?” All links are also listed in the <a href="../resources/video-guide.html">External Video Guide</a>.</p>
+</div>
+<p><strong>Reactivate the recipes (5 minutes).</strong> With the Basic formula sheet open, write from memory the general 95% confidence interval recipe and the two-sided test of a benchmark value. Today both recipes return, applied to a regression slope.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check your preparation
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Interval: <span class="math inline">\(\text{estimate} \pm (\text{multiplier}) \times
+\text{standard error}\)</span>, with the multiplier close to 1.96 for large samples. Test: <span class="math inline">\(t = (\text{estimate} - \text{benchmark})/\text{standard error}\)</span>, compared with a t distribution; small p-values are evidence against the benchmark.</p>
+</div>
+</div>
+</div>
+<p><strong>Classify (5 minutes).</strong> For a <em>useful</em> model, decide whether each quantity should be relatively small or relatively large: SSE, SSR, <span class="math inline">\(R^2\)</span>. Commit to your three answers; the lecture defines all three quantities precisely.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check your preparation
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>For a useful model, SSE should be relatively small, SSR relatively large, and <span class="math inline">\(R^2\)</span> relatively large. These are comparisons to total outcome variation, not universal cut-offs.</p>
+</div>
+</div>
+</div>
+<p><strong>R warm-up (10 minutes).</strong> The standing warm-up: rebuild the Lecture 1 model and extract its coefficient table. Bring the table to class — today’s first hour reads it line by line:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>deals <span class="ot">&lt;-</span> <span class="fu">subset</span>(sharks, deal_on_show <span class="sc">==</span> <span class="dv">1</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>deals<span class="sc">$</span>ask_1k <span class="ot">&lt;-</span> deals<span class="sc">$</span>ask_amount_usd <span class="sc">/</span> <span class="dv">1000</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>deals<span class="sc">$</span>deal_1k <span class="ot">&lt;-</span> deals<span class="sc">$</span>deal_amount_usd <span class="sc">/</span> <span class="dv">1000</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>deal_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(deal_1k <span class="sc">~</span> ask_1k, <span class="at">data =</span> deals)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(deal_model)<span class="sc">$</span>coefficients</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>If squared terms, ratios, or the interval recipe feel rusty, review <a href="../resources/math-refresher.html">Mathematics Refresher: squares, proportions, and standardisation</a>.</p>
+</section>
+<section id="in-class" class="level2 course-phase phase-in-class">
+<h2 class="anchored" data-anchor-id="in-class">In class</h2>
+<p>The session opens with the usual four-minute entry quiz on the prep videos, then turns to the driving question — with the warm-up coefficient table on screen.</p>
+<p class="concept-video">
+<strong>Stanford explanation (review):</strong> <a href="https://www.youtube.com/watch?v=50sv4UTjE90">3.4 Some Important Questions</a>.
+</p>
+<section id="how-precisely-do-we-know-the-slope" class="level3">
+<h3 class="anchored" data-anchor-id="how-precisely-do-we-know-the-slope">How precisely do we know the slope?</h3>
+<p>The warm-up construction once more, so every object on this page is built in the open:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>deals <span class="ot">&lt;-</span> <span class="fu">subset</span>(sharks, deal_on_show <span class="sc">==</span> <span class="dv">1</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>deals<span class="sc">$</span>ask_1k <span class="ot">&lt;-</span> deals<span class="sc">$</span>ask_amount_usd <span class="sc">/</span> <span class="dv">1000</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>deals<span class="sc">$</span>deal_1k <span class="ot">&lt;-</span> deals<span class="sc">$</span>deal_amount_usd <span class="sc">/</span> <span class="dv">1000</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>deal_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(deal_1k <span class="sc">~</span> ask_1k, <span class="at">data =</span> deals)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(deal_model)<span class="sc">$</span>coefficients</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>            Estimate Std. Error  t value      Pr(&gt;|t|)
+(Intercept) 27.57097 7.24074969  3.80775  1.499641e-04
+ask_1k       1.00851 0.01820567 55.39538 4.161677e-289</code></pre>
+</div>
+</div>
+<p>Lecture 1 read only the first column. The other three columns — and the interval R computes from them — are the <strong>pentad</strong> from QM Basic, returning unchanged. Nothing in this table is new; only the quantity being estimated is:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 30%">
+<col style="width: 30%">
+<col style="width: 40%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Pentad ingredient</th>
+<th>Where it sits</th>
+<th style="text-align: right;">For the ask–deal slope</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>estimate</td>
+<td><code>Estimate</code> column</td>
+<td style="text-align: right;"><span class="math inline">\(b_1 = 1.0085\)</span></td>
+</tr>
+<tr class="even">
+<td>standard error</td>
+<td><code>Std. Error</code> column</td>
+<td style="text-align: right;"><span class="math inline">\(\operatorname{SE}(b_1) = 0.0182\)</span></td>
+</tr>
+<tr class="odd">
+<td>t value</td>
+<td><code>t value</code> column</td>
+<td style="text-align: right;"><span class="math inline">\(t = 55.4\)</span></td>
+</tr>
+<tr class="even">
+<td>p-value</td>
+<td><code>Pr(&gt;|t|)</code> column</td>
+<td style="text-align: right;"><span class="math inline">\(&lt; 0.001\)</span></td>
+</tr>
+<tr class="odd">
+<td>confidence interval</td>
+<td><code>confint()</code></td>
+<td style="text-align: right;">computed below</td>
+</tr>
+</tbody>
+</table>
+<p>The standard error answers the pentad’s standing question, now about a slope: <strong>if we could redraw the sample, how much would <span class="math inline">\(b_1\)</span> wobble?</strong> The estimated slope 1.0085 came from these 882 deals; a different set of deals would give a slightly different line. The SE of 0.0182 — in the slope’s own units, $1,000 of deal per $1,000 of ask — estimates the size of that sampling wobble under the Lecture 2 model conditions.</p>
+<p><strong>Degrees of freedom.</strong> The interval multiplier comes from a t distribution with <span class="math inline">\(n - 2 = 882 - 2 = 880\)</span> degrees of freedom. The subtraction is the same bookkeeping as in QM Basic: estimating the intercept and the slope uses two pieces of information before any is left over to estimate the residual spread. (With <span class="math inline">\(k\)</span> slopes plus an intercept, the residual degrees of freedom become <span class="math inline">\(n - k - 1\)</span>; that general form matters from Lecture 4 onwards.) At 880 degrees of freedom, the multiplier <span class="math inline">\(t_{0.975,\,880} = 1.963\)</span> is indistinguishable in practice from the familiar 1.96.</p>
+<div id="exm-i03-interval" class="theorem example">
+<p><span class="theorem-title"><strong>Example 19.1 (Worked example: the slope interval by hand)</strong></span> Everything comes from the coefficient table: <span class="math inline">\(b_1 = 1.0085\)</span>, <span class="math inline">\(\operatorname{SE}(b_1) = 0.0182\)</span>, multiplier <span class="math inline">\(\approx 1.96\)</span>.</p>
+<p><span class="math display">\[
+b_1 \pm t_{0.975,\,880}\operatorname{SE}(b_1)
+= 1.0085 \pm 1.96 \times 0.0182
+= 1.0085 \pm 0.0357
+= (0.973,\; 1.044).
+\]</span></p>
+<p>In words: under the model conditions, the data are consistent with a population slope between about $973 and $1,044 of agreed amount per $1,000 requested. The interval’s endpoints carry the slope’s units — that is the pentad rule that the estimate, SE, and interval share units, while t and the p-value are unit-free.</p>
+<p>R agrees:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(deal_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                 2.5 %    97.5 %
+(Intercept) 13.3598133 41.782122
+ask_1k       0.9727782  1.044241</code></pre>
+</div>
+</div>
+</div>
+<p>The interval describes <strong>sampling uncertainty under the model conditions</strong>. It does not include uncertainty from selection into televised pitches, the decision to analyse only on-air deals, or measurement choices — no formula widens an interval for a flawed design.</p>
+</section>
+<section id="the-t-test-against-zero" class="level3">
+<h3 class="anchored" data-anchor-id="the-t-test-against-zero">The t-test against zero</h3>
+<p>The standard significance test asks whether the data are consistent with <strong>no</strong> linear association:</p>
+<p><span class="math display">\[
+H_0:\beta_1=0
+\qquad\text{versus}\qquad
+H_1:\beta_1\ne0,
+\qquad
+t=\frac{b_1-0}{\operatorname{SE}(b_1)}.
+\]</span></p>
+<p>By hand, once: <span class="math inline">\(t = 1.0085 / 0.0182 \approx 55.4\)</span>. An estimate 55 standard errors from zero is astronomically far into the tail of a t distribution. Live verification, computing the p-value exactly as QM Basic did:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>coef_table <span class="ot">&lt;-</span> <span class="fu">summary</span>(deal_model)<span class="sc">$</span>coefficients</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>b1 <span class="ot">&lt;-</span> coef_table[<span class="st">"ask_1k"</span>, <span class="st">"Estimate"</span>]</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>se_b1 <span class="ot">&lt;-</span> coef_table[<span class="st">"ask_1k"</span>, <span class="st">"Std. Error"</span>]</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>t_value <span class="ot">&lt;-</span> b1 <span class="sc">/</span> se_b1</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>p_value <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">pt</span>(<span class="sc">-</span><span class="fu">abs</span>(t_value), <span class="at">df =</span> <span class="fu">df.residual</span>(deal_model))</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">estimate =</span> b1, <span class="at">standard_error =</span> se_b1,</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">t_statistic =</span> t_value, <span class="at">p_value =</span> p_value)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      estimate standard_error    t_statistic        p_value 
+  1.008510e+00   1.820567e-02   5.539538e+01  4.161677e-289 </code></pre>
+</div>
+</div>
+<p>What the tiny p-value <strong>does</strong> say: if the population slope were zero and the model conditions held, a sample slope this far from zero would essentially never occur — strong evidence against a zero linear association in this selected sample.</p>
+<p>What it does <strong>not</strong> say, one line each:</p>
+<ul>
+<li>it does not say the model is correctly specified — Lecture 2’s fan and influential pitches stand as the permanent caveat under this table;</li>
+<li>it does not say the association is large or important — with 882 observations, even tiny slopes can earn tiny p-values;</li>
+<li>it does not say that requesting more causes a larger deal — no test statistic repairs an observational design.</li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check: the p-value is 4×10<sup>-289</sup>. Is this slope therefore trustworthy?
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>No.&nbsp;The p-value measures distance from zero in standard-error units, and the standard error was computed under the classical conditions — constant error variance and independent rows among them. Lecture 2 showed the residual fan and the handful of pitches that steer the fit, so this particular SE rests on doubtful ground. “Significant” means the data are inconsistent with a zero slope, not that 0.0182 is the right measure of wobble.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="decomposing-variation" class="level3">
+<h3 class="anchored" data-anchor-id="decomposing-variation">Decomposing variation</h3>
+<p>The second part of the driving question — how much does the line explain? — needs a benchmark. Without a predictor, the best single prediction for every deal is the mean agreed amount <span class="math inline">\(\bar y\)</span>. Regression is useful to the extent that the fitted values <span class="math inline">\(\widehat y_i\)</span> improve on that flat prediction.</p>
+<p>For each observation, the total deviation from the mean splits exactly into an explained part and a residual part, as <a href="#fig-i03-decomposition" class="quarto-xref">Figure&nbsp;<span>19.1</span></a> shows for one point:</p>
+<p><span class="math display">\[
+\underbrace{y_i-\bar y}_{\text{total}}
+=
+\underbrace{(\widehat y_i-\bar y)}_{\text{explained by the line}}
++
+\underbrace{(y_i-\widehat y_i)}_{\text{residual}}.
+\]</span></p>
+<div class="cell">
+<details class="code-fold">
+<summary>See the R code for this figure</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>x_d <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fl">2.2</span>, <span class="fl">3.4</span>, <span class="fl">4.6</span>, <span class="fl">5.8</span>, <span class="fl">7.0</span>, <span class="fl">8.2</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>y_d <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">+</span> <span class="fl">0.8</span> <span class="sc">*</span> x_d <span class="sc">+</span> <span class="fu">c</span>(<span class="fl">1.3</span>, <span class="sc">-</span><span class="fl">1.5</span>, <span class="fl">0.9</span>, <span class="sc">-</span><span class="fl">0.8</span>, <span class="fl">1.6</span>, <span class="sc">-</span><span class="fl">1.2</span>, <span class="fl">0.4</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>fit_d <span class="ot">&lt;-</span> <span class="fu">lm</span>(y_d <span class="sc">~</span> x_d)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>decomp_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> x_d, <span class="at">y =</span> y_d)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>i <span class="ot">&lt;-</span> <span class="dv">5</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>xh <span class="ot">&lt;-</span> x_d[i]; yh <span class="ot">&lt;-</span> y_d[i]; fh <span class="ot">&lt;-</span> <span class="fu">fitted</span>(fit_d)[i]; mh <span class="ot">&lt;-</span> <span class="fu">mean</span>(y_d)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(decomp_df, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y)) <span class="sc">+</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> mh, <span class="at">colour =</span> <span class="st">"#C98B2E"</span>,</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>             <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">intercept =</span> <span class="fu">coef</span>(fit_d)[<span class="dv">1</span>], <span class="at">slope =</span> <span class="fu">coef</span>(fit_d)[<span class="dv">2</span>],</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>              <span class="at">colour =</span> <span class="st">"#D55E00"</span>, <span class="at">linewidth =</span> <span class="fl">0.9</span>) <span class="sc">+</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"segment"</span>, <span class="at">x =</span> xh <span class="sc">+</span> <span class="fl">0.55</span>, <span class="at">xend =</span> xh <span class="sc">+</span> <span class="fl">0.55</span>, <span class="at">y =</span> mh, <span class="at">yend =</span> yh,</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>           <span class="at">colour =</span> <span class="st">"#17324D"</span>, <span class="at">linewidth =</span> <span class="fl">0.9</span>) <span class="sc">+</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"segment"</span>, <span class="at">x =</span> xh, <span class="at">xend =</span> xh, <span class="at">y =</span> mh, <span class="at">yend =</span> fh,</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>           <span class="at">colour =</span> <span class="st">"#009E73"</span>, <span class="at">linewidth =</span> <span class="fl">1.3</span>) <span class="sc">+</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"segment"</span>, <span class="at">x =</span> xh, <span class="at">xend =</span> xh, <span class="at">y =</span> fh, <span class="at">yend =</span> yh,</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>           <span class="at">colour =</span> <span class="st">"#0072B2"</span>, <span class="at">linewidth =</span> <span class="fl">1.3</span>) <span class="sc">+</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="fl">2.6</span>, <span class="at">colour =</span> <span class="st">"#009E73"</span>) <span class="sc">+</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> xh <span class="sc">+</span> <span class="fl">1.25</span>, <span class="at">y =</span> (mh <span class="sc">+</span> yh) <span class="sc">/</span> <span class="dv">2</span>,</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>           <span class="at">label =</span> <span class="st">"y[i] - bar(y)"</span>, <span class="at">parse =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>           <span class="at">colour =</span> <span class="st">"#17324D"</span>, <span class="at">size =</span> <span class="fl">3.4</span>) <span class="sc">+</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> xh <span class="sc">-</span> <span class="fl">0.85</span>, <span class="at">y =</span> (mh <span class="sc">+</span> fh) <span class="sc">/</span> <span class="dv">2</span>,</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>           <span class="at">label =</span> <span class="st">"hat(y)[i] - bar(y)"</span>, <span class="at">parse =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>           <span class="at">colour =</span> <span class="st">"#009E73"</span>, <span class="at">size =</span> <span class="fl">3.4</span>) <span class="sc">+</span></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> xh <span class="sc">-</span> <span class="fl">0.75</span>, <span class="at">y =</span> (fh <span class="sc">+</span> yh) <span class="sc">/</span> <span class="dv">2</span> <span class="sc">+</span> <span class="fl">0.15</span>,</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>           <span class="at">label =</span> <span class="st">"y[i] - hat(y)[i]"</span>, <span class="at">parse =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>           <span class="at">colour =</span> <span class="st">"#0072B2"</span>, <span class="at">size =</span> <span class="fl">3.4</span>) <span class="sc">+</span></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="fl">9.0</span>, <span class="at">y =</span> mh <span class="sc">-</span> <span class="fl">0.45</span>, <span class="at">label =</span> <span class="st">"bar(y)"</span>,</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>           <span class="at">parse =</span> <span class="cn">TRUE</span>, <span class="at">colour =</span> <span class="st">"#17324D"</span>, <span class="at">size =</span> <span class="fl">3.4</span>) <span class="sc">+</span></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="fl">9.4</span>, <span class="at">y =</span> <span class="fu">coef</span>(fit_d)[<span class="dv">1</span>] <span class="sc">+</span> <span class="fu">coef</span>(fit_d)[<span class="dv">2</span>] <span class="sc">*</span> <span class="fl">9.4</span> <span class="sc">+</span> <span class="fl">0.5</span>,</span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>           <span class="at">label =</span> <span class="st">"fitted line"</span>, <span class="at">hjust =</span> <span class="dv">1</span>,</span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>           <span class="at">colour =</span> <span class="st">"#D55E00"</span>, <span class="at">size =</span> <span class="fl">3.4</span>) <span class="sc">+</span></span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">9.6</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">9.6</span>)) <span class="sc">+</span></span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Predictor X"</span>, <span class="at">y =</span> <span class="st">"Outcome Y"</span>) <span class="sc">+</span></span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#5B6976"</span>),</span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>)</span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-i03-decomposition" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-i03-decomposition-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="i03-inference-fit-ftest_files/figure-html/fig-i03-decomposition-1.png" class="img-fluid figure-img" width="633">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-i03-decomposition-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;19.1: One observation’s total deviation from the mean of Y splits into the part the fitted line explains and the residual. Squaring and summing over all observations gives SST = SSR + SSE.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Square each piece and sum over all observations. For ordinary least squares with an intercept, the cross-terms cancel and the identity holds exactly:</p>
+<p><span class="math display">\[
+\underbrace{\sum_i(y_i-\bar y)^2}_{\text{SST: total}}
+=
+\underbrace{\sum_i(\widehat y_i-\bar y)^2}_{\text{SSR: explained}}
++
+\underbrace{\sum_i(y_i-\widehat y_i)^2}_{\text{SSE: residual}}.
+\]</span></p>
+<p>Live, on the deal model, with the identity checked:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> deals<span class="sc">$</span>deal_1k</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>yhat <span class="ot">&lt;-</span> <span class="fu">fitted</span>(deal_model)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>SST <span class="ot">&lt;-</span> <span class="fu">sum</span>((y <span class="sc">-</span> <span class="fu">mean</span>(y))<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>SSR <span class="ot">&lt;-</span> <span class="fu">sum</span>((yhat <span class="sc">-</span> <span class="fu">mean</span>(y))<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>SSE <span class="ot">&lt;-</span> <span class="fu">sum</span>((y <span class="sc">-</span> yhat)<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">SST =</span> SST, <span class="at">SSR =</span> SSR, <span class="at">SSE =</span> SSE, <span class="at">check =</span> SSR <span class="sc">+</span> SSE)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      SST       SSR       SSE     check 
+103509324  80441122  23068202 103509324 </code></pre>
+</div>
+</div>
+<p>The units are squared thousands of dollars, so the raw magnitudes (around <span class="math inline">\(10^8\)</span>) mean little on their own — the sums of squares matter only relative to each other, which is exactly what the next section computes.</p>
+<div id="exm-i03-sst-sse" class="theorem example">
+<p><span class="theorem-title"><strong>Example 19.2 (Worked example: from SST and SSE to SSR and R²)</strong></span> A regression output reports <span class="math inline">\(\text{SST} = 500\)</span> and <span class="math inline">\(\text{SSE} = 125\)</span>. Find SSR and <span class="math inline">\(R^2\)</span>.</p>
+<p>By the identity, <span class="math inline">\(\text{SSR} = \text{SST} - \text{SSE} = 500 - 125 = 375\)</span>. Then</p>
+<p><span class="math display">\[
+R^2 = \frac{\text{SSR}}{\text{SST}} = \frac{375}{500} = 0.75
+\qquad\text{or equivalently}\qquad
+R^2 = 1 - \frac{\text{SSE}}{\text{SST}} = 1 - \frac{125}{500} = 0.75.
+\]</span></p>
+<p>The fitted values account for 75% of the observed sample variation in the outcome; 25% remains as residual variation around the line. In class, the one-click Mentimeter check on this calculation is posed right before the break.</p>
+</div>
+</section>
+<section id="r²-what-0.777-means-and-four-things-it-is-not" class="level3">
+<h3 class="anchored" data-anchor-id="r²-what-0.777-means-and-four-things-it-is-not">R²: what 0.777 means — and four things it is not</h3>
+<p>The general definition, applied to the live numbers:</p>
+<p><span class="math display">\[
+R^2=\frac{\text{SSR}}{\text{SST}}
+=1-\frac{\text{SSE}}{\text{SST}}.
+\]</span></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">manual =</span> <span class="dv">1</span> <span class="sc">-</span> SSE <span class="sc">/</span> SST,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">from_R =</span> <span class="fu">summary</span>(deal_model)<span class="sc">$</span>r.squared,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">correlation_squared =</span> <span class="fu">cor</span>(deals<span class="sc">$</span>ask_1k, deals<span class="sc">$</span>deal_1k)<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>             manual              from_R correlation_squared 
+          0.7771389           0.7771389           0.7771389 </code></pre>
+</div>
+</div>
+<p>Here <span class="math inline">\(R^2 \approx 0.777\)</span>: <strong>about 77.7% of the observed sample variation in agreed on-air deal amounts, among deal records, is explained by the linear association with the amount requested.</strong> The third number above shows a simple-regression bonus fact: with an intercept, <span class="math inline">\(R^2 = r_{XY}^2\)</span>, the squared correlation. Squaring discards the sign, so inspect the slope or correlation for direction.</p>
+<p><span class="math inline">\(R^2\)</span> is one of the most misquoted numbers in applied work. Four things it is <strong>not</strong>, each with a wrong sentence corrected. The first two are worked here; the last two are yours.</p>
+<p><strong>Not the percentage of correct predictions.</strong> <em>Wrong:</em> “The model predicts 77.7% of deal amounts correctly.” <em>Corrected:</em> the model explains 77.7% of the <em>variation</em> in deal amounts; individual predictions can still miss by hundreds of thousands of dollars (the residual standard error is about $162,000).</p>
+<p><strong>Not proof that the assumptions hold.</strong> <em>Wrong:</em> “With <span class="math inline">\(R^2\)</span> this high, the model is clearly well specified.” <em>Corrected:</em> <span class="math inline">\(R^2\)</span> measures fit, not validity — Lecture 2 found a residual fan and influential pitches in this very model, and 0.777 is silent about both.</p>
+<div class="callout callout-style-default callout-caution callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Try it: correct the last two wrong sentences
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>In class this is the pair task. Correct each sentence in one line, as above.</p>
+<p><em>Sentence 3 (you).</em> “Asking explains 78% of the deal, so raising your ask will raise your deal.”</p>
+<p><em>Sentence 4 (you).</em> “The model will explain 77.7% of deal-amount variation in next year’s pitches too.”</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check your answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><em>Sentence 3</em> claims causation: <span class="math inline">\(R^2\)</span> describes an association among observed deals; requests were not randomly assigned, and nothing in a fit statistic says what would happen if a founder <em>changed</em> their ask. <em>Sentence 4</em> claims out-of-sample performance: <span class="math inline">\(R^2\)</span> is computed on this sample; a new season, a different selection of pitches, or a changed negotiation culture can all lower it. In-sample fit is evidence about these 882 records, not a guarantee for the next 882.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="the-overall-f-test" class="level3">
+<h3 class="anchored" data-anchor-id="the-overall-f-test">The overall F-test</h3>
+<p>The last part of the driving question: is the model useful <strong>at all</strong>, compared with predicting <span class="math inline">\(\bar y\)</span> for everyone? For a regression with <span class="math inline">\(k\)</span> predictors, the overall usefulness test is</p>
+<p><span class="math display">\[
+H_0:\beta_1=\cdots=\beta_k=0
+\]</span></p>
+<p>against the alternative that at least one slope is non-zero. The statistic is</p>
+<p><span class="math display">\[
+F=\frac{\text{SSR}/k}{\text{SSE}/(n-k-1)}.
+\]</span></p>
+<p>Read the ratio the way it is built: the numerator is <strong>explained variation per predictor</strong>; the denominator is <strong>residual variation per residual degree of freedom</strong>. F asks how many times more explanation the model buys, per coefficient spent, than leftover noise would suggest. Values near 1 are what pure noise delivers; large values are evidence that the predictors jointly matter.</p>
+<p>The whole lecture now sits in one printed block — read <code>summary()</code> from top to bottom in this order: (1) formula and analysis sample, (2) coefficient estimates and units, (3) standard errors, t statistics, and p-values, (4) residual scale, (5) <span class="math inline">\(R^2\)</span> and adjusted <span class="math inline">\(R^2\)</span>, (6) the overall F-test — and (7) everything the table does <em>not</em> print: assumptions and design limits.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(deal_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = deal_1k ~ ask_1k, data = deals)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-434.38  -30.12  -28.85  -28.21 2821.15 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) 27.57097    7.24075   3.808  0.00015 ***
+ask_1k       1.00851    0.01821  55.395  &lt; 2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 161.9 on 880 degrees of freedom
+Multiple R-squared:  0.7771,    Adjusted R-squared:  0.7769 
+F-statistic:  3069 on 1 and 880 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<p>The output reports <span class="math inline">\(F \approx 3069\)</span> on 1 and 880 degrees of freedom, with a p-value too small to print meaningfully. Rejecting the null says the model with requested amount fits better than an intercept-only model, under the inferential conditions.</p>
+<p><strong>In simple regression, F and t answer the same question.</strong> With one predictor and a two-sided alternative, <span class="math inline">\(H_0:\beta_1 = 0\)</span> is the entire joint null, and</p>
+<p><span class="math display">\[
+F = t^2.
+\]</span></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>t_slope <span class="ot">&lt;-</span> <span class="fu">summary</span>(deal_model)<span class="sc">$</span>coefficients[<span class="st">"ask_1k"</span>, <span class="st">"t value"</span>]</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>f_model <span class="ot">&lt;-</span> <span class="fu">unname</span>(<span class="fu">summary</span>(deal_model)<span class="sc">$</span>fstatistic[<span class="st">"value"</span>])</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">t_squared =</span> t_slope<span class="sc">^</span><span class="dv">2</span>, <span class="at">F =</span> f_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>t_squared         F 
+ 3068.648  3068.648 </code></pre>
+</div>
+</div>
+<p>Both equal about 3069. This equivalence <strong>dies in multiple regression</strong>, where the F-test evaluates several slopes jointly while each t-test evaluates one — Lecture 5 builds a genuine joint test on exactly that difference.</p>
+</section>
+<section id="usefulness-has-more-than-one-meaning" class="level3">
+<h3 class="anchored" data-anchor-id="usefulness-has-more-than-one-meaning">Usefulness has more than one meaning</h3>
+<p>“Is the model useful?” has at least four distinct readings, and a model can pass one while failing another:</p>
+<ul>
+<li><strong>Statistically non-zero slope, low <span class="math inline">\(R^2\)</span>.</strong> A loyalty-programme analysis on 400,000 customers finds a reliably positive effect of mailings on spending — real, precisely estimated, and explaining 1% of spending variation. Useful for a mass decision, useless for predicting any one customer.</li>
+<li><strong>High <span class="math inline">\(R^2\)</span>, poor causal interpretation.</strong> Store revenue regressed on staff count fits beautifully — because both track store size. Hiring more staff at a small store will not produce a big store’s revenue.</li>
+<li><strong>Good in-sample fit, fragile out-of-sample prediction.</strong> A travel-demand model fitted on 2015–2019 data explained bookings superbly and collapsed in 2020. In-sample <span class="math inline">\(R^2\)</span> never promised stability.</li>
+<li><strong>Accurate predictions, no structural story.</strong> A black-box model may forecast weekly orders extremely well while its coefficients support no explanation of <em>why</em> — fine for stocking decisions, useless for designing a price change.</li>
+</ul>
+<p>Always align the evaluation with the goal: explanation, prediction, or decision support.</p>
+<div class="optional-box">
+<p><span class="label">Optional: robust standard errors</span><br> Heteroskedasticity-consistent, or <strong>robust</strong>, standard errors relax the constant-variance assumption when computing uncertainty. The fitted coefficients remain the ordinary least-squares values; only the estimated SEs (and hence t values, p-values, and intervals) change. Given Lecture 2’s residual fan, they are a natural upgrade for this model:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run this if these packages are available in the course R environment</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lmtest)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sandwich)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="fu">coeftest</span>(deal_model, <span class="at">vcov. =</span> <span class="fu">vcovHC</span>(deal_model, <span class="at">type =</span> <span class="st">"HC1"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>They fix exactly <strong>one</strong> thing: a misspecified conditional error variance. They do not repair non-linearity, omitted-variable bias, dependence across rows, influential data errors, or non-random selection. A robust SE on a biased slope is a precise measurement of the wrong quantity.</p>
+</div>
+<div class="caveat-box">
+<p><span class="label">What a precise slope and a high R² can and cannot say</span></p>
+<p>Every number this lecture produced — the SE of 0.0182, the interval <span class="math inline">\((0.973, 1.044)\)</span>, the p-value, <span class="math inline">\(R^2 = 0.777\)</span>, <span class="math inline">\(F \approx 3069\)</span> — is computed <em>under the model conditions of Lecture 2</em>, and the diagnostics there flagged two of them: the residual spread grows with deal size, and a handful of extreme pitches steer the fit. So the classical SE (and everything built from it) rests on a doubtful variance assumption, and both the slope and <span class="math inline">\(R^2\)</span> are partly the work of a few identifiable records. Beyond that, the sample is on-air deals only — selection travels with every estimate — and none of today’s statistics moves the association any closer to a causal claim. Precision and fit are internal report cards, not external validation.</p>
+</div>
+</section>
+<section id="answering-the-driving-question" class="level3">
+<h3 class="anchored" data-anchor-id="answering-the-driving-question">Answering the driving question</h3>
+<p>Precisely, substantially, and yes — with conditions. The slope 1.0085 has standard error 0.0182, so the 95% interval <span class="math inline">\((0.973, 1.044)\)</span> pins the association down to within about seven cents per dollar asked; the t-test rejects a zero slope beyond any doubt (<span class="math inline">\(t \approx 55.4\)</span>). The line explains 77.7% of the variation in agreed amounts, and the overall F-test (<span class="math inline">\(F \approx 3069\)</span>) confirms the model beats a flat mean. Every one of those statements is conditional on the Lecture 2 diagnostics — the fan and the influential pitches — and none of them is causal.</p>
+<p><strong>Next:</strong> Tutorial 1 rehearses Lectures 1–3 in exam format and in TestVision style: fit a model in R, diagnose it, and defend its coefficients with intervals, tests, and <span class="math inline">\(R^2\)</span> — the complete simple-regression pipeline you now own. Bring your attempts; the session starts from them.</p>
+</section>
+</section>
+<section id="after-class" class="level2 course-phase phase-after">
+<h2 class="anchored" data-anchor-id="after-class">After class</h2>
+<p><span class="time-budget">Total practice time: about 70 minutes.</span></p>
+<section id="retrieval-10-minutes" class="level3">
+<h3 class="anchored" data-anchor-id="retrieval-10-minutes">Retrieval (10 minutes)</h3>
+<ol type="1">
+<li>Why are the residual degrees of freedom <span class="math inline">\(n-2\)</span> in simple regression?</li>
+<li>Which pentad quantities share the slope’s units, and which are unit-free?</li>
+<li>What do SST, SSR, and SSE measure, and how are they related?</li>
+<li>Why is <span class="math inline">\(R^2\)</span> between 0 and 1 in an OLS model with an intercept?</li>
+<li>What is the null hypothesis of the overall F-test, and why does <span class="math inline">\(F=t^2\)</span> in simple regression?</li>
+<li>What single problem do robust standard errors address?</li>
+</ol>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check your answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>Two coefficients — intercept and slope — are estimated before residual variation can be measured, using up two pieces of information.</li>
+<li>The estimate, its SE, and the interval endpoints share the slope’s units; the t statistic and p-value are unit-free.</li>
+<li>Total, explained (fitted), and residual sample variation in the outcome; <span class="math inline">\(\text{SST}=\text{SSR}+\text{SSE}\)</span> for OLS with an intercept.</li>
+<li>SSE is non-negative and no larger than SST, so <span class="math inline">\(1-\text{SSE}/\text{SST}\)</span> lies between 0 and 1.</li>
+<li>All population slope coefficients are zero. With one predictor that is the same hypothesis as the two-sided slope t-test, and <span class="math inline">\(F=t^2\)</span>.</li>
+<li>Misspecified (non-constant) conditional error variance — nothing else.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="from-worked-to-faded-an-interval-for-a-new-row-15-minutes" class="level3">
+<h3 class="anchored" data-anchor-id="from-worked-to-faded-an-interval-for-a-new-row-15-minutes">From worked to faded: an interval for a new row (15 minutes)</h3>
+<p>Re-read the worked slope interval (<a href="#exm-i03-interval" class="quarto-xref">Example&nbsp;<span>19.1</span></a>). Then build the interval for the <strong>intercept row</strong> of the same table.</p>
+<p><em>Step 1 (given).</em> From the coefficient table: estimate <span class="math inline">\(27.571\)</span>, standard error <span class="math inline">\(7.241\)</span>, degrees of freedom <span class="math inline">\(880\)</span>, multiplier <span class="math inline">\(\approx 1.96\)</span>.</p>
+<p><em>Step 2 (you).</em> Compute the 95% interval.</p>
+<p><em>Step 3 (you).</em> Interpret it in one sentence — and say why this particular interval has little standalone business value (Lecture 1 told you).</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check your answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><span class="math inline">\(27.571 \pm 1.96 \times 7.241 = 27.571 \pm 14.19 = (13.4,\; 41.8)\)</span>, in $1,000s — R’s exact answer is <span class="math inline">\((13.36, 41.78)\)</span>. Under the model conditions, the data are consistent with a population intercept between about $13,400 and $41,800. But the intercept is the fitted mean at a request of zero, outside the observed range of asks, so the interval is mathematically sound and substantively unhelpful.</p>
+</div>
+</div>
+</div>
+<p>Then the unassisted set:</p>
+<ol type="1">
+<li>A study reports a coefficient of 2.40 with standard error 0.80 in a large sample. Compute the t statistic, decide the 5% two-sided test against zero, and give the 95% interval.</li>
+<li>Interpret <span class="math inline">\(R^2=0.20\)</span> without calling the model “80% wrong.”</li>
+<li>A model has <span class="math inline">\(k=3\)</span>, <span class="math inline">\(n=104\)</span>, SSR = 300, and SSE = 500. Calculate F.</li>
+<li>Explain why adding a predictor cannot increase the in-sample SSE in OLS.</li>
+</ol>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check your answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li><span class="math inline">\(t = 2.40/0.80 = 3\)</span>; reject at 5% (well beyond 1.96). Interval: <span class="math inline">\(2.40 \pm 1.96 \times 0.80 = (0.83,\; 3.97)\)</span>.</li>
+<li>The fitted values explain 20% of observed outcome variation; 80% remains as residual variation around the fitted line. Nothing is “wrong” — the model’s predictions are simply far from individual outcomes.</li>
+<li><span class="math inline">\(F=(300/3)/(500/(104-3-1))=100/5=20\)</span>.</li>
+<li>The expanded model can reproduce the old fit by setting the new slope to zero, so least squares cannot end at a larger minimum SSE.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="practice-the-full-pipeline-on-equity-and-season-20-minutes" class="level3">
+<h3 class="anchored" data-anchor-id="practice-the-full-pipeline-on-equity-and-season-20-minutes">Practice: the full pipeline on equity and season (20 minutes)</h3>
+<p>Fit <code>equity_offered_pct ~ season</code> on all 1,441 pitches. Report the slope’s 95% confidence interval, the t-test against zero, <span class="math inline">\(R^2\)</span>, and the overall F-test — then write a 120-word conclusion that separates estimate, uncertainty, fit, and scope.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check a model answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>equity_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> season, <span class="at">data =</span> sharks)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(equity_model)<span class="sc">$</span>coefficients</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>              Estimate Std. Error   t value      Pr(&gt;|t|)
+(Intercept) 20.4565874 0.46442667  44.04697 4.922706e-269
+season      -0.8241241 0.04752298 -17.34159  2.514546e-61</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(equity_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                 2.5 %     97.5 %
+(Intercept) 19.5455616 21.3676132
+season      -0.9173458 -0.7309023</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">r_squared =</span> <span class="fu">summary</span>(equity_model)<span class="sc">$</span>r.squared,</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">F =</span> <span class="fu">unname</span>(<span class="fu">summary</span>(equity_model)<span class="sc">$</span>fstatistic[<span class="st">"value"</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  r_squared           F 
+  0.1728605 300.7308055 </code></pre>
+</div>
+</div>
+<p>A complete conclusion reports: one later season is associated with about 0.824 percentage points less initial equity offered (SE 0.048); the 95% interval <span class="math inline">\((-0.917, -0.731)\)</span> excludes zero and the t-test rejects a zero slope (<span class="math inline">\(t\approx-17.3\)</span>, p <span class="math inline">\(&lt;\)</span> 0.001); season explains about 17.3% of observed equity-offer variation, and the overall F-test (<span class="math inline">\(F\approx300.7 = t^2\)</span>) rejects the intercept-only model. Scope: an observational time trend among recorded pitches — not a causal effect of season, and the classical SEs assume the Lecture 2 conditions.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="spaced-review-one-diagnostics-item-from-lecture-2-5-minutes" class="level3">
+<h3 class="anchored" data-anchor-id="spaced-review-one-diagnostics-item-from-lecture-2-5-minutes">Spaced review: one diagnostics item from Lecture 2 (5 minutes)</h3>
+<p>The residual-versus-fitted plot of the deal model fans out to the right. Which of today’s printed numbers does that pattern undermine most directly, and why?</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check your answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The classical standard error 0.0182 — and with it the t statistic, p-value, and confidence interval built from it. The classical SE formula assumes one common error variance <span class="math inline">\(\sigma^2\)</span>; a fan says the conditional variance grows with the fitted value, so the stated precision is doubtful. Robust SEs address exactly this one problem; they repair nothing else.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="worked-exam-interpretation-5-minutes" class="level3">
+<h3 class="anchored" data-anchor-id="worked-exam-interpretation-5-minutes">Worked exam interpretation (5 minutes)</h3>
+<p><strong>Question</strong> (mock exam Question 3 pattern). A model of venture sales growth (percentage points) on marketing spending (€10,000s), fitted on <span class="math inline">\(n = 102\)</span> ventures, reports a slope of 1.38 with standard error 0.46, <span class="math inline">\(R^2 = 0.083\)</span>, and <span class="math inline">\(F = 9.0\)</span>. Build the 95% interval for the slope, decide the 5% test against zero, verify the F statistic from the t statistic, and state in one sentence what the low <span class="math inline">\(R^2\)</span> does and does not imply.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check a model answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><span class="math inline">\(t = 1.38/0.46 = 3.0\)</span>; with <span class="math inline">\(df = 100\)</span> the multiplier is about 1.98, so the interval is <span class="math inline">\(1.38 \pm 1.98\times0.46 \approx (0.47,\; 2.29)\)</span> percentage points per €10,000. The interval excludes zero, so the two-sided 5% test rejects <span class="math inline">\(H_0:\beta_1=0\)</span>; consistently, <span class="math inline">\(F = t^2 = 9.0\)</span>. The low <span class="math inline">\(R^2\)</span> says marketing spending explains about 8% of growth variation — predictions for individual ventures will be poor — but it does not undo the evidence that the association is non-zero, and neither number makes the association causal.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="from-the-reading-ladder-10-minutes" class="level3">
+<h3 class="anchored" data-anchor-id="from-the-reading-ladder-10-minutes">From the reading ladder (10 minutes)</h3>
+<p>The <a href="../resources/reading-ladder.html">reading ladder</a> returns to <a href="https://doi.org/10.2307/3069429">Tierney &amp; Farmer (2002)</a> — the paper whose correlation table you read in Basic Lecture 5. This time find a <strong>regression table</strong> and pick one coefficient row. Apply today’s pentad reading: the estimate and its sign, the reported SE or significance marker, what null hypothesis the star implicitly tests, and what the careful one-sentence interpretation is. Then find the reported <span class="math inline">\(R^2\)</span> (or change in <span class="math inline">\(R^2\)</span>) and say in one sentence what it does — and does not — tell you about the model’s usefulness.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check your approach
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-12" class="callout-12-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Your sentence should name the outcome, the predictor’s units or scale, and “holding the other included variables fixed”, and the significance star should translate to “a t-test against zero rejects at the marked level” — nothing more. If the <span class="math inline">\(R^2\)</span> sentence avoided both “the model is good” and “the model is bad” and instead said what share of outcome variation the predictors account for in this sample, you read the table the way this course intends.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="make-it-yours-5-minutes" class="level3">
+<h3 class="anchored" data-anchor-id="make-it-yours-5-minutes">Make it yours (5 minutes)</h3>
+<div class="utility-prompt">
+<p><span class="label">Utility: two sentences</span></p>
+<p>Think of your EiA3 venture — or any business you know well — and one regression you might run on its data. Write two sentences: first say which you would rather have for your next decision, a precise slope (narrow interval) or a high <span class="math inline">\(R^2\)</span>, and why; then name the usefulness meaning from today’s four-case list that matters most for that decision. There is no wrong answer; the point is noticing that precision and fit answer different questions.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+See an example, then write your own
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-13" class="callout-13-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Take a student-run campus meal-prep box venture. “For setting next month’s ad budget I would take a precise slope over a high <span class="math inline">\(R^2\)</span>: I need to know what an extra €100 buys, even if week-to-week orders stay noisy. That is the levers meaning of usefulness — predicting individual weeks matters less to me than the payoff of an input I control.”</p>
+</div>
+</div>
+</div>
+<p>You can discuss this task — and any other task in this chapter — with <strong>Tilly</strong>, the course AI assistant on Canvas: ask it to invent a business model with a significant slope and a low <span class="math inline">\(R^2\)</span> and challenge you to say what the model is still useful for.</p>
+</div>
+<p>Continue to Tutorial 1: Simple regression, diagnostics, and model usefulness.</p>
+<p>Formula sheet: Lecture 3 formulas.</p>
+<p>For a more formal treatment, see James et al., <em>An Introduction to Statistical Learning</em>, 2nd ed., Sections 3.1.2–3.1.3, and <a href="https://tilburguniversity.on.worldcat.org/oclc/317545871">Nieuwenhuis, <em>Statistical Methods for Business and Economics</em></a>, Chapters 19–20.</p>
+</section>
+</section>
+
+
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/valentinamel\.github\.io\/textbook-qm-ebi\/");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../intermediate/i02-assumptions-diagnostics.html" class="pagination-link" aria-label="Lecture 2: What the model assumes and how residuals betray it">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">Lecture 2: What the model assumes and how residuals betray it</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../intermediate/t01-exam-prep.html" class="pagination-link" aria-label="Tutorial 1: Simple regression, diagnostics, and model usefulness">
+        <span class="nav-page-text"><span class="chapter-title">Tutorial 1: Simple regression, diagnostics, and model usefulness</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -1,0 +1,1653 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.42">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Lecture 4: Conditioning, Bayes’ rule, and independence – Quantitative Methods to Understand E&amp;BI</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../basic/b05-joint-covariance-correlation.html" rel="next">
+<link href="../basic/t01-exam-prep.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-ecf4e518a83458a2bb67b2a9bf74271b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar docked">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../basic/overview.html">QM Basic: Course overview</a></li><li class="breadcrumb-item"><a href="../basic/b04-conditioning-bayes-independence.html"><span class="chapter-title">Lecture 4: Conditioning, Bayes’ rule, and independence</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Quantitative Methods to Understand E&amp;BI</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Welcome</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../basic/overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">QM Basic: Course overview</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b01-introduction-data-analysis.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 1: Introduction to Data Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b02-probability-foundations.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 2: Probability foundations and random variables</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b03-discrete-distributions.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 3: Discrete distributions, expectation, and variance</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/t01-exam-prep.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Tutorial 1: Evidence and probability foundations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b04-conditioning-bayes-independence.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">Lecture 4: Conditioning, Bayes’ rule, and independence</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b05-joint-covariance-correlation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 5: Joint random variables, covariance, and correlation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/t02-exam-prep.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Tutorial 2: Conditioning and relationships</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b06-continuous-normal.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 6: Continuous distributions and the normal model</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b07-samples-estimators.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 7: Samples, parameters, and estimators</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b08-sampling-distributions.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 8: Sampling distributions and the central limit theorem</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/t03-exam-prep.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Tutorial 3: Normal models, sampling, and standard errors</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b09-t-confidence-intervals.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 9: The t distribution, confidence intervals, and the two-sided test</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b10-testing-errors-power.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 10: Testing decisions, errors, power, and the road to regression</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/t04-exam-prep.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Tutorial 4: Inference and tests against zero</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/formula-sheet.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">QM Basic Formula Sheet</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/mock-exam.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Mock Exam: QM Basic</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../intermediate/overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">QM Intermediate: Course overview</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/i01-simple-linear-regression.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 1: Simple linear regression</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/i02-assumptions-diagnostics.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 2: What the model assumes and how residuals betray it</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/i03-inference-fit-ftest.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 3: Coefficient inference, fit, and the F-test</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/t01-exam-prep.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Tutorial 1: Simple regression, diagnostics, and model usefulness</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/i04-multiple-regression.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 4: Multiple regression and what controls do</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/i05-categories-joint-tests.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 5: Categories as predictors and joint tests</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/i06-interactions-curvature.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 6: Interactions and curvature</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/t02-exam-prep.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Tutorial 2: Multiple regression and extensions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/code-sheet.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">QM Intermediate Code Sheet</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/mock-exam.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Mock Exam: QM Intermediate</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <span class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">QM Advanced: Course overview</span></span>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Supplementary resources</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../resources/how-to-succeed.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">How to succeed in this course</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../resources/r-refresher.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">R Refresher</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../resources/math-refresher.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Mathematics Refresher</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../resources/video-guide.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">External Video Guide</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../resources/reading-ladder.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Reading research papers</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul class="collapse">
+  <li><a href="#before-class" id="toc-before-class" class="nav-link active" data-scroll-target="#before-class">Before class</a></li>
+  <li><a href="#in-class" id="toc-in-class" class="nav-link" data-scroll-target="#in-class">In class</a></li>
+  <li><a href="#after-class" id="toc-after-class" class="nav-link" data-scroll-target="#after-class">After class</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../basic/overview.html">QM Basic: Course overview</a></li><li class="breadcrumb-item"><a href="../basic/b04-conditioning-bayes-independence.html"><span class="chapter-title">Lecture 4: Conditioning, Bayes’ rule, and independence</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="b04" class="quarto-section-identifier"><span class="chapter-title">Lecture 4: Conditioning, Bayes’ rule, and independence</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="outcomes">
+<p><span class="label">By the end of Lecture 4, you can</span></p>
+<ul>
+<li>calculate conditional probabilities from a counts table and identify the reference class behind each one;</li>
+<li>use the multiplication rule to move between joint and conditional probabilities;</li>
+<li>rebuild an overall probability from group-specific rates with the law of total probability;</li>
+<li>update a probability after new evidence with Bayes’ rule, first by counting on a natural-frequency tree and then with the formula;</li>
+<li>check whether two events are independent and explain why disjoint is not the same as independent.</li>
+</ul>
+</div>
+<div class="driving-question">
+<p><span class="label">Driving question</span></p>
+<p class="dq-context">
+An investor who learns a pitch is late-season updates their expectations. A bank seeing a positive fraud flag does the same. Updating chances on new information is the most used probability skill in business — and the easiest to get backwards.
+</p>
+<p>Late-season pitches reach deals more often. What exactly do the two possible “68.8% versus 57.3%” sentences claim, and what does a positive flag from an AI deal-predictor really tell us?</p>
+</div>
+<section id="before-class" class="level2 course-phase phase-before">
+<h2 class="anchored" data-anchor-id="before-class">Before class</h2>
+<p><span class="time-budget">Total preparation time: about 30 minutes.</span></p>
+<div class="video-prep">
+<p><span class="label">Video preparation (15 minutes)</span><br> Watch <a href="https://www.youtube.com/watch?v=MPRKc4UPoJk">Conditional Probabilities</a> and <a href="https://www.youtube.com/watch?v=kz2tvO_ZAKI">Bayes’ Rule</a>. Be ready to identify the reference class in a conditional probability and to explain why reversing a condition changes the denominator. All links are also listed in the <a href="../resources/video-guide.html">External Video Guide</a>.</p>
+</div>
+<p><strong>Reactivate (10 minutes).</strong> Lecture 2 built the 2×2 counts table for deals and seasons. Rebuild it — the construction of <span class="math inline">\(D\)</span> and <span class="math inline">\(L\)</span> is the same as there:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>D <span class="ot">&lt;-</span> sharks<span class="sc">$</span>deal_on_show <span class="sc">==</span> <span class="dv">1</span>   <span class="co"># on-air deal</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>L <span class="ot">&lt;-</span> sharks<span class="sc">$</span>season <span class="sc">&gt;=</span> <span class="dv">9</span>         <span class="co"># late season: Seasons 9-16</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(<span class="at">deal =</span> D, <span class="at">late =</span> L)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Then compare, in words only:</p>
+<ul>
+<li>“Among pitches in Seasons 9–16, what proportion reached an on-air deal?”</li>
+<li>“Among pitches that reached an on-air deal, what proportion came from Seasons 9–16?”</li>
+</ul>
+<p>Both questions will use the same cell of your table. Decide before class which part of the table each question restricts attention to. The lecture opens with exactly this exercise.</p>
+<p><strong>Predict (5 minutes).</strong> Answer the one-click Mentimeter question posted on Canvas before you come to class: an AI classifier flags pitches likely to get a deal and catches 80% of actual deals. Of the <em>flagged</em> pitches, what share are deals — near 80%, near 50%, or near 30%? Commit to an answer; the lecture resolves it.</p>
+<p>If fractions or the conditioning bar are unfamiliar, review <a href="../resources/math-refresher.html">Mathematics Refresher: fractions, powers, and event notation</a>.</p>
+</section>
+<section id="in-class" class="level2 course-phase phase-in-class">
+<h2 class="anchored" data-anchor-id="in-class">In class</h2>
+<p>The session opens with the usual four-minute entry quiz on the prep videos, then turns to the driving question. Two sentences circulate about the same dataset:</p>
+<ul>
+<li><strong>Sentence A.</strong> “68.8% of late-season pitches reached an on-air deal.”</li>
+<li><strong>Sentence B.</strong> “57.3% of the pitches that reached a deal came from the late seasons.”</li>
+</ul>
+<p>Both sentences are built on the <em>same</em> 505 records — the late-season deals. Yet they answer different questions and produce different numbers. By the end of this session you can say precisely what each sentence claims, and you can answer a harder question of the same kind: when an AI classifier flags a pitch as a likely deal, how much should that flag change your mind?</p>
+<section id="one-table-five-denominators" class="level3">
+<h3 class="anchored" data-anchor-id="one-table-five-denominators">One table, five denominators</h3>
+<p>Everything starts from the Lecture 2 counts table. The code constructs <span class="math inline">\(D\)</span> and <span class="math inline">\(L\)</span> exactly as before — run it yourself:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>D <span class="ot">&lt;-</span> sharks<span class="sc">$</span>deal_on_show <span class="sc">==</span> <span class="dv">1</span>   <span class="co"># on-air deal</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>L <span class="ot">&lt;-</span> sharks<span class="sc">$</span>season <span class="sc">&gt;=</span> <span class="dv">9</span>         <span class="co"># late season: Seasons 9-16</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(<span class="at">deal =</span> D, <span class="at">late =</span> L)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       late
+deal    FALSE TRUE
+  FALSE   330  229
+  TRUE    377  505</code></pre>
+</div>
+</div>
+<p>Written with row and column totals:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 28%">
+<col style="width: 31%">
+<col style="width: 28%">
+<col style="width: 10%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th style="text-align: right;">Early (<span class="math inline">\(L^c\)</span>, S1–8)</th>
+<th style="text-align: right;">Late (<span class="math inline">\(L\)</span>, S9–16)</th>
+<th style="text-align: right;">Total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>No deal</strong> (<span class="math inline">\(D^c\)</span>)</td>
+<td style="text-align: right;">330</td>
+<td style="text-align: right;">229</td>
+<td style="text-align: right;"><strong>559</strong></td>
+</tr>
+<tr class="even">
+<td><strong>Deal</strong> (<span class="math inline">\(D\)</span>)</td>
+<td style="text-align: right;">377</td>
+<td style="text-align: right;">505</td>
+<td style="text-align: right;"><strong>882</strong></td>
+</tr>
+<tr class="odd">
+<td><strong>Total</strong></td>
+<td style="text-align: right;"><strong>707</strong></td>
+<td style="text-align: right;"><strong>734</strong></td>
+<td style="text-align: right;"><strong>1441</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Before any formula, do the class opening exercise: for each probability below, point — physically, on the table — to the count that goes on top and the count that goes underneath.</p>
+<ol type="1">
+<li><span class="math inline">\(P(D)\)</span>;</li>
+<li><span class="math inline">\(P(L)\)</span>;</li>
+<li><span class="math inline">\(P(D\cap L)\)</span>;</li>
+<li><span class="math inline">\(P(D\mid L)\)</span>;</li>
+<li><span class="math inline">\(P(L\mid D)\)</span>.</li>
+</ol>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check your denominators
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li><span class="math inline">\(P(D)\)</span>: 882 deal records out of all 1,441 records.</li>
+<li><span class="math inline">\(P(L)\)</span>: 734 late-season records out of all 1,441 records.</li>
+<li><span class="math inline">\(P(D\cap L)\)</span>: 505 late-season deal records out of all 1,441 records.</li>
+<li><span class="math inline">\(P(D\mid L)\)</span>: 505 late-season deal records out of the <strong>734 late-season records</strong>.</li>
+<li><span class="math inline">\(P(L\mid D)\)</span>: 505 late-season deal records out of the <strong>882 deal records</strong>.</li>
+</ol>
+<p>The first three all divide by 1,441. The last two divide by a <em>part</em> of the table — and that is the whole subject of this lecture.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="conditional-probability" class="level3">
+<h3 class="anchored" data-anchor-id="conditional-probability">Conditional probability</h3>
+<p class="concept-video">
+<strong>MIT explanation (review):</strong> <a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/conditional-probabilities/">02.2 Conditional Probabilities</a>.
+</p>
+<p>For events <span class="math inline">\(A\)</span> and <span class="math inline">\(B\)</span> with <span class="math inline">\(P(B)&gt;0\)</span>, the <strong>conditional probability of <span class="math inline">\(A\)</span> given <span class="math inline">\(B\)</span></strong> is</p>
+<p><span class="math display">\[P(A\mid B)=\frac{P(A\cap B)}{P(B)}.\]</span></p>
+<p>Read the definition as an instruction in three steps: keep only the outcomes inside <span class="math inline">\(B\)</span>, rescale their total probability to 1, and then ask what fraction of that reduced world is also in <span class="math inline">\(A\)</span>. The event after the vertical bar is the <strong>reference class</strong> — the group you restrict attention to — and it supplies the denominator. For a fixed <span class="math inline">\(B\)</span>, <span class="math inline">\(P(\cdot\mid B)\)</span> is itself a probability law: it satisfies all three rules from Lecture 2.</p>
+<div id="exm-b04-conditional" class="theorem example">
+<p><span class="theorem-title"><strong>Example 5.1 (Worked example: the two rival sentences, resolved)</strong></span> <strong>Sentence A asks about <span class="math inline">\(P(D\mid L)\)</span>.</strong> Conditioning on <span class="math inline">\(L\)</span> means covering everything except the Late column:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th style="text-align: right;">Early</th>
+<th style="text-align: right;"><strong>Late (<span class="math inline">\(L\)</span>)</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>No deal</td>
+<td style="text-align: right;">·</td>
+<td style="text-align: right;"><strong>229</strong></td>
+</tr>
+<tr class="even">
+<td>Deal</td>
+<td style="text-align: right;">·</td>
+<td style="text-align: right;"><strong>505</strong></td>
+</tr>
+<tr class="odd">
+<td>Total</td>
+<td style="text-align: right;">·</td>
+<td style="text-align: right;"><strong>734</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Within that one column, 505 of 734 records are deals:</p>
+<p><span class="math display">\[P(D\mid L)=\frac{505}{734}\approx 0.688.\]</span></p>
+<p><strong>Sentence B asks about <span class="math inline">\(P(L\mid D)\)</span>.</strong> Conditioning on <span class="math inline">\(D\)</span> means covering everything except the Deal row:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th style="text-align: right;">Early</th>
+<th style="text-align: right;">Late</th>
+<th style="text-align: right;">Total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>No deal</td>
+<td style="text-align: right;">·</td>
+<td style="text-align: right;">·</td>
+<td style="text-align: right;">·</td>
+</tr>
+<tr class="even">
+<td><strong>Deal (<span class="math inline">\(D\)</span>)</strong></td>
+<td style="text-align: right;"><strong>377</strong></td>
+<td style="text-align: right;"><strong>505</strong></td>
+<td style="text-align: right;"><strong>882</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Within that one row, 505 of 882 records are late-season:</p>
+<p><span class="math display">\[P(L\mid D)=\frac{505}{882}\approx 0.573.\]</span></p>
+<p>The numerator is 505 in both calculations — the same intersection cell. The denominators, and therefore the questions, differ: Sentence A restricts to the 734 late-season pitches, Sentence B to the 882 deal pitches.</p>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check: which sentence matches which number?
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Sentence A (“of late-season pitches, … reached a deal”) conditions on the season, so it is <span class="math inline">\(P(D\mid L)=505/734\approx 68.8\%\)</span>. Sentence B (“of deal pitches, … came from late seasons”) conditions on the deal, so it is <span class="math inline">\(P(L\mid D)=505/882\approx 57.3\%\)</span>. A report that quotes “68.8% of deal pitches came from late seasons” has attached the right number to the wrong sentence.</p>
+</div>
+</div>
+</div>
+<p>Verification in R — subsetting with <code>[L]</code> or <code>[D]</code> is exactly the “restrict the reference class” step:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>D <span class="ot">&lt;-</span> sharks<span class="sc">$</span>deal_on_show <span class="sc">==</span> <span class="dv">1</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>L <span class="ot">&lt;-</span> sharks<span class="sc">$</span>season <span class="sc">&gt;=</span> <span class="dv">9</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">P_deal_given_late =</span> <span class="fu">mean</span>(D[L]),</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">P_late_given_deal =</span> <span class="fu">mean</span>(L[D])</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>P_deal_given_late P_late_given_deal 
+        0.6880109         0.5725624 </code></pre>
+</div>
+</div>
+</section>
+<section id="the-multiplication-rule" class="level3">
+<h3 class="anchored" data-anchor-id="the-multiplication-rule">The multiplication rule</h3>
+<p class="concept-video">
+<strong>MIT explanation (review):</strong> <a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/the-multiplication-rule/">02.6 The Multiplication Rule</a>.
+</p>
+<p>Multiply both sides of the definition by <span class="math inline">\(P(B)\)</span> and the same content appears in a new role — a way to <em>build</em> a joint probability from a conditional one:</p>
+<p><span class="math display">\[P(A\cap B)=P(A\mid B)\,P(B).\]</span></p>
+<p>Reversing the roles of <span class="math inline">\(A\)</span> and <span class="math inline">\(B\)</span> must give the same joint probability, because <span class="math inline">\(A\cap B\)</span> and <span class="math inline">\(B\cap A\)</span> are the same event:</p>
+<p><span class="math display">\[P(A\cap B)=P(A\mid B)\,P(B)=P(B\mid A)\,P(A).\]</span></p>
+<p>This one line is the algebraic reason the two rival sentences can share a numerator while having different denominators: both products equal <span class="math inline">\(505/1441\)</span>, but they factor it through different reference classes.</p>
+<div class="callout callout-style-default callout-caution callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Try it: verify the joint probability two ways
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>In class this is the pair task. Use the counts table to check the identity above for <span class="math inline">\(D\)</span> and <span class="math inline">\(L\)</span>.</p>
+<p><em>Step 1 (given).</em> The direct route: <span class="math inline">\(P(D\cap L)=505/1441\approx 0.350\)</span>.</p>
+<p><em>Step 2 (given).</em> First factorisation: <span class="math inline">\(P(D\mid L)\,P(L)=\dfrac{505}{734}\cdot\dfrac{734}{1441}\)</span>. The 734 cancels — carry out the cancellation and confirm you land on <span class="math inline">\(505/1441\)</span>.</p>
+<p><em>Step 3 (you).</em> Write down the second factorisation, <span class="math inline">\(P(L\mid D)\,P(D)\)</span>, as a product of two fractions from the table, and show that it also collapses to <span class="math inline">\(505/1441\)</span>.</p>
+<p><em>Step 4 (you).</em> Confirm all three routes in R.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check your answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><span class="math inline">\(P(L\mid D)\,P(D)=\dfrac{505}{882}\cdot\dfrac{882}{1441}=\dfrac{505}{1441}
+\approx 0.350\)</span>: the 882 cancels, just as the 734 did.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>D <span class="ot">&lt;-</span> sharks<span class="sc">$</span>deal_on_show <span class="sc">==</span> <span class="dv">1</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>L <span class="ot">&lt;-</span> sharks<span class="sc">$</span>season <span class="sc">&gt;=</span> <span class="dv">9</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">direct_joint            =</span> <span class="fu">mean</span>(D <span class="sc">&amp;</span> L),</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">cond_on_late_times_base =</span> <span class="fu">mean</span>(D[L]) <span class="sc">*</span> <span class="fu">mean</span>(L),</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">cond_on_deal_times_base =</span> <span class="fu">mean</span>(L[D]) <span class="sc">*</span> <span class="fu">mean</span>(D)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           direct_joint cond_on_late_times_base cond_on_deal_times_base 
+              0.3504511               0.3504511               0.3504511 </code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="the-law-of-total-probability" class="level3">
+<h3 class="anchored" data-anchor-id="the-law-of-total-probability">The law of total probability</h3>
+<p class="concept-video">
+<strong>MIT explanation (review):</strong> <a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/total-probability-theorem/">02.7 Total Probability Theorem</a>.
+</p>
+<p>Lecture 2 introduced a partition: events that do not overlap and together cover every outcome. Conditioning gives the probability of <span class="math inline">\(A\)</span> <em>within</em> each part; the multiplication rule turns each conditional probability into a joint piece; and adding the pieces gives the overall probability of <span class="math inline">\(A\)</span>. That chain of three known moves is the <strong>law of total probability</strong>: for a partition <span class="math inline">\(B_1,\ldots,B_k\)</span> with every <span class="math inline">\(P(B_i)&gt;0\)</span>,</p>
+<p><span class="math display">\[P(A)=\sum_{i=1}^{k}P(A\mid B_i)\,P(B_i).\]</span></p>
+<div id="exm-b04-total" class="theorem example">
+<p><span class="theorem-title"><strong>Example 5.2 (Worked example: rebuilding P(D) from the period-specific rates)</strong></span> The early/late events <span class="math inline">\(\{L^c, L\}\)</span> form a partition, so</p>
+<p><span class="math display">\[P(D)=P(D\mid L^c)\,P(L^c)+P(D\mid L)\,P(L)
+=\frac{377}{707}\cdot\frac{707}{1441}
++\frac{505}{734}\cdot\frac{734}{1441}
+=\frac{377+505}{1441}=\frac{882}{1441}\approx 0.612.\]</span></p>
+<p>Point to the two kinds of number: <span class="math inline">\(377/707\approx 0.533\)</span> and <span class="math inline">\(505/734\approx 0.688\)</span> are the <em>period-specific deal rates</em>, and <span class="math inline">\(707/1441\approx 0.491\)</span> and <span class="math inline">\(734/1441\approx 0.509\)</span> are the <strong>weights</strong> — how much of the sample space each period occupies. The overall deal probability is a weighted average of the group rates, so it must lie between 0.533 and 0.688, closer to the rate of the slightly larger group.</p>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>D <span class="ot">&lt;-</span> sharks<span class="sc">$</span>deal_on_show <span class="sc">==</span> <span class="dv">1</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>L <span class="ot">&lt;-</span> sharks<span class="sc">$</span>season <span class="sc">&gt;=</span> <span class="dv">9</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">direct       =</span> <span class="fu">mean</span>(D),</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">from_periods =</span> <span class="fu">mean</span>(D[<span class="sc">!</span>L]) <span class="sc">*</span> <span class="fu">mean</span>(<span class="sc">!</span>L) <span class="sc">+</span> <span class="fu">mean</span>(D[L]) <span class="sc">*</span> <span class="fu">mean</span>(L)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      direct from_periods 
+   0.6120749    0.6120749 </code></pre>
+</div>
+</div>
+<p><a href="#fig-b04-partition-areas" class="quarto-xref">Figure&nbsp;<span>5.1</span></a> shows the same computation as areas.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>See the R code for this figure</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>D <span class="ot">&lt;-</span> sharks<span class="sc">$</span>deal_on_show <span class="sc">==</span> <span class="dv">1</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>L <span class="ot">&lt;-</span> sharks<span class="sc">$</span>season <span class="sc">&gt;=</span> <span class="dv">9</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>p_early <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="sc">!</span>L)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>p_deal_early <span class="ot">&lt;-</span> <span class="fu">mean</span>(D[<span class="sc">!</span>L])</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>p_deal_late <span class="ot">&lt;-</span> <span class="fu">mean</span>(D[L])</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># light backgrounds: the two parts of the partition</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"rect"</span>, <span class="at">xmin =</span> <span class="dv">0</span>, <span class="at">xmax =</span> p_early, <span class="at">ymin =</span> <span class="dv">0</span>, <span class="at">ymax =</span> <span class="dv">1</span>,</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>           <span class="at">fill =</span> <span class="st">"#009E73"</span>, <span class="at">alpha =</span> <span class="fl">0.25</span>) <span class="sc">+</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"rect"</span>, <span class="at">xmin =</span> p_early, <span class="at">xmax =</span> <span class="dv">1</span>, <span class="at">ymin =</span> <span class="dv">0</span>, <span class="at">ymax =</span> <span class="dv">1</span>,</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>           <span class="at">fill =</span> <span class="st">"#D55E00"</span>, <span class="at">alpha =</span> <span class="fl">0.25</span>) <span class="sc">+</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># solid areas: deal rate within each part, times the part's width</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"rect"</span>, <span class="at">xmin =</span> <span class="dv">0</span>, <span class="at">xmax =</span> p_early, <span class="at">ymin =</span> <span class="dv">0</span>,</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>           <span class="at">ymax =</span> p_deal_early, <span class="at">fill =</span> <span class="st">"#009E73"</span>, <span class="at">alpha =</span> <span class="fl">0.85</span>) <span class="sc">+</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"rect"</span>, <span class="at">xmin =</span> p_early, <span class="at">xmax =</span> <span class="dv">1</span>, <span class="at">ymin =</span> <span class="dv">0</span>,</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>           <span class="at">ymax =</span> p_deal_late, <span class="at">fill =</span> <span class="st">"#D55E00"</span>, <span class="at">alpha =</span> <span class="fl">0.85</span>) <span class="sc">+</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"segment"</span>, <span class="at">x =</span> p_early, <span class="at">xend =</span> p_early, <span class="at">y =</span> <span class="dv">0</span>, <span class="at">yend =</span> <span class="dv">1</span>,</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>           <span class="at">colour =</span> <span class="st">"#17324D"</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"rect"</span>, <span class="at">xmin =</span> <span class="dv">0</span>, <span class="at">xmax =</span> <span class="dv">1</span>, <span class="at">ymin =</span> <span class="dv">0</span>, <span class="at">ymax =</span> <span class="dv">1</span>,</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>           <span class="at">fill =</span> <span class="cn">NA</span>, <span class="at">colour =</span> <span class="st">"#17324D"</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> p_early <span class="sc">/</span> <span class="dv">2</span>, <span class="at">y =</span> <span class="fl">0.28</span>, <span class="at">label =</span> <span class="st">"D ∩ Lᶜ"</span>,</span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>           <span class="at">colour =</span> <span class="st">"white"</span>, <span class="at">size =</span> <span class="fl">4.2</span>) <span class="sc">+</span></span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> p_early <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">-</span> p_early) <span class="sc">/</span> <span class="dv">2</span>, <span class="at">y =</span> <span class="fl">0.36</span>,</span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>           <span class="at">label =</span> <span class="st">"D ∩ L"</span>, <span class="at">colour =</span> <span class="st">"white"</span>, <span class="at">size =</span> <span class="fl">4.2</span>) <span class="sc">+</span></span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> p_early <span class="sc">/</span> <span class="dv">2</span>, <span class="at">y =</span> <span class="fl">0.88</span>, <span class="at">label =</span> <span class="st">"L^c"</span>,</span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>           <span class="at">parse =</span> <span class="cn">TRUE</span>, <span class="at">colour =</span> <span class="st">"#17324D"</span>, <span class="at">size =</span> <span class="fl">4.4</span>) <span class="sc">+</span></span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> p_early <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">-</span> p_early) <span class="sc">/</span> <span class="dv">2</span>, <span class="at">y =</span> <span class="fl">0.88</span>,</span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>           <span class="at">label =</span> <span class="st">"L"</span>, <span class="at">colour =</span> <span class="st">"#17324D"</span>, <span class="at">size =</span> <span class="fl">4.4</span>) <span class="sc">+</span></span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="fl">0.985</span>, <span class="at">y =</span> <span class="fl">0.955</span>, <span class="at">label =</span> <span class="st">"Omega"</span>,</span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>           <span class="at">parse =</span> <span class="cn">TRUE</span>, <span class="at">colour =</span> <span class="st">"#17324D"</span>, <span class="at">size =</span> <span class="fl">3.8</span>) <span class="sc">+</span></span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">expand =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-b04-partition-areas" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-b04-partition-areas-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="b04-conditioning-bayes-independence_files/figure-html/fig-b04-partition-areas-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-b04-partition-areas-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.1: Total probability as areas. The columns are the early/late partition from Lecture 2; column width is the period’s probability (the weight), and the height of each coloured region is the period-specific deal rate. The two coloured areas do not overlap, and their sum is P(D).
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="bayes-rule-count-first-formula-second" class="level3">
+<h3 class="anchored" data-anchor-id="bayes-rule-count-first-formula-second">Bayes’ rule: count first, formula second</h3>
+<p class="concept-video">
+<strong>MIT explanation (review):</strong> <a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/bayes-rule/">02.8 Bayes’ Rule</a>.
+</p>
+<p>Return to your prep prediction. An AI classifier reads pitch transcripts and flags the pitches it considers likely to reach a deal. Three numbers describe a (hypothetical) classifier of this kind:</p>
+<ul>
+<li>the <strong>base rate</strong>: 10% of pitches in its target population reach a deal;</li>
+<li>the <strong>sensitivity</strong>: among actual deals, 80% get flagged, <span class="math inline">\(P(\text{flag}\mid\text{deal})=0.80\)</span>;</li>
+<li>the <strong>false-positive rate</strong>: among non-deals, 20% still get flagged, <span class="math inline">\(P(\text{flag}\mid\text{no deal})=0.20\)</span>.</li>
+</ul>
+<p>A pitch has just been flagged. How likely is a deal now — near 80%, 50%, or 30%? Before any formula, count.</p>
+<div id="exm-b04-bayes-tree" class="theorem example">
+<p><span class="theorem-title"><strong>Example 5.3 (Worked example: 1,000 imaginary pitches)</strong></span> Imagine 1,000 pitches from this population and push them through the three numbers, as in <a href="#fig-b04-bayes-tree" class="quarto-xref">Figure&nbsp;<span>5.2</span></a>.</p>
+<ol type="1">
+<li><strong>Split by the base rate.</strong> Of 1,000 pitches, 100 are deals and 900 are not.</li>
+<li><strong>Flag the deals.</strong> Sensitivity 80%: of the 100 deals, 80 are flagged.</li>
+<li><strong>Flag some non-deals too.</strong> False-positive rate 20%: of the 900 non-deals, 180 are flagged.</li>
+<li><strong>Collect the flagged.</strong> In total <span class="math inline">\(80+180=260\)</span> pitches carry a flag — and only 80 of them are deals:</li>
+</ol>
+<p><span class="math display">\[P(\text{deal}\mid\text{flag})=\frac{80}{260}\approx 0.31.\]</span></p>
+<p>The classifier catches 80% of deals, yet fewer than a third of its flags are deals. The reason is visible in the tree: the 900 non-deals are such a large group that even a modest 20% false-positive rate produces 180 false flags — more than double the 80 true ones. A flag moves the deal probability from 10% to 31%: real evidence, but nowhere near certainty.</p>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>See the drawing code (optional, not exam material)</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>old_par <span class="ot">&lt;-</span> <span class="fu">par</span>(<span class="at">no.readonly =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="fl">0.2</span>, <span class="fl">0.2</span>, <span class="fl">0.2</span>, <span class="fl">0.2</span>))</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="cn">NA</span>, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">10</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="fl">0.3</span>, <span class="fl">9.7</span>), <span class="at">axes =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">""</span>, <span class="at">ylab =</span> <span class="st">""</span>, <span class="at">xaxs =</span> <span class="st">"i"</span>, <span class="at">yaxs =</span> <span class="st">"i"</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>draw_node <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y, top, bottom, <span class="at">fill =</span> <span class="st">"white"</span>,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>                      <span class="at">border =</span> <span class="st">"#17324D"</span>, <span class="at">lwd =</span> <span class="fl">1.4</span>, <span class="at">w =</span> <span class="fl">1.05</span>, <span class="at">h =</span> <span class="fl">0.78</span>) {</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rect</span>(x <span class="sc">-</span> w, y <span class="sc">-</span> h, x <span class="sc">+</span> w, y <span class="sc">+</span> h, <span class="at">col =</span> fill, <span class="at">border =</span> border, <span class="at">lwd =</span> lwd)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">text</span>(x, y <span class="sc">+</span> <span class="fl">0.26</span>, top, <span class="at">font =</span> <span class="dv">2</span>, <span class="at">cex =</span> <span class="fl">1.0</span>, <span class="at">col =</span> <span class="st">"#17324D"</span>)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">text</span>(x, y <span class="sc">-</span> <span class="fl">0.30</span>, bottom, <span class="at">cex =</span> <span class="fl">0.8</span>, <span class="at">col =</span> <span class="st">"#5B6976"</span>)</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>draw_branch <span class="ot">&lt;-</span> <span class="cf">function</span>(x1, y1, x2, y2, label, <span class="at">above =</span> <span class="cn">TRUE</span>) {</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">segments</span>(x1, y1, x2, y2, <span class="at">col =</span> <span class="st">"#9AA7B2"</span>, <span class="at">lwd =</span> <span class="fl">1.6</span>)</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">text</span>((x1 <span class="sc">+</span> x2) <span class="sc">/</span> <span class="dv">2</span>, (y1 <span class="sc">+</span> y2) <span class="sc">/</span> <span class="dv">2</span> <span class="sc">+</span> <span class="cf">if</span> (above) <span class="fl">0.32</span> <span class="cf">else</span> <span class="sc">-</span><span class="fl">0.32</span>,</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>       label, <span class="at">cex =</span> <span class="fl">0.76</span>, <span class="at">col =</span> <span class="st">"#5B6976"</span>)</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="co"># branches first, then boxes on top</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="fu">draw_branch</span>(<span class="fl">2.45</span>, <span class="fl">5.35</span>, <span class="fl">3.55</span>, <span class="fl">7.15</span>, <span class="st">"10% deal"</span>)</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="fu">draw_branch</span>(<span class="fl">2.45</span>, <span class="fl">4.65</span>, <span class="fl">3.55</span>, <span class="fl">2.85</span>, <span class="st">"90% no deal"</span>, <span class="at">above =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="fu">draw_branch</span>(<span class="fl">5.65</span>, <span class="fl">7.75</span>, <span class="fl">6.95</span>, <span class="fl">8.45</span>, <span class="st">"80% flagged"</span>)</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a><span class="fu">draw_branch</span>(<span class="fl">5.65</span>, <span class="fl">7.05</span>, <span class="fl">6.95</span>, <span class="fl">6.35</span>, <span class="st">"20% not"</span>, <span class="at">above =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="fu">draw_branch</span>(<span class="fl">5.65</span>, <span class="fl">2.95</span>, <span class="fl">6.95</span>, <span class="fl">3.65</span>, <span class="st">"20% flagged"</span>)</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a><span class="fu">draw_branch</span>(<span class="fl">5.65</span>, <span class="fl">2.25</span>, <span class="fl">6.95</span>, <span class="fl">1.55</span>, <span class="st">"80% not"</span>, <span class="at">above =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a><span class="fu">draw_node</span>(<span class="fl">1.35</span>, <span class="fl">5.0</span>, <span class="st">"1,000"</span>, <span class="st">"pitches"</span>, <span class="at">w =</span> <span class="fl">1.15</span>)</span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a><span class="fu">draw_node</span>(<span class="fl">4.6</span>, <span class="fl">7.4</span>, <span class="st">"100"</span>, <span class="st">"deal"</span>)</span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a><span class="fu">draw_node</span>(<span class="fl">4.6</span>, <span class="fl">2.6</span>, <span class="st">"900"</span>, <span class="st">"no deal"</span>)</span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a><span class="fu">draw_node</span>(<span class="fl">8.0</span>, <span class="fl">8.6</span>, <span class="st">"80"</span>, <span class="st">"flagged"</span>, <span class="at">fill =</span> <span class="st">"#FDE5C1"</span>,</span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>          <span class="at">border =</span> <span class="st">"#D55E00"</span>, <span class="at">lwd =</span> <span class="fl">2.2</span>)</span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a><span class="fu">draw_node</span>(<span class="fl">8.0</span>, <span class="fl">6.2</span>, <span class="st">"20"</span>, <span class="st">"not flagged"</span>, <span class="at">fill =</span> <span class="st">"#F4F7F9"</span>,</span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a>          <span class="at">border =</span> <span class="st">"#9AA7B2"</span>)</span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a><span class="fu">draw_node</span>(<span class="fl">8.0</span>, <span class="fl">3.8</span>, <span class="st">"180"</span>, <span class="st">"flagged"</span>, <span class="at">fill =</span> <span class="st">"#FDE5C1"</span>,</span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>          <span class="at">border =</span> <span class="st">"#D55E00"</span>, <span class="at">lwd =</span> <span class="fl">2.2</span>)</span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a><span class="fu">draw_node</span>(<span class="fl">8.0</span>, <span class="fl">1.4</span>, <span class="st">"720"</span>, <span class="st">"not flagged"</span>, <span class="at">fill =</span> <span class="st">"#F4F7F9"</span>,</span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a>          <span class="at">border =</span> <span class="st">"#9AA7B2"</span>)</span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="fl">9.55</span>, <span class="fl">6.2</span>, <span class="st">"260</span><span class="sc">\n</span><span class="st">flagged</span><span class="sc">\n</span><span class="st">in total"</span>, <span class="at">cex =</span> <span class="fl">0.82</span>, <span class="at">col =</span> <span class="st">"#D55E00"</span>)</span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(old_par)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-b04-bayes-tree" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-b04-bayes-tree-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="b04-conditioning-bayes-independence_files/figure-html/fig-b04-bayes-tree-1.png" class="img-fluid figure-img" width="768">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-b04-bayes-tree-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.2: Natural-frequency tree for 1,000 imaginary pitches. Orange boxes are the flagged pitches: 80 + 180 = 260 flags in total, of which only 80 are deals, so P(deal | flag) = 80/260, about 31%.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Now the formula. The question reverses a condition: the classifier’s quality is stated as <span class="math inline">\(P(\text{flag}\mid\text{deal})\)</span>, but the decision-maker needs <span class="math inline">\(P(\text{deal}\mid\text{flag})\)</span>. The multiplication rule gives the numerator and total probability gives the denominator:</p>
+<p><span class="math display">\[P(B_i\mid A)=\frac{P(A\mid B_i)\,P(B_i)}
+{\sum_j P(A\mid B_j)\,P(B_j)}.\]</span></p>
+<p>This is <strong>Bayes’ rule</strong>. For the classifier, with the deal/no-deal partition:</p>
+<p><span class="math display">\[P(\text{deal}\mid\text{flag})
+=\frac{0.80\times 0.10}{0.80\times 0.10+0.20\times 0.90}
+=\frac{0.08}{0.08+0.18}=\frac{0.08}{0.26}\approx 0.308.\]</span></p>
+<p>Every term is a branch of the tree, divided by 1,000:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 30%">
+<col style="width: 40%">
+<col style="width: 30%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Formula term</th>
+<th style="text-align: right;">Value</th>
+<th>Tree count</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(P(\text{flag}\mid\text{deal})\,P(\text{deal})\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0.08\)</span></td>
+<td>the 80 flagged deals</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(P(\text{flag}\mid\text{no deal})\,P(\text{no deal})\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0.18\)</span></td>
+<td>the 180 flagged non-deals</td>
+</tr>
+<tr class="odd">
+<td>the denominator (total probability of a flag)</td>
+<td style="text-align: right;"><span class="math inline">\(0.26\)</span></td>
+<td>all 260 flagged pitches</td>
+</tr>
+</tbody>
+</table>
+<p>The formula is the tree, written compactly. When a Bayes question appears on the exam, you may draw the tree with a convenient imaginary total and count — the two routes always agree.</p>
+<p>Bayes’ rule also works on the Shark Tank events themselves. Reversing <span class="math inline">\(P(D\mid L)\)</span> recovers <span class="math inline">\(P(L\mid D)\)</span>, and the R check makes the point that nothing beyond the multiplication rule and total probability is involved:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>D <span class="ot">&lt;-</span> sharks<span class="sc">$</span>deal_on_show <span class="sc">==</span> <span class="dv">1</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>L <span class="ot">&lt;-</span> sharks<span class="sc">$</span>season <span class="sc">&gt;=</span> <span class="dv">9</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>bayes_late_given_deal <span class="ot">&lt;-</span> <span class="fu">mean</span>(D[L]) <span class="sc">*</span> <span class="fu">mean</span>(L) <span class="sc">/</span> <span class="fu">mean</span>(D)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">from_bayes =</span> bayes_late_given_deal,</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">from_table =</span> <span class="fu">mean</span>(L[D])</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>from_bayes from_table 
+ 0.5725624  0.5725624 </code></pre>
+</div>
+</div>
+</section>
+<section id="independence-of-events" class="level3">
+<h3 class="anchored" data-anchor-id="independence-of-events">Independence of events</h3>
+<p class="concept-video">
+<strong>MIT explanation (review):</strong> <a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/independence-of-two-events/">03.3 Independence of Two Events</a>.
+</p>
+<p>Conditioning finally makes precise an idea Lecture 2 could only promise: what it means for one event to carry <em>no information</em> about another. Events <span class="math inline">\(A\)</span> and <span class="math inline">\(B\)</span> (with <span class="math inline">\(P(B)&gt;0\)</span>) are <strong>independent</strong> when learning that <span class="math inline">\(B\)</span> occurred does not change the probability of <span class="math inline">\(A\)</span>:</p>
+<p><span class="math display">\[P(A\mid B)=P(A).\]</span></p>
+<p>Multiplying both sides by <span class="math inline">\(P(B)\)</span> gives the symmetric <strong>product form</strong>, which also covers zero-probability events and is the usual textbook definition:</p>
+<p><span class="math display">\[P(A\cap B)=P(A)\,P(B).\]</span></p>
+<div id="exm-b04-independence" class="theorem example">
+<p><span class="theorem-title"><strong>Example 5.4 (Worked example: are D and L independent?)</strong></span> Check either form with the real numbers.</p>
+<p>Via conditioning: <span class="math inline">\(P(D\mid L)=505/734\approx 0.688\)</span>, while <span class="math inline">\(P(D)=882/1441\approx 0.612\)</span>. Learning that a pitch is late-season <em>raises</em> the deal probability, so <span class="math inline">\(D\)</span> and <span class="math inline">\(L\)</span> are <strong>not independent</strong>.</p>
+<p>Via the product: <span class="math inline">\(P(D\cap L)=505/1441\approx 0.350\)</span>, while <span class="math inline">\(P(D)\,P(L)=\dfrac{882}{1441}\cdot\dfrac{734}{1441}\approx 0.612\times
+0.509\approx 0.312\)</span>. The joint probability exceeds the product, which says the same thing: deals and late seasons occur together more often than independence would predict.</p>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>D <span class="ot">&lt;-</span> sharks<span class="sc">$</span>deal_on_show <span class="sc">==</span> <span class="dv">1</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>L <span class="ot">&lt;-</span> sharks<span class="sc">$</span>season <span class="sc">&gt;=</span> <span class="dv">9</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">P_D_given_L  =</span> <span class="fu">mean</span>(D[L]),</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">P_D          =</span> <span class="fu">mean</span>(D),</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">P_D_and_L    =</span> <span class="fu">mean</span>(D <span class="sc">&amp;</span> L),</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">P_D_times_P_L =</span> <span class="fu">mean</span>(D) <span class="sc">*</span> <span class="fu">mean</span>(L)</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  P_D_given_L           P_D     P_D_and_L P_D_times_P_L 
+    0.6880109     0.6120749     0.3504511     0.3117717 </code></pre>
+</div>
+</div>
+<p><strong>Disjoint is not independent — one minute, one example.</strong> Take the early/late pair <span class="math inline">\(L^c\)</span> and <span class="math inline">\(L\)</span>. They are disjoint: no pitch is in both periods, so <span class="math inline">\(P(L^c\cap L)=0\)</span>. But the product <span class="math inline">\(P(L^c)\,P(L)\approx 0.491\times 0.509\approx 0.25\)</span> is far from zero, so they fail the independence check spectacularly. Disjoint events with positive probability are always <em>dependent</em>: observing one tells you the other is impossible — maximal information, not none.</p>
+</section>
+<section id="second-application-deal-rates-by-team-composition" class="level3">
+<h3 class="anchored" data-anchor-id="second-application-deal-rates-by-team-composition">Second application: deal rates by team composition</h3>
+<p>The dataset classifies pitching teams as <code>all_men</code>, <code>all_women</code>, <code>mixed</code>, or <code>unknown</code>. Each within-category deal rate is a conditional probability: <span class="math inline">\(P(D\mid \text{category})\)</span>, with the category as reference class. The construction is shown in full — this is the live-R segment of the session:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>D <span class="ot">&lt;-</span> sharks<span class="sc">$</span>deal_on_show <span class="sc">==</span> <span class="dv">1</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>known_gender <span class="ot">&lt;-</span> sharks<span class="sc">$</span>pitcher_gender_group <span class="sc">!=</span> <span class="st">"unknown"</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>gender_labels <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"all_men"</span>, <span class="st">"all_women"</span>, <span class="st">"mixed"</span>)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>gender_deal_rates <span class="ot">&lt;-</span> <span class="fu">tapply</span>(</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  sharks<span class="sc">$</span>deal_on_show[known_gender],</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">factor</span>(sharks<span class="sc">$</span>pitcher_gender_group[known_gender], <span class="at">levels =</span> gender_labels),</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  mean</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>gender_deal_rates</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  all_men all_women     mixed 
+0.5808538 0.6363636 0.6630435 </code></pre>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>See the R code for this figure</summary>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>known_gender <span class="ot">&lt;-</span> sharks<span class="sc">$</span>pitcher_gender_group <span class="sc">!=</span> <span class="st">"unknown"</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>gender_labels <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"all_men"</span>, <span class="st">"all_women"</span>, <span class="st">"mixed"</span>)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>gender_deal_rates <span class="ot">&lt;-</span> <span class="fu">tapply</span>(</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  sharks<span class="sc">$</span>deal_on_show[known_gender],</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">factor</span>(sharks<span class="sc">$</span>pitcher_gender_group[known_gender], <span class="at">levels =</span> gender_labels),</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  mean</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>gender_counts <span class="ot">&lt;-</span> <span class="fu">table</span>(</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">factor</span>(sharks<span class="sc">$</span>pitcher_gender_group[known_gender], <span class="at">levels =</span> gender_labels)</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>rates_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">team =</span> <span class="fu">paste0</span>(<span class="fu">c</span>(<span class="st">"All-men"</span>, <span class="st">"All-women"</span>, <span class="st">"Mixed"</span>),</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>                <span class="st">"</span><span class="sc">\n</span><span class="st">(n = "</span>, <span class="fu">as.integer</span>(gender_counts), <span class="st">")"</span>),</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">deal_rate =</span> <span class="fu">as.numeric</span>(gender_deal_rates)</span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>rates_df<span class="sc">$</span>team <span class="ot">&lt;-</span> <span class="fu">factor</span>(rates_df<span class="sc">$</span>team, <span class="at">levels =</span> rates_df<span class="sc">$</span>team)</span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(rates_df, <span class="fu">aes</span>(<span class="at">x =</span> team, <span class="at">y =</span> deal_rate)) <span class="sc">+</span></span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"#009E73"</span>, <span class="at">alpha =</span> <span class="fl">0.85</span>, <span class="at">colour =</span> <span class="st">"white"</span>,</span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>           <span class="at">width =</span> <span class="fl">0.62</span>) <span class="sc">+</span></span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">paste0</span>(<span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> deal_rate, <span class="dv">1</span>), <span class="st">"%"</span>)),</span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>            <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.6</span>, <span class="at">colour =</span> <span class="st">"#17324D"</span>, <span class="at">size =</span> <span class="fl">3.6</span>) <span class="sc">+</span></span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.75</span>),</span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>                     <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="fl">0.75</span>, <span class="at">by =</span> <span class="fl">0.15</span>),</span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">paste0</span>(<span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">75</span>, <span class="at">by =</span> <span class="dv">15</span>), <span class="st">"%"</span>),</span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>                     <span class="at">expand =</span> <span class="fu">expansion</span>(<span class="at">mult =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.05</span>))) <span class="sc">+</span></span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Source classification of pitching team"</span>,</span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Pitches with an on-air deal"</span>) <span class="sc">+</span></span>
+<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
+<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#5B6976"</span>),</span>
+<span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>)</span>
+<span id="cb18-37"><a href="#cb18-37" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-b04-team-deal-rates" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-b04-team-deal-rates-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="b04-conditioning-bayes-independence_files/figure-html/fig-b04-team-deal-rates-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-b04-team-deal-rates-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.3: Conditional deal proportions by the source’s team-composition category, among the 1,434 pitches with a known classification. Each bar is a within-category percentage: P(deal | category).
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Read <a href="#fig-b04-team-deal-rates" class="quarto-xref">Figure&nbsp;<span>5.3</span></a> as three conditional proportions, each with its own denominator: the 63.6% bar means that 63.6% of the 385 all-women pitch records reached an on-air deal. The bars use three different reference classes, which is exactly why they can be compared — each is rescaled within its own group.</p>
+<div class="caveat-box">
+<p><span class="label">What a conditional probability can and cannot say</span></p>
+<p><strong>Reversing the condition does not reverse cause.</strong> Bayes’ rule converts <span class="math inline">\(P(A\mid B)\)</span> into <span class="math inline">\(P(B\mid A)\)</span> — an accounting identity about reference classes. It says nothing about which event influences which: <span class="math inline">\(P(D\mid L) &gt; P(D)\)</span> does not mean late broadcasting causes deals, and a flagged pitch is not made more deal-worthy by the flag.</p>
+<p><strong>These are selected televised records.</strong> Every conditional proportion in this lecture describes pitches that producers selected for broadcast. The team-composition comparison uses the source’s presenter classification (not every company member, and seven records are unclassified) and does not isolate a causal effect of team composition. The classifier example uses stated hypothetical rates, not rates estimated from these data. And, as always, an on-air deal is not a completed investment.</p>
+</div>
+</section>
+<section id="answering-the-driving-question" class="level3">
+<h3 class="anchored" data-anchor-id="answering-the-driving-question">Answering the driving question</h3>
+<p>The two sentences claim different things about the same 505 records: “68.8% of late-season pitches reached a deal” is <span class="math inline">\(P(D\mid L)=505/734\)</span>, with the late seasons as reference class; “57.3% of deal pitches came from late seasons” is <span class="math inline">\(P(L\mid D)=505/882\)</span>, with the deals as reference class. Both are correct; swapping their numbers is the classic conditioning error. And a positive flag from the AI deal-predictor tells us less than its 80% sensitivity suggests: with a 10% base rate and a 20% false-positive rate, only <span class="math inline">\(80/260\approx 31\%\)</span> of flagged pitches are deals — the flag lifts the probability from 10% to 31%, no further.</p>
+<p><strong>Next:</strong> We can now update the chance of one event when another is known. The natural next step is to watch two numerical measurements at the same time — deals and seasons, seasons and equity asks — because business questions are usually about relationships, not single variables. Lecture 5 introduces the joint distribution of a pair of random variables and the first summaries of co-movement, covariance and correlation, together with what a correlation number does and does not license us to say.</p>
+</section>
+</section>
+<section id="after-class" class="level2 course-phase phase-after">
+<h2 class="anchored" data-anchor-id="after-class">After class</h2>
+<p><span class="time-budget">Total practice time: about 60 minutes.</span></p>
+<section id="retrieval-10-minutes" class="level3">
+<h3 class="anchored" data-anchor-id="retrieval-10-minutes">Retrieval (10 minutes)</h3>
+<ol type="1">
+<li>What is the denominator of <span class="math inline">\(P(A\mid B)\)</span>?</li>
+<li>Why is <span class="math inline">\(P(A\mid B)\)</span> generally different from <span class="math inline">\(P(B\mid A)\)</span>?</li>
+<li>What makes a collection of events a partition?</li>
+<li>What does the denominator in Bayes’ rule calculate?</li>
+<li>State the two equivalent definitions of independence of events.</li>
+<li>Can two disjoint events, each with positive probability, be independent?</li>
+</ol>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check your answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li><span class="math inline">\(P(B)\)</span>, the probability of the conditioning event.</li>
+<li>They condition on different reference classes and therefore have different denominators.</li>
+<li>The parts are mutually disjoint and their union is <span class="math inline">\(\Omega\)</span>.</li>
+<li>The total probability of the observed evidence, added across all parts of the partition.</li>
+<li><span class="math inline">\(P(A\mid B)=P(A)\)</span> (learning <span class="math inline">\(B\)</span> does not change the probability of <span class="math inline">\(A\)</span>), and the product form <span class="math inline">\(P(A\cap B)=P(A)\,P(B)\)</span>.</li>
+<li>No.&nbsp;Their intersection has probability 0 while the product of their probabilities is positive, so the product check fails. Observing one makes the other impossible.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="from-worked-to-faded-the-bayes-tree-15-minutes" class="level3">
+<h3 class="anchored" data-anchor-id="from-worked-to-faded-the-bayes-tree-15-minutes">From worked to faded: the Bayes tree (15 minutes)</h3>
+<p>Re-read the worked count tree (<a href="#exm-b04-bayes-tree" class="quarto-xref">Example&nbsp;<span>5.3</span></a>). Then rebuild it with new numbers: base rate 20%, sensitivity 90%, false-positive rate 30%.</p>
+<p><em>Step 1 (given).</em> Start with 1,000 imaginary pitches: 200 deals, 800 non-deals.</p>
+<p><em>Step 2 (you).</em> Fill in the four leaves: flagged and unflagged counts in each branch.</p>
+<p><em>Step 3 (you).</em> Collect the flagged pitches and compute <span class="math inline">\(P(\text{deal}\mid\text{flag})\)</span>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check your answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Of the 200 deals, 90% are flagged: 180. Of the 800 non-deals, 30% are flagged: 240. Flagged total <span class="math inline">\(180+240=420\)</span>, of which 180 are deals: <span class="math inline">\(P(\text{deal}\mid\text{flag})=180/420\approx 0.429\)</span>. The formula agrees: <span class="math inline">\(\dfrac{0.90\times 0.20}{0.90\times 0.20+0.30\times 0.80}
+=\dfrac{0.18}{0.42}\approx 0.429\)</span>.</p>
+</div>
+</div>
+</div>
+<p><strong>Unassisted.</strong> A stricter classifier operates on a population where 5% of pitches reach a deal; its sensitivity is 90% and its false-positive rate is 10%. What share of flagged pitches are deals? Use either the tree or the formula.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check your answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>With 1,000 pitches: 50 deals of which 45 flagged; 950 non-deals of which 95 flagged. <span class="math inline">\(P(\text{deal}\mid\text{flag})=45/(45+95)=45/140\approx 0.321\)</span>. Even with 90% sensitivity and a low false-positive rate, the 5% base rate keeps the share of true flags below one third.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="practice-15-minutes" class="level3">
+<h3 class="anchored" data-anchor-id="practice-15-minutes">Practice (15 minutes)</h3>
+<p>Use the counts table: 330, 229, 377, 505, with totals 559, 882, 707, 734, and 1,441.</p>
+<ol type="1">
+<li>Use the early/late partition to verify <span class="math inline">\(P(D)=P(D\mid L^c)\,P(L^c)+P(D\mid L)\,P(L)\)</span>.</li>
+<li>Calculate and interpret <span class="math inline">\(P(L\mid D)\)</span>. Explain why it differs from <span class="math inline">\(P(D\mid L)\)</span>.</li>
+<li>Decide by calculation whether <span class="math inline">\(D\)</span> and <span class="math inline">\(L\)</span> are independent, using the product form.</li>
+<li>The events <span class="math inline">\(L^c\)</span> and <span class="math inline">\(L\)</span> are disjoint. Are they independent? Explain in one sentence.</li>
+<li>Among the 1,434 pitches with a known team-composition classification, 428 of 661 pitches with women represented (all-women or mixed) and 449 of 773 all-men pitches reached an on-air deal. Calculate both conditional deal proportions and interpret the difference.</li>
+</ol>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check your answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li><span class="math inline">\((377/707)(707/1441)+(505/734)(734/1441)=(377+505)/1441=882/1441
+\approx 0.612\)</span>.</li>
+<li><span class="math inline">\(P(L\mid D)=505/882\approx 0.573\)</span>: among deal records, 57.3% came from Seasons 9–16. It differs from <span class="math inline">\(P(D\mid L)=505/734\approx 0.688\)</span> because the conditioning event — and therefore the denominator — is different.</li>
+<li><span class="math inline">\(P(D\cap L)=505/1441\approx 0.350\)</span>, while <span class="math inline">\(P(D)\,P(L)=(882/1441)(734/1441)\approx 0.312\)</span>. The two are not equal, so <span class="math inline">\(D\)</span> and <span class="math inline">\(L\)</span> are not independent.</li>
+<li>No: <span class="math inline">\(P(L^c\cap L)=0\)</span> but <span class="math inline">\(P(L^c)\,P(L)\approx 0.25&gt;0\)</span>, so the product check fails — disjoint events with positive probability are always dependent.</li>
+<li><span class="math inline">\(428/661\approx 0.648\)</span> and <span class="math inline">\(449/773\approx 0.581\)</span>, a descriptive difference of about 6.7 percentage points. The comparison uses the source’s presenter classification and selected televised pitches; it does not establish a causal effect of team composition.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="spaced-review-one-item-from-lecture-3-5-minutes" class="level3">
+<h3 class="anchored" data-anchor-id="spaced-review-one-item-from-lecture-3-5-minutes">Spaced review: one item from Lecture 3 (5 minutes)</h3>
+<p>A variable <span class="math inline">\(Y\)</span> has PMF <span class="math inline">\(p_Y(0)=0.2\)</span>, <span class="math inline">\(p_Y(1)=0.5\)</span>, and <span class="math inline">\(p_Y(2)=0.3\)</span>. Calculate <span class="math inline">\(E[Y]\)</span> and say in one sentence what the number means, given that <span class="math inline">\(Y\)</span> can never equal it exactly… or can it?</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check your answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><span class="math inline">\(E[Y]=0(0.2)+1(0.5)+2(0.3)=1.1\)</span>. It is the probability-weighted average of the possible values — the long-run average over many repetitions — and it need not be a value the variable can take: here <span class="math inline">\(Y\)</span> is never 1.1.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="worked-exam-interpretation-10-minutes" class="level3">
+<h3 class="anchored" data-anchor-id="worked-exam-interpretation-10-minutes">Worked exam interpretation (10 minutes)</h3>
+<p><strong>Question.</strong> A student sees <span class="math inline">\(P(D\mid L)=0.688\)</span> and writes, “68.8% of deal pitches came from late seasons.”</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check a model answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The calculation conditions on <span class="math inline">\(L\)</span>, so the denominator is the 734 pitches in Seasons 9–16. The correct interpretation is that 68.8% of late-season records reached an on-air deal. The sentence the student wrote describes the reverse conditional, <span class="math inline">\(P(L\mid D)=505/882\approx 57.3\%\)</span>. Neither quantity measures completed investment or a causal season effect.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="make-it-yours-5-minutes" class="level3">
+<h3 class="anchored" data-anchor-id="make-it-yours-5-minutes">Make it yours (5 minutes)</h3>
+<div class="utility-prompt">
+<p><span class="label">Utility: two sentences</span></p>
+<p>Think of your EiA venture — or any business you know well. Name one signal it receives about customers or partners (a positive review, a signed letter of intent, a click on an ad) and write two sentences: first state the conditional probability the signal makes you want to know, in <span class="math inline">\(P(\cdot\mid\cdot)\)</span> form with the reference class named; then say what base rate you would need before trusting the signal, Bayes-style. There is no wrong answer; the point is connecting today’s tools to something you care about.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+See an example, then write your own
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Take a student-run campus meal-prep box venture. “I want <span class="math inline">\(P(\text{becomes a paying customer} \mid \text{clicked the ad})\)</span>, where the reference class is all students shown the ad this month. Before trusting a high click count I would need the base rate of buyers among all viewers — with a tiny base rate, most clickers still never buy, exactly the count-tree logic.”</p>
+</div>
+</div>
+</div>
+<p>You can discuss this task — and any other task in this chapter — with <strong>Tilly</strong>, the course AI assistant on Canvas: ask it to build the natural-frequency tree for your signal with numbers you consider realistic.</p>
+</div>
+<p>Continue to Lecture 5: Joint random variables, covariance, and correlation.</p>
+<p>Formula sheet: Lecture 4 formulas.</p>
+<p>For a more formal explanation, consult <a href="https://tilburguniversity.on.worldcat.org/oclc/317545871">Nieuwenhuis, <em>Statistical Methods for Business and Economics</em></a>, Chapters 7–8.</p>
+</section>
+</section>
+
+
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/valentinamel\.github\.io\/textbook-qm-ebi\/");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../basic/t01-exam-prep.html" class="pagination-link" aria-label="Tutorial 1: Evidence and probability foundations">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">Tutorial 1: Evidence and probability foundations</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../basic/b05-joint-covariance-correlation.html" class="pagination-link" aria-label="Lecture 5: Joint random variables, covariance, and correlation">
+        <span class="nav-page-text"><span class="chapter-title">Lecture 5: Joint random variables, covariance, and correlation</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

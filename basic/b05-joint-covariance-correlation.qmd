@@ -1,0 +1,778 @@
+# Lecture 5: Joint random variables, covariance, and correlation {#b05}
+
+```{r}
+#| label: b05-setup
+#| include: false
+# Chunk options only. Every object used in this chapter is constructed in
+# visible code on this page, so that copying the code always works.
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
+                      fig.width = 7, fig.height = 4.5)
+```
+
+::: {.outcomes}
+<span class="label">By the end of Lecture 5, you can</span>
+
+- define a pair of random variables on one sample space;
+- read a joint PMF and recover marginal and conditional distributions;
+- check independence of two random variables with the product rule in every
+  cell of the joint table;
+- derive covariance from signed products of deviations and compute it two
+  ways;
+- explain how correlation standardises covariance;
+- separate linear association from independence, causality, and importance.
+:::
+
+::: {.driving-question}
+<span class="label">Driving question</span>
+
+<p class="dq-context">Business questions are rarely about one variable alone: marketing and sales, price and demand, timing and success. The first analytical step is measuring whether two quantities move together at all, and how strongly.</p>
+
+Deals and late seasons, equity offers and deals, seasons and equity offers.
+Which pairs move together, how strongly, and what does a correlation number
+license us to say?
+:::
+
+::: {.course-phase .phase-before}
+
+## Before class
+
+<span class="time-budget">Total preparation time: about 30 minutes.</span>
+
+<div class="video-prep">
+<span class="label">Video preparation (20 minutes)</span><br>
+Watch
+<a href="https://www.youtube.com/watch?v=7nu97OYx4X4">Joint PMFs and the
+Expected Value Rule</a>,
+<a href="https://www.youtube.com/watch?v=K2Tlj27nkjs">Covariance</a>, and
+<a href="https://www.youtube.com/watch?v=HTs6Zhc2S1M">The Correlation
+Coefficient</a>. Be ready to state what a joint PMF records, what covariance
+averages, and how correlation standardises covariance. All links are also
+listed in the <a href="../resources/video-guide.html">External Video
+Guide</a>.
+</div>
+
+**Reactivate (5 minutes).** From earlier lectures you know the deal
+indicator $X$ (1 for an on-air deal, 0 otherwise) and the late-period
+indicator $Y$ (1 for Seasons 9--16, 0 for Seasons 1--8). One selected pitch
+record now produces *two* numbers at once: the ordered pair $(X,Y)$. Write
+down all possible values of the pair.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+Four ordered pairs: $(0,0)$, $(0,1)$, $(1,0)$, $(1,1)$ --- early no-deal,
+late no-deal, early deal, late deal. Order matters: $(1,0)$ and $(0,1)$
+describe different pitches.
+:::
+
+**Predict (5 minutes).** Answer the one-click Mentimeter question posted on
+Canvas before you come to class: is the correlation between season and the
+equity percentage entrepreneurs initially offer **positive**, **near
+zero**, or **negative**? Commit to an answer; the lecture resolves it.
+
+If ordered pairs, products, or standardisation are unfamiliar, review
+[Mathematics Refresher: products, indices, and
+z-scores](../resources/math-refresher.html).
+
+:::
+
+::: {.course-phase .phase-in-class}
+
+## In class
+
+The session opens with the usual four-minute entry quiz on the prep videos,
+then turns to the driving question --- three pairs of variables on one slide:
+deal and late period, equity offered and deal, season and equity offered.
+Every pair raises the same two questions: do the variables move together,
+and how strongly? Until now each random variable had its own distribution,
+studied alone. Two separate marginal distributions, however, cannot say how
+values are *paired*. For that we need the joint distribution.
+
+### The joint probability mass function
+
+<p class="concept-video"><strong>MIT explanation (review):</strong>
+<a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/joint-pmfs-and-the-expected-value-rule/">06.7 Joint PMFs and the Expected Value Rule</a>.</p>
+
+For discrete random variables $X$ and $Y$ defined on the same experiment,
+the **joint PMF** records the probability of every possible pair of values:
+
+$$p_{X,Y}(x,y)=P(X=x,\;Y=y).$$
+
+Like any PMF it must be non-negative, and its entries must sum to 1 over
+every possible pair --- each outcome lands in exactly one cell.
+
+The live construction, with $X$ and $Y$ built in full view:
+
+```{r}
+#| label: b05-joint-pmf
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+X <- sharks$deal_on_show                # deal indicator: 1 = on-air deal
+Y <- as.integer(sharks$season >= 9)     # late-period indicator: 1 = S9-16
+joint_counts <- table(Deal = X, Late_period = Y)
+joint_pmf <- prop.table(joint_counts)
+joint_counts
+round(joint_pmf, 3)
+sum(joint_pmf)
+```
+
+As a table with the marginal sums written in:
+
+| $p_{X,Y}(x,y)$ | $Y=0$ (early) | $Y=1$ (late) | row sum: $p_X(x)$ |
+|---|---:|---:|---:|
+| $X=0$ (no deal) | 0.229 | 0.159 | **0.388** |
+| $X=1$ (deal)    | 0.262 | 0.350 | **0.612** |
+| column sum: $p_Y(y)$ | **0.491** | **0.509** | 1 |
+
+::: {.callout-note collapse="true"}
+## Check: which entry is P(X = 1, Y = 1)?
+
+The bottom-right cell of the joint table, 0.350: the probability that the
+selected pitch reached a deal *and* came from a late season,
+$505/1441\approx 0.350$. It is one number for one pair of values --- not a
+row, not a column.
+:::
+
+#### Recovering marginal PMFs
+
+Each single-variable distribution is recovered by summing the joint PMF over
+the values of the other variable:
+
+$$p_X(x)=\sum_y p_{X,Y}(x,y),
+\qquad
+p_Y(y)=\sum_x p_{X,Y}(x,y).$$
+
+Work it by hand on the table first --- the arrows drawn in class point along
+a row and down a column: $p_X(1)=0.262+0.350=0.612$ (sum the $X=1$ row) and
+$p_Y(1)=0.159+0.350=0.509$ (sum the $Y=1$ column). These are exactly $P(D)$
+and $P(L)$ from earlier lectures, now living in the margins of the joint
+table --- which is why single-variable distributions are called *marginal*.
+
+```{r}
+#| label: b05-marginals
+X <- sharks$deal_on_show
+Y <- as.integer(sharks$season >= 9)
+joint_pmf <- prop.table(table(Deal = X, Late_period = Y))
+rowSums(joint_pmf)   # marginal PMF of X
+colSums(joint_pmf)   # marginal PMF of Y
+```
+
+The joint table determines the marginals, but not the other way round: many
+different joint tables share the same margins. What the joint table adds is
+the *pairing*.
+
+#### Conditional PMFs are rescaled columns
+
+<p class="concept-video"><strong>MIT explanation (review):</strong>
+<a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/conditional-pmfs/">07.2 Conditional PMFs</a>.</p>
+
+Lecture 4's conditioning idea transfers cell by cell. For $p_Y(y)>0$,
+
+$$p_{X\mid Y}(x\mid y)=\frac{p_{X,Y}(x,y)}{p_Y(y)}.$$
+
+::: {#exm-b05-conditional}
+## Worked example: one conditional entry, by hand
+
+What is $p_{X\mid Y}(1\mid 1)$ --- the deal probability given a late-season
+pitch? Cover everything except the $Y=1$ column and rescale it by its own
+total:
+
+| $p_{X,Y}(x,y)$ | $Y=0$ | **$Y=1$** |
+|---|---:|---:|
+| $X=0$ | · | **0.159** |
+| $X=1$ | · | **0.350** |
+| column sum | · | **0.509** |
+
+$$p_{X\mid Y}(1\mid 1)=\frac{0.350}{0.509}
+=\frac{505/1441}{734/1441}=\frac{505}{734}\approx 0.688.$$
+
+This is precisely Lecture 4's $P(D\mid L)$: the 505-over-734 calculation,
+now read off a joint PMF. Dividing the whole column by 0.509 makes its
+entries sum to 1 --- a rescaled column is a complete conditional
+distribution of $X$.
+:::
+
+```{r}
+#| label: b05-conditional-pmf
+X <- sharks$deal_on_show
+Y <- as.integer(sharks$season >= 9)
+joint_counts <- table(Deal = X, Late_period = Y)
+round(prop.table(joint_counts, margin = 2), 3)   # each column sums to 1
+```
+
+### Independence of random variables
+
+<p class="concept-video"><strong>MIT explanation (review):</strong>
+<a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/independence-of-random-variables/">07.4 Independence of Random Variables</a>.</p>
+
+Lecture 4 defined independence for a *pair of events*: $P(A\cap
+B)=P(A)\,P(B)$. Random variables generate many events at once --- one for
+every value they can take --- so independence of random variables demands
+more. Discrete $X$ and $Y$ are **independent** when the product rule holds
+in *every* cell of the joint table:
+
+$$p_{X,Y}(x,y)=p_X(x)\,p_Y(y)
+\quad\text{for every pair } (x,y).$$
+
+One mismatch anywhere proves dependence; establishing independence requires
+checking every cell.
+
+::: {#exm-b05-independence}
+## Worked example: the (1,1) cell check
+
+If deal and late period were independent, the bottom-right cell would equal
+the product of its margins:
+
+$$p_X(1)\,p_Y(1)=0.612\times 0.509\approx 0.312.$$
+
+The actual entry is $p_{X,Y}(1,1)=0.350$. The mismatch --- 0.350 observed
+against 0.312 required --- proves that $X$ and $Y$ are **not independent**:
+deals and late seasons are paired more often than independent variables
+would allow. This is the joint-PMF version of Lecture 4's finding that
+$P(D\mid L)\ne P(D)$.
+:::
+
+```{r}
+#| label: b05-joint-independence
+X <- sharks$deal_on_show
+Y <- as.integer(sharks$season >= 9)
+observed_joint_11 <- mean(X == 1 & Y == 1)
+independent_joint_11 <- mean(X == 1) * mean(Y == 1)
+c(observed_joint_11 = observed_joint_11,
+  independent_joint_11 = independent_joint_11)
+```
+
+Had the $(1,1)$ cell matched, the conclusion would still be open: one
+matching cell is not enough for independence, but one mismatching cell is
+enough for dependence.
+
+### Covariance comes from expectation
+
+<p class="concept-video"><strong>MIT explanation (review):</strong>
+<a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/covariance/">12.5 Covariance</a>.</p>
+
+Independence versus dependence is a yes/no verdict. The next tool grades the
+dependence: in which *direction* do the variables move together, and how
+strongly? Lecture 3 measured spread as an expected squared deviation,
+$\operatorname{Var}(X)=E[(X-\mu_X)^2]$. **Covariance** applies the same idea
+to a pair. With $\mu_X=E[X]$ and $\mu_Y=E[Y]$,
+
+$$\operatorname{Cov}(X,Y)=E[(X-\mu_X)(Y-\mu_Y)].$$
+
+The object inside the expectation is a *signed product* of deviations, and
+the sign logic comes before any formula manipulation:
+
+- both values above their means, or both below: the product is **positive**;
+- one above and one below: the product is **negative**.
+
+Covariance averages those signed products over the joint distribution. A
+positive covariance says above-average values of one variable tend to occur
+with above-average values of the other; a negative covariance says they tend
+to occur with below-average values.
+
+::: {#exm-b05-covariance}
+## Worked example: four signed products, one at a time
+
+Take this small joint PMF (it returns in the practice sets):
+
+|  | $Y=0$ | $Y=1$ |
+|---|---:|---:|
+| $X=0$ | 0.30 | 0.20 |
+| $X=1$ | 0.10 | 0.40 |
+
+The marginals are $p_X(1)=0.10+0.40=0.50$ and $p_Y(1)=0.20+0.40=0.60$, so
+$\mu_X=E[X]=0.5$ and $\mu_Y=E[Y]=0.6$.
+
+Write out the signed product of deviations for each cell, one by one:
+
+| Cell $(x,y)$ | $(x-0.5)(y-0.6)$ | Sign | Probability | Contribution |
+|---|---:|:---:|---:|---:|
+| $(0,0)$ | $(-0.5)(-0.6)=+0.30$ | both below | 0.30 | $+0.090$ |
+| $(0,1)$ | $(-0.5)(+0.4)=-0.20$ | mixed | 0.20 | $-0.040$ |
+| $(1,0)$ | $(+0.5)(-0.6)=-0.30$ | mixed | 0.10 | $-0.030$ |
+| $(1,1)$ | $(+0.5)(+0.4)=+0.20$ | both above | 0.40 | $+0.080$ |
+
+Average with the joint probabilities as weights:
+
+$$\operatorname{Cov}(X,Y)=0.090-0.040-0.030+0.080=0.10.$$
+
+The heavy cells are the two "agreeing" corners $(0,0)$ and $(1,1)$, so the
+positive contributions dominate: this pair moves together.
+
+**Verify with the computational form.** Expanding the product gives the
+identity
+
+$$\operatorname{Cov}(X,Y)=E[XY]-E[X]\,E[Y].$$
+
+Here $XY$ is nonzero only in the $(1,1)$ cell, so $E[XY]=1\times 1\times
+0.40=0.40$, and
+
+$$\operatorname{Cov}(X,Y)=0.40-(0.5)(0.6)=0.40-0.30=0.10.$$
+
+The same answer by both routes. The definition explains the sign; the
+computational form is quicker on an exam.
+:::
+
+The same two routes on the Shark Tank pair, in visible code:
+
+```{r}
+#| label: b05-covariance-from-expectation
+X <- sharks$deal_on_show
+Y <- as.integer(sharks$season >= 9)
+E_X <- mean(X)
+E_Y <- mean(Y)
+E_XY <- mean(X * Y)
+
+c(
+  E_X = E_X,
+  E_Y = E_Y,
+  E_XY = E_XY,
+  covariance_from_moments = E_XY - E_X * E_Y,
+  covariance_from_deviations = mean((X - E_X) * (Y - E_Y))
+)
+```
+
+Covariance has **product units**. If $X$ is measured in dollars and $Y$ in
+years, $\operatorname{Cov}(X,Y)$ is in dollar-years. Its sign is
+interpretable; its magnitude changes whenever either measurement unit
+changes, which makes raw covariances hard to compare.
+
+#### Independence implies zero covariance
+
+If $X$ and $Y$ are independent, then $E[XY]=E[X]\,E[Y]$, so
+$\operatorname{Cov}(X,Y)=0$. The reverse is not generally true: zero
+covariance rules out linear co-movement, not every form of dependence.
+
+### Correlation standardises covariance
+
+<p class="concept-video"><strong>MIT explanations (review):</strong>
+<a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/the-correlation-coefficient/">12.8 The Correlation Coefficient</a> and
+<a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/interpreting-the-correlation-coefficient/">12.10 Interpreting the Correlation Coefficient</a>.</p>
+
+The unit problem has a standard fix: divide by the two standard deviations.
+For variables whose standard deviations are not zero,
+
+$$\rho_{XY}
+=\frac{\operatorname{Cov}(X,Y)}
+{\operatorname{SD}(X)\operatorname{SD}(Y)},
+\qquad -1\le\rho_{XY}\le1.$$
+
+Track the units: the numerator is in dollar-years, and the denominator is
+dollars times years --- also dollar-years. They cancel, so **correlation has
+no units** and does not change when either variable is rescaled. Its sign
+gives the direction of linear association; its magnitude, between 0 and 1,
+gives the strength of linear association.
+
+```{r}
+#| label: b05-correlation-from-covariance
+X <- sharks$deal_on_show
+Y <- as.integer(sharks$season >= 9)
+cov_xy <- mean((X - mean(X)) * (Y - mean(Y)))
+rho_xy <- cov_xy / (sqrt(mean((X - mean(X))^2)) *
+                    sqrt(mean((Y - mean(Y))^2)))
+c(from_definition = rho_xy,
+  from_R = cor(X, Y))
+```
+
+The word *linear* carries real weight. @fig-b05-linear-curved shows two
+patterns of the same size.
+
+```{r}
+#| label: fig-b05-linear-curved
+#| code-fold: true
+#| code-summary: "See the R code for this figure"
+#| fig-width: 7
+#| fig-height: 3.4
+#| fig-cap: "Correlation measures linear association only. Pattern A rises almost linearly and has r close to 1. Pattern B is strongly related but U-shaped: its fitted line is flat and its correlation is close to 0."
+library(ggplot2)
+x_association <- seq(-2, 2, length.out = 61)
+y_linear <- as.numeric(scale(0.8 * x_association +
+                             0.25 * sin(7 * x_association)))
+y_curved <- as.numeric(scale(x_association^2))
+
+assoc_df <- data.frame(
+  x = rep(x_association, times = 2),
+  y = c(y_linear, y_curved),
+  pattern = rep(c("Pattern A", "Pattern B"), each = 61)
+)
+r_labels <- data.frame(
+  pattern = c("Pattern A", "Pattern B"),
+  label = paste0("r = ", sprintf("%.2f", c(
+    cor(x_association, y_linear),
+    cor(x_association, y_curved)
+  ))),
+  x = -2,
+  y = max(assoc_df$y) + 0.45
+)
+
+ggplot(assoc_df, aes(x = x, y = y)) +
+  geom_point(colour = "#009E73", alpha = 0.72, size = 1.8) +
+  geom_smooth(method = "lm", se = FALSE,
+              colour = "#D55E00", linewidth = 0.9) +
+  geom_text(data = r_labels, aes(x = x, y = y, label = label),
+            hjust = 0, colour = "#17324D", size = 3.4) +
+  facet_wrap(~ pattern) +
+  labs(x = "X", y = "Y (standardised units)") +
+  theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    plot.caption = element_text(colour = "#5B6976"),
+    axis.title = element_text(colour = "#17324D"),
+    strip.text = element_text(colour = "#17324D", face = "bold")
+  )
+```
+
+Each point is one $(x,y)$ pair; the orange line is the fitted linear
+summary. Pattern A follows an almost straight rising path, so its
+correlation is close to 1. Pattern B has a clear U-shaped relationship, but
+its fitted line is flat and its correlation is close to 0.
+
+::: {.callout-note collapse="true"}
+## Check: which panel has correlation near zero --- and why is that not "no relationship"?
+
+Pattern B. Its correlation is near zero because rises on the right cancel
+falls on the left in the signed products --- there is no *linear* trend. The
+relationship itself is strong: knowing $x$ pins down $y$ almost exactly. A
+near-zero correlation licenses only "no linear association," never "no
+relationship."
+:::
+
+#### Sample covariance and sample correlation
+
+For observed pairs $(x_i,y_i)$, the usual sample covariance is
+
+$$s_{XY}=\frac{1}{n-1}\sum_{i=1}^{n}(x_i-\bar{x})(y_i-\bar{y}),$$
+
+and the sample correlation is
+
+$$r_{XY}=\frac{s_{XY}}{s_X s_Y}.$$
+
+These are sample statistics, the two-variable analogues of $s^2$ and $s$
+from Lecture 3. Under a model and sampling design, they may be used to
+estimate the population quantities $\operatorname{Cov}(X,Y)$ and
+$\rho_{XY}$.
+
+::: {.optional-box}
+<span class="label">Optional: point-biserial correlation</span><br>
+When one of the two variables is a 0/1 indicator --- offered equity paired
+with the deal indicator, say --- the ordinary Pearson correlation computed on
+the pair also goes by the name *point-biserial correlation*. It is not a new
+formula, only a special-case name you may meet in other courses; `cor()`
+computes it the same way.
+:::
+
+### Inspect first, summarise second
+
+A correlation compresses a whole scatter of pairs into one number, so look
+at the scatter before trusting the number. For the season--equity pair
+(treating season as an equally spaced time index), @fig-b05-season-equity
+shows every pitch.
+
+```{r}
+#| label: fig-b05-season-equity
+#| code-fold: true
+#| code-summary: "See the R code for this figure"
+#| fig-cap: "Season and initially offered equity for all 1,441 pitches. Horizontal jitter only reveals overlapping points. The orange line is the fitted linear summary; its downward direction is the negative linear association that the correlation summarises."
+library(ggplot2)
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+
+ggplot(sharks, aes(x = season, y = equity_offered_pct)) +
+  geom_point(position = position_jitter(width = 0.14, height = 0,
+                                        seed = 2026),
+             colour = "#009E73", alpha = 0.45, size = 1.6) +
+  geom_smooth(method = "lm", se = FALSE,
+              colour = "#D55E00", linewidth = 0.9) +
+  scale_x_continuous(breaks = c(seq(1, 15, by = 2), 16)) +
+  labs(x = "Season", y = "Equity initially offered (%)") +
+  theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    plot.caption = element_text(colour = "#5B6976"),
+    axis.title = element_text(colour = "#17324D")
+  )
+```
+
+Each point represents one pitch: season is read horizontally and initially
+offered equity in percentage points vertically. The downward drift is
+visible but noisy --- the large vertical spread shows why the line does not
+predict every pitch closely. Now the live correlations, resolving the prep
+prediction:
+
+```{r}
+#| label: b05-observed-correlations
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+c(
+  season_with_equity_offered =
+    cor(sharks$season, sharks$equity_offered_pct),
+  equity_offered_with_deal =
+    cor(sharks$equity_offered_pct, sharks$deal_on_show)
+)
+```
+
+Season and initially offered equity have a moderate **negative** linear
+association, $r\approx -0.42$: entrepreneurs in later seasons tend to offer
+smaller ownership stakes. If you predicted "negative" in the prep, the
+scatter and the number now back you up --- and if not, the plot shows what
+the single number was hiding. Offered equity and the 0/1 deal indicator
+have a weak negative association, $r\approx -0.11$.
+
+::: {.caveat-box}
+<span class="label">What a correlation can and cannot say</span>
+
+The weak negative equity--deal correlation invites a tempting reading:
+"offer less equity and you are more likely to get a deal." Three patterns
+coexist in this file: later seasons have higher deal proportions, later
+seasons have lower initial equity offers, and deal records have slightly
+lower offers on average. The marginal equity--deal association may therefore
+partly reflect differences *between seasons* rather than an effect of the
+offer itself --- season is entangled with both variables. Offered equity was
+not randomly assigned, and the file records selected televised pitches, not
+a causal experiment. Separating the equity--deal association *within* a
+season from the season differences requires holding season fixed --- exactly
+what multiple regression does in Intermediate Lecture 4. Until then:
+correlation alone does not establish causation, independence (only its
+absence), or practical importance.
+:::
+
+### Answering the driving question
+
+Deal and late period move together: the joint entry 0.350 exceeds the
+independence benchmark 0.312, and their correlation is a mild positive
+$r\approx 0.16$. Season and offered equity move oppositely, and moderately:
+$r\approx -0.42$. Offered equity and deals barely move together at all,
+$r\approx -0.11$, and the caveat box explains why even that number should
+not be read as advice. A correlation licenses a statement about the
+direction and strength of *linear* co-movement in these records --- nothing
+about cause, and nothing about curved relationships.
+
+**Next:** Tutorial 2 turns Lectures 4 and 5 into exam practice: conditional
+probabilities read off tables, a Bayes tree with new numbers, and covariance
+and correlation computed and interpreted. Bring your attempted after-class
+tasks --- especially the joint table and the signed-product routine, which the
+tutorial reuses directly. After the tutorial, Lecture 6 leaves whole numbers
+behind: quantities that can land anywhere in a range.
+
+:::
+
+::: {.course-phase .phase-after}
+
+## After class
+
+<span class="time-budget">Total practice time: about 70 minutes.</span>
+
+### Retrieval (10 minutes)
+
+1. What information does a joint PMF contain that two marginal PMFs do not?
+2. How do you recover a marginal PMF from a joint PMF?
+3. Why can covariance change when units change?
+4. Why does independence imply zero covariance?
+5. Why does zero correlation not imply independence?
+
+::: {.callout-note collapse="true"}
+## Check your answers
+
+1. It records how values of the two variables occur together --- the
+   pairing, not just the two separate distributions.
+2. Sum the joint PMF over every value of the other variable.
+3. Covariance has product units, so rescaling either variable rescales the
+   covariance.
+4. Independence gives $E[XY]=E[X]\,E[Y]$, hence zero covariance for the
+   variables considered in this course.
+5. Correlation measures linear association; dependent variables can have
+   zero linear association (the U-shape in @fig-b05-linear-curved).
+:::
+
+### From worked to faded: covariance on a new table (20 minutes)
+
+Re-read the signed-products worked example (@exm-b05-covariance). Then
+repeat the routine on a new joint PMF:
+
+|  | $Y=0$ | $Y=1$ |
+|---|---:|---:|
+| $X=0$ | 0.10 | 0.30 |
+| $X=1$ | 0.40 | 0.20 |
+
+*Step 1 (given).* The marginals: $p_X(1)=0.60$, $p_Y(1)=0.50$, so
+$\mu_X=0.6$ and $\mu_Y=0.5$.
+
+*Step 2 (you).* Write the four signed products $(x-0.6)(y-0.5)$, one per
+cell, with their signs.
+
+*Step 3 (you).* Weight each product by its cell probability and add.
+
+*Step 4 (you).* Verify with $E[XY]-E[X]E[Y]$ and interpret the sign.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+Contributions: $(0,0)$: $(+0.30)(0.10)=+0.030$; $(0,1)$:
+$(-0.30)(0.30)=-0.090$; $(1,0)$: $(-0.20)(0.40)=-0.080$; $(1,1)$:
+$(+0.20)(0.20)=+0.040$. Sum:
+$\operatorname{Cov}(X,Y)=0.030-0.090-0.080+0.040=-0.10$. Check:
+$E[XY]=0.20$ and $E[X]E[Y]=0.6\times 0.5=0.30$, so $0.20-0.30=-0.10$. The
+negative sign says the disagreeing corners are heavy: high $X$ tends to come
+with low $Y$.
+:::
+
+**Unassisted practice table.** For the joint PMF
+
+|  | $Y=0$ | $Y=1$ |
+|---|---:|---:|
+| $X=0$ | 0.25 | 0.25 |
+| $X=1$ | 0.15 | 0.35 |
+
+1. Find the marginal PMFs of $X$ and $Y$.
+2. Are $X$ and $Y$ independent?
+3. Calculate $\operatorname{Cov}(X,Y)$ and interpret its sign.
+4. Calculate $P(X=1\mid Y=1)$ and compare it with $P(X=1)$.
+5. Define $Z=100X$. Calculate $\operatorname{Cov}(Z,Y)$ and state what
+   happens to $\operatorname{Corr}(Z,Y)$.
+
+::: {.callout-note collapse="true"}
+## Check your answers
+
+1. $P(X=0)=0.50$, $P(X=1)=0.50$; $P(Y=0)=0.40$, $P(Y=1)=0.60$.
+2. No. $P(X=1,Y=1)=0.35$, whereas $P(X=1)P(Y=1)=0.50\times 0.60=0.30$. One
+   mismatching cell proves dependence.
+3. $E[X]=0.50$, $E[Y]=0.60$, $E[XY]=0.35$, so
+   $\operatorname{Cov}(X,Y)=0.35-0.30=0.05$. Positive: the pair $(1,1)$
+   occurs with greater probability than independence would give.
+4. $P(X=1\mid Y=1)=0.35/0.60=7/12\approx 0.583$, larger than the marginal
+   $P(X=1)=0.50$: conditioning on $Y=1$ shifts the distribution of $X$
+   upward.
+5. $\operatorname{Cov}(Z,Y)=100\operatorname{Cov}(X,Y)=5$. Multiplication by
+   a positive constant rescales covariance but leaves correlation unchanged.
+:::
+
+### Spaced review: two items from earlier lectures (10 minutes)
+
+**From Lecture 2.** In the record-selection experiment, is "the selected
+pitch is the record with pitch_id 7" an outcome or an event? And what kind
+of object is the record itself?
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+The record itself is an **outcome** --- one complete possible result. The
+description picks out the singleton set containing that record, and a set of
+outcomes is an **event**. Same distinction as 4 versus $\{4\}$ for a die.
+:::
+
+**From Lecture 4.** A classifier flags likely deals in a population with a
+10% deal base rate; sensitivity is 70% and the false-positive rate is 20%.
+Using a 1,000-pitch tree, what share of flagged pitches are deals?
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+Of 100 deals, 70 are flagged; of 900 non-deals, 180 are flagged. So
+$P(\text{deal}\mid\text{flag})=70/(70+180)=70/250=0.28$.
+:::
+
+### Worked exam interpretation (10 minutes)
+
+The dataset contains 1,441 televised pitches from Seasons 1--16. The
+variable `season` records the season number, and `equity_offered_pct`
+records the percentage of the business initially offered to the sharks.
+
+**Question.** R reports
+`cor(sharks$season, sharks$equity_offered_pct) = -0.416`. Interpret this
+result in context. State:
+
+1. the direction and approximate strength of the linear association;
+2. what the association means for pitches in earlier and later seasons;
+3. whether the correlation has units; and
+4. one conclusion that cannot be justified from this result.
+
+::: {.callout-note collapse="true"}
+## Check a model answer
+
+Among the 1,441 records, season and initially offered equity have a moderate
+negative linear association: later-season pitches tend to offer a smaller
+ownership percentage initially, although this is not true of every
+individual pitch. The correlation is dimensionless: it has no units. It
+summarises only linear co-movement and does not show that the passage of
+time caused offers to change.
+:::
+
+### Exam-style: independence and covariance sign (5 minutes)
+
+For the joint PMF
+
+|  | $Y=0$ | $Y=1$ |
+|---|---:|---:|
+| $X=0$ | 0.18 | 0.42 |
+| $X=1$ | 0.12 | 0.28 |
+
+decide whether $X$ and $Y$ are independent, and state
+$\operatorname{Cov}(X,Y)$ without long calculation.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+Marginals: $P(X=1)=0.40$, $P(Y=1)=0.70$. Check every cell:
+$0.60\times 0.30=0.18$, $0.60\times 0.70=0.42$, $0.40\times 0.30=0.12$,
+$0.40\times 0.70=0.28$ --- all four match, so $X$ and $Y$ are
+**independent**. Independence implies $\operatorname{Cov}(X,Y)=0$ (directly:
+$E[XY]=0.28=E[X]E[Y]$). Note the contrast with the earlier tables: there one
+mismatch settled dependence; here independence needed all four cells.
+:::
+
+### From the reading ladder (10 minutes)
+
+Next rung of the [reading ladder](../resources/reading-ladder.qmd): open
+[Tierney & Farmer (2002)](https://doi.org/10.2307/3069429) via the
+university library and find the table that reports means, standard
+deviations, and correlations among the study variables (in management
+journals this is usually the first numbered table). Pick any two variables:
+state their reported correlation, interpret its sign and rough strength in
+one sentence, and --- as in today's caveat --- name one third variable that
+could produce that correlation without either variable driving the other.
+Note the sample size the table reports and why it matters for how seriously
+to take a small correlation.
+
+::: {.callout-note collapse="true"}
+## Check your approach
+
+Whatever pair you chose, the sentence should have the form "employees higher
+in A tended also to be higher/lower in B in this sample (r = ...)" --- a
+statement about co-movement in one sample, not about causation and not about
+any individual. If your third-variable story was plausible (tenure, role,
+ability), you have applied the Lecture 5 box to a published table --- which
+is precisely how you will read your thesis sources.
+:::
+
+### Make it yours (5 minutes)
+
+:::: {.utility-prompt}
+<span class="label">Utility: two sentences</span>
+
+Think of your EiA venture --- or any business you know well. Name two
+quantities it could measure per customer, per week, or per order (marketing
+spend and sign-ups, price and basket size, delivery time and repeat
+purchases) and write two sentences: first predict the sign of their
+correlation and why; then name one third variable that could produce that
+correlation without either quantity driving the other. There is no wrong
+answer; the point is connecting today's tools to something you care about.
+
+::: {.callout-note collapse="true"}
+## See an example, then write your own
+
+Take a student-run campus meal-prep box venture. "Weekly flyer spend and weekly sign-ups should correlate positively, since flyers reach students who have never heard of us. But exam weeks could produce that correlation on their own: I hand out more flyers in exam weeks, and students order more prepared food in exactly those weeks."
+:::
+
+You can discuss this task --- and any other task in this chapter --- with
+**Tilly**, the course AI assistant on Canvas: ask it to propose lurking
+third variables for your pair and pick the most plausible one.
+::::
+
+Continue to Tutorial 2: Conditioning and relationships.
+
+Formula sheet: Lecture 5 formulas.
+
+For a more formal explanation, consult
+[Nieuwenhuis, *Statistical Methods for Business and Economics*](https://tilburguniversity.on.worldcat.org/oclc/317545871),
+Chapters 5 and 11.
+
+:::

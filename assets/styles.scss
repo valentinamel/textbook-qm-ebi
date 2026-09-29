@@ -1,0 +1,432 @@
+/*-- scss:defaults --*/
+
+// Typography: the platform's own UI font, as in the prototype site —
+// SF Pro on macOS/iOS, Segoe UI on Windows. Modern, neutral, corporate.
+// No web-font import (faster, and consistent with consulting-style decks).
+$web-font-path: false;
+
+// Restrained visual system: navy/teal, flat surfaces, thin rules,
+// generous whitespace. Consulting-report minimalism.
+
+$qm-navy: #17324D;
+$qm-teal: #2F7D73;
+$qm-teal-dark: #23605A;
+$qm-gold: #C98B2E;
+$qm-orange: #D97E28;
+$qm-ink: #26313C;
+
+// Typography: Helvetica Neue first — this is what the bookdown prototype
+// actually rendered in (its gitbook layer set .book.font-family-1 to
+// "Helvetica Neue", Helvetica, Arial, overriding the body rule), and it is
+// the look the course settled on. Fallbacks mirror the prototype exactly:
+// Windows students get Arial, as they did on the old site.
+$font-family-sans-serif: "Helvetica Neue", Helvetica, -apple-system,
+  BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+$font-size-root: 16.5px;
+$headings-font-weight: 650;
+$headings-color: $qm-navy;
+$link-color: $qm-teal-dark;
+
+/*-- scss:rules --*/
+
+body {
+  color: $qm-ink;
+  line-height: 1.7;
+  letter-spacing: 0.2px;   // as on the prototype site (gitbook body rule)
+}
+
+p { margin-bottom: 1.05rem; }
+
+h1 { margin-bottom: 1.6rem; letter-spacing: -0.015em; }
+h2, h3, h4 { letter-spacing: -0.01em; }
+
+// Small-caps label style shared by the standing components.
+%kicker {
+  display: block;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.72rem;
+  font-weight: 650;
+}
+
+// Section headings inside the lecture get a short teal rule.
+.course-phase h3 {
+  margin-top: 2.6rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.4rem;
+  position: relative;
+}
+.course-phase h3::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 2.2rem;
+  height: 2px;
+  background: rgba($qm-teal, 0.55);
+}
+
+// ---------------------------------------------------------------------------
+// Three-phase visual language (unchanged meaning across all courses):
+// pale blue = Before class, pale green = In class, pale purple = After class.
+// Near-white grounds; a thin coloured border carries the meaning.
+// ---------------------------------------------------------------------------
+
+.course-phase {
+  border-radius: 6px;
+  padding: 1.7rem 2.1rem 1.5rem 2.1rem;
+  margin: 2.6rem 0;
+}
+
+.course-phase > h2 {
+  border-bottom: none;
+  margin-top: 0.1rem;
+  margin-bottom: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.course-phase > h2::before {
+  content: "";
+  width: 0.55rem;
+  height: 0.55rem;
+  flex: 0 0 auto;
+}
+
+.phase-before {
+  background: #F7FAFD;
+  border-left: 4px solid #8FBCDE;
+  > h2::before { background: #5B9BC9; }
+}
+.phase-in-class {
+  background: #F7FBF8;
+  border-left: 4px solid #9CC7A2;
+  > h2::before { background: #6BA873; }
+}
+.phase-after {
+  background: #FAF8FC;
+  border-left: 4px solid #BCABD8;
+  > h2::before { background: #9A7FC4; }
+}
+
+// ---------------------------------------------------------------------------
+// Standing components
+// ---------------------------------------------------------------------------
+
+// Learning outcomes at the top of every lecture: teal checklist.
+.outcomes {
+  background: #F2F8F7;
+  border-radius: 6px;
+  padding: 1.3rem 1.7rem;
+  margin: 1.8rem 0;
+
+  .label {
+    @extend %kicker;
+    color: $qm-teal-dark;
+    margin-bottom: 0.7rem;
+  }
+  ul {
+    list-style: none;
+    padding-left: 0.2rem;
+    margin-bottom: 0.1rem;
+  }
+  li {
+    padding-left: 1.55rem;
+    position: relative;
+    margin-bottom: 0.4rem;
+  }
+  li::before {
+    content: "\2713";
+    position: absolute;
+    left: 0;
+    color: $qm-teal;
+    font-weight: 700;
+  }
+}
+
+// Driving question: stated at the start of class, answered in the last
+// five minutes. One per lecture.
+.driving-question {
+  background: $qm-navy;
+  color: #FFFFFF;
+  border-radius: 6px;
+  padding: 1.35rem 1.8rem;
+  margin: 2rem 0;
+
+  .label {
+    @extend %kicker;
+    color: #9FD3CC;
+    margin-bottom: 0.5rem;
+  }
+  // Context/motivation lead-in: what we measure and why it is worth asking.
+  .dq-context {
+    color: #C2D3E0;
+    font-size: 0.93rem;
+    line-height: 1.6;
+    margin: 0 0 0.65rem 0;
+  }
+  p { margin: 0; color: #FFFFFF; font-size: 1.05rem; line-height: 1.6; }
+  p.dq-context { margin: 0 0 0.65rem 0; color: #C2D3E0; font-size: 0.93rem; }
+}
+
+// The one caveat box per lecture ("What this number can and cannot say").
+// Navy/teal, never yellow.
+.caveat-box {
+  background: #FFFFFF;
+  border: 1px solid rgba($qm-navy, 0.3);
+  border-top: 3px solid $qm-navy;
+  border-radius: 6px;
+  padding: 1.25rem 1.7rem;
+  margin: 2rem 0;
+
+  .label {
+    @extend %kicker;
+    color: $qm-navy;
+    margin-bottom: 0.6rem;
+  }
+}
+
+// Video preparation box inside Before class
+.video-prep {
+  background: #FFFFFF;
+  border: 1px solid #C3D8E9;
+  border-radius: 6px;
+  padding: 1rem 1.35rem;
+  margin: 1.2rem 0;
+
+  .label { font-weight: 650; color: $qm-navy; }
+  .label::before { content: "\25B6\FE0E\00A0"; color: $qm-teal; font-size: 0.8em; }
+}
+
+// Optional formal material (demoted definitions, countable additivity, ...)
+.optional-box {
+  background: #F8FAFB;
+  border: 1px dashed #B5C0CA;
+  border-radius: 6px;
+  padding: 1rem 1.35rem;
+  margin: 1.5rem 0;
+  font-size: 0.94rem;
+
+  .label { font-weight: 650; color: #55636F; }
+}
+
+// Utility-writing prompt: one per lecture, at the end of After class.
+// Warm and personal, clearly not a graded exercise.
+.utility-prompt {
+  background: #FDFAF3;
+  border-left: 3px solid rgba($qm-gold, 0.7);
+  border-radius: 6px;
+  padding: 1.2rem 1.6rem;
+  margin: 1.7rem 0;
+
+  .label {
+    @extend %kicker;
+    color: #8A6512;
+    margin-bottom: 0.55rem;
+  }
+  p:last-child { margin-bottom: 0; }
+}
+
+// Stated time budgets
+.time-budget {
+  font-size: 0.84rem;
+  color: #5B6976;
+  font-style: italic;
+}
+
+// Pointer to an MIT / external explanation for one concept
+.concept-video {
+  font-size: 0.86rem;
+  color: #5B6976;
+  margin: 0.3rem 0 1rem 0;
+}
+
+// ---------------------------------------------------------------------------
+// Callouts, worked examples, code, tables
+// ---------------------------------------------------------------------------
+
+div.callout.callout { margin: 1.7rem 0; border-radius: 6px; }
+
+// "Try it" (faded tasks): warm orange, pencil, nothing alarming.
+// Authored as callout-caution.
+div.callout-caution.callout {
+  border-left-color: $qm-orange;
+
+  .callout-header, > .callout-header {
+    background-color: #FCF5EC;
+    color: #7A4A14;
+    font-weight: 650;
+  }
+  .callout-icon { display: none; }
+  .callout-title-container::before { content: "\270F\FE0F\00A0\00A0"; }
+}
+
+// Checks and model answers: quiet teal.
+div.callout-note.callout {
+  border-left-color: rgba($qm-teal, 0.75);
+
+  .callout-header, > .callout-header {
+    background-color: #F1F7F6;
+    color: $qm-teal-dark;
+    font-weight: 650;
+  }
+  .callout-icon { display: none; }
+  .callout-title-container::before { content: "\2713\00A0\00A0"; color: $qm-teal; }
+}
+
+// Worked examples (Quarto example environments): warm sand, gold accent —
+// the "worked" rung of the worked–faded–unassisted ladder.
+div.example {
+  background: #FCFAF4;
+  border-left: 3px solid rgba($qm-gold, 0.7);
+  border-radius: 6px;
+  padding: 1.1rem 1.5rem;
+  margin: 1.7rem 0;
+
+  .theorem-title { color: #8A6512; }
+}
+
+// Code: calm, teal-accented.
+pre.sourceCode, div.sourceCode {
+  background-color: #F5F8F9;
+  border: none;
+  border-left: 3px solid rgba($qm-teal, 0.4);
+  border-radius: 6px;
+  padding: 0.8rem 1rem;
+  margin: 1.3rem 0;
+}
+p code:not(.sourceCode), li code:not(.sourceCode) {
+  background-color: #EFF4F5;
+  color: $qm-teal-dark;
+  border-radius: 4px;
+  padding: 0.08em 0.3em;
+}
+
+// Tables: thin rules, no striping.
+.course-phase table, main table {
+  margin: 1.4rem 0;
+  thead th {
+    border-bottom: 2px solid rgba($qm-teal, 0.6);
+    color: $qm-navy;
+  }
+  td, th { padding: 0.45rem 0.7rem; }
+}
+
+// Figure captions
+figcaption {
+  color: #5B6976;
+  font-size: 0.86rem;
+  margin-top: 0.5rem;
+}
+
+// ---------------------------------------------------------------------------
+// Welcome page: team and course cards
+// ---------------------------------------------------------------------------
+
+.team-grid, .course-grid {
+  display: grid;
+  gap: 1rem;
+  margin: 1.5em 0;
+}
+.course-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.team-grid { grid-template-columns: 1fr; }
+
+.team-card, .course-card {
+  background: #fff;
+  border: 1px solid #D9E0E6;
+  border-radius: 6px;
+  padding: 1.1rem;
+}
+
+.team-card {
+  align-items: start;
+  column-gap: 1.5rem;
+  display: grid;
+  grid-template-columns: 12rem minmax(0, 1fr);
+}
+.team-card > :not(.team-photo) { grid-column: 2; }
+
+.team-photo {
+  border: 1px solid #D9E0E6;
+  border-radius: 50%;
+  display: block;
+  grid-column: 1;
+  grid-row: 1 / span 5;
+  height: 12rem;
+  width: 12rem;
+  margin-bottom: 0.8rem;
+  object-fit: cover;
+}
+.team-photo--valentina { object-position: 50% 38%; }
+.team-photo--gabriela  { object-position: 50% 40%; }
+.team-photo--serhan    { object-position: 50% 50%; }
+
+.team-name { color: $qm-navy; font-weight: 650; line-height: 1.3; margin-bottom: 0.25rem; }
+.team-role { color: #5B6976; font-size: 0.92em; margin-bottom: 0.65rem; }
+
+.course-number {
+  color: $qm-navy;
+  font-size: 0.78em;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.course-card h3 { font-size: 1.08em; margin: 0.45rem 0 0.55rem; border: none; padding: 0; }
+.course-card h3::after { display: none; }
+.course-card p { margin-bottom: 0; }
+
+@media (max-width: 760px) {
+  .course-grid { grid-template-columns: 1fr; }
+  .team-card { grid-template-columns: 1fr; }
+  .team-card > :not(.team-photo) { grid-column: 1; }
+}
+
+// ---------------------------------------------------------------------------
+// Printable weekly checklists (how-to-succeed page)
+// ---------------------------------------------------------------------------
+
+.week-checklist {
+  background: #fff;
+  border: 1px solid #D9E0E6;
+  border-radius: 6px;
+  padding: 1.1rem 1.5rem;
+  margin: 1.4rem 0;
+
+  h4 { margin-top: 0; }
+  ul { list-style: none; padding-left: 0; margin-bottom: 0; }
+  li { padding-left: 1.7rem; position: relative; margin-bottom: 0.4rem; }
+  li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.28em;
+    width: 0.85em;
+    height: 0.85em;
+    border: 1.5px solid #8FA3B3;
+    border-radius: 3px;
+  }
+  .day { font-weight: 650; color: $qm-navy; }
+}
+
+@media print {
+  .sidebar, .navbar, #quarto-sidebar, #quarto-margin-sidebar,
+  .page-navigation, #quarto-header { display: none !important; }
+  .week-checklist { break-inside: avoid; border: 1.5px solid #000; }
+  body { font-size: 12pt; }
+}
+
+// ---------------------------------------------------------------------------
+// Folded figure code ("See the R code for this figure")
+// ---------------------------------------------------------------------------
+
+details.code-fold {
+  margin: 0.4rem 0 0.9rem 0;
+
+  > summary {
+    font-size: 0.85rem;
+    color: #5B6976;
+    cursor: pointer;
+    padding: 0.15rem 0;
+  }
+  > summary:hover { color: $qm-teal-dark; }
+}

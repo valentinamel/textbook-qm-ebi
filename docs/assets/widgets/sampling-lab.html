@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sampling distribution lab</title>
+<style>
+  :root { --navy:#17324D; --teal:#2F7D73; --muted:#5B6976; --line:#D9E0E6; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+         margin: 0; padding: 10px 12px; color:#26313C; background:#fff; font-size:14px; }
+  .panels { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .panel h3 { margin:0 0 2px 0; font-size:0.95rem; color:var(--navy); }
+  .panel .sub { color:var(--muted); font-size:0.78rem; margin:0 0 4px 0; min-height:2.2em; }
+  canvas { width:100%; height:240px; border:1px solid var(--line); border-radius:4px; }
+  .controls { display:flex; flex-wrap:wrap; align-items:center; gap:10px 16px; margin-top:10px; }
+  .controls label { font-weight:600; color:var(--navy); }
+  input[type=range] { width:160px; vertical-align:middle; accent-color: var(--teal); }
+  button { font:inherit; font-weight:600; color:#fff; background:var(--teal); border:none;
+           border-radius:4px; padding:6px 14px; cursor:pointer; }
+  button.secondary { background:#fff; color:var(--navy); border:1.5px solid var(--line); }
+  button:active { transform:translateY(1px); }
+  .stats { margin-top:8px; font-size:0.85rem; color:var(--muted); line-height:1.5; }
+  .stats b { color:var(--navy); }
+  @media (max-width:640px){ .panels { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<div class="panels">
+  <div class="panel">
+    <h3>Population: initial equity offered (%)</h3>
+    <p class="sub">All 1,441 recorded pitches. Right-skewed. &mu; = 13.21, &sigma; = 8.44. This never changes.</p>
+    <canvas id="pop" width="560" height="240"></canvas>
+  </div>
+  <div class="panel">
+    <h3>Sample means, one dot-column per sample</h3>
+    <p class="sub" id="samp-sub">Draw samples of size n and watch the histogram of their means form. Same x-axis as the population.</p>
+    <canvas id="means" width="560" height="240"></canvas>
+  </div>
+</div>
+<div class="controls">
+  <label>n = <span id="nval">25</span></label>
+  <input type="range" id="n" min="2" max="400" value="25">
+  <button id="draw1">Draw 1 sample</button>
+  <button id="draw100">Draw 100 samples</button>
+  <button id="reset" class="secondary">Reset</button>
+</div>
+<div class="stats" id="stats">No samples drawn yet.</div>
+<script>
+const data = [15,10,10,25,15,15,10,10,20,20,35,20,10,10,5,30,15,15,25,40,20,20,25,25,30,10,15,25,20,25,25,25,70,20,20,10,25,25,20,10,15,10,51,10,18,25,20,10,20,10,40,40,30,33,20,25,30,15,25,25,51,20,15,10,10,5,25,5,10,10,20,20,25,20,15,10,20,25,25,20,5,30,30,20,25,25,20,20,25,15,20,10,40,15,25,15,45,20,15,15,15,5,10,10,25,40,10,20,20,10,5,50,30,25,35,25,20,20,15,25,15,25,20,25,20,25,15,50,51,12,15,20,10,5,25,30,15,15,15,51,20,3,5,10,15,20,20,30,33,30,15,20,20,10,5,20,10,33,10,30,10,7,10,10,10,5,10,33,20,15,15,10,33,15,12,10,25,10,25,40,15,5,10,15,10,10,20,20,25,5,15,20,15,10,15,10,10,25,20,30,15,20,5,15,25,30,33,5,10,12,12,26,14,20,8,15,10,20,100,15,12,25,30,20,35,10,5,30,20,20,10,20,25,10,20,40,10,15,25,10,10,15,20,20,20,20,22,20,15,25,40,10,20,30,34,25,5,10,25,25,15,10,10,10,5,20,20,33,10,20,10,15,10,33,20,25,15,10,5,15,7,20,25,20,10,10,20,15,20,7,20,20,20,12.5,20,10,15,10,15,10,15,12,20,15,15,30,10,5,15,15,20,20,10,20,10,10,10,30,20,5,10,20,30,20,5,10,10,15,25,5,15,10,5,20,10,25,10,20,25,25,17.5,20,20,10,5,30,20,4,30,10,10,15,15,20,30,20,10,10,10,15,15,15,10,10,20,20,10,10,30,3,10,12,35,20,25,15,20,10,20,10,5,20,20,15,5,15,20,10,10,30,5,25,5,25,25,5,5,20,20,10,10,35,10,10,5,5,15,20,10,29,15,20,5,10,10,20,20,5,15,30,20,10,20,10,20,10,20,11,10,20,5,30,15,20,10,20,8,6,10,10,7.5,20,5,10,15,20,10,15,20,20,5,20,15,10,5,10,15,10,15,10,15,20,10,20,5,12,5,10,13.5,20,5,5,10,20,15,20,5,10,25,10,18,8,10,50,20,20,3.5,20,15,10,10,5,20,10,10,20,3.5,15,12.5,10,10,20,10,10,20,10,20,10,15,20,10,15,20,25,20,10,10,8,15,15,10,10,15,20,10,20,10,10,10,15,20,20,10,20,5,25,25,10,10,40,15,25,7,20,5,20,5,5,2.5,10,20,20,20,5,10,20,5,20,10,15,10,20,10,8,15,25,20,10,10,10,10,7.5,15,10,10,16,5,15,5,10,12.5,20,5,10,10,15,10,10,7.6,5,15,20,40,20,10,10,20,10,4,20,10,20,16,7.5,20,15,10,10,20,6,3.1,4,10,5,20,20,10,10,10,20,20,5,10,10,10,5,20,10,20,12,15,10,40,10,10,10,20,3,10,5,10,15,10,10,5,5,20,4,10,5,5,20,20,10,20,15,10,20,20,25,20,20,10,7,20,6,5,15,15,5,5,10,15,20,33,2.5,10,10,3,8,5,10,10,20,10,8,10,10,10,12.5,10,5,5,8,10,13,20,20,5,7,10,5,25,10,10,30,10,15,20,15,5,5,5,15,10,10,7.5,10,30,12,10,15,10,12.5,10,20,15,10,15,5,10,5,10,2,6,25,10,10,25,5,5,5,10,10,12.5,5,5,25,10,5,5,5,10,5,10,20,20,15,10,10,40,8,1.5,5,5,15,20,15,9,18,10,6.3,10,10,20,10,10,10,10,5,10,12.5,10,15,10,15,15,12,20,20,5,5,10,3,4.5,7,50,5,7.5,20,10,10,10,5,20,15,5,15,10,10,10,10,10,30,10,7,10,10,10,25,5,10,10,20,10,10,5,8,15,20,10,10,4,8,10,5,8,25,10,10,10,20,7.5,25,20,15,10,5,10,2.5,15,5,13,8,15,10,20,15,33,5,10,4,10,5,10,20,5,3,8,25,10,8,6,10,8,20,20,10,10,10,3.5,15,10,15,5,20,5,7.5,15,10,10,7.5,5,16,10,2,10,20,50,5,10,10,20,5,7,10,20,2.5,10,10,15,8,10,10,20,5,10,10,15,10,15,15,17,2,4,10,15,7,10,10,15,6,15,20,20,10,10,15,20,5,7,7,20,2.5,10,10,20,5,5,10,18,5,8,10,33.3,10,10,10,14,8,10,15,20,10,10,15,20,5,5,10,15,10,12,15,15,5,8,10,10,10,15,15,20,5,10,10,15,7,10,10,10,17.5,6,10,4,5,10,12,10,10,10,10,2,20,8,20,20,15,10,15,20,10,20,10,10,10,10,10,10,8,10,15,10,20,2.5,10,8,10,5,10,20,5,10,5,10,15,20,10,10,10,5,20,10,5,5,30,10,10,10,5,4,7,7,25,5,5,15,10,10,5,20,5,10,3,15,7,10,5,10,20,10,5,10,20,1,5,10,10,10,5,12,8,2,5,10,20,15,10,4,10,10,10,3,15,2.5,10,10,10,15,8,5,10,7,2.5,20,10,10,5,5,20,10,15,10,10,8,5,5,10,10,20,5,25,30,2.5,25,10,10,10,2.5,15,5,2.5,7.5,5,15,10,10,10,5,10,10,20,1,6,40,10,10,5,25,15,10,6,7.5,5,6,2.5,10,10,3,15,2,15,6,10,6,15,5,10,15,20,7.5,3,5,20,10,10,22,5,10,5,10,6,10,5,5,10,5,5,5,10,10,10,15,5,10,10,10,10,10,10,5,5,10,20,10,10,10,10,4,8,5,15,10,5,10,15,20,10,5,10,20,10,15,3,5,5,5,5,5,2.5,5,8,7,5,10,20,25,10,5,5,15,30,20,10,5,12,10,5,5,5,10,8,20,5,10,10,6,5,5,10,15,5,10,10,5,5,15,5,10,17,30,10,5,15,5,10,10,7.5,10,10,5,5,10,10,20,2,7,10,5,10,8,20,15,5,10,10,10,20,10,10,10,10,10,10,10,5,8,5,10,5,10,20,4,10,3.5,8,10,10,10,10,10,7.5,25,4,6.5,10,10,10,20,20,10,2,2,2.5,5,15,5,10,10,4,10,10,5,2.5,5,5,5,15,10,5,10,5,5,5,5,20,5,10,2,4,5,5,15.9,5,5,7.5,8,10,5,6,5,10,10,10,2.5,35,10,5,4,5,5,10,10,15,10,10,10,10,10,10,10,5,10,5,5,5,5,10,5,10,5,10,20,10,10,10,5,5,5,10,5,10,10,2.5,5,10,10,10,10,5,10,4,15,5,5,10,15,5,10,15,15,3,8,5,5,10,10,5,10,5,5];
+const MU = 13.208, SIGMA = 8.441;
+const XMIN = 0, XMAX = 60;                 // shared x-axis
+let n = 25, means = [];
+
+function drawHist(canvas, values, binw, color, maxY, meanLine, overlaySE) {
+  const c = canvas.getContext("2d"), W = canvas.width, H = canvas.height;
+  const padL = 30, padB = 22, padT = 8;
+  c.clearRect(0,0,W,H);
+  const nb = Math.ceil((XMAX - XMIN)/binw);
+  const counts = new Array(nb).fill(0);
+  values.forEach(v => { const i = Math.min(nb-1, Math.max(0, Math.floor((v - XMIN)/binw))); counts[i]++; });
+  const peak = maxY || Math.max(1, ...counts);
+  const xw = (W - padL - 6)/nb;
+  c.fillStyle = color;
+  counts.forEach((k,i) => {
+    if (!k) return;
+    const h = (H - padB - padT) * k/peak;
+    c.fillRect(padL + i*xw, H - padB - h, Math.max(1, xw - 1), h);
+  });
+  // axis
+  c.strokeStyle = "#8FA3B3"; c.lineWidth = 1;
+  c.beginPath(); c.moveTo(padL, H-padB+0.5); c.lineTo(W-4, H-padB+0.5); c.stroke();
+  c.fillStyle = "#5B6976"; c.font = "11px sans-serif"; c.textAlign = "center";
+  for (let x = XMIN; x <= XMAX; x += 10) {
+    const px = padL + (x - XMIN)/(XMAX - XMIN) * (W - padL - 6);
+    c.fillText(String(x), px, H - 7);
+    c.strokeStyle = "#D9E0E6"; c.beginPath(); c.moveTo(px, H-padB); c.lineTo(px, H-padB+3); c.stroke();
+  }
+  if (meanLine !== null) {
+    const px = padL + (meanLine - XMIN)/(XMAX - XMIN) * (W - padL - 6);
+    c.strokeStyle = "#C98B2E"; c.lineWidth = 2;
+    c.beginPath(); c.moveTo(px, padT); c.lineTo(px, H-padB); c.stroke();
+    c.fillStyle = "#8A6512"; c.textAlign = "left";
+    c.fillText("μ", px + 4, padT + 10);
+  }
+}
+
+function sampleMean(size) {
+  let s = 0;
+  for (let i=0; i<size; i++) s += data[(Math.random()*data.length)|0];
+  return s/size;
+}
+
+function redraw() {
+  drawHist(document.getElementById("pop"), data, 2, "#B9D2CE", null, MU);
+  const binw = 0.5;
+  drawHist(document.getElementById("means"), means, binw, "#2F7D73", null, MU);
+  const st = document.getElementById("stats");
+  if (!means.length) { st.textContent = "No samples drawn yet."; return; }
+  const m = means.reduce((a,b)=>a+b,0)/means.length;
+  const sd = Math.sqrt(means.reduce((a,b)=>a+(b-m)*(b-m),0)/means.length);
+  st.innerHTML = "<b>" + means.length + "</b> samples of n = <b>" + n + "</b> drawn. " +
+    "Mean of the sample means: <b>" + m.toFixed(2) + "</b> (population μ = 13.21). " +
+    "SD of the sample means: <b>" + sd.toFixed(2) + "</b>; the square-root rule predicts " +
+    "σ/√n = 8.44/√" + n + " = <b>" + (SIGMA/Math.sqrt(n)).toFixed(2) + "</b>.";
+}
+
+document.getElementById("n").addEventListener("input", e => {
+  n = +e.target.value;
+  document.getElementById("nval").textContent = n;
+  means = [];           // new n starts a new sampling distribution
+  redraw();
+});
+document.getElementById("draw1").addEventListener("click", () => { means.push(sampleMean(n)); redraw(); });
+document.getElementById("draw100").addEventListener("click", () => { for (let i=0;i<100;i++) means.push(sampleMean(n)); redraw(); });
+document.getElementById("reset").addEventListener("click", () => { means = []; redraw(); });
+redraw();
+</script>
+</body>
+</html>

@@ -1,0 +1,669 @@
+# Lecture 7: Samples, parameters, and estimators {#b07}
+
+```{r}
+#| label: b07-setup
+#| include: false
+# Chunk options only. Every object used in this chapter is constructed in
+# visible code on this page, so that copying the code always works.
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
+                      fig.width = 7, fig.height = 4.5)
+```
+
+::: {.outcomes}
+<span class="label">By the end of Lecture 7, you can</span>
+
+- distinguish a population, sampling frame, sample, and target population;
+- explain simple random sampling with and without replacement, and apply
+  the 10% working rule;
+- distinguish parameters, estimators, and estimates, with the capital and
+  lower-case notation discipline;
+- explain why a sample proportion is a sample mean;
+- explain the $n-1$ degrees of freedom in a sample variance;
+- describe how an estimate varies from sample to sample while the parameter
+  sits still;
+- classify sampling methods and name the main threat of each.
+:::
+
+::: {.driving-question}
+<span class="label">Driving question</span>
+
+<p class="dq-context">Checking every record, customer, or transaction is usually too expensive, so firms audit a sample and act on what it shows. That only works if a small sample can be trusted to speak for the whole.</p>
+
+We can only afford to inspect 100 of the 1,441 pitches. What can 100
+randomly chosen records tell us about all of them --- and what can they
+never tell us about entrepreneurs in general?
+:::
+
+::: {.course-phase .phase-before}
+
+## Before class
+
+<span class="time-budget">Total preparation time: about 25 minutes.</span>
+
+<div class="video-prep">
+<span class="label">Video preparation (10 minutes)</span><br>
+Watch <a href="https://www.youtube.com/watch?v=nuXDb9B3y0M">The Sample
+Mean and Some Terminology</a>. Be ready to distinguish a population
+quantity from a statistic calculated after a sample is observed. The link
+is also listed in the
+<a href="../resources/video-guide.html">External Video Guide</a>.
+</div>
+
+**Reactivate (10 minutes).** Suppose we want the mean initial equity
+offered across the 1,441 recorded pitches in completed Seasons 1--16, but
+can inspect only 100 randomly selected records. Identify:
+
+1. the finite population;
+2. the population variable;
+3. the sample;
+4. the parameter of interest;
+5. a statistic that could estimate it.
+
+::: {.callout-note collapse="true"}
+## Check your answers
+
+The finite population is the 1,441 recorded pitches; the variable is
+initial equity offered; the sample is the 100 selected records; the
+parameter is the population mean equity offer; and the sample mean is a
+suitable estimator.
+:::
+
+**Predict (5 minutes).** Answer the one-click Mentimeter question posted on
+Canvas before you come to class: two students each draw their own random
+sample of 100 pitches from the file and each compute the mean equity
+offered. Will their two sample means be **equal**? Commit to an answer; the
+lecture resolves it.
+
+If subscripts or summation notation are not secure, review
+[Mathematics Refresher: indices and sums](../resources/math-refresher.html).
+
+:::
+
+::: {.course-phase .phase-in-class}
+
+## In class
+
+The session opens with the usual four-minute entry quiz on the prep videos,
+then turns to the driving question. Your prep prediction --- do two random
+samples give equal means? --- stays on screen, unresolved, until the
+sampling activity below settles it with evidence.
+
+### Define the population before calculating
+
+A **population** is the complete set of units about which a question is
+asked. A **sample** is the subset observed for analysis. A **sampling
+frame** is the list or mechanism from which the sample is selected. The
+**target population** is the broader group to which we hope to generalise.
+
+These sets need not coincide. The teaching file is a near-census of
+recorded US *Shark Tank* pitches from completed Seasons 1--16, but it is
+not a random sample of all entrepreneurs, all funding pitches, or even all
+applicants to the show. Randomly sampling rows from this file supports
+inference to the 1,441-record population. It does not remove the show's
+selection process.
+
+::: {.callout-note collapse="true"}
+## Check: classify two scenarios
+
+**Scenario A.** A food-delivery startup wants to know how satisfied "its
+customers" are. It emails a survey to the app users who opted in to
+marketing emails; 800 reply. Identify the target population, the frame,
+and the sample.
+
+**Scenario B.** A consultant uses our 100 sampled pitches to advise "US
+entrepreneurs seeking investors." What is the frame, and what is the
+target population being claimed?
+
+**Answers.** In A, the target population is all customers; the frame is
+the opted-in email list (which already excludes many customers); the
+sample is the 800 who chose to reply --- a voluntary-response subset of an
+incomplete frame. In B, the frame is the 1,441 recorded *Shark Tank*
+pitches; the claimed target population is all US entrepreneurs seeking
+investors. Random row sampling licenses conclusions about the frame, not
+about that far larger target group.
+:::
+
+### Simple random sampling
+
+In a simple random sample of size $n$, every set of $n$ population units
+has the same chance of selection.
+
+- **With replacement:** a selected unit is returned before the next draw.
+  Draws are independent and each draw has the same distribution.
+- **Without replacement:** a unit cannot be selected twice. Draws are
+  dependent, although every draw has the same marginal distribution.
+
+When a without-replacement sample is a small fraction of a large
+population, the dependence is weak. This course uses the 10% condition as
+a practical working rule: if $n\le 0.10N$, the usual independent-sample
+standard-error formulas are a good approximation.
+
+The running sample for this lecture and the next is drawn with a visible
+seed, so every reader gets the same 100 rows:
+
+```{r}
+#| label: b07-draw-sample
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+set.seed(123)
+sample_rows <- sample(seq_len(nrow(sharks)), size = 100, replace = FALSE)
+pitch_sample <- sharks[sample_rows, ]
+
+nrow(pitch_sample)
+```
+
+Here $100/1441\approx 0.069<0.10$, so the working rule is satisfied.
+
+How does this one realised sample compare to the population it came from?
+
+```{r}
+#| label: fig-b07-population-sample
+#| code-fold: true
+#| code-summary: "See the R code for this figure"
+#| fig-cap: "Initial equity offered: all 1,441 records (grey bars) and the seed-123 random sample of 100 (green connected points). The sample resembles the population but does not reproduce it exactly."
+library(ggplot2)
+
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+set.seed(123)
+sample_rows <- sample(seq_len(nrow(sharks)), size = 100, replace = FALSE)
+pitch_sample <- sharks[sample_rows, ]
+
+breaks <- seq(0, 100, by = 5)
+pop_hist <- hist(sharks$equity_offered_pct, breaks = breaks, plot = FALSE)
+samp_hist <- hist(pitch_sample$equity_offered_pct, breaks = breaks,
+                  plot = FALSE)
+pop_density <- data.frame(mid = pop_hist$mids, density = pop_hist$density)
+samp_density <- data.frame(mid = samp_hist$mids, density = samp_hist$density)
+
+ggplot() +
+  geom_col(data = pop_density, aes(mid, density), width = 5,
+           fill = "grey75", alpha = 0.85, colour = "white") +
+  geom_line(data = samp_density, aes(mid, density),
+            colour = "#009E73", linewidth = 0.9) +
+  geom_point(data = samp_density, aes(mid, density),
+             colour = "#009E73", size = 2.2) +
+  annotate("text", x = 40, y = 0.070, label = "all 1,441 records",
+           colour = "#5B6976", size = 3.4, hjust = 0) +
+  annotate("text", x = 40, y = 0.062, label = "random sample of 100",
+           colour = "#009E73", size = 3.4, hjust = 0) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
+  labs(x = "Equity initially offered (%)", y = "Density") +
+  theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    plot.caption = element_text(colour = "#5B6976"),
+    axis.title = element_text(colour = "#17324D")
+  )
+```
+
+The horizontal axis gives equity intervals in percentage points; the
+vertical axis is density, so the differently sized datasets can be compared
+by shape. The sample resembles the population but does not reproduce it
+exactly --- and a *different* random sample would resemble it differently.
+That observation is worth turning into an experiment.
+
+### The live sampling activity: watching an estimator vary
+
+In class this segment runs live. The whole class watches five different
+random samples being drawn, one after another, and tracks one number per
+sample: the mean equity offered. The target of the exercise is the
+population mean of the file,
+
+```{r}
+#| label: b07-parameter
+mu_equity <- mean(sharks$equity_offered_pct)
+mu_equity
+```
+
+about 13.21 percentage points --- knowable here only because we happen to
+hold the full file. In a real study you would hold *only* the sample, which
+is exactly why the behaviour of the sample mean matters.
+
+Five samples of 100, each from its own seed, each summarised by its mean.
+The code is fully reproducible --- run it yourself and you will get the
+same five numbers:
+
+```{r}
+#| label: b07-five-samples
+seeds <- 101:105
+sample_means <- numeric(length(seeds))
+for (i in seq_along(seeds)) {
+  set.seed(seeds[i])
+  rows <- sample(seq_len(nrow(sharks)), size = 100, replace = FALSE)
+  sample_means[i] <- mean(sharks$equity_offered_pct[rows])
+}
+round(sample_means, 2)
+```
+
+Five samples, five different means --- from about 12.0 to about 13.8.
+@fig-b07-five-means puts them on one fixed axis, with the population mean
+drawn as a vertical line that never moves.
+
+```{r}
+#| label: fig-b07-five-means
+#| code-fold: true
+#| code-summary: "See the R code for this figure"
+#| fig-height: 3.2
+#| fig-cap: "Five random samples of 100, five sample means (green dots), one fixed population mean (gold dashed line at 13.21). The estimate varies from draw to draw; the parameter sits still."
+library(ggplot2)
+
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+mu_equity <- mean(sharks$equity_offered_pct)
+
+seeds <- 101:105
+sample_means <- numeric(length(seeds))
+for (i in seq_along(seeds)) {
+  set.seed(seeds[i])
+  rows <- sample(seq_len(nrow(sharks)), size = 100, replace = FALSE)
+  sample_means[i] <- mean(sharks$equity_offered_pct[rows])
+}
+five_means <- data.frame(draw = seq_along(seeds),
+                         seed = paste("seed", seeds),
+                         sample_mean = sample_means)
+
+ggplot(five_means, aes(sample_mean, draw)) +
+  geom_vline(xintercept = mu_equity, linetype = "dashed",
+             colour = "#C98B2E", linewidth = 0.7) +
+  geom_point(colour = "#009E73", size = 3) +
+  annotate("text", x = mu_equity + 0.12, y = length(seeds) + 0.45,
+           label = "mu == 13.21", parse = TRUE,
+           colour = "#17324D", size = 3.4, hjust = 0) +
+  scale_y_continuous(breaks = five_means$draw, labels = five_means$seed) +
+  coord_cartesian(xlim = c(10, 16),
+                  ylim = c(0.5, length(seeds) + 0.5)) +
+  labs(x = "Sample mean equity offered (%)", y = "Draw") +
+  theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.y = element_blank(),
+    plot.caption = element_text(colour = "#5B6976"),
+    axis.title = element_text(colour = "#17324D")
+  )
+```
+
+Read the figure slowly, because Lecture 8 is built on it. Each green dot
+is one *estimate*: the realised mean of one realised sample. The gold
+dashed line is the *parameter*: one fixed, unmoving number. The dots scatter
+around the line --- none hits it exactly, none is far from it, and no dot
+is "wrong." The scatter is not a mistake in the procedure; it *is* the
+procedure. Random samples produce random estimates.
+
+This resolves the prep prediction: two students drawing their own random
+samples will almost never get equal means. Any two of the five dots differ,
+and yours (in the after-class task below) will differ again.
+
+In class the five-dot plot stays on screen through the break, with one
+question to chew on: if we drew a sixth sample, where would its mean land?
+You cannot say exactly --- but by now you can say something about the
+*range* in which it would probably fall. Making that "something" precise is
+the entire subject of Lecture 8.
+
+### Parameters, estimators, and estimates
+
+<p class="concept-video"><strong>MIT explanation (review):</strong>
+<a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/the-sample-mean-and-some-terminology/">20.3 The Sample Mean and Some Terminology</a>.</p>
+
+A **parameter** is a fixed numerical property of a population, usually
+unknown. An **estimator** is a rule based on random sample variables. Its
+value changes from sample to sample. An **estimate** is the number obtained
+from one realised sample.
+
+For a random sample $X_1,\ldots,X_n$:
+
+$$\bar X=\frac{1}{n}\sum_{i=1}^{n}X_i$$
+
+is an estimator of the population mean $\mu$. After observing values
+$x_1,\ldots,x_n$,
+
+$$\bar x=\frac{1}{n}\sum_{i=1}^{n}x_i$$
+
+is the realised estimate. Capital letters describe random quantities before
+sampling; lower-case letters describe observed values.
+
+For a 0/1 variable, the sample proportion is a sample mean:
+
+$$\widehat P=\frac{1}{n}\sum_{i=1}^{n}X_i.$$
+
+Its realised value is written $\hat p$.
+
+The usual sample variance and standard deviation are
+
+$$S^2=\frac{1}{n-1}\sum_{i=1}^{n}(X_i-\bar X)^2,
+\qquad S=\sqrt{S^2}.$$
+
+The denominator $n-1$ makes $S^2$ an unbiased estimator of population
+variance under independent random sampling.
+
+The realised estimates for our seed-123 sample:
+
+```{r}
+#| label: b07-sample-estimates
+c(
+  sample_mean_equity = mean(pitch_sample$equity_offered_pct),
+  sample_sd_equity = sd(pitch_sample$equity_offered_pct),
+  sample_deal_proportion = mean(pitch_sample$deal_on_show)
+)
+```
+
+For this realised sample, $\bar x=12.76$ percentage points, $s=7.71$
+percentage points, and $\hat p=0.64$.
+
+::: {#exm-b07-three-objects}
+## Worked example: three objects for the deal proportion
+
+Identify the parameter, the estimator, and the estimate for the proportion
+of deals, using our realised sample.
+
+- **Parameter:** $p$, the proportion of the 1,441 records with an on-air
+  deal --- one fixed number. Because the file is a near-census of its
+  frame, we can even look it up: $882/1441\approx 0.612$. In a real study
+  it would be unknown.
+- **Estimator:** $\widehat P=\frac{1}{100}\sum_{i=1}^{100}X_i$, where
+  $X_i$ is the deal indicator of the $i$-th sampled record --- a rule
+  whose value is random because the sample is.
+- **Estimate:** $\hat p=0.64$, the number the rule produced for the
+  seed-123 sample. A different seed would produce a different $\hat p$
+  while $p$ stayed exactly where it was.
+:::
+
+### Why the sample variance has $n-1$ degrees of freedom
+
+Once $\bar X$ has been calculated from the same sample, the deviations must
+satisfy
+
+$$\sum_{i=1}^{n}(X_i-\bar X)=0.$$
+
+If $n-1$ deviations are known, the final deviation is forced to make the
+sum zero. Only $n-1$ deviations can vary freely: the sample variance has
+$n-1$ **degrees of freedom**.
+
+::: {#exm-b07-df}
+## Worked example: three deviations, two degrees of freedom
+
+Suppose a sample has $n=3$ observations and the first two deviations from
+the sample mean are $2$ and $-5$.
+
+*Step 1.* The deviations must sum to zero:
+$2+(-5)+d_3=0$.
+
+*Step 2.* Solve: $d_3=3$. The third deviation cannot be chosen freely ---
+it is forced.
+
+*Step 3.* Count the freedom: three deviations, but only two carried any
+information once the sample mean was fixed. The sample variance for this
+sample has $3-1=2$ degrees of freedom.
+:::
+
+Using the fitted sample mean makes squared deviations around $\bar X$
+slightly too small on average as a measure of population spread. Dividing
+by $n-1$, rather than $n$, corrects that downward bias under the
+random-sample model. Degrees of freedom count remaining independent pieces
+of information; they are not a percentage or a probability.
+
+### Sampling method determines the evidence boundary
+
+The number of rows does not identify the sampling design. Ask how units
+entered the data:
+
+| Method | How units enter | Main implication |
+|---|---|---|
+| Simple random sample | selected by a known random mechanism | supports design-based generalisation to the frame |
+| Stratified random sample | randomly selected within defined groups | can guarantee representation of important groups |
+| Convenience sample | selected because they are easy to reach | vulnerable to selection bias |
+| Voluntary-response sample | units choose whether to respond | people with stronger views may be over-represented |
+| Census of a frame | every unit in the available frame is recorded | no sampling error for that frame, but coverage error can remain |
+
+The Shark Tank teaching file is close to a census of its recorded-pitch
+frame. When we draw 100 rows for an inference exercise, the randomisation
+is created by our row-sampling procedure. It does not make the television
+programme's selection of pitches random.
+
+::: {.callout-caution collapse="true"}
+## Try it: classify four recruitment stories
+
+In class this is the pair task. For each story, name the sampling method
+from the table and state its main threat.
+
+*Story 1 (given, as a model).* "A ministry lists all registered firms,
+groups them by province, and randomly selects firms within each province."
+Method: stratified random sample. Main implication: representation of
+every province is guaranteed by design.
+
+*Story 2 (you).* "A startup posts a poll on its own Instagram account
+asking followers to rate a prototype; 412 followers respond."
+
+*Story 3 (you).* "A student emails the survey to friends, family, and two
+student associations she belongs to."
+
+*Story 4 (you).* "A researcher numbers all 8,214 firms in the Chamber of
+Commerce register and selects 300 using a random number generator."
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+Story 2: voluntary-response sample --- followers already like the brand,
+and those with the strongest opinions are most likely to reply. Story 3:
+convenience sample --- easy-to-reach contacts are systematically unlike
+the wider population, so selection bias is the main threat. Story 4:
+simple random sample from the register --- it supports generalisation to
+the registered-firm frame, though firms missing from the register remain
+out of reach (coverage error).
+:::
+:::
+
+Random selection reduces systematic over-representation within the
+sampling frame. It does not guarantee that one realised sample is
+perfectly balanced: by chance, a sample can contain unusually many large
+equity offers or unusually many deals. Larger samples reduce this random
+instability --- the five-dot plot would tighten if each dot summarised
+1,000 draws instead of 100.
+
+::: {.caveat-box}
+<span class="label">What random selection can and cannot repair</span>
+
+Random **sampling** supports generalisation from the sample to the frame
+it was drawn from: our 100 rows speak, with quantifiable uncertainty, for
+the 1,441 recorded pitches. Random **assignment** --- allocating units to
+treatments by chance --- supports causal comparison. They answer different
+design questions and neither substitutes for the other. And neither
+repairs the show's selection: the frame itself was assembled by producers
+choosing telegenic pitches, so no amount of careful random row-sampling
+turns conclusions about this file into conclusions about entrepreneurs in
+general. Finally, "unbiased" is a promise about the procedure across many
+samples, not about your one realised estimate: $\bar x = 12.76$ is not
+$\mu = 13.21$, and no single sample can tell you how far off it is.
+:::
+
+### Answering the driving question
+
+One hundred randomly chosen records give estimates of the file's
+parameters: the seed-123 sample estimates the mean equity offer at
+$\bar x=12.76$ against the true $\mu=13.21$, and the deal proportion at
+$\hat p=0.64$ against $p\approx 0.612$. Five repeated draws put the sample
+mean between about 12.0 and 13.8 while the parameter never moved ---
+random samples inform us about the frame, with a random error whose size
+Lecture 8 will quantify. What they can never tell us: anything reliable
+about entrepreneurs in general, because the frame is a television
+programme's curated selection, and our row-sampling randomness cannot
+undo that.
+
+**Next:** We now speak carefully about samples: the parameter sits still while
+the estimator varies from sample to sample --- you watched five sample means
+land in five different places. Lecture 8 studies the pattern behind those
+dots: the sampling distribution of the mean, the standard error that measures
+its spread, and the central limit theorem, which explains why averages turn
+bell-shaped even when the underlying data are wildly skewed. That pattern is
+what will let us attach a margin of error to any estimate.
+
+:::
+
+::: {.course-phase .phase-after}
+
+## After class
+
+<span class="time-budget">Total practice time: about 50 minutes.</span>
+
+### Retrieval (10 minutes)
+
+1. What is the difference between a target population and a sampling frame?
+2. Why are draws without replacement dependent?
+3. What is the difference between an estimator and an estimate?
+4. Why is a sample proportion a sample mean?
+5. Why does the sample variance have $n-1$ degrees of freedom?
+6. What does random sampling support that random assignment does not?
+
+::: {.callout-note collapse="true"}
+## Check your answers
+
+1. The target population is the group of substantive interest; the
+   sampling frame is the set from which units can actually be selected.
+2. Selecting one unit changes which units remain available.
+3. An estimator is a random rule before data are observed; an estimate is
+   its realised numerical value.
+4. A 0/1 indicator sums to the number of successes, so its mean is the
+   success proportion.
+5. Estimating the sample mean imposes one constraint: all deviations from
+   it must sum to zero. Only $n-1$ deviations can vary freely.
+6. Random sampling supports generalisation to the sampling frame; random
+   assignment supports causal comparison of treatments.
+:::
+
+### Practice (15 minutes)
+
+1. For a population of $N=20{,}000$ customers and a simple random sample
+   of $n=500$, check the 10% condition.
+2. Write the estimator and realised estimate for the population deal
+   proportion.
+3. Explain why $\mu$ is fixed while $\bar X$ is random.
+4. Using `pitch_sample`, calculate the sample mean and sample SD of
+   `description_words`.
+5. Explain why this random sample cannot justify conclusions about all US
+   entrepreneurs.
+6. For a sample of five observations, state the degrees of freedom used to
+   estimate variance and explain the number.
+
+::: {.callout-note collapse="true"}
+## Check your answers
+
+1. $500/20{,}000=0.025<0.10$, so the condition is satisfied.
+2. The estimator is $\widehat P=n^{-1}\sum_iX_i$; the realised estimate is
+   $\hat p=n^{-1}\sum_ix_i$ --- here $0.64$.
+3. The population and its mean are treated as fixed; the selected
+   observations, and therefore their mean, vary across possible samples.
+4. Rebuild the sample and compute --- about 4.82 words with an SD of about
+   1.76:
+
+```{r}
+#| label: b07-practice-check
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+set.seed(123)
+sample_rows <- sample(seq_len(nrow(sharks)), size = 100, replace = FALSE)
+pitch_sample <- sharks[sample_rows, ]
+c(mean = mean(pitch_sample$description_words),
+  sd   = sd(pitch_sample$description_words))
+```
+
+5. The sample was selected from televised records, not from all US
+   entrepreneurs; random row selection cannot repair that coverage gap.
+6. The degrees of freedom are $5-1=4$. Once the sample mean is estimated,
+   four deviations may vary freely and the fifth is fixed by their zero
+   sum.
+:::
+
+### Draw your own sample (10 minutes)
+
+Add a dot of your own to the class version of @fig-b07-five-means. Use
+your student number as the seed, draw your own sample of 100, and compute
+your mean equity offer:
+
+```{r}
+#| label: b07-own-sample
+#| eval: false
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+my_seed <- 2412345   # replace with your own student number
+set.seed(my_seed)
+rows <- sample(seq_len(nrow(sharks)), size = 100, replace = FALSE)
+mean(sharks$equity_offered_pct[rows])
+```
+
+Submit your mean to the shared class plot on Canvas (the Mentimeter link
+is posted under Lecture 7). Every student uses a different seed, so every
+student contributes a different dot.
+
+::: {.callout-note collapse="true"}
+## Check: what will the class plot show?
+
+Two hundred dots will not scatter arbitrarily: they will pile up around
+13.2, thin out towards the edges, and form a recognisable shape. That
+shape --- the sampling distribution of the mean --- is exactly what
+Lecture 8 names, describes, and puts to work.
+:::
+
+### Spaced review: one item from Lecture 6 (5 minutes)
+
+Processing time is modelled as $Y\sim N(50,100)$, and
+$P(Z\le 1.5)=0.9332$ is supplied. Find $P(Y>65)$ by hand.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+$\sigma=\sqrt{100}=10$ and $z=(65-50)/10=1.5$, so
+$P(Y>65)=1-P(Z\le 1.5)=1-0.9332=0.0668$: under this model, about 6.7% of
+processing times exceed 65 minutes.
+:::
+
+### Worked exam interpretation (5 minutes)
+
+**Question.** A retailer's loyalty programme has 52,000 members. An
+analyst draws 400 members at random; their mean January spend is
+&euro;87.40. A slide then claims: "the average member spends &euro;87.40
+per month." Identify the parameter, the estimator, and the estimate, and
+give two distinct objections to the claim.
+
+::: {.callout-note collapse="true"}
+## Check a model answer
+
+The parameter is the mean January spend across all 52,000 members (fixed,
+unknown). The estimator is the sample mean $\bar X$ of 400 randomly drawn
+members' spends. The estimate is $\bar x=87.40$ euros. Objections: first,
+the estimate carries sampling error --- another random 400 members would
+give a different mean, so &euro;87.40 should be reported with its
+uncertainty (Lectures 8--9); second, the claim generalises a January
+figure to "per month," which the data cannot support --- the frame covers
+one month's spending only.
+:::
+
+### Make it yours (5 minutes)
+
+:::: {.utility-prompt}
+<span class="label">Utility: two sentences</span>
+
+Think of your EiA venture --- or any business you know well. Write two
+sentences: first name one group you would genuinely want to learn about
+(your target population) and the best list of its members you could
+actually get your hands on (your frame), then say where the gap between
+the two would bite if you sampled from that list. There is no wrong
+answer; the point is connecting today's tools to something you care about.
+
+::: {.callout-note collapse="true"}
+## See an example, then write your own
+
+Take a student-run campus meal-prep box venture. "I want to learn about all students on campus who buy lunch at least twice a week, but the best list I can actually get is my own mailing list. Sampling from that list overrepresents existing fans, so any satisfaction estimate would be too rosy for the market I want to enter next."
+:::
+
+You can discuss this task --- and any other task in this chapter --- with
+**Tilly**, the course AI assistant on Canvas: ask it to hunt for coverage
+gaps in your frame and to suggest who your sample would silently leave
+out.
+::::
+
+Continue to Lecture 8: Sampling distributions and the central limit
+theorem.
+
+Formula sheet: Lecture 7 formulas.
+
+For a more formal explanation, consult
+[Nieuwenhuis, *Statistical Methods for Business and Economics*](https://tilburguniversity.on.worldcat.org/oclc/317545871),
+Chapter 12.
+
+:::

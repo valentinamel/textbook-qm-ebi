@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.42">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Lecture 5: Categories as predictors and joint tests – Quantitative Methods to Understand E&amp;BI</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../intermediate/i06-interactions-curvature.html" rel="next">
+<link href="../intermediate/i04-multiple-regression.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-ecf4e518a83458a2bb67b2a9bf74271b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar docked">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../intermediate/overview.html">QM Intermediate: Course overview</a></li><li class="breadcrumb-item"><a href="../intermediate/i05-categories-joint-tests.html"><span class="chapter-title">Lecture 5: Categories as predictors and joint tests</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Quantitative Methods to Understand E&amp;BI</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Welcome</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../basic/overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">QM Basic: Course overview</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b01-introduction-data-analysis.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 1: Introduction to Data Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b02-probability-foundations.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 2: Probability foundations and random variables</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b03-discrete-distributions.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 3: Discrete distributions, expectation, and variance</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/t01-exam-prep.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Tutorial 1: Evidence and probability foundations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b04-conditioning-bayes-independence.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 4: Conditioning, Bayes’ rule, and independence</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b05-joint-covariance-correlation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 5: Joint random variables, covariance, and correlation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/t02-exam-prep.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Tutorial 2: Conditioning and relationships</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b06-continuous-normal.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 6: Continuous distributions and the normal model</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b07-samples-estimators.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 7: Samples, parameters, and estimators</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b08-sampling-distributions.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 8: Sampling distributions and the central limit theorem</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/t03-exam-prep.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Tutorial 3: Normal models, sampling, and standard errors</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b09-t-confidence-intervals.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 9: The t distribution, confidence intervals, and the two-sided test</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/b10-testing-errors-power.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 10: Testing decisions, errors, power, and the road to regression</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/t04-exam-prep.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Tutorial 4: Inference and tests against zero</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/formula-sheet.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">QM Basic Formula Sheet</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/mock-exam.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Mock Exam: QM Basic</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../intermediate/overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">QM Intermediate: Course overview</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/i01-simple-linear-regression.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 1: Simple linear regression</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/i02-assumptions-diagnostics.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 2: What the model assumes and how residuals betray it</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/i03-inference-fit-ftest.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 3: Coefficient inference, fit, and the F-test</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/t01-exam-prep.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Tutorial 1: Simple regression, diagnostics, and model usefulness</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/i04-multiple-regression.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 4: Multiple regression and what controls do</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/i05-categories-joint-tests.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">Lecture 5: Categories as predictors and joint tests</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/i06-interactions-curvature.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 6: Interactions and curvature</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/t02-exam-prep.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Tutorial 2: Multiple regression and extensions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/code-sheet.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">QM Intermediate Code Sheet</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intermediate/mock-exam.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Mock Exam: QM Intermediate</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <span class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">QM Advanced: Course overview</span></span>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Supplementary resources</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../resources/how-to-succeed.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">How to succeed in this course</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../resources/r-refresher.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">R Refresher</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../resources/math-refresher.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Mathematics Refresher</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../resources/video-guide.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">External Video Guide</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../resources/reading-ladder.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Reading research papers</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul class="collapse">
+  <li><a href="#before-class" id="toc-before-class" class="nav-link active" data-scroll-target="#before-class">Before class</a></li>
+  <li><a href="#in-class" id="toc-in-class" class="nav-link" data-scroll-target="#in-class">In class</a></li>
+  <li><a href="#after-class" id="toc-after-class" class="nav-link" data-scroll-target="#after-class">After class</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../intermediate/overview.html">QM Intermediate: Course overview</a></li><li class="breadcrumb-item"><a href="../intermediate/i05-categories-joint-tests.html"><span class="chapter-title">Lecture 5: Categories as predictors and joint tests</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="i05" class="quarto-section-identifier"><span class="chapter-title">Lecture 5: Categories as predictors and joint tests</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="outcomes">
+<p><span class="label">By the end of Lecture 5, you can</span></p>
+<ul>
+<li>encode a two-level or multi-level categorical predictor with dummy variables;</li>
+<li>interpret dummy coefficients relative to a named reference group, in percentage points where the outcome is a percentage;</li>
+<li>avoid the dummy-variable trap;</li>
+<li>compute a partial F statistic by hand from an anova table and read the R output;</li>
+<li>separate joint usefulness from individual significance;</li>
+<li>separate adjusted associations from causal or essentialist claims.</li>
+</ul>
+</div>
+<div class="driving-question">
+<p><span class="label">Driving question</span></p>
+<p class="dq-context">
+Markets come in categories: sales channels, customer segments, team compositions. Putting categories into a model correctly — and judging whether they belong in it at all — is a craft this lecture teaches.
+</p>
+<p>Adjusted for season and ask, do all-women presenting teams offer different equity than all-men teams — and are the category terms worth having in the model at all?</p>
+</div>
+<section id="before-class" class="level2 course-phase phase-before">
+<h2 class="anchored" data-anchor-id="before-class">Before class</h2>
+<p><span class="time-budget">Total preparation time: about 25 minutes.</span></p>
+<div class="video-prep">
+<p><span class="label">Video preparation (10 minutes)</span><br> Watch Stanford Statistical Learning <a href="https://www.youtube.com/watch?v=dEBQmiXv9fk&amp;list=PLoROMvodv4rOzrYsAxzQyHb8n_RWNuS1e&amp;index=13">3.5 Extensions of the Linear Model</a>, focusing on qualitative predictors and how a reference category determines coefficient meaning. All links are also listed in the <a href="../resources/video-guide.html">External Video Guide</a>.</p>
+</div>
+<p><strong>Reactivate and predict (5 minutes).</strong> With three categories — <code>all_men</code>, <code>all_women</code>, and <code>mixed</code> — how many dummy variables does a model with an intercept need? Commit to a number, then answer the one-click Mentimeter question posted on Canvas: at the same season and requested amount, do you expect all-women teams to offer <strong>more</strong>, <strong>less</strong>, or <strong>about the same</strong> equity as all-men teams? The lecture resolves both.</p>
+<p><strong>R warm-up (10 minutes).</strong> Class starts from the subset and factor you build here — there are no hidden objects, so this warm-up <em>is</em> the setup. Bring the contrasts table:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>known_gender <span class="ot">&lt;-</span> <span class="fu">subset</span>(sharks, pitcher_gender_group <span class="sc">!=</span> <span class="st">"unknown"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>known_gender<span class="sc">$</span>gender <span class="ot">&lt;-</span> <span class="fu">relevel</span>(<span class="fu">factor</span>(known_gender<span class="sc">$</span>pitcher_gender_group),</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>                               <span class="at">ref =</span> <span class="st">"all_men"</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>known_gender<span class="sc">$</span>ask_1k <span class="ot">&lt;-</span> known_gender<span class="sc">$</span>ask_amount_usd <span class="sc">/</span> <span class="dv">1000</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">levels</span>(known_gender<span class="sc">$</span>gender)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">contrasts</span>(known_gender<span class="sc">$</span>gender)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>If indicators and reference categories are unfamiliar, review <a href="../resources/math-refresher.html">Mathematics Refresher: indicators and reference categories</a>.</p>
+</section>
+<section id="in-class" class="level2 course-phase phase-in-class">
+<h2 class="anchored" data-anchor-id="in-class">In class</h2>
+<p>The session opens with the usual four-minute entry quiz on the prep videos, then turns to the driving question — and, before any model, to the measurement behind it.</p>
+<section id="measurement-first-what-the-category-records" class="level3">
+<h3 class="anchored" data-anchor-id="measurement-first-what-the-category-records">Measurement first: what the category records</h3>
+<p class="concept-video">
+<strong>Stanford explanation (review):</strong> <a href="https://www.youtube.com/watch?v=dEBQmiXv9fk">3.5 Extensions of the Linear Model</a>.
+</p>
+<p>The source categories describe the presenting team as all men, all women, or mixed. They do not measure the share of women, gender identity beyond the source categories, or the composition of the full venture. Seven records with an <code>unknown</code> classification are excluded from every model in this lecture; the reason comes at the end. Every sentence this chapter produces inherits this measurement boundary.</p>
+</section>
+<section id="a-two-level-indicator" class="level3">
+<h3 class="anchored" data-anchor-id="a-two-level-indicator">A two-level indicator</h3>
+<p>For a binary predictor <span class="math inline">\(D_i\in\{0,1\}\)</span>,</p>
+<p><span class="math display">\[
+E[Y_i\mid D_i]=\beta_0+\beta_1D_i.
+\]</span></p>
+<p>Then</p>
+<p><span class="math display">\[
+E[Y_i\mid D_i=0]=\beta_0,
+\qquad
+E[Y_i\mid D_i=1]=\beta_0+\beta_1.
+\]</span></p>
+<p>Thus <span class="math inline">\(\beta_1\)</span> is the expected difference between the 1 group and the 0 <strong>reference group</strong>. A dummy regression with one indicator is exactly a comparison of two group means, dressed as a regression.</p>
+<div id="exm-i05-two-ticks" class="theorem example">
+<p><span class="theorem-title"><strong>Example 22.1 (Worked example: two group means from two coefficients)</strong></span> Restrict to the all-men and all-women teams (1,158 records) and let <code>women_team</code> equal 1 for all-women teams:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>known_gender <span class="ot">&lt;-</span> <span class="fu">subset</span>(sharks, pitcher_gender_group <span class="sc">!=</span> <span class="st">"unknown"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>two_groups <span class="ot">&lt;-</span> <span class="fu">subset</span>(known_gender,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>                     pitcher_gender_group <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"all_men"</span>, <span class="st">"all_women"</span>))</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>two_groups<span class="sc">$</span>women_team <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  two_groups<span class="sc">$</span>pitcher_gender_group <span class="sc">==</span> <span class="st">"all_women"</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(<span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> women_team, <span class="at">data =</span> two_groups))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>(Intercept)  women_team 
+ 13.1973739   0.8210677 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tapply</span>(two_groups<span class="sc">$</span>equity_offered_pct, two_groups<span class="sc">$</span>women_team, mean)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       0        1 
+13.19737 14.01844 </code></pre>
+</div>
+</div>
+<p>Read the two coefficients as two ticks on the equity axis (<a href="#fig-i05-two-ticks" class="quarto-xref">Figure&nbsp;<span>22.1</span></a>): the intercept <span class="math inline">\(\beta_0\approx 13.20\)</span> <em>is</em> the all-men mean, and <span class="math inline">\(\beta_0+\beta_1\approx 13.20+0.82=14.02\)</span> <em>is</em> the all-women mean. The slope <span class="math inline">\(\beta_1\approx 0.82\)</span> is the gap between the ticks — nothing more.</p>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>See the drawing code (optional, not exam material)</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>old_par <span class="ot">&lt;-</span> <span class="fu">par</span>(<span class="at">no.readonly =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="fl">3.5</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>))</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="cn">NA</span>, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="fl">12.6</span>, <span class="fl">14.6</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">axes =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">""</span>, <span class="at">ylab =</span> <span class="st">""</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">axis</span>(<span class="dv">1</span>, <span class="at">at =</span> <span class="fu">seq</span>(<span class="fl">12.6</span>, <span class="fl">14.6</span>, <span class="at">by =</span> <span class="fl">0.4</span>))</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="fu">mtext</span>(<span class="st">"Mean initial equity offered (%)"</span>, <span class="at">side =</span> <span class="dv">1</span>, <span class="at">line =</span> <span class="fl">2.4</span>, <span class="at">cex =</span> <span class="fl">0.9</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="fu">segments</span>(<span class="fl">13.20</span>, <span class="fl">0.15</span>, <span class="fl">13.20</span>, <span class="fl">0.55</span>, <span class="at">col =</span> <span class="st">"#0072B2"</span>, <span class="at">lwd =</span> <span class="dv">4</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="fu">segments</span>(<span class="fl">14.02</span>, <span class="fl">0.15</span>, <span class="fl">14.02</span>, <span class="fl">0.55</span>, <span class="at">col =</span> <span class="st">"#D55E00"</span>, <span class="at">lwd =</span> <span class="dv">4</span>)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="fu">arrows</span>(<span class="fl">13.20</span>, <span class="fl">0.38</span>, <span class="fl">14.02</span>, <span class="fl">0.38</span>, <span class="at">length =</span> <span class="fl">0.08</span>, <span class="at">code =</span> <span class="dv">3</span>, <span class="at">col =</span> <span class="st">"#17324D"</span>)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="fl">13.20</span>, <span class="fl">0.72</span>, <span class="fu">expression</span>(beta[<span class="dv">0</span>] <span class="sc">==</span> <span class="fl">13.20</span>), <span class="at">col =</span> <span class="st">"#0072B2"</span>)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="fl">14.02</span>, <span class="fl">0.72</span>, <span class="fu">expression</span>(beta[<span class="dv">0</span>] <span class="sc">+</span> beta[<span class="dv">1</span>] <span class="sc">==</span> <span class="fl">14.02</span>), <span class="at">col =</span> <span class="st">"#D55E00"</span>)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="fl">13.61</span>, <span class="fl">0.25</span>, <span class="fu">expression</span>(beta[<span class="dv">1</span>] <span class="sc">==</span> <span class="fl">0.82</span>), <span class="at">col =</span> <span class="st">"#17324D"</span>, <span class="at">cex =</span> <span class="fl">0.9</span>)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(old_par)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-i05-two-ticks" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-i05-two-ticks-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="i05-categories-joint-tests_files/figure-html/fig-i05-two-ticks-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-i05-two-ticks-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;22.1: The two-level dummy model places the two group means as two ticks on the outcome axis: the intercept is the reference-group mean and the dummy coefficient is the distance between the ticks.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="more-than-two-categories" class="level3">
+<h3 class="anchored" data-anchor-id="more-than-two-categories">More than two categories</h3>
+<p>With <span class="math inline">\(G\)</span> categories and an intercept, use <span class="math inline">\(G-1\)</span> dummies. Including all <span class="math inline">\(G\)</span> dummies plus an intercept creates exact linear dependence, because the dummies sum to 1 in every row — the model from Lecture 4 whose coefficients are not identified. This is the <strong>dummy-variable trap</strong>.</p>
+<p>R creates the dummies automatically when a predictor is a factor. Set the reference category deliberately and verify it — this is exactly what your warm-up built:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>known_gender<span class="sc">$</span>gender <span class="ot">&lt;-</span> <span class="fu">relevel</span>(<span class="fu">factor</span>(known_gender<span class="sc">$</span>pitcher_gender_group),</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>                               <span class="at">ref =</span> <span class="st">"all_men"</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>known_gender<span class="sc">$</span>ask_1k <span class="ot">&lt;-</span> known_gender<span class="sc">$</span>ask_amount_usd <span class="sc">/</span> <span class="dv">1000</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">levels</span>(known_gender<span class="sc">$</span>gender)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "all_men"   "all_women" "mixed"    </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">contrasts</span>(known_gender<span class="sc">$</span>gender)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>          all_women mixed
+all_men           0     0
+all_women         1     0
+mixed             0     1</code></pre>
+</div>
+</div>
+<p>Each row of the contrasts table is a category; each column is one dummy. The reference category <code>all_men</code> is the all-zero row: it lives in the intercept.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check: four industries and an intercept — how many dummies?
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Three. One industry is the reference group carried by the intercept; the three dummy coefficients each compare one remaining industry with it. Four dummies plus an intercept would fall into the trap.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="percent-versus-percentage-points" class="level3">
+<h3 class="anchored" data-anchor-id="percent-versus-percentage-points">Percent versus percentage points</h3>
+<p>One habit must be in place before any coefficient is read. The outcome <code>equity_offered_pct</code> is measured in percent, so its regression coefficients are in <strong>percentage points</strong> — and the sentence “the all-women coefficient is 1.28%” is ambiguous. It could mean:</p>
+<ul>
+<li>a <strong>relative</strong> change: offers 1.28% <em>of</em> the all-men level higher (13.0% would become about 13.2%); or</li>
+<li>an <strong>absolute</strong> change of 1.28 <strong>percentage points</strong>: 13.0% becomes 14.28%.</li>
+</ul>
+<p>These differ by a factor of about eight here. A coefficient on a percent-scaled outcome is always the absolute kind. The precise sentence replacing the ambiguous one is: “At the same season and requested amount, all-women presenting teams are fitted to offer 1.28 <strong>equity percentage points</strong> more initially than all-men presenting teams.” Every full-credit dummy interpretation in this course uses <em>percentage points</em> for this outcome.</p>
+</section>
+<section id="the-adjusted-comparison" class="level3">
+<h3 class="anchored" data-anchor-id="the-adjusted-comparison">The adjusted comparison</h3>
+<p>Now the model of the driving question: both category dummies, with season and requested amount (in thousands of dollars) held fixed.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>gender_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> ask_1k <span class="sc">+</span> gender,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> known_gender</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(gender_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = equity_offered_pct ~ season + ask_1k + gender, data = known_gender)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-16.118  -4.778  -1.100   3.220  82.590 
+
+Coefficients:
+                  Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)     20.8388333  0.5064929  41.143  &lt; 2e-16 ***
+season          -0.8238940  0.0477959 -17.238  &lt; 2e-16 ***
+ask_1k          -0.0026613  0.0005822  -4.571 5.28e-06 ***
+genderall_women  1.2835231  0.4810241   2.668  0.00771 ** 
+gendermixed      0.1209343  0.5411539   0.223  0.82320    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 7.612 on 1429 degrees of freedom
+Multiple R-squared:  0.1913,    Adjusted R-squared:  0.189 
+F-statistic: 84.49 on 4 and 1429 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<p>Both dummy coefficients, each with the full sentence — categories named, unit, held-fixed set, sample boundary:</p>
+<ul>
+<li><strong>All-women versus all-men.</strong> Among pitches with a recorded source classification, all-women presenting teams are fitted to offer about <strong>1.28 equity percentage points more</strong> initially than all-men presenting teams at the same season and requested amount (p <span class="math inline">\(\approx\)</span> 0.008).</li>
+<li><strong>Mixed versus all-men.</strong> Among the same pitches, mixed teams are fitted to differ from all-men teams by about <strong>0.12 percentage points</strong> at the same season and requested amount (p <span class="math inline">\(\approx\)</span> 0.823) — an estimate not statistically distinguishable from zero.</li>
+</ul>
+<p>Note the adjusted all-women gap (1.28 points) is larger than the raw gap from the worked example (0.82 points): adjusting for season and ask moved the comparison, which is precisely why the held-fixed set belongs in the sentence. These are two reference-group comparisons, not a claim that gender causes the offers.</p>
+<p>Changing the reference group changes coefficient labels, not fitted values or overall fit — verify rather than trust:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>known_gender<span class="sc">$</span>gender_women_ref <span class="ot">&lt;-</span> <span class="fu">relevel</span>(known_gender<span class="sc">$</span>gender,</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>                                         <span class="at">ref =</span> <span class="st">"all_women"</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(<span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> ask_1k <span class="sc">+</span> gender_women_ref,</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> known_gender))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>            (Intercept)                  season                  ask_1k 
+           22.122356419            -0.823893957            -0.002661283 
+gender_women_refall_men   gender_women_refmixed 
+           -1.283523102            -1.162588850 </code></pre>
+</div>
+</div>
+<p>The same three group means are now described from the all-women vantage point: the all-men coefficient is <span class="math inline">\(-1.28\)</span>, the mirror image of before, and the fitted values are identical.</p>
+</section>
+<section id="are-the-category-terms-worth-having-at-all" class="level3">
+<h3 class="anchored" data-anchor-id="are-the-category-terms-worth-having-at-all">Are the category terms worth having at all?</h3>
+<p>Block 1 read the coefficients one at a time. The driving question also asks something no single t-test answers: do the two category terms <strong>jointly</strong> add information beyond season and ask?</p>
+<p>The logic needs two <strong>nested</strong> models — the reduced model is the complete model with the tested coefficients forced to zero, fitted on the same rows:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>See the drawing code (optional, not exam material)</summary>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>old_par <span class="ot">&lt;-</span> <span class="fu">par</span>(<span class="at">no.readonly =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="fl">0.3</span>, <span class="fl">0.3</span>, <span class="fl">0.3</span>, <span class="fl">0.3</span>))</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="cn">NA</span>, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">10</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">5</span>), <span class="at">axes =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">""</span>, <span class="at">ylab =</span> <span class="st">""</span>, <span class="at">xaxs =</span> <span class="st">"i"</span>, <span class="at">yaxs =</span> <span class="st">"i"</span>)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="fu">rect</span>(<span class="fl">0.4</span>, <span class="fl">1.1</span>, <span class="fl">4.6</span>, <span class="fl">3.9</span>, <span class="at">col =</span> <span class="st">"#DCEAF3"</span>, <span class="at">border =</span> <span class="st">"#17324D"</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="fu">rect</span>(<span class="fl">5.4</span>, <span class="fl">1.1</span>, <span class="fl">9.6</span>, <span class="fl">3.9</span>, <span class="at">col =</span> <span class="st">"#FDE5C1"</span>, <span class="at">border =</span> <span class="st">"#17324D"</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="fl">2.5</span>, <span class="fl">3.35</span>, <span class="st">"Reduced model"</span>, <span class="at">font =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"#17324D"</span>)</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="fl">2.5</span>, <span class="fl">2.55</span>, <span class="st">"season + ask_1k"</span>, <span class="at">cex =</span> <span class="fl">0.95</span>)</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="fl">2.5</span>, <span class="fl">1.85</span>, <span class="fu">expression</span>(beta[aw] <span class="sc">==</span> <span class="dv">0</span> <span class="sc">~</span> <span class="st">","</span> <span class="sc">~</span> beta[mx] <span class="sc">==</span> <span class="dv">0</span>),</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>     <span class="at">cex =</span> <span class="fl">0.95</span>, <span class="at">col =</span> <span class="st">"#5B6976"</span>)</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="fl">7.5</span>, <span class="fl">3.35</span>, <span class="st">"Complete model"</span>, <span class="at">font =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"#17324D"</span>)</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="fl">7.5</span>, <span class="fl">2.55</span>, <span class="st">"season + ask_1k"</span>, <span class="at">cex =</span> <span class="fl">0.95</span>)</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="fl">7.5</span>, <span class="fl">1.85</span>, <span class="st">"+ two category dummies"</span>, <span class="at">cex =</span> <span class="fl">0.95</span>)</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="fu">arrows</span>(<span class="fl">4.7</span>, <span class="fl">2.5</span>, <span class="fl">5.3</span>, <span class="fl">2.5</span>, <span class="at">length =</span> <span class="fl">0.1</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"#17324D"</span>)</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="fl">5.0</span>, <span class="fl">3.0</span>, <span class="st">"free the</span><span class="sc">\n</span><span class="st">two coefficients"</span>, <span class="at">cex =</span> <span class="fl">0.8</span>, <span class="at">col =</span> <span class="st">"#5B6976"</span>)</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(old_par)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-i05-nested" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-i05-nested-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="i05-categories-joint-tests_files/figure-html/fig-i05-nested-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-i05-nested-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;22.2: The nested pair behind the partial F-test: the reduced model is the complete model with the two category coefficients set to zero, on the same analysis rows.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The hypotheses:</p>
+<p><span class="math display">\[
+H_0:\beta_{all\_women}=\beta_{mixed}=0
+\quad\text{against at least one non-zero.}
+\]</span></p>
+<div id="exm-i05-partial-f" class="theorem example">
+<p><span class="theorem-title"><strong>Example 22.2 (Worked example: the partial F statistic by hand)</strong></span> Fit both models and ask R for the anova table:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>reduced_gender <span class="ot">&lt;-</span> <span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> ask_1k,</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>                     <span class="at">data =</span> known_gender)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(reduced_gender, gender_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Analysis of Variance Table
+
+Model 1: equity_offered_pct ~ season + ask_1k
+Model 2: equity_offered_pct ~ season + ask_1k + gender
+  Res.Df   RSS Df Sum of Sq      F Pr(&gt;F)  
+1   1431 83228                             
+2   1429 82792  2    436.25 3.7649 0.0234 *
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+<p>Plug the table’s numbers into the formula once by hand. Adding the two category terms reduces the residual sum of squares by <span class="math inline">\(436.25\)</span> using <span class="math inline">\(2\)</span> degrees of freedom; the complete model leaves <span class="math inline">\(82{,}792\)</span> on <span class="math inline">\(1{,}429\)</span> degrees of freedom:</p>
+<p><span class="math display">\[
+F=\frac{436.25/2}{82{,}792/1{,}429}
+=\frac{218.13}{57.94}
+\approx 3.76.
+\]</span></p>
+<p>Read the ratio: the numerator is explained variation <em>per tested coefficient</em>; the denominator is unexplained variation <em>per residual degree of freedom</em>. The category terms buy about 3.8 times as much explanation per coefficient as noise alone would — with p <span class="math inline">\(\approx\)</span> 0.023, more than chance comfortably explains.</p>
+</div>
+<p>At 5%, the two source-category terms are <strong>jointly useful</strong> in this specification. Hold that next to the individual results: joint p-value <span class="math inline">\(0.023\)</span>, yet the mixed dummy’s own p-value is <span class="math inline">\(0.823\)</span> <em>in the very same output</em>. Joint usefulness is not individual significance — the F-test asks whether the pair of terms together improves the model, not whether each survives on its own. (The overall F in <code>summary(gender_model)</code>, about 84.5 with a tiny p-value, answers a third, cruder question: whether <em>all four</em> predictors jointly beat an intercept-only model.)</p>
+</section>
+<section id="visualise-the-adjusted-comparison" class="level3">
+<h3 class="anchored" data-anchor-id="visualise-the-adjusted-comparison">Visualise the adjusted comparison</h3>
+<div class="cell">
+<details class="code-fold">
+<summary>See the R code for this figure</summary>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>known_gender <span class="ot">&lt;-</span> <span class="fu">subset</span>(sharks, pitcher_gender_group <span class="sc">!=</span> <span class="st">"unknown"</span>)</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>known_gender<span class="sc">$</span>gender <span class="ot">&lt;-</span> <span class="fu">relevel</span>(<span class="fu">factor</span>(known_gender<span class="sc">$</span>pitcher_gender_group),</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>                               <span class="at">ref =</span> <span class="st">"all_men"</span>)</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>known_gender<span class="sc">$</span>ask_1k <span class="ot">&lt;-</span> known_gender<span class="sc">$</span>ask_amount_usd <span class="sc">/</span> <span class="dv">1000</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>gender_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> ask_1k <span class="sc">+</span> gender,</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> known_gender</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>newdat <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">season =</span> <span class="fu">mean</span>(known_gender<span class="sc">$</span>season),</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">ask_1k =</span> <span class="fu">mean</span>(known_gender<span class="sc">$</span>ask_1k),</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">gender =</span> <span class="fu">factor</span>(<span class="fu">c</span>(<span class="st">"all_men"</span>, <span class="st">"all_women"</span>, <span class="st">"mixed"</span>),</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>                  <span class="at">levels =</span> <span class="fu">levels</span>(known_gender<span class="sc">$</span>gender))</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(gender_model, <span class="at">newdata =</span> newdat, <span class="at">interval =</span> <span class="st">"confidence"</span>)</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>adj_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">team =</span> <span class="fu">factor</span>(<span class="fu">c</span>(<span class="st">"All-men"</span>, <span class="st">"All-women"</span>, <span class="st">"Mixed"</span>),</span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>                <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"All-men"</span>, <span class="st">"All-women"</span>, <span class="st">"Mixed"</span>)),</span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">fit =</span> pred[, <span class="st">"fit"</span>],</span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">lwr =</span> pred[, <span class="st">"lwr"</span>],</span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">upr =</span> pred[, <span class="st">"upr"</span>]</span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(adj_df, <span class="fu">aes</span>(<span class="at">x =</span> team, <span class="at">y =</span> fit)) <span class="sc">+</span></span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_pointrange</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> lwr, <span class="at">ymax =</span> upr),</span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>                  <span class="at">colour =</span> <span class="st">"#009E73"</span>, <span class="at">linewidth =</span> <span class="fl">0.7</span>, <span class="at">fatten =</span> <span class="fl">2.6</span>) <span class="sc">+</span></span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Source classification of pitching team"</span>,</span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Fitted initial equity offered (%)"</span>) <span class="sc">+</span></span>
+<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
+<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#5B6976"</span>),</span>
+<span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>)</span>
+<span id="cb18-37"><a href="#cb18-37" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-i05-adjusted" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-i05-adjusted-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="i05-categories-joint-tests_files/figure-html/fig-i05-adjusted-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-i05-adjusted-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;22.3: Fitted initial equity by source classification at the average season and requested amount, with 95% confidence intervals. The intervals express model-based uncertainty, not uncertainty about how the categories were recorded.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Read <a href="#fig-i05-adjusted" class="quarto-xref">Figure&nbsp;<span>22.3</span></a> with the standing five-step sequence:</p>
+<ol type="1">
+<li><strong>Axes:</strong> source categories across, fitted initial equity (in percent) up.</li>
+<li><strong>Units:</strong> each point is a fitted mean at the <em>same</em> average season and requested amount — an adjusted comparison, not raw group means.</li>
+<li><strong>Marks:</strong> points are fitted values (about 12.9, 14.1, and 13.0); vertical lines are 95% confidence intervals, wider for the smaller categories.</li>
+<li><strong>Pattern:</strong> the all-women point sits about 1.28 points above the all-men point; the mixed interval overlaps both.</li>
+<li><strong>Limits:</strong> the intervals express <strong>model-based</strong> sampling uncertainty. They say nothing about the <strong>recording</strong> uncertainty in the broad source categories themselves, and nothing causal.</li>
+</ol>
+</section>
+<section id="why-unknown-is-excluded-not-a-fourth-group" class="level3">
+<h3 class="anchored" data-anchor-id="why-unknown-is-excluded-not-a-fourth-group">Why <code>unknown</code> is excluded, not a fourth group</h3>
+<p>Seven records carry the classification <code>unknown</code>. That label records the <em>absence of information</em>, not a kind of team: treating it as a substantive fourth category would estimate a “mean equity of teams the source failed to classify,” a quantity with no business meaning. Excluding the records keeps every coefficient interpretable; the price, stated openly, is that the analysed sample is the classified records only.</p>
+<div class="caveat-box">
+<p><span class="label">What these category coefficients can and cannot say</span></p>
+<p>The categories are broad source codings of the on-screen presenting team — not shares, identities, or full founding teams — so the coefficients compare codings, not people. The analysed sample is the 1,434 classified records of broadcast pitches; selection into the show and into classification travels with every estimate. The two dummy coefficients are two reference-group contrasts at fixed season and ask, and they change labels when the reference changes. None of this supports an essentialist or causal reading: the model reports that offers <em>differ</em> by coded composition in these data, not that composition <em>makes</em> anyone offer differently.</p>
+</div>
+</section>
+<section id="answering-the-driving-question" class="level3">
+<h3 class="anchored" data-anchor-id="answering-the-driving-question">Answering the driving question</h3>
+<p>At the same season and requested amount, all-women presenting teams are fitted to offer about 1.28 equity percentage points more than all-men teams (p <span class="math inline">\(\approx\)</span> 0.008); mixed teams are indistinguishable from all-men teams. The two category terms are jointly useful (partial F <span class="math inline">\(\approx\)</span> 3.76, p <span class="math inline">\(\approx\)</span> 0.023), so they earn their place in the model — as an adjusted association within these recorded pitches, nothing more.</p>
+<p><strong>Next:</strong> We can now compare categories at fixed values of the other predictors — but so far every group shares one slope, and every trend is a straight line. Both restrictions are modelling choices, not facts. Lecture 6 relaxes them: interactions let the season trend differ by team composition, and polynomial terms let the trend bend — each with the discipline for reading the result honestly.</p>
+</section>
+</section>
+<section id="after-class" class="level2 course-phase phase-after">
+<h2 class="anchored" data-anchor-id="after-class">After class</h2>
+<p><span class="time-budget">Total practice time: about 70 minutes.</span></p>
+<section id="retrieval-10-minutes" class="level3">
+<h3 class="anchored" data-anchor-id="retrieval-10-minutes">Retrieval (10 minutes)</h3>
+<ol type="1">
+<li>Why are only <span class="math inline">\(G-1\)</span> dummies used with an intercept?</li>
+<li>What does a dummy coefficient compare?</li>
+<li>What changes when the reference group changes?</li>
+<li>What does a partial F-test evaluate?</li>
+<li>Why can a joint F-test reject when one individual t-test does not?</li>
+</ol>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check your answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>All <span class="math inline">\(G\)</span> dummies sum to 1, the intercept column: exact collinearity, so the coefficients would not be identified.</li>
+<li>A category with the named reference category, holding the other included predictors fixed.</li>
+<li>Coefficient labels and values change to describe the same fits from a new vantage point; fitted values and overall fit do not change.</li>
+<li>Whether a specified group of coefficients is jointly zero, comparing nested models on the same rows.</li>
+<li>The F-test evaluates the terms together; individual tests ask narrower questions, each with its own uncertainty, and can miss what the pair achieves jointly.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="releveling-and-verification-practice-15-minutes" class="level3">
+<h3 class="anchored" data-anchor-id="releveling-and-verification-practice-15-minutes">Releveling and verification practice (15 minutes)</h3>
+<ol type="1">
+<li>Relevel <code>gender</code> so <code>mixed</code> is the reference group and interpret both dummy coefficients. Save the relevelled model as <code>relevelled_model</code>.</li>
+<li>Verify that fitted values are unchanged after releveling by comparing with <code>gender_model</code>.</li>
+<li>State the hypotheses for the partial F-test of both gender dummies.</li>
+<li>Explain why the seven <code>unknown</code> records were excluded rather than treated as evidence of a substantive fourth group.</li>
+<li>Explain why “the all-women coefficient is 1.28%” is ambiguous, then rewrite it precisely.</li>
+</ol>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check your answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li><p>Use:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>mixed_reference <span class="ot">&lt;-</span> <span class="fu">relevel</span>(known_gender<span class="sc">$</span>gender, <span class="at">ref =</span> <span class="st">"mixed"</span>)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>relevelled_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> ask_1k <span class="sc">+</span> mixed_reference,</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> known_gender</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(relevelled_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>At fixed season and request, the all-men coefficient is about <span class="math inline">\(-0.121\)</span> percentage points and the all-women coefficient about <span class="math inline">\(1.163\)</span> percentage points, each relative to mixed teams.</p></li>
+<li><p><code>all.equal(fitted(gender_model), fitted(relevelled_model))</code> returns <code>TRUE</code> up to numerical tolerance.</p></li>
+<li><p><span class="math inline">\(H_0:\beta_{all\_women}=\beta_{mixed}=0\)</span> against at least one non-zero coefficient, with all-men as the current reference.</p></li>
+<li><p><code>unknown</code> records lack a known classification; absence of recorded information is not a meaningful team-composition category.</p></li>
+<li><p>It confuses percent with percentage points and omits the comparison and conditioning. A precise version: “At the same season and requested amount, all-women presenting teams are fitted to offer 1.28 equity percentage points more initially than all-men presenting teams.”</p></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="from-worked-to-faded-a-partial-f-with-new-numbers-10-minutes" class="level3">
+<h3 class="anchored" data-anchor-id="from-worked-to-faded-a-partial-f-with-new-numbers-10-minutes">From worked to faded: a partial F with new numbers (10 minutes)</h3>
+<p>Test the two category dummies in a <em>smaller</em> complete model that contains only <code>season</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>reduced_season <span class="ot">&lt;-</span> <span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> season, <span class="at">data =</span> known_gender)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>full_season    <span class="ot">&lt;-</span> <span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> gender,</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">data =</span> known_gender)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(reduced_season, full_season)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Analysis of Variance Table
+
+Model 1: equity_offered_pct ~ season
+Model 2: equity_offered_pct ~ season + gender
+  Res.Df   RSS Df Sum of Sq      F   Pr(&gt;F)   
+1   1432 84646                                
+2   1430 84003  2    643.43 5.4766 0.004272 **
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+<p><em>Step 1 (given).</em> Adding the two dummies reduces the residual sum of squares by <span class="math inline">\(643.43\)</span> using <span class="math inline">\(2\)</span> degrees of freedom; the complete model leaves <span class="math inline">\(84{,}003\)</span> on <span class="math inline">\(1{,}430\)</span> degrees of freedom.</p>
+<p><em>Step 2 (you).</em> Plug these into the F formula from the worked example.</p>
+<p><em>Step 3 (you).</em> Compare with the table’s F and p-value and state the conclusion at 5% in one sentence.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check your answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><span class="math inline">\(F=(643.43/2)/(84{,}003/1{,}430)=321.7/58.7\approx 5.48\)</span>, matching the table, with p <span class="math inline">\(\approx\)</span> 0.004. At 5%, the two category terms are jointly useful even in the model that adjusts only for season.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="the-120-word-interpretation-10-minutes" class="level3">
+<h3 class="anchored" data-anchor-id="the-120-word-interpretation-10-minutes">The 120-word interpretation (10 minutes)</h3>
+<p>Write a 120-word interpretation of the full <code>gender_model</code> that includes the source measurement boundary and the causal limit.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check a model answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>A complete answer reports: the outcome and sample (initial equity offered, 1,434 broadcast pitches with a recorded source classification); both estimates with units and conditioning (all-women teams fitted 1.28 percentage points above all-men teams, mixed teams 0.12 points above, at the same season and requested amount); uncertainty (p <span class="math inline">\(\approx\)</span> 0.008 and 0.823; jointly useful, partial F p <span class="math inline">\(\approx\)</span> 0.023); the measurement boundary (broad source coding of the on-screen team, not shares or identities); and the scope (adjusted associations among selected, recorded pitches — not causal, not essentialist).</p>
+</div>
+</div>
+</div>
+</section>
+<section id="spaced-review-one-item-from-lecture-4-5-minutes" class="level3">
+<h3 class="anchored" data-anchor-id="spaced-review-one-item-from-lecture-4-5-minutes">Spaced review: one item from Lecture 4 (5 minutes)</h3>
+<p>Using the Lecture 4 three-predictor model, compute the combined fitted difference for a pitch three seasons later requesting $200,000 more, at the same description length.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check your answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><span class="math inline">\(3(-0.836)+200(-0.0029)\approx-3.09\)</span> percentage points: contributions add because the model is additive, and $200,000 is 200 units of <code>ask_1k</code>.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="worked-exam-interpretation-5-minutes" class="level3">
+<h3 class="anchored" data-anchor-id="worked-exam-interpretation-5-minutes">Worked exam interpretation (5 minutes)</h3>
+<p><strong>Question.</strong> In the mock-exam Q4 style: a model of equity on season, <code>ask_1k</code>, and industry (four categories, reference <code>Food and Beverage</code>) reports <code>industryTechnology 1.9 (p = 0.04)</code>. A student writes: “Technology pitches offer 1.9% more equity, so entering tech makes founders more generous.” Correct the sentence.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check a model answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Three repairs. Units: the estimate is 1.9 equity <em>percentage points</em>, not a relative 1.9%. Comparison and conditioning: technology pitches are fitted 1.9 points above <em>Food and Beverage</em> pitches at the same season and requested amount, among the recorded pitches. Scope: nothing here is causal — “entering tech makes founders more generous” reads a reference-group contrast as an effect of industry choice.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="from-the-reading-ladder-10-minutes" class="level3">
+<h3 class="anchored" data-anchor-id="from-the-reading-ladder-10-minutes">From the reading ladder (10 minutes)</h3>
+<p>Next rung of the <a href="../resources/reading-ladder.html">reading ladder</a>: open <a href="https://doi.org/10.1073/pnas.1321202111">Brooks et al.&nbsp;(2014)</a> — an open-access study of entrepreneurial pitch success. Find where the analysis compares pitches across a <strong>category</strong> (the presenter’s gender). Identify the categorical predictor and what serves as the reference comparison, and restate the paper’s headline gap in one careful sentence that respects today’s two rules: percentage points are not percent, and an adjusted gap between categories is not a causal claim about any attribute. Then note one way their setting differs from our Shark Tank teaching file.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check your approach
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>A good sentence names both categories explicitly, states the outcome and its unit, and attributes the gap to the sample and design (“in these pitch competitions, pitches presented by … were funded … percentage points more often than …”) without sliding into “because investors prefer…”. Differences from our file worth noting: their data include experiments with manipulated recordings, whereas ours are selected, edited television records with a broad source category for the presenting team.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="make-it-yours-5-minutes" class="level3">
+<h3 class="anchored" data-anchor-id="make-it-yours-5-minutes">Make it yours (5 minutes)</h3>
+<div class="utility-prompt">
+<p><span class="label">Utility: two sentences</span></p>
+<p>Think of your EiA3 venture — or any business you know well. Name one categorical feature of your customers or products (segment, channel, region, plan tier), and write two sentences: which category would you set as the reference group and why, and what would a “jointly useful” F-test verdict on the whole set of categories change about how you describe your market? There is no wrong answer; the point is choosing a reference deliberately.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+See an example, then write your own
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Take a student-run campus meal-prep box venture. “My channels are the campus stand, the app, and the website; I would set the campus stand as reference because it is the original channel every decision gets compared against. A jointly useful F-verdict would justify describing my market by channel at all — individually mixed p-values on single dummies would not settle that.”</p>
+</div>
+</div>
+</div>
+<p>You can discuss this task — and any other task in this chapter — with <strong>Tilly</strong>, the course AI assistant on Canvas: ask it to check whether your two sentences confuse percent with percentage points, or to quiz you on the dummy-variable trap with your own categories.</p>
+</div>
+<p>Continue to Lecture 6: Interactions and curvature.</p>
+<p>Formula sheet: Lecture 5 formulas.</p>
+<p>For a more formal treatment, see James et al., <em>An Introduction to Statistical Learning</em>, 2nd ed., Sections 3.2.2 and 3.3.1, and <a href="https://tilburguniversity.on.worldcat.org/oclc/317545871">Nieuwenhuis, <em>Statistical Methods for Business and Economics</em></a>, Chapters 20–21.</p>
+</section>
+</section>
+
+
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/valentinamel\.github\.io\/textbook-qm-ebi\/");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../intermediate/i04-multiple-regression.html" class="pagination-link" aria-label="Lecture 4: Multiple regression and what controls do">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">Lecture 4: Multiple regression and what controls do</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../intermediate/i06-interactions-curvature.html" class="pagination-link" aria-label="Lecture 6: Interactions and curvature">
+        <span class="nav-page-text"><span class="chapter-title">Lecture 6: Interactions and curvature</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

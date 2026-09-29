@@ -1,0 +1,654 @@
+# Lecture 5: Categories as predictors and joint tests {#i05}
+
+```{r}
+#| label: i05-setup
+#| include: false
+# Chunk options only. Every object used in this chapter is constructed in
+# visible code on this page, so that copying the code always works.
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
+                      fig.width = 7, fig.height = 4.5)
+```
+
+::: {.outcomes}
+<span class="label">By the end of Lecture 5, you can</span>
+
+- encode a two-level or multi-level categorical predictor with dummy
+  variables;
+- interpret dummy coefficients relative to a named reference group, in
+  percentage points where the outcome is a percentage;
+- avoid the dummy-variable trap;
+- compute a partial F statistic by hand from an anova table and read the
+  R output;
+- separate joint usefulness from individual significance;
+- separate adjusted associations from causal or essentialist claims.
+:::
+
+::: {.driving-question}
+<span class="label">Driving question</span>
+
+<p class="dq-context">Markets come in categories: sales channels, customer segments, team compositions. Putting categories into a model correctly --- and judging whether they belong in it at all --- is a craft this lecture teaches.</p>
+
+Adjusted for season and ask, do all-women presenting teams offer different
+equity than all-men teams --- and are the category terms worth having in the
+model at all?
+:::
+
+::: {.course-phase .phase-before}
+
+## Before class
+
+<span class="time-budget">Total preparation time: about 25 minutes.</span>
+
+<div class="video-prep">
+<span class="label">Video preparation (10 minutes)</span><br>
+Watch Stanford Statistical Learning
+<a href="https://www.youtube.com/watch?v=dEBQmiXv9fk&list=PLoROMvodv4rOzrYsAxzQyHb8n_RWNuS1e&index=13">3.5
+Extensions of the Linear Model</a>, focusing on qualitative predictors and
+how a reference category determines coefficient meaning. All links are also
+listed in the <a href="../resources/video-guide.html">External Video
+Guide</a>.
+</div>
+
+**Reactivate and predict (5 minutes).** With three categories --- `all_men`,
+`all_women`, and `mixed` --- how many dummy variables does a model with an
+intercept need? Commit to a number, then answer the one-click Mentimeter
+question posted on Canvas: at the same season and requested amount, do you
+expect all-women teams to offer **more**, **less**, or **about the same**
+equity as all-men teams? The lecture resolves both.
+
+**R warm-up (10 minutes).** Class starts from the subset and factor you
+build here --- there are no hidden objects, so this warm-up *is* the setup.
+Bring the contrasts table:
+
+```{r}
+#| label: i05-prep-warmup
+#| eval: false
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+known_gender <- subset(sharks, pitcher_gender_group != "unknown")
+known_gender$gender <- relevel(factor(known_gender$pitcher_gender_group),
+                               ref = "all_men")
+known_gender$ask_1k <- known_gender$ask_amount_usd / 1000
+levels(known_gender$gender)
+contrasts(known_gender$gender)
+```
+
+If indicators and reference categories are unfamiliar, review
+[Mathematics Refresher: indicators and reference categories](../resources/math-refresher.html).
+
+:::
+
+::: {.course-phase .phase-in-class}
+
+## In class
+
+The session opens with the usual four-minute entry quiz on the prep videos,
+then turns to the driving question --- and, before any model, to the
+measurement behind it.
+
+### Measurement first: what the category records
+
+<p class="concept-video"><strong>Stanford explanation (review):</strong>
+<a href="https://www.youtube.com/watch?v=dEBQmiXv9fk">3.5 Extensions of the Linear Model</a>.</p>
+
+The source categories describe the presenting team as all men, all women, or
+mixed. They do not measure the share of women, gender identity beyond the
+source categories, or the composition of the full venture. Seven records with
+an `unknown` classification are excluded from every model in this lecture;
+the reason comes at the end. Every sentence this chapter produces inherits
+this measurement boundary.
+
+### A two-level indicator
+
+For a binary predictor $D_i\in\{0,1\}$,
+
+$$
+E[Y_i\mid D_i]=\beta_0+\beta_1D_i.
+$$
+
+Then
+
+$$
+E[Y_i\mid D_i=0]=\beta_0,
+\qquad
+E[Y_i\mid D_i=1]=\beta_0+\beta_1.
+$$
+
+Thus $\beta_1$ is the expected difference between the 1 group and the 0
+**reference group**. A dummy regression with one indicator is exactly a
+comparison of two group means, dressed as a regression.
+
+::: {#exm-i05-two-ticks}
+## Worked example: two group means from two coefficients
+
+Restrict to the all-men and all-women teams (1,158 records) and let
+`women_team` equal 1 for all-women teams:
+
+```{r}
+#| label: i05-two-level
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+known_gender <- subset(sharks, pitcher_gender_group != "unknown")
+two_groups <- subset(known_gender,
+                     pitcher_gender_group %in% c("all_men", "all_women"))
+two_groups$women_team <- as.integer(
+  two_groups$pitcher_gender_group == "all_women"
+)
+coef(lm(equity_offered_pct ~ women_team, data = two_groups))
+tapply(two_groups$equity_offered_pct, two_groups$women_team, mean)
+```
+
+Read the two coefficients as two ticks on the equity axis
+(@fig-i05-two-ticks): the intercept $\beta_0\approx 13.20$ *is* the all-men
+mean, and $\beta_0+\beta_1\approx 13.20+0.82=14.02$ *is* the all-women mean.
+The slope $\beta_1\approx 0.82$ is the gap between the ticks --- nothing
+more.
+:::
+
+```{r}
+#| label: fig-i05-two-ticks
+#| code-fold: true
+#| code-summary: "See the drawing code (optional, not exam material)"
+#| fig-height: 2.2
+#| fig-cap: "The two-level dummy model places the two group means as two ticks on the outcome axis: the intercept is the reference-group mean and the dummy coefficient is the distance between the ticks."
+old_par <- par(no.readonly = TRUE)
+par(mar = c(3.5, 1, 1, 1))
+plot(NA, xlim = c(12.6, 14.6), ylim = c(0, 1), axes = FALSE,
+     xlab = "", ylab = "")
+axis(1, at = seq(12.6, 14.6, by = 0.4))
+mtext("Mean initial equity offered (%)", side = 1, line = 2.4, cex = 0.9)
+segments(13.20, 0.15, 13.20, 0.55, col = "#0072B2", lwd = 4)
+segments(14.02, 0.15, 14.02, 0.55, col = "#D55E00", lwd = 4)
+arrows(13.20, 0.38, 14.02, 0.38, length = 0.08, code = 3, col = "#17324D")
+text(13.20, 0.72, expression(beta[0] == 13.20), col = "#0072B2")
+text(14.02, 0.72, expression(beta[0] + beta[1] == 14.02), col = "#D55E00")
+text(13.61, 0.25, expression(beta[1] == 0.82), col = "#17324D", cex = 0.9)
+par(old_par)
+```
+
+### More than two categories
+
+With $G$ categories and an intercept, use $G-1$ dummies. Including all $G$
+dummies plus an intercept creates exact linear dependence, because the
+dummies sum to 1 in every row --- the model from Lecture 4 whose coefficients
+are not identified. This is the **dummy-variable trap**.
+
+R creates the dummies automatically when a predictor is a factor. Set the
+reference category deliberately and verify it --- this is exactly what your
+warm-up built:
+
+```{r}
+#| label: i05-reference
+known_gender$gender <- relevel(factor(known_gender$pitcher_gender_group),
+                               ref = "all_men")
+known_gender$ask_1k <- known_gender$ask_amount_usd / 1000
+levels(known_gender$gender)
+contrasts(known_gender$gender)
+```
+
+Each row of the contrasts table is a category; each column is one dummy. The
+reference category `all_men` is the all-zero row: it lives in the intercept.
+
+::: {.callout-note collapse="true"}
+## Check: four industries and an intercept --- how many dummies?
+
+Three. One industry is the reference group carried by the intercept; the
+three dummy coefficients each compare one remaining industry with it. Four
+dummies plus an intercept would fall into the trap.
+:::
+
+### Percent versus percentage points
+
+One habit must be in place before any coefficient is read. The outcome
+`equity_offered_pct` is measured in percent, so its regression coefficients
+are in **percentage points** --- and the sentence "the all-women coefficient
+is 1.28%" is ambiguous. It could mean:
+
+- a **relative** change: offers 1.28% *of* the all-men level higher (13.0%
+  would become about 13.2%); or
+- an **absolute** change of 1.28 **percentage points**: 13.0% becomes
+  14.28%.
+
+These differ by a factor of about eight here. A coefficient on a
+percent-scaled outcome is always the absolute kind. The precise sentence
+replacing the ambiguous one is: "At the same season and requested amount,
+all-women presenting teams are fitted to offer 1.28 **equity percentage
+points** more initially than all-men presenting teams." Every full-credit
+dummy interpretation in this course uses *percentage points* for this
+outcome.
+
+### The adjusted comparison
+
+Now the model of the driving question: both category dummies, with season and
+requested amount (in thousands of dollars) held fixed.
+
+```{r}
+#| label: i05-fit
+gender_model <- lm(
+  equity_offered_pct ~ season + ask_1k + gender,
+  data = known_gender
+)
+summary(gender_model)
+```
+
+Both dummy coefficients, each with the full sentence --- categories named,
+unit, held-fixed set, sample boundary:
+
+- **All-women versus all-men.** Among pitches with a recorded source
+  classification, all-women presenting teams are fitted to offer about
+  **1.28 equity percentage points more** initially than all-men presenting
+  teams at the same season and requested amount (p $\approx$ 0.008).
+- **Mixed versus all-men.** Among the same pitches, mixed teams are fitted
+  to differ from all-men teams by about **0.12 percentage points** at the
+  same season and requested amount (p $\approx$ 0.823) --- an estimate not
+  statistically distinguishable from zero.
+
+Note the adjusted all-women gap (1.28 points) is larger than the raw gap
+from the worked example (0.82 points): adjusting for season and ask moved
+the comparison, which is precisely why the held-fixed set belongs in the
+sentence. These are two reference-group comparisons, not a claim that gender
+causes the offers.
+
+Changing the reference group changes coefficient labels, not fitted values or
+overall fit --- verify rather than trust:
+
+```{r}
+#| label: i05-change-reference
+known_gender$gender_women_ref <- relevel(known_gender$gender,
+                                         ref = "all_women")
+coef(lm(equity_offered_pct ~ season + ask_1k + gender_women_ref,
+        data = known_gender))
+```
+
+The same three group means are now described from the all-women vantage
+point: the all-men coefficient is $-1.28$, the mirror image of before, and
+the fitted values are identical.
+
+### Are the category terms worth having at all?
+
+Block 1 read the coefficients one at a time. The driving question also asks
+something no single t-test answers: do the two category terms **jointly** add
+information beyond season and ask?
+
+The logic needs two **nested** models --- the reduced model is the complete
+model with the tested coefficients forced to zero, fitted on the same rows:
+
+```{r}
+#| label: fig-i05-nested
+#| code-fold: true
+#| code-summary: "See the drawing code (optional, not exam material)"
+#| fig-height: 2.6
+#| fig-cap: "The nested pair behind the partial F-test: the reduced model is the complete model with the two category coefficients set to zero, on the same analysis rows."
+old_par <- par(no.readonly = TRUE)
+par(mar = c(0.3, 0.3, 0.3, 0.3))
+plot(NA, xlim = c(0, 10), ylim = c(0, 5), axes = FALSE,
+     xlab = "", ylab = "", xaxs = "i", yaxs = "i")
+rect(0.4, 1.1, 4.6, 3.9, col = "#DCEAF3", border = "#17324D", lwd = 2)
+rect(5.4, 1.1, 9.6, 3.9, col = "#FDE5C1", border = "#17324D", lwd = 2)
+text(2.5, 3.35, "Reduced model", font = 2, col = "#17324D")
+text(2.5, 2.55, "season + ask_1k", cex = 0.95)
+text(2.5, 1.85, expression(beta[aw] == 0 ~ "," ~ beta[mx] == 0),
+     cex = 0.95, col = "#5B6976")
+text(7.5, 3.35, "Complete model", font = 2, col = "#17324D")
+text(7.5, 2.55, "season + ask_1k", cex = 0.95)
+text(7.5, 1.85, "+ two category dummies", cex = 0.95)
+arrows(4.7, 2.5, 5.3, 2.5, length = 0.1, lwd = 2, col = "#17324D")
+text(5.0, 3.0, "free the\ntwo coefficients", cex = 0.8, col = "#5B6976")
+par(old_par)
+```
+
+The hypotheses:
+
+$$
+H_0:\beta_{all\_women}=\beta_{mixed}=0
+\quad\text{against at least one non-zero.}
+$$
+
+::: {#exm-i05-partial-f}
+## Worked example: the partial F statistic by hand
+
+Fit both models and ask R for the anova table:
+
+```{r}
+#| label: i05-partial-f
+reduced_gender <- lm(equity_offered_pct ~ season + ask_1k,
+                     data = known_gender)
+anova(reduced_gender, gender_model)
+```
+
+Plug the table's numbers into the formula once by hand. Adding the two
+category terms reduces the residual sum of squares by $436.25$ using $2$
+degrees of freedom; the complete model leaves $82{,}792$ on $1{,}429$
+degrees of freedom:
+
+$$
+F=\frac{436.25/2}{82{,}792/1{,}429}
+=\frac{218.13}{57.94}
+\approx 3.76.
+$$
+
+Read the ratio: the numerator is explained variation *per tested
+coefficient*; the denominator is unexplained variation *per residual degree
+of freedom*. The category terms buy about 3.8 times as much explanation per
+coefficient as noise alone would --- with p $\approx$ 0.023, more than chance
+comfortably explains.
+:::
+
+At 5%, the two source-category terms are **jointly useful** in this
+specification. Hold that next to the individual results: joint p-value
+$0.023$, yet the mixed dummy's own p-value is $0.823$ *in the very same
+output*. Joint usefulness is not individual significance --- the F-test asks
+whether the pair of terms together improves the model, not whether each
+survives on its own. (The overall F in `summary(gender_model)`, about 84.5
+with a tiny p-value, answers a third, cruder question: whether *all four*
+predictors jointly beat an intercept-only model.)
+
+### Visualise the adjusted comparison
+
+```{r}
+#| label: fig-i05-adjusted
+#| code-fold: true
+#| code-summary: "See the R code for this figure"
+#| fig-cap: "Fitted initial equity by source classification at the average season and requested amount, with 95% confidence intervals. The intervals express model-based uncertainty, not uncertainty about how the categories were recorded."
+library(ggplot2)
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+known_gender <- subset(sharks, pitcher_gender_group != "unknown")
+known_gender$gender <- relevel(factor(known_gender$pitcher_gender_group),
+                               ref = "all_men")
+known_gender$ask_1k <- known_gender$ask_amount_usd / 1000
+gender_model <- lm(
+  equity_offered_pct ~ season + ask_1k + gender,
+  data = known_gender
+)
+newdat <- data.frame(
+  season = mean(known_gender$season),
+  ask_1k = mean(known_gender$ask_1k),
+  gender = factor(c("all_men", "all_women", "mixed"),
+                  levels = levels(known_gender$gender))
+)
+pred <- predict(gender_model, newdata = newdat, interval = "confidence")
+adj_df <- data.frame(
+  team = factor(c("All-men", "All-women", "Mixed"),
+                levels = c("All-men", "All-women", "Mixed")),
+  fit = pred[, "fit"],
+  lwr = pred[, "lwr"],
+  upr = pred[, "upr"]
+)
+
+ggplot(adj_df, aes(x = team, y = fit)) +
+  geom_pointrange(aes(ymin = lwr, ymax = upr),
+                  colour = "#009E73", linewidth = 0.7, fatten = 2.6) +
+  labs(x = "Source classification of pitching team",
+       y = "Fitted initial equity offered (%)") +
+  theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    plot.caption = element_text(colour = "#5B6976"),
+    axis.title = element_text(colour = "#17324D")
+  )
+```
+
+Read @fig-i05-adjusted with the standing five-step sequence:
+
+1. **Axes:** source categories across, fitted initial equity (in percent) up.
+2. **Units:** each point is a fitted mean at the *same* average season and
+   requested amount --- an adjusted comparison, not raw group means.
+3. **Marks:** points are fitted values (about 12.9, 14.1, and 13.0); vertical
+   lines are 95% confidence intervals, wider for the smaller categories.
+4. **Pattern:** the all-women point sits about 1.28 points above the all-men
+   point; the mixed interval overlaps both.
+5. **Limits:** the intervals express **model-based** sampling uncertainty.
+   They say nothing about the **recording** uncertainty in the broad source
+   categories themselves, and nothing causal.
+
+### Why `unknown` is excluded, not a fourth group
+
+Seven records carry the classification `unknown`. That label records the
+*absence of information*, not a kind of team: treating it as a substantive
+fourth category would estimate a "mean equity of teams the source failed to
+classify," a quantity with no business meaning. Excluding the records keeps
+every coefficient interpretable; the price, stated openly, is that the
+analysed sample is the classified records only.
+
+::: {.caveat-box}
+<span class="label">What these category coefficients can and cannot say</span>
+
+The categories are broad source codings of the on-screen presenting team ---
+not shares, identities, or full founding teams --- so the coefficients
+compare codings, not people. The analysed sample is the 1,434 classified
+records of broadcast pitches; selection into the show and into
+classification travels with every estimate. The two dummy coefficients are
+two reference-group contrasts at fixed season and ask, and they change
+labels when the reference changes. None of this supports an essentialist or
+causal reading: the model reports that offers *differ* by coded composition
+in these data, not that composition *makes* anyone offer differently.
+:::
+
+### Answering the driving question
+
+At the same season and requested amount, all-women presenting teams are
+fitted to offer about 1.28 equity percentage points more than all-men teams
+(p $\approx$ 0.008); mixed teams are indistinguishable from all-men teams.
+The two category terms are jointly useful (partial F $\approx$ 3.76,
+p $\approx$ 0.023), so they earn their place in the model --- as an adjusted
+association within these recorded pitches, nothing more.
+
+**Next:** We can now compare categories at fixed values of the other
+predictors --- but so far every group shares one slope, and every trend is a
+straight line. Both restrictions are modelling choices, not facts. Lecture 6
+relaxes them: interactions let the season trend differ by team composition,
+and polynomial terms let the trend bend --- each with the discipline for
+reading the result honestly.
+
+:::
+
+::: {.course-phase .phase-after}
+
+## After class
+
+<span class="time-budget">Total practice time: about 70 minutes.</span>
+
+### Retrieval (10 minutes)
+
+1. Why are only $G-1$ dummies used with an intercept?
+2. What does a dummy coefficient compare?
+3. What changes when the reference group changes?
+4. What does a partial F-test evaluate?
+5. Why can a joint F-test reject when one individual t-test does not?
+
+::: {.callout-note collapse="true"}
+## Check your answers
+
+1. All $G$ dummies sum to 1, the intercept column: exact collinearity, so
+   the coefficients would not be identified.
+2. A category with the named reference category, holding the other included
+   predictors fixed.
+3. Coefficient labels and values change to describe the same fits from a new
+   vantage point; fitted values and overall fit do not change.
+4. Whether a specified group of coefficients is jointly zero, comparing
+   nested models on the same rows.
+5. The F-test evaluates the terms together; individual tests ask narrower
+   questions, each with its own uncertainty, and can miss what the pair
+   achieves jointly.
+:::
+
+### Releveling and verification practice (15 minutes)
+
+1. Relevel `gender` so `mixed` is the reference group and interpret both
+   dummy coefficients. Save the relevelled model as `relevelled_model`.
+2. Verify that fitted values are unchanged after releveling by comparing
+   with `gender_model`.
+3. State the hypotheses for the partial F-test of both gender dummies.
+4. Explain why the seven `unknown` records were excluded rather than treated
+   as evidence of a substantive fourth group.
+5. Explain why "the all-women coefficient is 1.28%" is ambiguous, then
+   rewrite it precisely.
+
+::: {.callout-note collapse="true"}
+## Check your answers
+
+1. Use:
+
+   ```r
+   mixed_reference <- relevel(known_gender$gender, ref = "mixed")
+   relevelled_model <- lm(
+     equity_offered_pct ~ season + ask_1k + mixed_reference,
+     data = known_gender
+   )
+   coef(relevelled_model)
+   ```
+
+   At fixed season and request, the all-men coefficient is about $-0.121$
+   percentage points and the all-women coefficient about $1.163$ percentage
+   points, each relative to mixed teams.
+2. `all.equal(fitted(gender_model), fitted(relevelled_model))` returns
+   `TRUE` up to numerical tolerance.
+3. $H_0:\beta_{all\_women}=\beta_{mixed}=0$ against at least one non-zero
+   coefficient, with all-men as the current reference.
+4. `unknown` records lack a known classification; absence of recorded
+   information is not a meaningful team-composition category.
+5. It confuses percent with percentage points and omits the comparison and
+   conditioning. A precise version: "At the same season and requested
+   amount, all-women presenting teams are fitted to offer 1.28 equity
+   percentage points more initially than all-men presenting teams."
+:::
+
+### From worked to faded: a partial F with new numbers (10 minutes)
+
+Test the two category dummies in a *smaller* complete model that contains
+only `season`:
+
+```{r}
+#| label: i05-faded-anova
+reduced_season <- lm(equity_offered_pct ~ season, data = known_gender)
+full_season    <- lm(equity_offered_pct ~ season + gender,
+                     data = known_gender)
+anova(reduced_season, full_season)
+```
+
+*Step 1 (given).* Adding the two dummies reduces the residual sum of squares
+by $643.43$ using $2$ degrees of freedom; the complete model leaves
+$84{,}003$ on $1{,}430$ degrees of freedom.
+
+*Step 2 (you).* Plug these into the F formula from the worked example.
+
+*Step 3 (you).* Compare with the table's F and p-value and state the
+conclusion at 5% in one sentence.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+$F=(643.43/2)/(84{,}003/1{,}430)=321.7/58.7\approx 5.48$, matching the
+table, with p $\approx$ 0.004. At 5%, the two category terms are jointly
+useful even in the model that adjusts only for season.
+:::
+
+### The 120-word interpretation (10 minutes)
+
+Write a 120-word interpretation of the full `gender_model` that includes the
+source measurement boundary and the causal limit.
+
+::: {.callout-note collapse="true"}
+## Check a model answer
+
+A complete answer reports: the outcome and sample (initial equity offered,
+1,434 broadcast pitches with a recorded source classification); both
+estimates with units and conditioning (all-women teams fitted 1.28
+percentage points above all-men teams, mixed teams 0.12 points above, at the
+same season and requested amount); uncertainty (p $\approx$ 0.008 and 0.823;
+jointly useful, partial F p $\approx$ 0.023); the measurement boundary
+(broad source coding of the on-screen team, not shares or identities); and
+the scope (adjusted associations among selected, recorded pitches --- not
+causal, not essentialist).
+:::
+
+### Spaced review: one item from Lecture 4 (5 minutes)
+
+Using the Lecture 4 three-predictor model, compute the combined fitted
+difference for a pitch three seasons later requesting $200,000 more, at the
+same description length.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+$3(-0.836)+200(-0.0029)\approx-3.09$ percentage points: contributions add
+because the model is additive, and $200,000 is 200 units of `ask_1k`.
+:::
+
+### Worked exam interpretation (5 minutes)
+
+**Question.** In the mock-exam Q4 style: a model of equity on season,
+`ask_1k`, and industry (four categories, reference `Food and Beverage`)
+reports `industryTechnology 1.9 (p = 0.04)`. A student writes: "Technology
+pitches offer 1.9% more equity, so entering tech makes founders more
+generous." Correct the sentence.
+
+::: {.callout-note collapse="true"}
+## Check a model answer
+
+Three repairs. Units: the estimate is 1.9 equity *percentage points*, not a
+relative 1.9%. Comparison and conditioning: technology pitches are fitted
+1.9 points above *Food and Beverage* pitches at the same season and
+requested amount, among the recorded pitches. Scope: nothing here is causal
+--- "entering tech makes founders more generous" reads a reference-group
+contrast as an effect of industry choice.
+:::
+
+### From the reading ladder (10 minutes)
+
+Next rung of the [reading ladder](../resources/reading-ladder.qmd): open
+[Brooks et al. (2014)](https://doi.org/10.1073/pnas.1321202111) --- an
+open-access study of entrepreneurial pitch success. Find where the analysis
+compares pitches across a **category** (the presenter's gender). Identify
+the categorical predictor and what serves as the reference comparison, and
+restate the paper's headline gap in one careful sentence that respects
+today's two rules: percentage points are not percent, and an adjusted gap
+between categories is not a causal claim about any attribute. Then note one
+way their setting differs from our Shark Tank teaching file.
+
+::: {.callout-note collapse="true"}
+## Check your approach
+
+A good sentence names both categories explicitly, states the outcome and
+its unit, and attributes the gap to the sample and design ("in these
+pitch competitions, pitches presented by ... were funded ... percentage
+points more often than ...") without sliding into "because investors
+prefer...". Differences from our file worth noting: their data include
+experiments with manipulated recordings, whereas ours are selected,
+edited television records with a broad source category for the presenting
+team.
+:::
+
+### Make it yours (5 minutes)
+
+:::: {.utility-prompt}
+<span class="label">Utility: two sentences</span>
+
+Think of your EiA3 venture --- or any business you know well. Name one
+categorical feature of your customers or products (segment, channel, region,
+plan tier), and write two sentences: which category would you set as the
+reference group and why, and what would a "jointly useful" F-test verdict on
+the whole set of categories change about how you describe your market? There
+is no wrong answer; the point is choosing a reference deliberately.
+
+::: {.callout-note collapse="true"}
+## See an example, then write your own
+
+Take a student-run campus meal-prep box venture. "My channels are the campus stand, the app, and the website; I would set the campus stand as reference because it is the original channel every decision gets compared against. A jointly useful F-verdict would justify describing my market by channel at all --- individually mixed p-values on single dummies would not settle that."
+:::
+
+You can discuss this task --- and any other task in this chapter --- with
+**Tilly**, the course AI assistant on Canvas: ask it to check whether your
+two sentences confuse percent with percentage points, or to quiz you on the
+dummy-variable trap with your own categories.
+::::
+
+Continue to Lecture 6: Interactions and curvature.
+
+Formula sheet: Lecture 5 formulas.
+
+For a more formal treatment, see James et al., *An Introduction to
+Statistical Learning*, 2nd ed., Sections 3.2.2 and 3.3.1, and
+[Nieuwenhuis, *Statistical Methods for Business and Economics*](https://tilburguniversity.on.worldcat.org/oclc/317545871),
+Chapters 20--21.
+
+:::

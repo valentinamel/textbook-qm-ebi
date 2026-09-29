@@ -1,0 +1,644 @@
+# Lecture 8: Sampling distributions and the central limit theorem {#b08}
+
+```{r}
+#| label: b08-setup
+#| include: false
+# Chunk options only. Every object used in this chapter is constructed in
+# visible code on this page, so that copying the code always works.
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
+                      fig.width = 7, fig.height = 4.5)
+```
+
+::: {.outcomes}
+<span class="label">By the end of Lecture 8, you can</span>
+
+- distinguish a population distribution, a sampling distribution, and a
+  realised estimate;
+- derive the mean and variance of a sample mean using the linearity rules;
+- calculate and interpret a standard error;
+- use the square-root rule to relate sample size to precision;
+- state the central limit theorem for this course's conditions and apply it
+  to means and proportions;
+- explain what the law of large numbers and the CLT each claim --- and what
+  neither of them repairs.
+:::
+
+::: {.driving-question}
+<span class="label">Driving question</span>
+
+<p class="dq-context">Any number computed from a sample would have come out differently with a different sample. Before acting on an estimate, a careful analyst asks how much such numbers wobble --- and what tames the wobble.</p>
+
+Our sample of 100 gave mean equity 12.76. How wrong could that number be, and
+why does averaging make it trustworthy even though single pitches are wildly
+skewed?
+:::
+
+::: {.course-phase .phase-before}
+
+## Before class
+
+<span class="time-budget">Total preparation time: about 30 minutes.</span>
+
+<div class="video-prep">
+<span class="label">Video preparation (15 minutes)</span><br>
+Watch <a href="https://www.youtube.com/watch?v=Yh5bR7X3ch8">The Weak Law
+of Large Numbers</a> and
+<a href="https://www.youtube.com/watch?v=IrKUM3nNXJE">The Central Limit
+Theorem</a>. Focus on what converges as sample size grows and on which
+distribution becomes approximately normal. All links are also listed in the
+<a href="../resources/video-guide.html">External Video Guide</a>.
+</div>
+
+**Reactivate (10 minutes).** Classify each object as a *population
+distribution*, a *sampling distribution*, or a *realised estimate*:
+
+1. the distribution of equity offered across individual pitches;
+2. the distribution of $\bar X$ across all possible samples of 40 pitches;
+3. the single mean calculated from one observed sample.
+
+::: {.callout-note collapse="true"}
+## Check your answers
+
+The first is a population distribution, the second is a sampling
+distribution, and the third is a realised estimate. Keep the three apart all
+lecture: the middle one is the new object.
+:::
+
+**Predict (5 minutes).** Answer the one-click Mentimeter question posted on
+Canvas before you come to class: to cut the typical error of a sample mean
+**in half**, do you need $2\times$, $4\times$, or $10\times$ the
+observations? Commit to an answer; the lecture resolves it.
+
+If square roots, sums, degrees of freedom, or standardisation are not secure,
+review [Mathematics Refresher: powers, roots, and
+standardisation](../resources/math-refresher.html).
+
+:::
+
+::: {.course-phase .phase-in-class}
+
+## In class
+
+The session opens with the usual four-minute entry quiz on the prep videos,
+then turns to the driving question. Start from where Lecture 7 ended: **the
+five dots.** Five random samples of 100 pitches produced five different
+sample means, plotted on one axis, while the population mean sat still
+underneath them. During the break you guessed where a sixth mean would land.
+This lecture is about the *pattern* behind those dots --- the hardest and most
+useful idea in the course.
+
+### The pattern behind the five dots
+
+Imagine not five samples but *every possible* random sample of the same size,
+each producing its own sample mean. The distribution of those possible values
+of $\bar X$ is its **sampling distribution**. It describes uncertainty in an
+*estimator*, not variation among individual pitches:
+
+- the **population distribution** describes how equity offers vary across
+  the 1,441 pitches;
+- the **sampling distribution** describes how $\bar X$ would vary across
+  repeated samples;
+- a **realised estimate**, such as 12.76, is one draw from that sampling
+  distribution.
+
+The two population parameters this chapter keeps returning to are the frame
+mean and SD of equity offered, and the frame deal proportion. Construct them
+yourself --- because the 1,441 records are the entire frame, the SD divides by
+$N$, not $n-1$:
+
+```{r}
+#| label: b08-population-parameters
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+mu_equity <- mean(sharks$equity_offered_pct)
+sigma_equity <- sqrt(mean((sharks$equity_offered_pct - mu_equity)^2))
+p_deal <- mean(sharks$deal_on_show)
+c(mu_equity = mu_equity, sigma_equity = sigma_equity, p_deal = p_deal)
+```
+
+So $\mu = 13.21$ percentage points, $\sigma = 8.44$ percentage points, and
+$p = 0.612$. These are fixed numbers. What varies is any statistic computed
+from a random sample of the frame.
+
+### Explore it: the sampling-distribution lab
+
+Before any formula, see the sampling distribution *form*. The lab below shows
+the strongly right-skewed population histogram of the 1,441 equity offers on
+the left. Use the **slider** to choose a sample size $n$ and press
+**Redraw** to draw many random samples of that size: each sample's mean drops
+into the histogram forming on the right, next to the population.
+
+<iframe src="../assets/widgets/sampling-lab.html" width="100%" height="520" style="border:1px solid #C9D4DC; border-radius:6px;" title="Sampling distribution lab"></iframe>
+
+Work through three settings and watch three things --- centre, spread, shape:
+
+1. Set $n = 2$ and redraw several times. The means scatter widely and the
+   histogram of means is still skewed.
+2. Set $n = 25$. The histogram of means narrows and starts to look
+   symmetric, centred near 13.2.
+3. Slide up to $n = 100$. The histogram of means is a tight, bell-shaped
+   pile around the population mean, even though the population histogram
+   beside it has not changed at all.
+
+Everything in the rest of this lecture is the mathematics of what you just
+manipulated: *where* the pile sits, *how wide* it is, and *why* it becomes
+bell-shaped.
+
+### The mean and variance of a sample mean
+
+For independent, identically distributed variables $X_1,\ldots,X_n$ with
+population mean $\mu$ and variance $\sigma^2$,
+
+$$
+E[\bar X]=\mu,
+\qquad
+\operatorname{Var}(\bar X)=\frac{\sigma^2}{n},
+\qquad
+\operatorname{SD}(\bar X)=\frac{\sigma}{\sqrt n}.
+$$
+
+The first equality says that $\bar X$ is **unbiased** for $\mu$: the pile of
+sample means is centred on the parameter, exactly as in the lab. The third
+quantity --- the SD of the estimator across repeated samples --- is called the
+**standard error** (SE). An SD describes variation among *observations*; an
+SE describes variation of an *estimator*.
+
+These are not new facts. They follow from the linearity rules you already
+have on the formula sheet (the Lecture 8 block, and the Refresher's
+linearity rules):
+
+- $E[X+Y]=E[X]+E[Y]$ and $E[aX]=aE[X]$, so
+  $E[\bar X]=\frac{1}{n}\sum_i E[X_i]=\frac{1}{n}\,n\mu=\mu$;
+- $\operatorname{Var}(aX)=a^2\operatorname{Var}(X)$ and, for
+  **independent** variables,
+  $\operatorname{Var}(X+Y)=\operatorname{Var}(X)+\operatorname{Var}(Y)$, so
+
+$$
+\operatorname{Var}(\bar X)
+=\operatorname{Var}\!\left(\frac{X_1+\cdots+X_n}{n}\right)
+=\frac{1}{n^2}\sum_{i=1}^{n}\operatorname{Var}(X_i)
+=\frac{n\sigma^2}{n^2}
+=\frac{\sigma^2}{n}.
+$$
+
+Independent positive and negative deviations partly cancel in an average.
+That cancellation is why the right-hand histogram in the lab is so much
+narrower than the population histogram.
+
+In practice $\sigma$ is usually unknown and is estimated by the sample SD
+$S$, giving the estimated standard error
+$\operatorname{SE}(\bar X)=S/\sqrt n$. Substituting an estimate for a
+parameter adds a little extra uncertainty; Lecture 9 opens with the price of
+that substitution.
+
+::: {#exm-b08-se}
+## Worked example: E, Var, and SE for σ = 12, n = 36
+
+A population has mean $\mu$ and SD $\sigma=12$. A random sample of $n=36$
+observations is drawn. Find the mean, variance, and SE of $\bar X$, naming
+the rule used at each step.
+
+- **Mean.** By linearity of expectation ($E[X+Y]=E[X]+E[Y]$, $E[aX]=aE[X]$),
+  $E[\bar X]=\mu$ --- whatever $\mu$ is, the sample mean is unbiased for it.
+- **Variance.** By $\operatorname{Var}(aX)=a^2\operatorname{Var}(X)$ and
+  additivity of variance under independence,
+  $\operatorname{Var}(\bar X)=\sigma^2/n=12^2/36=144/36=4$.
+- **SE.** Take the square root:
+  $\operatorname{SD}(\bar X)=\sqrt 4=2$, i.e. $\sigma/\sqrt n=12/6=2$.
+
+The typical distance between a sample mean and $\mu$ is about 2 units ---
+one sixth of the typical distance of a *single* observation from $\mu$.
+All three rules are on the formula sheet; the derivations are in the
+[Mathematics Refresher](../resources/math-refresher.html).
+:::
+
+### The square-root rule
+
+Precision grows with $\sqrt n$, not with $n$. This resolves the prep
+prediction: to cut the SE **in half** you need $\mathbf{4\times}$ the
+observations, because
+
+$$
+\frac{\sigma}{\sqrt{4n}}=\frac{1}{2}\cdot\frac{\sigma}{\sqrt n}.
+$$
+
+Doubling the sample buys less than you might hope; each extra digit of
+precision gets more expensive. This is worth knowing before you budget for
+any data collection.
+
+::: {.callout-caution collapse="true"}
+## Try it: how large must n become to cut an SE from 4 to 1?
+
+In class this is the pair task before the break. Complete the missing steps
+before opening the answer.
+
+*Step 1 (given).* The SE must fall by a factor of $4/1 = 4$.
+
+*Step 2 (you).* The SE is proportional to $1/\sqrt n$. By what factor must
+$n$ change to divide the SE by 4?
+
+*Step 3 (you).* If the original sample had $n=50$, how many observations
+does the new design need?
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+Dividing the SE by 4 requires multiplying $n$ by $4^2=16$: the square-root
+rule in reverse. From $n=50$ the design needs $16\times 50=800$
+observations. Precision is bought at a quadratic price.
+:::
+:::
+
+### The central limit theorem
+
+<p class="concept-video"><strong>MIT explanation (review):</strong>
+<a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/the-central-limit-theorem/">19.2 The Central Limit Theorem</a>.</p>
+
+The lab showed one more pattern that the mean-and-variance rules do not
+explain: the pile of sample means became *bell-shaped*, even though the
+population is strongly skewed. That is the **central limit theorem** (CLT).
+Under the independent-sampling conditions used in this course, the
+standardised sample mean
+
+$$
+Z=\frac{\bar X-\mu}{\sigma/\sqrt n}
+$$
+
+approaches a standard normal distribution as $n$ grows. Equivalently,
+
+$$
+\bar X\ \dot\sim\ N\!\left(\mu,\frac{\sigma^2}{n}\right)
+$$
+
+for a sufficiently large sample. The dot above $\sim$ signals an
+approximation. The normal model from Lecture 6 returns here --- not as a model
+for the *data*, where it failed for equity offers, but as a model for the
+*sample mean*.
+
+There is **no universal rule that $n=30$ is always enough.** Strong
+skewness, extreme outliers, or dependence between observations may require
+much more data. If the population itself is normal, the sample mean is
+exactly normal for every $n$.
+
+@fig-b08-clt shows the simulation behind the claim: 5,000 sample means of
+$n=5$ draws and 5,000 sample means of $n=40$ draws from the equity variable.
+
+```{r}
+#| label: fig-b08-clt
+#| code-fold: true
+#| code-summary: "See the R code for this figure"
+#| fig-cap: "Simulated sampling distributions of the mean equity offered for n = 5 (left) and n = 40 (right), each based on 5,000 samples, with the corresponding normal approximations (orange curves). Both panels use the same axes."
+library(ggplot2)
+
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+mu_equity <- mean(sharks$equity_offered_pct)
+sigma_equity <- sqrt(mean((sharks$equity_offered_pct - mu_equity)^2))
+set.seed(208)
+B <- 5000
+means_5 <- replicate(B, mean(sample(sharks$equity_offered_pct, 5,
+                                    replace = TRUE)))
+means_40 <- replicate(B, mean(sample(sharks$equity_offered_pct, 40,
+                                     replace = TRUE)))
+
+panel_levels <- c("n = 5", "n = 40")
+sim_means <- data.frame(
+  sample_mean = c(means_5, means_40),
+  panel = factor(rep(panel_levels, each = B), levels = panel_levels)
+)
+
+all_means <- c(means_5, means_40)
+shared_limits <- c(floor(min(all_means)), ceiling(max(all_means)))
+shared_breaks <- seq(shared_limits[1], shared_limits[2], length.out = 36)
+
+normal_grid <- seq(shared_limits[1], shared_limits[2], length.out = 400)
+normal_curves <- rbind(
+  data.frame(x = normal_grid, panel = panel_levels[1],
+             density = dnorm(normal_grid, mu_equity,
+                             sigma_equity / sqrt(5))),
+  data.frame(x = normal_grid, panel = panel_levels[2],
+             density = dnorm(normal_grid, mu_equity,
+                             sigma_equity / sqrt(40)))
+)
+normal_curves$panel <- factor(normal_curves$panel, levels = panel_levels)
+
+ggplot(sim_means, aes(sample_mean)) +
+  geom_histogram(aes(y = after_stat(density)), breaks = shared_breaks,
+                 fill = "#009E73", alpha = 0.85, colour = "white") +
+  geom_line(data = normal_curves, aes(x, density),
+            colour = "#D55E00", linewidth = 0.9) +
+  facet_wrap(~ panel, scales = "fixed") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
+  labs(x = "Sample mean equity offered (%)", y = "Density") +
+  theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    plot.caption = element_text(colour = "#5B6976"),
+    axis.title = element_text(colour = "#17324D"),
+    strip.text = element_text(colour = "#17324D", face = "bold")
+  )
+```
+
+Read @fig-b08-clt with the five-step sequence. (1) Each bar counts simulated
+sample means, not pitches. (2) The horizontal axis is the possible sample
+mean of equity offered, in percentage points --- **the same range in both
+panels**, so widths can be compared directly. (3) The vertical axis is
+density, also on a shared scale. (4) The pattern: the $n=40$ pile is far
+narrower and visibly closer to its orange normal curve than the $n=5$ pile,
+which still leans right like the population. (5) Takeaway: averaging 40
+independent draws from a wildly skewed population already produces a
+concentrated, nearly normal sampling distribution.
+
+### Sample proportions are sample means
+
+For a Bernoulli variable $X$ with $P(X=1)=p$ (Lecture 3),
+
+$$
+E[X]=p,
+\qquad
+\operatorname{Var}(X)=p(1-p).
+$$
+
+A sample proportion is just the sample mean of an indicator, so every result
+above applies immediately: $\widehat P=\bar X$ satisfies
+
+$$
+E[\widehat P]=p,
+\qquad
+\operatorname{SE}(\widehat P)=\sqrt{\frac{p(1-p)}{n}}.
+$$
+
+Its sampling distribution is approximately normal when the expected numbers
+of successes and failures are both sufficiently large. This course uses
+$np\ge10$ **and** $n(1-p)\ge10$ as the working rule (the *success--failure
+condition*).
+
+::: {#exm-b08-proportion}
+## Worked example: SE of the deal proportion at n = 100
+
+Suppose we draw a random sample of $n=100$ pitches from the frame, where the
+deal proportion is $p=0.612$. How far is the sample deal proportion
+typically from 0.612?
+
+- **SE.**
+  $\operatorname{SE}(\widehat P)=\sqrt{0.612\,(1-0.612)/100}
+  =\sqrt{0.2375/100}\approx 0.0487$, about 4.9 percentage points.
+- **Success--failure check.** $np=100(0.612)=61.2\ge 10$ and
+  $n(1-p)=100(0.388)=38.8\ge 10$, so the normal approximation is reasonable.
+
+In R, using `p_deal` as constructed above:
+
+```{r}
+#| label: b08-proportion-se
+p_deal <- mean(sharks$deal_on_show)
+c(SE_deal_proportion_n_100 = sqrt(p_deal * (1 - p_deal) / 100),
+  successes = 100 * p_deal, failures = 100 * (1 - p_deal))
+```
+:::
+
+### The law of large numbers and the CLT answer different questions
+
+<p class="concept-video"><strong>MIT explanation (review):</strong>
+<a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/the-weak-law-of-large-numbers/">18.4 The Weak Law of Large Numbers</a>.</p>
+
+- The **law of large numbers** (LLN) says *where the pile goes*: $\bar X$
+  becomes close to $\mu$ as $n$ grows.
+- The **CLT** says *what the pile looks like*: the approximate shape and
+  scale of the sampling distribution after standardisation.
+
+One is about convergence of a value, the other about convergence of a
+distribution. Both assume the sampling is random; neither repairs a sample
+that was selected badly in the first place.
+
+::: {.callout-note collapse="true"}
+## Check: match each statement to LLN, CLT, or neither
+
+1. "With enough random draws, the sample mean equity will be very close to
+   13.21."
+2. "For $n=100$ random draws, the sample mean equity is approximately
+   $N(13.21, 0.844^2)$."
+3. "With enough respondents, our LinkedIn poll will represent Dutch
+   founders."
+
+Statement 1 is the LLN, statement 2 is the CLT, and statement 3 is
+**neither**: no theorem turns a self-selected sample into a representative
+one --- see the caveat box.
+:::
+
+::: {.caveat-box}
+<span class="label">What a bigger sample can and cannot fix</span>
+
+Everything in this lecture concerns **random sampling error**: the
+unavoidable wobble of a statistic across random samples. More observations
+shrink that wobble at the square-root rate. They do **nothing** for
+**selection bias**: if pitches enter the data because producers chose good
+television, a sample of a million such pitches still describes televised
+pitches, not entrepreneurs in general. An SE of 0.84 quantifies precision
+*within the recorded-pitch frame*; it is silent about who got into the frame,
+and an on-air deal is still not a completed investment.
+:::
+
+### Answering the driving question
+
+Our sample of 100 gave mean equity 12.76, while the frame mean is 13.21. How
+wrong could 12.76 have been? Its standard error:
+
+```{r}
+#| label: b08-driving-question
+sigma_equity <- sqrt(mean((sharks$equity_offered_pct -
+                             mean(sharks$equity_offered_pct))^2))
+c(SE_mean_n_25 = sigma_equity / sqrt(25),
+  SE_mean_n_100 = sigma_equity / sqrt(100))
+```
+
+At $n=100$ the SE is about **0.84 percentage points**: a random-sample mean
+typically lands within about 0.84 points of 13.21, and rarely more than
+about two SEs away. (At $n=25$ the SE would be twice as large --- the
+square-root rule again.) Averaging is trustworthy despite the wild skew of
+single pitches because deviations cancel (the variance rule) and the CLT
+gives the mean a predictable, nearly normal distribution.
+
+**Next:** We can now say how much a sample mean typically wobbles: one
+standard error. Turning that into a sentence a report can carry --- "the frame
+mean plausibly lies between $a$ and $b$" --- needs one more ingredient,
+because in a real sample the population $\sigma$ is unknown and must be
+estimated too, adding uncertainty of its own. Lecture 9 introduces the t
+distribution that prices in this extra uncertainty, builds the confidence
+interval from it, and runs the course's first formal test of a benchmark
+claim.
+
+:::
+
+::: {.course-phase .phase-after}
+
+## After class
+
+<span class="time-budget">Total practice time: about 55 minutes.</span>
+
+### Retrieval (10 minutes)
+
+1. What varies in a sampling distribution?
+2. Why is $E[\bar X]=\mu$ called unbiasedness?
+3. What is the difference between an SD and an SE?
+4. To cut an SE in half, by what factor must the sample size grow, and why?
+5. What does the CLT say becomes approximately normal?
+6. Why does a larger sample not remove selection bias?
+
+::: {.callout-note collapse="true"}
+## Check your answers
+
+1. The statistic varies across possible repeated samples; the parameter and
+   the population stay fixed.
+2. Its long-run average across repeated samples equals the population
+   parameter.
+3. An SD describes variation among observations; an SE describes variation
+   of an estimator across samples.
+4. By a factor of 4: the SE is proportional to $1/\sqrt n$, so halving it
+   requires $2^2=4$ times the observations.
+5. The standardised sample mean --- and therefore, approximately, the
+   sampling distribution of the mean. Not the original observations.
+6. Sample size shrinks random error only. It does not change how units
+   entered the sampling frame or the sample.
+:::
+
+### From worked to faded (5 minutes)
+
+Re-read the worked SE calculation (@exm-b08-se). Then complete the same
+calculation for a proportion: a planned survey expects $p=0.30$ and
+$n=100$.
+
+*Step 1 (given).* The SE formula for a proportion is
+$\sqrt{p(1-p)/n}$.
+
+*Step 2 (you).* Calculate the SE.
+
+*Step 3 (you).* Check the success--failure condition.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+$\operatorname{SE}(\widehat P)=\sqrt{0.30(0.70)/100}\approx 0.0458$, about
+4.6 percentage points. The expected counts are $np=30$ successes and
+$n(1-p)=70$ failures, both at least 10, so the normal approximation is
+acceptable.
+:::
+
+### Practice (10 minutes)
+
+1. If $\sigma=15$ and $n=25$, find $E[\bar X]$,
+   $\operatorname{Var}(\bar X)$, and $\operatorname{SE}(\bar X)$, naming
+   the rule used at each step.
+2. How large must $n$ become to reduce an SE from 6 to 1.5?
+3. For a sample proportion with $\hat p$ expected near 0.50 and $n=64$,
+   calculate the SE and check the success--failure condition.
+4. Explain why the normal approximation is more convincing in the
+   right-hand panel of @fig-b08-clt.
+5. State one threat to the CLT-based approximation that a large $n$ alone
+   does not solve.
+
+::: {.callout-note collapse="true"}
+## Check your answers
+
+1. $E[\bar X]=\mu$ (linearity of expectation);
+   $\operatorname{Var}(\bar X)=\sigma^2/n=225/25=9$ (variance of a scaled
+   sum of independent variables); $\operatorname{SE}(\bar X)=\sqrt 9=3$.
+2. The SE must fall by a factor of 4, so the sample size must grow by
+   $4^2=16$ times.
+3. $\sqrt{0.50(0.50)/64}=0.0625$. Expected counts are 32 and 32, both at
+   least 10.
+4. Averaging 40 observations cancels more of the skewness and shrinks the
+   sampling variation more than averaging 5 observations; the histogram
+   hugs its normal curve far more closely.
+5. Dependence between observations, or a non-representative sampling
+   process. (Extreme outliers slow the approximation too.)
+:::
+
+### Widget homework (10 minutes)
+
+Open the sampling-distribution lab again and run these three settings. For
+each, redraw several times and write **one sentence** on what the histogram
+of sample means shows:
+
+1. $n = 2$;
+2. $n = 25$;
+3. $n = 100$.
+
+::: {.callout-note collapse="true"}
+## Check a model answer
+
+1. At $n=2$ the sample means scatter widely and their histogram is still
+   right-skewed, echoing the population shape.
+2. At $n=25$ the histogram of means is clearly narrower and roughly
+   symmetric, centred near 13.2.
+3. At $n=100$ the means form a tight bell around the population mean, with
+   a typical deviation of less than one percentage point --- the SE of about
+   0.84 made visible.
+:::
+
+### Spaced review: one item each from Lectures 7 and 6 (10 minutes)
+
+1. *(Lecture 7.)* The sample variance divides by $n-1$, not $n$. In one or
+   two sentences, why?
+2. *(Lecture 6.)* Daily revenue is modelled as $X\sim N(10, 2^2)$ (in
+   thousands of euros). Find $P(X>13)$.
+
+::: {.callout-note collapse="true"}
+## Check your answers
+
+1. The deviations are measured from the sample mean, which was itself
+   estimated from the data; once it is fixed, only $n-1$ deviations can
+   vary freely, and dividing by $n-1$ removes the resulting downward bias.
+2. Standardise: $z=(13-10)/2=1.5$, so
+   $P(X>13)=P(Z>1.5)\approx 0.067$.
+:::
+
+### Worked exam interpretation (5 minutes)
+
+**Question.** Mean equity offered in the recorded-pitch frame is
+$\mu=13.21$ with $\sigma=8.44$. A random sample of $n=100$ pitches is
+drawn. Using the CLT, find the probability that the sample mean exceeds
+14.5 percentage points.
+
+::: {.callout-note collapse="true"}
+## Check a model answer
+
+By the CLT, $\bar X\ \dot\sim\ N(13.21, 0.844^2)$ since
+$\operatorname{SE}=8.44/\sqrt{100}=0.844$. Standardise:
+$z=(14.5-13.21)/0.844\approx 1.53$, so
+$P(\bar X>14.5)\approx P(Z>1.53)\approx 0.063$. About a 6% chance --- and
+note the question is about the *mean*, not a single pitch: for one pitch
+the normal model was already rejected in Lecture 6.
+:::
+
+### Make it yours (5 minutes)
+
+:::: {.utility-prompt}
+<span class="label">Utility: two sentences</span>
+
+Think of your EiA venture --- or any business you know well. Name one number
+you would estimate from a sample (customer satisfaction, conversion rate,
+average basket size) and write two sentences: first say how you would draw
+the sample and roughly what SE-driven wobble you would tolerate, then say
+whether collecting four times the data would be worth halving that wobble
+for the decision at hand.
+
+::: {.callout-note collapse="true"}
+## See an example, then write your own
+
+Take a student-run campus meal-prep box venture. "I would estimate the conversion rate of tasting-stand visitors from a random 100 of them, and a wobble of about $\pm 5$ percentage points is fine for deciding on a second stand. Collecting four times the data would halve that to about $\pm 2.5$ points, which is not worth four more tasting days for this decision."
+:::
+
+You can discuss this task --- and any other task in this chapter --- with
+**Tilly**, the course AI assistant on Canvas: ask it to help you sketch the
+sample-size trade-off for your own numbers.
+::::
+
+Continue to Lecture 9: The t distribution, confidence intervals, and the
+two-sided test.
+
+Formula sheet: Lecture 8 formulas.
+
+For a more formal explanation, consult
+[Nieuwenhuis, *Statistical Methods for Business and Economics*](https://tilburguniversity.on.worldcat.org/oclc/317545871),
+Chapters 13 and 14.
+
+:::

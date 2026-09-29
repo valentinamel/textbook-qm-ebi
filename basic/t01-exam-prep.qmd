@@ -1,0 +1,300 @@
+# Tutorial 1: Evidence and probability foundations {#b-ep01}
+
+```{r}
+#| label: bep01-setup
+#| include: false
+# Chunk options only. Every object used in this chapter is constructed in
+# visible code on this page, so that copying the code always works.
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
+                      fig.width = 7, fig.height = 4.2)
+```
+
+::: {.outcomes}
+<span class="label">By the end of Tutorial 1, you can</span>
+
+- distinguish data, events, random variables, and distributions;
+- apply probability rules to the Shark Tank record-selection experiment;
+- calculate and interpret a Bernoulli PMF, CDF, and expectation;
+- calculate a variance and standard deviation from a small PMF;
+- write a concise interpretation of supplied R output.
+:::
+
+Tutorials are **exam preparation sessions**: every task below follows the
+format of the final exam. The standing routine for each task is the same ---
+the TA states the task, pairs work on it first for a few minutes with AI use
+allowed, and the solution is then discussed in plenary, starting from the
+pair attempts.
+
+::: {.course-phase .phase-before}
+
+## Before class
+
+Bring your after-class work from Lectures 1--3. Without reopening the
+chapters, complete these definitions:
+
+1. An observational unit is ...
+2. An event is ...
+3. A random variable is ...
+4. A PMF is ...
+5. The variance of a random variable averages ...
+
+Use the cumulative formula sheet through Lecture 3.
+
+Review [Mathematics Refresher: sets, fractions, and
+sums](../resources/math-refresher.html) if the notation is slowing you down.
+
+::: {.callout-note collapse="true"}
+## Check your preparation
+
+1. An observational unit is the entity represented by one row of the data.
+2. An event is a specified subset of the sample space.
+3. A random variable is a real-valued function on the sample space.
+4. A PMF assigns probability $P(X=x)$ to each value in the support of a
+   discrete random variable; its masses are non-negative and sum to 1.
+5. Variance averages squared deviations from the variable's mean:
+   $\operatorname{Var}(X)=E\!\left[(X-E[X])^2\right]$.
+:::
+
+:::
+
+::: {.course-phase .phase-in-class}
+
+## In class
+
+Attempt each task before opening its answer. A complete written answer should
+name the quantity, show the calculation, report the value and units, interpret
+it in context, and state an important model or measurement boundary.
+
+All tasks use the Shark Tank teaching file. Load it once:
+
+```{r}
+#| label: bep01-load
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+```
+
+### Task 1 --- Data and measurement
+
+R reports:
+
+```{r}
+#| label: bep01-task1
+#| echo: false
+c(
+  rows = nrow(sharks),
+  columns = ncol(sharks),
+  deals = sum(sharks$deal_on_show),
+  deal_proportion = mean(sharks$deal_on_show),
+  median_description_words = median(sharks$description_words)
+)
+```
+
+1. What is the observational unit?
+2. Verify the deal proportion from 882 deals and 559 non-deals.
+3. Explain why the mean of `deal_on_show` is a proportion.
+4. Evaluate: "The data contain 1,441 successful companies."
+5. What exactly does `description_words` measure?
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+One row is one recorded televised pitch. There are $882+559=1441$ records and
+$882/1441\approx0.612$, so 61.2% reached an on-air agreement. The mean of a
+0/1 indicator equals the share coded 1 because its sum counts the 1s.
+"Successful companies" is incorrect: the outcome is an agreement made on the
+show, not completed funding or later venture performance. Word count
+describes the written text in the source dataset, not the spoken pitch.
+:::
+
+### Task 2 --- Events and probability rules
+
+The experiment selects one of the 1,441 records uniformly. The two events are
+built exactly as in Lecture 2:
+
+```{r}
+#| label: bep01-events
+D <- sharks$deal_on_show == 1   # on-air deal
+L <- sharks$season >= 9         # late season: Seasons 9-16
+```
+
+R reports:
+
+```{r}
+#| label: bep01-task2
+#| echo: false
+c(P_D = mean(D), P_L = mean(L), P_D_and_L = mean(D & L))
+```
+
+1. Define $\Omega$, and distinguish an outcome from event $D$.
+2. Translate $D^c$, $D\cap L$, and $D\cup L$ into words.
+3. Calculate $P(D^c)$.
+4. Calculate $P(D\cup L)$ using the addition rule.
+5. Explain why these probabilities do not automatically apply to a future US
+   entrepreneur.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+The sample space is the set of 1,441 complete pitch records; one selected
+record is an outcome, while $D$ is the subset of 882 deal records. The
+complement is no on-air deal, the intersection is a late-season deal, and the
+union is late-season, deal, or both. $P(D^c)=1-882/1441=559/1441\approx0.388$.
+The union is $P(D)+P(L)-P(D\cap L)\approx0.771$. Future use requires a
+defined target population and comparable selection, time period, and outcome.
+:::
+
+### Task 3 --- PMF, CDF, and expectation
+
+Let $X=1$ for an on-air deal and $X=0$ otherwise. Use $p=882/1441$.
+
+1. Write the PMF and verify that its masses sum to 1.
+2. Write the full piecewise CDF $F_X(a)$.
+3. Calculate $E[X]$ from the PMF.
+4. Explain why $E[X]$ equals the observed proportion of 1s.
+5. Explain the difference between the random variable $X$ and a realised
+   value $x=1$.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+$$
+p_X(0)=1-p,\qquad p_X(1)=p,
+$$
+
+and the masses total $1-p+p=1$.
+
+$$
+F_X(a)=
+\begin{cases}
+0,&a<0,\\
+1-p,&0\le a<1,\\
+1,&a\ge1.
+\end{cases}
+$$
+
+The expectation is $E[X]=0(1-p)+1p=p\approx0.612$. Because the indicator
+contains 882 ones among 1,441 observations, its mean is also $882/1441$.
+$X$ is the mapping defined before selection; $x=1$ is one possible
+realised value.
+:::
+
+### Task 4 --- Variance from a small PMF
+
+A venture studio models $N$, the number of investors who make an offer to one
+of its startups, with the PMF
+
+| $n$ | 0 | 1 | 2 |
+|---|---:|---:|---:|
+| $p_N(n)$ | 0.5 | 0.3 | 0.2 |
+
+1. Calculate $E[N]$.
+2. Calculate $\operatorname{Var}(N)$ from the definition
+   $E\!\left[(N-E[N])^2\right]$.
+3. Verify the result with the computational form
+   $E[N^2]-\left(E[N]\right)^2$.
+4. Report the standard deviation with its unit, and state in one sentence
+   what it measures here.
+
+::: {.callout-note collapse="true"}
+## Check a model answer
+
+$E[N]=0(0.5)+1(0.3)+2(0.2)=0.7$ offers.
+
+Definition form:
+$$
+\operatorname{Var}(N)=(0-0.7)^2(0.5)+(1-0.7)^2(0.3)+(2-0.7)^2(0.2)
+=0.245+0.027+0.338=0.61.
+$$
+
+Computational form: $E[N^2]=0^2(0.5)+1^2(0.3)+2^2(0.2)=1.1$, so
+$\operatorname{Var}(N)=1.1-0.7^2=1.1-0.49=0.61$. The two routes agree.
+
+The standard deviation is $\sqrt{0.61}\approx0.78$ offers. It measures the
+typical distance of the realised number of offers from the mean of 0.7,
+in the original unit (offers), whereas the variance is in squared offers.
+:::
+
+:::
+
+::: {.course-phase .phase-after}
+
+## After class
+
+### Timed individual practice --- 10 minutes
+
+An output block describes word count:
+
+```{r}
+#| label: bep01-timed
+#| echo: false
+w <- sharks$description_words
+c(
+  mean = mean(w),
+  median = median(w),
+  minimum = min(w),
+  maximum = max(w)
+)
+```
+
+Write no more than 100 words. Compare mean and median, calculate the range,
+and state the measurement boundary. Then explain which value equals the
+expectation if the empirical distribution gives mass $1/1441$ to each record.
+
+::: {.callout-note collapse="true"}
+## Check a model answer
+
+The written descriptions have a mean length of about 5.0 words and a median
+of 5 words. Their range is $13-1=12$ words. The thin upper tail is consistent
+with the mildly right-skewed histogram seen in Lecture 1. If each record
+receives probability $1/1441$, the empirical expectation is the mean, about
+5.0 words. These values describe written dataset text, not spoken-pitch
+length or quality.
+:::
+
+### Check your understanding
+
+Complete from memory:
+
+1. An event is ...
+2. A PMF must ...
+3. A CDF at $a$ reports ...
+4. Expectation is ...
+5. Variance is ... and its square root is ...
+
+::: {.callout-note collapse="true"}
+## Check your answers
+
+1. An event is a specified subset of the sample space.
+2. A PMF is non-negative and sums to 1 over the support.
+3. $F_X(a)=P(X\le a)$.
+4. $E[X]=\sum_x x\, p_X(x)$, the probability-weighted average of the possible
+   values.
+5. Variance is the probability-weighted average of squared deviations from
+   the mean, $\operatorname{Var}(X)=E[X^2]-\left(E[X]\right)^2$; its square
+   root is the standard deviation, in the variable's original unit.
+:::
+
+### Make it yours (5 minutes)
+
+:::: {.utility-prompt}
+<span class="label">Utility: two sentences</span>
+
+Think of your EiA venture --- or any business you know well. Pick one
+uncertain count that matters for it (customers who sign up in a week, offers
+received, orders returned), and write two sentences: first sketch a small PMF
+for it (three or four values with rough probabilities), then say what its
+expectation and standard deviation would tell you about a real decision.
+
+::: {.callout-note collapse="true"}
+## See an example, then write your own
+
+Take a student-run campus meal-prep box venture. "Weekly catering requests: 0 with probability 0.4, 1 with 0.4, 2 with 0.15, and 3 with 0.05, so I expect about 0.85 requests per week. The standard deviation tells me whether a weekend helper is justified --- with high spread, some weeks genuinely need one even though the average says no."
+:::
+
+You can discuss this task --- and any other task in this tutorial --- with
+**Tilly**, the course AI assistant on Canvas.
+::::
+
+Continue to Lecture 4: Conditioning, total probability, Bayes, and
+independence.
+
+:::

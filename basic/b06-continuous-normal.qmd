@@ -1,0 +1,778 @@
+# Lecture 6: Continuous distributions and the normal model {#b06}
+
+```{r}
+#| label: b06-setup
+#| include: false
+# Chunk options only. Every object used in this chapter is constructed in
+# visible code on this page, so that copying the code always works.
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
+                      fig.width = 7, fig.height = 4.5)
+```
+
+::: {.outcomes}
+<span class="label">By the end of Lecture 6, you can</span>
+
+- distinguish a continuous random variable from a discrete one;
+- explain why $P(X=x)=0$ for a continuous random variable and interpret a
+  probability density function as area rather than point probability;
+- use a CDF to calculate interval probabilities;
+- calculate uniform probabilities from interval lengths;
+- standardise a normal value and compute normal probabilities by hand from
+  supplied $Z$ values and with `pnorm()`;
+- convert a percentile back to a raw value with $x=\mu+z\sigma$ and verify
+  with `qnorm()`;
+- find quantiles of model distributions (the uniform median, normal
+  quartiles);
+- check a proposed normal model against a histogram of data and say when it
+  fails.
+:::
+
+::: {.driving-question}
+<span class="label">Driving question</span>
+
+<p class="dq-context">Not everything comes in whole numbers: negotiation time, invested amounts, and revenues can land anywhere in a range. Insurers, lenders, and operations planners price risk on exactly such quantities every day --- and that needs a new kind of probability model.</p>
+
+Negotiation time and invested amounts can take any value in a range. How do
+we assign probabilities when no single value has any?
+:::
+
+::: {.course-phase .phase-before}
+
+## Before class
+
+<span class="time-budget">Total preparation time: about 30 minutes.</span>
+
+<div class="video-prep">
+<span class="label">Video preparation (20 minutes)</span><br>
+Watch <a href="https://www.youtube.com/watch?v=8QFpZ3FndBc">Probability
+Density Functions</a>,
+<a href="https://www.youtube.com/watch?v=JoQDJMZA7F8">Uniform Random
+Variables</a>, and
+<a href="https://www.youtube.com/watch?v=6UMv4vb4y7c">Normal Random
+Variables</a>. Focus on the difference between density height and
+probability, and on the roles of the two normal parameters. All links are
+also listed in the
+<a href="../resources/video-guide.html">External Video Guide</a>.
+</div>
+
+**Reactivate (5 minutes).** A discrete random variable has separated
+possible values (Lecture 3 attached a PMF and a CDF to such variables). A
+continuous random variable can take every real value in an interval. Match
+each variable to the better description:
+
+1. number of sharks in an on-air deal;
+2. exact time spent negotiating a pitch;
+3. season number;
+4. exact amount invested, before rounding to dollars.
+
+::: {.callout-note collapse="true"}
+## Check your answers
+
+Variables 1 and 3 are discrete. Variables 2 and 4 are continuous in a
+mathematical model, even if a measuring device or database records rounded
+values.
+:::
+
+**Predict (5 minutes).** Answer the one-click Mentimeter question posted on
+Canvas before you come to class: for a *continuous* random variable $X$, is
+$P(X = \text{exactly } 10)$ **very small** or **exactly zero**? Commit to an
+answer; the lecture resolves it.
+
+If powers, square roots, inequalities, or z-score algebra feel unfamiliar,
+review
+[Mathematics Refresher: powers, functions, and intervals](../resources/math-refresher.html).
+
+:::
+
+::: {.course-phase .phase-in-class}
+
+## In class
+
+The session opens with the usual four-minute entry quiz on the prep videos,
+then turns to the driving question.
+
+Start with the prediction from your prep. For a continuous random variable,
+
+$$P(X=x)=0 \quad\text{for every single value } x.$$
+
+Not very small --- exactly zero. An interval contains infinitely many values;
+if each single value carried even the tiniest positive probability, the total
+would exceed 1. Yet the negotiation certainly takes *some* amount of time, so
+probability has not disappeared. It has moved: probability now belongs to
+**intervals**, not points. That forces a new object to replace the PMF, and
+building that object is the first job of this lecture.
+
+### From probability mass to probability density
+
+<p class="concept-video"><strong>MIT explanation (review):</strong>
+<a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/probability-density-functions/">08.2 Probability Density Functions</a>.</p>
+
+For a discrete random variable, the PMF assigns probability to individual
+values. For a continuous random variable $X$, a **probability density
+function** (PDF), written $f_X(x)$, is a non-negative curve whose total area
+is 1. The probability that $X$ lies between $a$ and $b$ is the **area** under
+the curve between those values.
+
+You do not need calculus in this course. You need to interpret probability
+as area and use a CDF, R, or supplied values to calculate it.
+
+The crucial reading rule: **density is height, probability is area.**
+Density is probability *per unit* of $x$ --- roughly, the probability of a
+tiny interval divided by its width. Because a width can be small, the height
+can be large. A density can exceed 1 as long as the total area under the
+curve is 1.
+
+::: {.callout-note collapse="true"}
+## Check: is a rectangle of width 0.5 and height 2 a valid density?
+
+Yes. The curve is non-negative and its total area is
+$0.5 \times 2 = 1$, so it is a legitimate PDF (a uniform density on an
+interval of length 0.5). The height 2 is not a probability --- no
+probability statement here exceeds 1, because every probability is an area
+inside that rectangle. Height 2 simply means the probability is packed into
+a narrow range.
+:::
+
+#### The CDF works for every random variable
+
+The cumulative distribution function is still
+
+$$F_X(x)=P(X\le x),$$
+
+exactly as in Lecture 3. For a continuous random variable,
+
+$$P(a<X\le b)=F_X(b)-F_X(a).$$
+
+Because a single point has zero probability, changing $<$ to $\le$ does not
+change a continuous probability: $P(a<X<b)$, $P(a\le X\le b)$, and the two
+mixed versions are all equal. This differs from a discrete variable, where a
+point may carry positive probability and the inequality type matters.
+
+### The uniform distribution
+
+<p class="concept-video"><strong>MIT explanation (review):</strong>
+<a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/uniform-random-variables/">05.5 Uniform Random Variables</a>.</p>
+
+If every equal-length subinterval of $[a,b]$ is equally likely, then
+$X\sim U(a,b)$. Its density is constant:
+
+$$f_X(x)=\frac{1}{b-a},\qquad a\le x\le b,$$
+
+and zero outside the **support** $[a,b]$. The height is not a choice --- it
+is *forced* by the requirement that the whole rectangle have area 1:
+
+$$\text{width}\times\text{height}=(b-a)\times\frac{1}{b-a}=1.$$
+
+Because the height is constant, interval probability depends only on
+interval length. For $a\le c<d\le b$,
+
+$$P(c<X<d)=\frac{d-c}{b-a}.$$
+
+The mean and variance are stated here without derivation:
+
+$$E[X]=\frac{a+b}{2},\qquad \operatorname{Var}(X)=\frac{(b-a)^2}{12}.$$
+
+::: {#exm-b06-uniform-session}
+## Worked example: when does the pitch appear?
+
+A recording session lasts 90 minutes, and an anonymised pitch is equally
+likely to start at any moment of it. Model the start time as
+$X\sim U(0,90)$, measured in minutes.
+
+*Step 1: the height.* The density is $1/(90-0)=1/90\approx 0.011$ per
+minute --- forced by total area 1, not chosen.
+
+*Step 2: the event.* "The pitch starts during the 18-minute window from
+minute 30 to minute 48" is the event $30<X<48$.
+
+*Step 3: the area.* The probability is the area of the shaded rectangle in
+@fig-b06-uniform-session:
+
+$$P(30<X<48)=\frac{48-30}{90-0}=\frac{18}{90}=0.20.$$
+
+For a uniform model, only the *length* of the window matters --- any
+18-minute window inside the session has probability 0.20.
+:::
+
+```{r}
+#| label: fig-b06-uniform-session
+#| code-fold: true
+#| code-summary: "See the R code for this figure"
+#| fig-cap: "The uniform density for a pitch start time over a 90-minute session. The navy line is the density; the shaded green area is the probability of the 18-minute window, 18/90 = 0.20."
+library(ggplot2)
+
+a <- 0
+b <- 90
+c_cut <- 30
+d_cut <- 48
+density_height <- 1 / (b - a)
+
+support_rect <- data.frame(x = c(a, b), y = density_height)
+window_rect  <- data.frame(x = c(c_cut, d_cut), y = density_height)
+density_line <- data.frame(x = c(-9, a, a, b, b, 99),
+                           y = c(0, 0, density_height, density_height, 0, 0))
+
+ggplot() +
+  geom_area(data = support_rect, aes(x, y), fill = "grey75", alpha = 0.25) +
+  geom_area(data = window_rect, aes(x, y), fill = "#009E73", alpha = 0.25) +
+  geom_line(data = density_line, aes(x, y), colour = "#17324D",
+            linewidth = 1.2) +
+  annotate("text", x = 66, y = 0.0127,
+           label = "density = 1/(b - a) = 1/90",
+           colour = "#17324D", size = 3.4) +
+  annotate("segment", x = 39, xend = 39, y = 0.0042, yend = 0.0010,
+           colour = "#17324D",
+           arrow = arrow(length = unit(0.08, "inches"))) +
+  annotate("text", x = 39, y = 0.0052,
+           label = "area = P(30 < X < 48) = 0.20",
+           colour = "#17324D", size = 3.4) +
+  scale_x_continuous(breaks = c(a, c_cut, d_cut, b),
+                     labels = c("a = 0", "c = 30", "d = 48", "b = 90"),
+                     expand = c(0, 0)) +
+  scale_y_continuous(breaks = c(0, density_height),
+                     labels = c("0", "1/90"),
+                     limits = c(0, 0.0145),
+                     expand = c(0, 0)) +
+  labs(x = "Minutes into the session", y = "Density") +
+  theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    plot.caption = element_text(colour = "#5B6976"),
+    axis.title = element_text(colour = "#17324D")
+  )
+```
+
+Read the horizontal axis as possible start times and the vertical axis as
+density, not probability. The navy density line is at 0 before minute 0,
+jumps to $1/90$ on the support, and drops back to 0 after minute 90. The
+green probability is an **area**: $18\times(1/90)=0.20$. Note the contrast
+with the check above --- here the height is far below 1, there it was 2;
+both are legitimate, because only the area is a probability.
+
+::: {.callout-caution collapse="true"}
+## Try it: the final stretch of the session
+
+In class this is the pair task. Same model, $X\sim U(0,90)$. What is the
+probability that the pitch starts in the final 27 minutes of the session?
+
+*Step 1 (given).* The event is $63<X<90$, an interval of length
+$90-63=27$ minutes inside the support.
+
+*Step 2 (you).* Divide the interval length by the support length.
+
+*Step 3 (you).* Interpret the result in one sentence.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+$P(63<X<90)=27/90=0.30$: under the uniform model there is a 30% chance the
+pitch starts in the final 27 minutes --- larger than the 0.20 above only
+because the window is longer.
+:::
+:::
+
+### The normal distribution
+
+<p class="concept-video"><strong>MIT explanation (review):</strong>
+<a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/normal-random-variables/">08.8 Normal Random Variables</a>.</p>
+
+A normal random variable is written
+
+$$X\sim N(\mu,\sigma^2).$$
+
+Read the notation carefully: the second parameter is the **variance**
+$\sigma^2$, not the standard deviation. The density is symmetric and
+bell-shaped. The parameter $\mu$ locates its centre; $\sigma>0$ controls its
+spread:
+
+$$E[X]=\mu,\qquad \operatorname{Var}(X)=\sigma^2.$$
+
+```{r}
+#| label: fig-b06-normal-shape
+#| code-fold: true
+#| code-summary: "See the R code for this figure"
+#| fig-cap: "The normal density. The shaded central area between the two grey dashed lines runs from one standard deviation below the mean to one above and contains about 68% of the distribution; the gold dashed line marks the mean μ."
+library(ggplot2)
+
+normal_curve <- data.frame(z = seq(-3.6, 3.6, length.out = 800))
+normal_curve$density <- dnorm(normal_curve$z)
+
+ggplot(normal_curve, aes(z, density)) +
+  geom_area(data = subset(normal_curve, z >= -1 & z <= 1),
+            fill = "#009E73", alpha = 0.25) +
+  geom_vline(xintercept = c(-1, 1), linetype = "dashed",
+             colour = "#5B6976", linewidth = 0.5) +
+  geom_vline(xintercept = 0, linetype = "dashed",
+             colour = "#C98B2E", linewidth = 0.7) +
+  geom_line(colour = "#17324D", linewidth = 1.2) +
+  annotate("text", x = 0, y = 0.16, label = "about 68%",
+           colour = "#17324D", size = 3.4) +
+  annotate("text", x = 0.15, y = 0.425, label = "mean~mu", parse = TRUE,
+           colour = "#17324D", size = 3.4, hjust = 0) +
+  scale_x_continuous(breaks = c(-2, -1, 0, 1, 2),
+                     labels = expression(mu - 2 * sigma, mu - sigma, mu,
+                                         mu + sigma, mu + 2 * sigma)) +
+  scale_y_continuous(limits = c(0, 0.43),
+                     expand = expansion(mult = c(0, 0.02))) +
+  labs(x = "Value of X", y = "Density") +
+  theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    plot.caption = element_text(colour = "#5B6976"),
+    axis.title = element_text(colour = "#17324D")
+  )
+```
+
+The horizontal axis locates possible values relative to $\mu$ and $\sigma$;
+the vertical axis is density, and probability is again area. In the normal
+**model**, about 68% of the distribution lies within one standard deviation
+of the mean and about 95% within 1.96 standard deviations. These are facts
+about the mathematical model --- the caveat box below explains why they are
+not automatic facts about every dataset.
+
+#### Standardising: every normal question becomes a Z question
+
+If $X\sim N(\mu,\sigma^2)$, then
+
+$$Z=\frac{X-\mu}{\sigma}\sim N(0,1).$$
+
+A z-score reports how many standard deviations a value lies above or below
+the mean. Standardising matters because the closed-book exam supplies a
+handful of standard-normal probabilities on the page --- your job is to
+translate the business question into a $Z$ question that those supplied
+values can answer. The hand calculation is the primary route; R only
+verifies it.
+
+::: {#exm-b06-supplied-z}
+## Worked example: normal probabilities from supplied Z values
+
+Processing time $Y$ (in minutes) is modelled as $Y\sim N(50,100)$. The
+variance is 100, so $\sigma=\sqrt{100}=10$. The following standard-normal
+probabilities are supplied, exactly as on the exam paper:
+
+```
+P(Z <=  1.5) = 0.9332
+P(Z <=  1.0) = 0.8413
+P(Z <= -1.0) = 0.1587
+```
+
+**(a) $P(Y\le 65)$.** Standardise the boundary:
+
+$$z=\frac{65-50}{10}=1.5,$$
+
+so
+
+$$P(Y\le 65)=P(Z\le 1.5)=0.9332.$$
+
+**(b) $P(40<Y<60)$.** Standardise both boundaries:
+
+$$z_{\text{low}}=\frac{40-50}{10}=-1.0,\qquad
+z_{\text{high}}=\frac{60-50}{10}=1.0,$$
+
+then take the difference of the two cumulative probabilities, exactly as
+with any CDF:
+
+$$P(40<Y<60)=P(Z\le 1.0)-P(Z\le -1.0)=0.8413-0.1587=0.6826.$$
+
+That is the 68% rule seen in @fig-b06-normal-shape: the interval runs from
+one standard deviation below the mean to one above.
+:::
+
+In class the same two numbers are then produced live in R. `pnorm()` is the
+normal CDF; give it the boundary, the mean, and the **standard deviation**
+(not the variance):
+
+```{r}
+#| label: b06-pnorm-check
+pnorm(65, mean = 50, sd = 10)
+pnorm(60, mean = 50, sd = 10) - pnorm(40, mean = 50, sd = 10)
+```
+
+The hand path and `pnorm()` agree. On the exam you will have the supplied
+values, not R, so practise the hand path first and use R to check.
+
+#### The reverse direction: from percentile to raw value
+
+`pnorm()` turns a value into a cumulative probability. The reverse question
+--- which *value* has a given proportion below it --- is answered by
+inverting the standardisation:
+
+$$x=\mu+z\sigma,$$
+
+where $z$ is the standard-normal quantile for the chosen proportion.
+
+::: {#exm-b06-reverse}
+## Worked example: the 90th percentile of processing time
+
+For $Y\sim N(50,100)$, which processing time is exceeded by only 10% of
+cases? The supplied standard-normal quantile is $z_{0.90}=1.2816$.
+
+*Step 1.* The 90th percentile of $Z$ is 1.2816: it lies 1.2816 standard
+deviations above the mean.
+
+*Step 2.* Translate back to the scale of $Y$:
+
+$$x=\mu+z\sigma=50+1.2816\times 10=62.8 \text{ minutes.}$$
+
+*Step 3.* Verify with `qnorm()`, the inverse of `pnorm()`:
+
+```{r}
+#| label: b06-qnorm-check
+qnorm(0.90, mean = 50, sd = 10)
+```
+
+About 62.8 minutes --- 90% of processing times fall at or below it, 10%
+above.
+:::
+
+The same function confirms the 1.96 in the 95% rule: the central 95% of the
+standard normal runs between
+
+```{r}
+#| label: b06-qnorm-central
+qnorm(c(0.025, 0.975))
+```
+
+Lectures 8 and 9 use exactly these two numbers to build confidence
+intervals.
+
+### Checking the normal model against data
+
+The normal distribution is a model, not a label that every quantitative
+variable automatically deserves. Skewness, bounds, extreme outliers, or a
+few heavily repeated values can make it a poor description. The check is
+visual: draw the histogram of the data, overlay the normal curve with the
+same mean and standard deviation, and see whether the curve reproduces the
+bars.
+
+```{r}
+#| label: b06-equity-model
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+c(mean_equity = mean(sharks$equity_offered_pct),
+  sd_equity   = sd(sharks$equity_offered_pct))
+```
+
+```{r}
+#| label: fig-b06-equity-normal-check
+#| code-fold: true
+#| code-summary: "See the R code for this figure"
+#| fig-cap: "Initial equity offered across all 1,441 recorded pitches (green bars), with the normal density that has the same mean and standard deviation (orange curve). The curve misses the skew, the bounds, and the spikes at round percentages."
+library(ggplot2)
+
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+mean_equity <- mean(sharks$equity_offered_pct)
+sd_equity <- sd(sharks$equity_offered_pct)
+
+ggplot(sharks, aes(equity_offered_pct)) +
+  geom_histogram(aes(y = after_stat(density)),
+                 breaks = seq(0, 100, by = 5),
+                 fill = "#009E73", alpha = 0.85, colour = "white") +
+  stat_function(fun = dnorm,
+                args = list(mean = mean_equity, sd = sd_equity),
+                colour = "#D55E00", linewidth = 0.9) +
+  annotate("text", x = 42, y = 0.062, label = "observed pitches",
+           colour = "#17324D", size = 3.4, hjust = 0) +
+  annotate("text", x = 42, y = 0.054,
+           label = "normal curve with the same mean and SD",
+           colour = "#D55E00", size = 3.4, hjust = 0) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
+  labs(x = "Equity initially offered (%)", y = "Density") +
+  theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    plot.caption = element_text(colour = "#5B6976"),
+    axis.title = element_text(colour = "#17324D")
+  )
+```
+
+Read @fig-b06-equity-normal-check with the five-step sequence from
+Lecture 1. *Axes:* initial equity in percentage points against density, so
+bar **areas**, not heights alone, represent proportions of pitches.
+*Elements:* green bars are the 1,441 observed offers; the orange curve is
+$N(13.2,\,8.4^2)$, the normal model with the matching mean and SD.
+*Pattern:* the bars pile up between 5% and 20% and stretch out a long right
+tail. *Deviations:* the data are bounded between 0% and 100%, strongly
+right-skewed, and spiked at round values such as 10% and 20%; the symmetric
+curve puts visible probability below 0% and misses the spikes entirely.
+*Meaning:* the normal model **fails** for individual equity offers. A model
+is a choice, and this check rejects the choice.
+
+That failure is not the end of the normal distribution's usefulness ---
+almost the opposite. From Lecture 8 onwards the normal model returns to
+describe **sampling distributions** of averages, and it will fit those well
+*even though* the underlying variable is as skewed as this one. That result
+is the central limit theorem, and it is the reason the normal model earns
+its central place in statistics.
+
+### Quantiles of a model distribution
+
+A **quantile** of a distribution is the boundary value below which a chosen
+proportion of the probability lies. You already computed quantiles of
+*data* in Lectures 1 and 2 (quartiles, the median, the IQR of the equity
+offers). The same idea applies to a *model* distribution, and the reverse
+calculation above is exactly this: a quantile question.
+
+- **Uniform:** by symmetry, the median of $U(a,b)$ is the midpoint
+  $(a+b)/2$. For the session-timing model $U(0,90)$, the median start time
+  is 45 minutes --- half the probability lies on each side.
+- **Normal:** quartiles sit $0.6745$ standard deviations either side of the
+  mean, $\mu\pm 0.6745\sigma$. For $Y\sim N(50,100)$:
+
+```{r}
+#| label: b06-model-quantiles
+qnorm(c(0.25, 0.75), mean = 50, sd = 10)
+```
+
+So the middle half of the model distribution runs from about 43.3 to 56.7
+minutes. Nothing more is needed here: quantiles of data were covered
+earlier in the course, and quantiles of models are one `qnorm()` or one
+midpoint away.
+
+::: {.caveat-box}
+<span class="label">What a normal label can and cannot say</span>
+
+"$X$ is normally distributed" is a **model claim**, not a fact about every
+variable --- it must be checked, the way @fig-b06-equity-normal-check
+checked it and found it false for equity offers. The 68% and 95% rules are
+exact statements about the mathematical normal model; quoting them for a
+variable that is skewed, bounded, or spiked (most business variables are at
+least one of these) produces confident-sounding numbers that are simply
+wrong. Model probabilities such as $P(Y\le 65)=0.9332$ are conclusions
+*inside* the model $N(50,100)$; they say nothing about reality unless the
+model describes the data. And a fitted curve that matches the mean and SD
+of the data can still miss the shape entirely --- matching two summaries is
+not a fit. The legitimate uses ahead: the normal as a checked model for
+some variables, and --- from Lecture 8 --- as the reliable model for
+sampling distributions of averages, where mathematics rather than wishful
+thinking puts it there.
+:::
+
+### Answering the driving question
+
+No single negotiation time or invested amount has positive probability ---
+$P(X=x)=0$ --- so probabilities are assigned to **intervals** as areas
+under a density. For the uniform session model, the 18-minute window gets
+$18/90=0.20$ because only length matters. For the normal processing-time
+model $N(50,100)$, supplied $Z$ values give $P(Y\le 65)=0.9332$ and
+$P(40<Y<60)=0.6826$ by hand, and `pnorm()` confirms both. The catch: a
+density is a modelling choice, and the equity histogram shows the normal
+choice failing for real offers --- so check the model before trusting its
+areas.
+
+**Next:** We can now model quantities that live on a continuum and read
+probabilities as areas. Everything so far, though, treats the 1,441 records as
+the whole world --- and real analysis rarely has the whole world. Firms see
+samples: 100 audited transactions, 500 surveyed customers. Lecture 7 makes the
+move from one pitch to a *sample* of pitches: populations, frames, and random
+sampling, plus the discipline of parameters, estimators, and estimates on
+which all of inference stands.
+
+:::
+
+::: {.course-phase .phase-after}
+
+## After class
+
+<span class="time-budget">Total practice time: about 55 minutes.</span>
+
+### Retrieval (10 minutes)
+
+1. Why is $P(X=x)=0$ for a continuous random variable?
+2. What quantity under a PDF represents probability?
+3. How do you obtain $P(a<X\le b)$ from a CDF?
+4. What do $\mu$ and $\sigma$ control in a normal model?
+5. A density curve reaches a height of 2. Why is that not a contradiction?
+6. What does a z-score of $-1.5$ mean?
+
+::: {.callout-note collapse="true"}
+## Check your answers
+
+1. Probability belongs to intervals; an individual point has zero width and
+   therefore zero area.
+2. Area under the density curve between the interval boundaries.
+3. $F_X(b)-F_X(a)$.
+4. $\mu$ controls the centre and $\sigma$ the spread.
+5. Density is probability per unit, not probability. A height above 1 is
+   fine as long as the total area under the curve is 1.
+6. The value lies 1.5 standard deviations below the mean.
+:::
+
+### From worked to faded (5 minutes)
+
+Re-read the session-timing calculation (@exm-b06-uniform-session). Then
+complete the same calculation for a new model: a waiting time
+$X\sim U(10,30)$ minutes.
+
+*Step 1 (given).* The density height is $1/(30-10)=0.05$ on the support
+$[10,30]$ and zero outside it.
+
+*Step 2 (you).* Find $P(14<X<20)$.
+
+*Step 3 (you).* State $E[X]$ and interpret both numbers in one sentence.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+$P(14<X<20)=(20-14)/(30-10)=6/20=0.30$ and $E[X]=(10+30)/2=20$: the wait
+averages 20 minutes, and under the uniform model there is a 30% chance it
+lands between 14 and 20 minutes.
+:::
+
+### Practice (15 minutes)
+
+For items 3 and 4, use only these supplied values, then verify in R:
+
+```
+P(Z <=  1.5) = 0.9332
+P(Z <=  1.0) = 0.8413
+P(Z <= -1.0) = 0.1587
+z(0.90)      = 1.2816
+```
+
+1. For $X\sim U(10,30)$: find $\operatorname{SD}(X)$ and $P(X>25)$.
+2. A supplier delivers at a moment uniformly distributed between 09:00 and
+   13:00. Your goods lift is reserved for other tenants except during
+   12:00--13:00. What is the probability the delivery arrives while the
+   lift is available, and what is the density height per minute?
+3. Monthly demand for a product is modelled as $Y\sim N(200,400)$.
+   Calculate $P(Y\le 230)$ and $P(180<Y<220)$ by hand.
+4. Weekly revenue is modelled as $N(100,15^2)$ (in hundreds of euros).
+   Which revenue level is exceeded in only 10% of weeks? Compute by hand
+   with $x=\mu+z\sigma$, then verify with `qnorm()`.
+5. Explain in two sentences why the normal curve in
+   @fig-b06-equity-normal-check is not a convincing model for offered
+   equity.
+
+::: {.callout-note collapse="true"}
+## Check your answers
+
+1. $\operatorname{SD}(X)=\sqrt{(30-10)^2/12}=20/\sqrt{12}\approx 5.77$
+   minutes, and $P(X>25)=(30-25)/20=0.25$.
+2. The window is 60 of the 240 possible minutes, so $60/240=0.25$. The
+   density height is $1/240\approx 0.0042$ per minute --- and the
+   probability is the area $60\times(1/240)=0.25$, not the height.
+3. $\sigma=\sqrt{400}=20$. For 230: $z=(230-200)/20=1.5$, so
+   $P(Y\le 230)=0.9332$. For the interval:
+   $z_{\text{low}}=(180-200)/20=-1.0$ and
+   $z_{\text{high}}=(220-200)/20=1.0$, so
+   $P(180<Y<220)=0.8413-0.1587=0.6826$.
+4. $x=100+1.2816\times 15=119.2$, so about 119 hundred euros; only 10% of
+   weeks exceed it.
+5. The observed distribution is bounded between 0% and 100%, strongly
+   right-skewed, and concentrated at a few round percentages; the symmetric
+   normal curve reproduces none of those features.
+
+Verification in R for items 3 and 4:
+
+```{r}
+#| label: b06-practice-check
+pnorm(230, mean = 200, sd = 20)
+pnorm(220, mean = 200, sd = 20) - pnorm(180, mean = 200, sd = 20)
+qnorm(0.90, mean = 100, sd = 15)
+```
+:::
+
+### Spaced review: one item from Lecture 3 (5 minutes)
+
+The number of sharks who join an on-air deal, $X$, has PMF $p(1)=0.6$,
+$p(2)=0.3$, $p(3)=0.1$. Find $F(2)=P(X\le 2)$ and $P(X<2)$. Why do the two
+answers differ here, when for a continuous variable they would not?
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+$F(2)=0.6+0.3=0.9$, while $P(X<2)=P(X=1)=0.6$. They differ because the
+single point $X=2$ carries positive probability, $p(2)=0.3$. For a
+continuous variable every single point has probability zero, so $<$ and
+$\le$ give the same answer.
+:::
+
+### Changing units (5 minutes)
+
+The session-timing variable $X\sim U(0,90)$ is recorded in minutes and then
+converted to seconds. Explain what changes about the PDF and what remains
+unchanged.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+The support stretches from $[0,90]$ minutes to $[0,5400]$ seconds, and the
+density height drops from $1/90$ per minute to $1/5400$ per second --- the
+numerical size of a density depends on the units. Probabilities of
+corresponding time intervals are unchanged, because they are areas: the
+18-minute window becomes a 1,080-second window, and
+$1080/5400=18/90=0.20$.
+:::
+
+### Exam-style item (10 minutes)
+
+This item follows the pattern of Mock Exam Question 3. Let
+$X\sim U(20,60)$ be a waiting time in minutes and, separately,
+$Y\sim N(80,25)$ a processing time in minutes. Supplied:
+
+```
+P(Z <=  1.5) = 0.9332
+P(Z <=  1.0) = 0.8413
+P(Z <= -1.0) = 0.1587
+```
+
+1. State the PDF height of $X$, including its value outside the support.
+2. Calculate $P(30<X<40)$, $E[X]$, and $\operatorname{Var}(X)$.
+3. Standardise 87.5 minutes under the model for $Y$, then calculate
+   $P(Y\le 87.5)$.
+4. Calculate $P(75<Y<85)$.
+5. Explain why a PDF height is not itself a probability.
+
+::: {.callout-note collapse="true"}
+## Check a model answer
+
+1. $f_X(x)=1/(60-20)=0.025$ for $20\le x\le 60$, and $f_X(x)=0$ outside
+   that interval.
+2. $P(30<X<40)=(40-30)/40=0.25$, $E[X]=(20+60)/2=40$, and
+   $\operatorname{Var}(X)=(60-20)^2/12\approx 133.33$ square minutes.
+3. The variance is 25, so $\sigma=5$ and $z=(87.5-80)/5=1.5$; hence
+   $P(Y\le 87.5)=0.9332$.
+4. $P(75<Y<85)=P(-1<Z<1)=0.8413-0.1587=0.6826$.
+5. Probability is area over an interval --- approximately density times a
+   small interval width. A single point has zero width and hence zero
+   probability; a density value only becomes a probability once multiplied
+   by a width.
+:::
+
+### Make it yours (5 minutes)
+
+:::: {.utility-prompt}
+<span class="label">Utility: two sentences</span>
+
+Think of your EiA venture --- or any business you know well. Pick one
+continuous quantity that matters for it (a delivery time, weekly revenue,
+time on site) and write two sentences: first name the interval of values
+that would trigger a real decision, then say whether a uniform or a normal
+model seems defensible for that quantity --- and which feature of its
+histogram you would check first. There is no wrong answer; the point is
+connecting today's tools to something you care about.
+
+::: {.callout-note collapse="true"}
+## See an example, then write your own
+
+Take a student-run campus meal-prep box venture. "Delivery time is my quantity: anything over 40 minutes triggers a refund, so $P(T > 40)$ is the number that matters. A normal model is doubtful because times cannot be negative and a few deliveries go very wrong --- right skew is the first thing I would check on the histogram."
+:::
+
+You can discuss this task --- and any other task in this chapter --- with
+**Tilly**, the course AI assistant on Canvas: ask it to propose a
+distribution for your quantity and then challenge whether the normal
+model's assumptions actually hold for it.
+::::
+
+Continue to Lecture 7: Samples, parameters, and estimators.
+
+Formula sheet: Lecture 6 formulas.
+
+For a more formal explanation, consult
+[Nieuwenhuis, *Statistical Methods for Business and Economics*](https://tilburguniversity.on.worldcat.org/oclc/317545871),
+Chapter 10.
+
+:::

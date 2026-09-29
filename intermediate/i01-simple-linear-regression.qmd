@@ -1,0 +1,928 @@
+# Lecture 1: Simple linear regression {#i01}
+
+```{r}
+#| label: i01-setup
+#| include: false
+# Chunk options only. Every object used in this chapter is constructed in
+# visible code on this page, so that copying the code always works.
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
+                      fig.width = 7, fig.height = 4.5)
+```
+
+::: {.outcomes}
+<span class="label">By the end of Lecture 1, you can</span>
+
+- state a simple linear regression model and identify its components;
+- read the slope as a difference of conditional means, with units;
+- convert a coefficient between measurement units (dollars, $1,000s,
+  $100,000s);
+- distinguish observations, fitted values, errors, and residuals;
+- explain what least squares minimises and why;
+- compute a slope and intercept by hand on a tiny dataset;
+- fit a regression with `lm()` in R and interpret both coefficients within
+  the observed range.
+:::
+
+::: {.driving-question}
+<span class="label">Driving question</span>
+
+<p class="dq-context">The first question of deal-making: does asking for more get you more? A line fitted through the data turns that vague hunch into one number a founder can actually use.</p>
+
+Among pitches that reached a deal, does asking for more money go together
+with getting more money --- and by how much per dollar asked?
+:::
+
+::: {.course-phase .phase-before}
+
+## Before class
+
+<span class="time-budget">Total preparation time: about 30 minutes.</span>
+
+<div class="video-prep">
+<span class="label">Video preparation (10 minutes)</span><br>
+Watch Stanford Statistical Learning
+<a href="https://www.youtube.com/watch?v=vCHtY6Me5FI&list=PLoROMvodv4rOzrYsAxzQyHb8n_RWNuS1e&index=9">3.1
+Simple Linear Regression</a>. Focus on the population line, the fitted line,
+and least squares. All links are also listed in the
+<a href="../resources/video-guide.html">External Video Guide</a>.
+</div>
+
+**Reactivate the pentad (10 minutes).** QM Intermediate builds directly on
+the five quantities you met at the end of QM Basic --- estimate, standard
+error, t value, p-value, confidence interval. With the Basic formula sheet
+open, answer the five items below.
+
+1. A study reports an estimate of 12 with standard error 4. What is the t
+   value for testing whether the underlying quantity is zero?
+2. With a large sample, what multiplier goes into a 95% confidence interval?
+3. Compute that 95% interval for the estimate in item 1.
+4. The p-value is 0.003. Complete: "If the true value were zero, ..."
+5. Which of the five quantities has the same units as the estimate itself?
+
+::: {.callout-note collapse="true"}
+## Check your answers
+
+1. $t = 12/4 = 3$.
+2. Approximately 1.96 (the t multiplier is close to the normal 1.96 when the
+   degrees of freedom are large).
+3. $12 \pm 1.96 \times 4 = (4.2,\; 19.8)$.
+4. "... an estimate at least this far from zero would occur in about 0.3% of
+   samples."
+5. The standard error and both interval endpoints; the t value and p-value
+   are unit-free.
+:::
+
+**Define the variables (2 minutes).** For the 882 pitches with an on-air
+deal, this lecture works in **thousands of dollars**:
+
+- $Y_i$: agreed on-air deal amount, in $1,000s;
+- $X_i$: amount initially requested, in $1,000s.
+
+A pitch that asked for \$300,000 and agreed \$250,000 has $X_i = 300$ and
+$Y_i = 250$.
+
+**Predict (3 minutes).** Answer the one-click Mentimeter question posted on
+Canvas before you come to class: what are the **sign** and the **unit** of
+the slope in a regression of agreed amount on requested amount? Commit to an
+answer; the lecture resolves it.
+
+**R warm-up (5 minutes).** The standing warm-up for every Intermediate
+lecture: run a few lines of R and bring the output to class. This week, load
+the data, subset the deals, and plot agreed amount against requested amount:
+
+```{r}
+#| label: i01-prep-warmup
+#| eval: false
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+deals <- subset(sharks, deal_on_show == 1)
+deals$ask_1k <- deals$ask_amount_usd / 1000
+deals$deal_1k <- deals$deal_amount_usd / 1000
+plot(deals$ask_1k, deals$deal_1k)
+```
+
+If lines, slopes, intercepts, or subscripts are not secure, review
+[Mathematics Refresher: straight lines and indices](../resources/math-refresher.html).
+
+:::
+
+::: {.course-phase .phase-in-class}
+
+## In class
+
+The session opens with the usual four-minute entry quiz on the prep videos,
+then turns to the driving question.
+
+<p class="concept-video"><strong>Stanford explanation (review):</strong>
+<a href="https://www.youtube.com/watch?v=vCHtY6Me5FI">3.1 Simple Linear Regression</a>.</p>
+
+### Begin with the data
+
+The warm-up plot, polished. The construction is exactly the warm-up code:
+
+```{r}
+#| label: i01-build-deals
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+deals <- subset(sharks, deal_on_show == 1)
+deals$ask_1k <- deals$ask_amount_usd / 1000
+deals$deal_1k <- deals$deal_amount_usd / 1000
+nrow(deals)
+```
+
+```{r}
+#| label: fig-i01-scatter
+#| code-fold: true
+#| code-summary: "See the R code for this figure"
+#| fig-cap: "Agreed on-air deal amount against amount requested, for the 882 pitches with a deal. Both axes in $1,000s. The display zooms in on requests and deals up to $1 million (864 of 882 records); the orange least-squares line is fitted on all 882."
+library(ggplot2)
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+deals <- subset(sharks, deal_on_show == 1)
+deals$ask_1k <- deals$ask_amount_usd / 1000
+deals$deal_1k <- deals$deal_amount_usd / 1000
+deal_model <- lm(deal_1k ~ ask_1k, data = deals)
+display_deals <- subset(deals, ask_1k <= 1000 & deal_1k <= 1000)
+
+ggplot(display_deals, aes(x = ask_1k, y = deal_1k)) +
+  geom_point(alpha = 0.45, size = 1.6, colour = "#009E73") +
+  geom_abline(intercept = coef(deal_model)[1],
+              slope = coef(deal_model)[2],
+              colour = "#D55E00", linewidth = 0.9) +
+  annotate("text", x = 40, y = 985,
+           label = "Fitted regression (estimated on all 882 deals)",
+           colour = "#D55E00", size = 3.4, hjust = 0) +
+  coord_cartesian(xlim = c(0, 1030), ylim = c(0, 1030), expand = FALSE) +
+  labs(x = "Amount requested ($1,000s)",
+       y = "Agreed on-air deal amount ($1,000s)") +
+  theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    plot.caption = element_text(colour = "#5B6976"),
+    axis.title = element_text(colour = "#17324D")
+  )
+```
+
+Each point in @fig-i01-scatter is one pitch with an on-air deal. Read
+requested amount horizontally and agreed amount vertically; both axes use
+units of $1,000. The orange line gives the fitted conditional mean, not the
+outcome of every pitch. The display shows 864 of the 882 deal records so
+that the dense region is readable. Eighteen records above \$1 million on at
+least one axis are omitted from this display but retained when estimating
+the orange line. Always say when a graph is zoomed; otherwise readers may
+mistake the displayed range for the complete data.
+
+### Units first: money in thousands
+
+Every number this lecture produces carries the units of these two columns,
+so settle the units before any model. We divide raw dollar amounts by 1,000:
+a request of \$300,000 becomes `ask_1k = 300`. Scaling changes nothing about
+the relationship; it only makes axes and coefficients readable
+(`ask_amount_usd = 300000` and `ask_1k = 300` are the same fact).
+
+::: {#exm-i01-units}
+## Worked example: the same coefficient in three unit systems
+
+Later in this lecture, R will print an intercept of about 27.571 with both
+variables in $1,000s. Two lines of arithmetic read it:
+
+$$
+27.571 \text{ (in \$1,000s)} = 27.571 \times \$1{,}000 = \$27{,}571.
+$$
+
+Suppose a published paper measures both variables in \$100,000s instead.
+Dividing both $Y$ and $X$ by a further 100 shrinks the intercept by that
+factor but leaves the slope untouched, because the slope is a ratio of the
+two:
+
+$$
+\text{intercept: } 27.571 / 100 = 0.276 \text{ (in \$100,000s)},
+\qquad
+\text{slope: } 1.0085 \text{ (unchanged)}.
+$$
+
+And in raw dollars? Multiplying both variables by 1,000 gives an intercept
+of $27.571 \times 1000 = 27{,}571$ dollars --- and again the same slope,
+1.0085 dollars per dollar. The general rule: rescaling the outcome and the
+predictor by the **same** factor moves the intercept and leaves the slope
+alone; rescaling only one of them rescales the slope by that factor. When
+two sources disagree about a coefficient, check the units before suspecting
+the analysis.
+:::
+
+### The population model and the conditional mean
+
+The simple linear regression model is
+
+$$
+Y_i=\beta_0+\beta_1X_i+\varepsilon_i.
+$$
+
+Equivalently, the conditional mean is
+
+$$
+E[Y_i\mid X_i=x]=\beta_0+\beta_1x.
+$$
+
+- $Y_i$ is the outcome for observation $i$.
+- $X_i$ is the predictor.
+- $\beta_0$ is the population intercept.
+- $\beta_1$ is the population slope.
+- $\varepsilon_i$ is the part of $Y_i$ not represented by the line.
+
+The slope is a **difference of conditional means**:
+
+$$
+\beta_1
+=E[Y\mid X=x+1]-E[Y\mid X=x].
+$$
+
+It is the expected difference in $Y$ **associated with** a one-unit
+difference in $X$ --- here, the expected difference in agreed amount between
+pitches whose requests differ by \$1,000. "Associated with" is deliberate,
+and this is the one place the phrase is flagged: a regression line alone
+compares averages across observed groups; it does not identify what would
+happen if a given pitch *changed* its request. The caveat box at the end of
+the lecture collects the full scope statement.
+
+### Errors versus residuals
+
+The population line is a model statement; nobody has seen it. What we
+compute from data is the fitted sample line
+
+$$
+\widehat Y_i=b_0+b_1X_i,
+$$
+
+and, for each observation, the **residual** --- the vertical difference
+
+$$
+e_i=Y_i-\widehat Y_i.
+$$
+
+The error $\varepsilon_i$ and the residual $e_i$ play parallel roles in the
+two equations but are different objects, as @fig-i01-error-residual shows.
+
+```{r}
+#| label: fig-i01-error-residual
+#| code-fold: true
+#| code-summary: "See the R code for this figure"
+#| fig-width: 8
+#| fig-height: 3.6
+#| fig-cap: "The same seven observations twice. Left: the unknown population line with the errors ε (distances to the true line). Right: the fitted least-squares line with the residuals e (distances to the estimated line). Only the right panel can be computed from data."
+library(ggplot2)
+set.seed(101)
+x_er <- c(1, 2.2, 3.4, 4.6, 5.8, 7.0, 8.2)
+beta0_true <- 1; beta1_true <- 0.8
+y_er <- beta0_true + beta1_true * x_er + c(1.3, -1.5, 0.9, -0.8, 1.6, -1.2, 0.4)
+fit_er <- lm(y_er ~ x_er)
+
+panel_names <- c("Population line (unknown)", "Fitted line (computed)")
+er_df <- data.frame(
+  panel = factor(rep(panel_names, each = 7), levels = panel_names),
+  x = rep(x_er, 2),
+  y = rep(y_er, 2),
+  line_y = c(beta0_true + beta1_true * x_er, fitted(fit_er))
+)
+line_df <- data.frame(
+  panel = factor(panel_names, levels = panel_names),
+  intercept = c(beta0_true, coef(fit_er)[1]),
+  slope = c(beta1_true, coef(fit_er)[2])
+)
+label_df <- data.frame(
+  panel = factor(panel_names, levels = panel_names),
+  x = x_er[5] + 0.45,
+  y = c((y_er[5] + beta0_true + beta1_true * x_er[5]) / 2,
+        (y_er[5] + fitted(fit_er)[5]) / 2),
+  lab = c("epsilon[i]", "e[i]")
+)
+
+ggplot(er_df, aes(x = x, y = y)) +
+  geom_abline(data = line_df[1, ],
+              aes(intercept = intercept, slope = slope),
+              colour = "#5B6976", linewidth = 0.9, linetype = "dashed") +
+  geom_abline(data = line_df[2, ],
+              aes(intercept = intercept, slope = slope),
+              colour = "#D55E00", linewidth = 0.9) +
+  geom_segment(aes(xend = x, yend = line_y),
+               colour = "#0072B2", linewidth = 0.8) +
+  geom_point(size = 2.6, colour = "#009E73") +
+  geom_text(data = label_df, aes(x = x, y = y, label = lab),
+            parse = TRUE, colour = "#0072B2", size = 4) +
+  coord_cartesian(xlim = c(0, 9.4), ylim = c(0, 9.4)) +
+  facet_wrap(~ panel) +
+  labs(x = "Predictor X", y = "Outcome Y") +
+  theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    plot.caption = element_text(colour = "#5B6976"),
+    axis.title = element_text(colour = "#17324D"),
+    strip.text = element_text(colour = "#17324D", face = "bold")
+  )
+```
+
+- $\varepsilon_i = Y_i - (\beta_0+\beta_1X_i)$ measures the distance to the
+  **population** line. Because $\beta_0$ and $\beta_1$ are unknown,
+  $\varepsilon_i$ is never observed.
+- $e_i = Y_i - (b_0+b_1X_i)$ measures the distance to the **fitted** line.
+  It is computed from data, one number per observation.
+
+Residuals are our window on the errors, but they are estimates, not the
+thing itself --- Lecture 2 lives entirely in that window.
+
+::: {.callout-note collapse="true"}
+## Check: which object is observable?
+
+Only the residual $e_i$. The observed data give $Y_i$ and $X_i$; the fitted
+line gives $\widehat Y_i$, so $e_i = Y_i - \widehat Y_i$ is a computable
+number. The error $\varepsilon_i$ depends on the unknown population
+coefficients $\beta_0$ and $\beta_1$, so it can be reasoned about but never
+calculated.
+:::
+
+### Least squares: why vertical, why squared
+
+For observation $i$, the model predicts $\widehat Y_i$ at its observed
+$X_i$. The residual $e_i=Y_i-\widehat Y_i$ is therefore a difference in the
+**outcome's units** --- thousands of dollars of agreed amount, not distance
+on the page. A positive residual lies above the line; a negative residual
+lies below it.
+
+Adding raw residuals is not a useful score: positive and negative misses
+can cancel. Adding absolute residuals avoids cancellation, but the resulting
+objective has sharp corners and is harder to optimise algebraically. Squared
+residuals are non-negative, penalise large misses more strongly, and give a
+smooth objective with a tractable solution. This is a modelling choice, not
+a claim that squared error is the only possible loss function.
+
+Ordinary least squares chooses $b_0$ and $b_1$ to minimise
+
+$$
+\operatorname{SSE}=\sum_{i=1}^{n}e_i^2
+=\sum_{i=1}^{n}(Y_i-b_0-b_1X_i)^2.
+$$
+
+The initials **OLS** stand for **ordinary least squares**: the rule that
+fits the linear model by minimising this squared-error criterion.
+
+#### Try the criterion yourself
+
+Drag either square handle. The vertical segments are residuals; the
+displayed SSE updates after every move. In class the widget stays open over
+the break with a target SSE to beat; then reveal the line with the smallest
+SSE.
+
+<style>
+.ls-lab {
+  background: #fff;
+  border: 1px solid #d5dbe0;
+  border-radius: 8px;
+  margin: 1.2em 0 1.5em;
+  padding: 1em;
+}
+.ls-lab-heading,
+.ls-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8em 1.2em;
+  justify-content: space-between;
+}
+.ls-lab svg {
+  display: block;
+  height: auto;
+  margin: 0.5em auto;
+  max-width: 700px;
+  touch-action: none;
+  width: 100%;
+}
+.ls-controls {
+  display: grid;
+  gap: 0.8em 1.4em;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0.6em 0 1em;
+}
+.ls-controls label {
+  color: #17324d;
+  font-size: 0.9em;
+  font-weight: 600;
+}
+.ls-controls input {
+  display: block;
+  margin-top: 0.3em;
+  width: 100%;
+}
+.ls-actions button {
+  background: #17324d;
+  border: 1px solid #17324d;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  padding: 0.45em 0.8em;
+}
+.ls-actions button + button {
+  background: #fff;
+  color: #17324d;
+}
+.ls-caption {
+  color: #53606b;
+  font-size: 0.9em;
+  margin-bottom: 0;
+}
+.ls-axis { stroke: #65727e; stroke-width: 1.2; }
+.ls-tick { fill: #53606b; font-size: 13px; }
+.ls-label { fill: #263b4b; font-size: 15px; }
+.ls-point { fill: #0072b2; stroke: #17324d; stroke-width: 1; }
+.ls-fit-line { stroke: #d55e00; stroke-width: 3; }
+.ls-residual { stroke: #755f93; stroke-width: 2; stroke-dasharray: 4 3; }
+.ls-handle { fill: #f0e442; stroke: #17324d; stroke-width: 2; cursor: ns-resize; }
+.ls-handle:focus { outline: 3px solid #56b4e9; outline-offset: 2px; }
+@media (max-width: 767px) {
+  .ls-controls {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+
+<div id="least-squares-lab" class="ls-lab" role="group" aria-labelledby="ls-lab-title">
+<div class="ls-lab-heading">
+<strong id="ls-lab-title">Least-squares line lab</strong>
+<span id="ls-equation" aria-live="polite"></span>
+</div>
+<svg id="ls-svg" viewBox="0 0 700 390" role="img" aria-label="Scatterplot with a draggable line and vertical residual segments"></svg>
+<div class="ls-controls">
+<label>Line height at x = 1
+<input id="ls-left" type="range" min="0" max="10" step="0.05" value="3">
+</label>
+<label>Line height at x = 9
+<input id="ls-right" type="range" min="0" max="10" step="0.05" value="7">
+</label>
+</div>
+<div class="ls-actions">
+<button id="ls-best" type="button">Show least-squares fit</button>
+<button id="ls-reset" type="button">Try another line</button>
+<strong id="ls-sse" aria-live="polite"></strong>
+</div>
+<p class="ls-caption">Squares make every contribution to SSE non-negative. Longer residuals contribute disproportionately because their lengths are squared.</p>
+</div>
+
+<script>
+(function () {
+  const root = document.getElementById("least-squares-lab");
+  if (!root || root.dataset.ready) return;
+  root.dataset.ready = "true";
+  const svg = root.querySelector("#ls-svg");
+  const left = root.querySelector("#ls-left");
+  const right = root.querySelector("#ls-right");
+  const equation = root.querySelector("#ls-equation");
+  const sseText = root.querySelector("#ls-sse");
+  const points = [
+    {x:1, y:1.8}, {x:2, y:1.4}, {x:3, y:3.2},
+    {x:4, y:4.8}, {x:5, y:4.2}, {x:6, y:6.8},
+    {x:7, y:6.4}, {x:8, y:8.6}, {x:9, y:8.2}
+  ];
+  const ns = "http://www.w3.org/2000/svg";
+  const box = {left:58, right:680, top:18, bottom:336};
+  const sx = x => box.left + x / 10 * (box.right - box.left);
+  const sy = y => box.bottom - y / 10 * (box.bottom - box.top);
+  const add = (name, attrs, parent=svg) => {
+    const el = document.createElementNS(ns, name);
+    Object.entries(attrs).forEach(([k,v]) => el.setAttribute(k, v));
+    parent.appendChild(el); return el;
+  };
+  add("line", {x1:box.left, y1:box.bottom, x2:box.right, y2:box.bottom, class:"ls-axis"});
+  add("line", {x1:box.left, y1:box.top, x2:box.left, y2:box.bottom, class:"ls-axis"});
+  [0,2,4,6,8,10].forEach(v => {
+    add("line", {x1:sx(v), y1:box.bottom, x2:sx(v), y2:box.bottom+6, class:"ls-axis"});
+    const tx=add("text", {x:sx(v), y:box.bottom+25, class:"ls-tick"}); tx.textContent=v;
+    add("line", {x1:box.left-6, y1:sy(v), x2:box.left, y2:sy(v), class:"ls-axis"});
+    const ty=add("text", {x:box.left-12, y:sy(v)+4, class:"ls-tick", "text-anchor":"end"}); ty.textContent=v;
+  });
+  const xl=add("text", {x:(box.left+box.right)/2, y:382, class:"ls-label", "text-anchor":"middle"}); xl.textContent="Predictor x";
+  const yl=add("text", {x:16, y:(box.top+box.bottom)/2, class:"ls-label", transform:`rotate(-90 16 ${(box.top+box.bottom)/2})`, "text-anchor":"middle"}); yl.textContent="Outcome y";
+  const residualGroup=add("g", {class:"ls-residuals"});
+  const line=add("line", {class:"ls-fit-line"});
+  const handleLeft=add("rect", {width:16, height:16, rx:2, class:"ls-handle", "aria-hidden":"true"});
+  const handleRight=add("rect", {width:16, height:16, rx:2, class:"ls-handle", "aria-hidden":"true"});
+  points.forEach(p => add("circle", {cx:sx(p.x), cy:sy(p.y), r:5.5, class:"ls-point"}));
+  const meanX=points.reduce((a,p)=>a+p.x,0)/points.length;
+  const meanY=points.reduce((a,p)=>a+p.y,0)/points.length;
+  const bestSlope=points.reduce((a,p)=>a+(p.x-meanX)*(p.y-meanY),0) /
+                  points.reduce((a,p)=>a+(p.x-meanX)**2,0);
+  const bestIntercept=meanY-bestSlope*meanX;
+  const fitFromHeights = () => {
+    const y1=Number(left.value), y9=Number(right.value);
+    const slope=(y9-y1)/8, intercept=y1-slope;
+    return {intercept, slope};
+  };
+  function draw() {
+    const {intercept, slope}=fitFromHeights();
+    residualGroup.replaceChildren();
+    let sse=0;
+    points.forEach(p => {
+      const fitted=intercept+slope*p.x;
+      sse+=(p.y-fitted)**2;
+      add("line", {x1:sx(p.x), y1:sy(p.y), x2:sx(p.x), y2:sy(fitted), class:"ls-residual"}, residualGroup);
+    });
+    line.setAttribute("x1", sx(0)); line.setAttribute("y1", sy(intercept));
+    line.setAttribute("x2", sx(10)); line.setAttribute("y2", sy(intercept+10*slope));
+    [[handleLeft,1,Number(left.value)],[handleRight,9,Number(right.value)]].forEach(([h,x,y])=>{
+      h.setAttribute("x",sx(x)-8); h.setAttribute("y",sy(y)-8);
+    });
+    equation.textContent=`ŷ = ${intercept.toFixed(2)} ${slope<0?"−":"+"} ${Math.abs(slope).toFixed(2)}x`;
+    sseText.textContent=`SSE = ${sse.toFixed(2)}`;
+  }
+  function drag(handle, slider) {
+    handle.addEventListener("pointerdown", event => {
+      handle.setPointerCapture(event.pointerId);
+      const move = e => {
+        const rect=svg.getBoundingClientRect();
+        const svgY=(e.clientY-rect.top)*390/rect.height;
+        const y=Math.max(0,Math.min(10,(box.bottom-svgY)*10/(box.bottom-box.top)));
+        slider.value=y.toFixed(2); draw();
+      };
+      handle.addEventListener("pointermove", move);
+      handle.addEventListener("pointerup", () => handle.removeEventListener("pointermove", move), {once:true});
+    });
+  }
+  drag(handleLeft,left); drag(handleRight,right);
+  root.querySelector("#ls-best").addEventListener("click",()=>{
+    left.value=(bestIntercept+bestSlope).toFixed(2);
+    right.value=(bestIntercept+9*bestSlope).toFixed(2); draw();
+  });
+  root.querySelector("#ls-reset").addEventListener("click",()=>{
+    left.value=3; right.value=7; draw();
+  });
+  draw();
+})();
+</script>
+
+The line that minimises SSE has closed-form coefficients. For simple
+regression,
+
+$$
+b_1=\frac{s_{XY}}{s_X^2},
+\qquad
+b_0=\bar y-b_1\bar x,
+$$
+
+where $s_{XY}$ is the sample covariance of $X$ and $Y$ and $s_X^2$ is the
+sample variance of $X$. The second formula rearranges to
+$\bar y = b_0 + b_1\bar x$: the fitted line always passes through the point
+of means $(\bar x,\bar y)$.
+
+::: {#exm-i01-toy}
+## Worked example: least squares by hand on three points
+
+Three observations: $(1,2)$, $(2,5)$, $(3,5)$. Every sum written out.
+
+**Means.** $\bar x = (1+2+3)/3 = 2$ and $\bar y = (2+5+5)/3 = 4$.
+
+**Deviations and their products.**
+
+| $i$ | $x_i-\bar x$ | $y_i-\bar y$ | $(x_i-\bar x)(y_i-\bar y)$ | $(x_i-\bar x)^2$ |
+|---|---:|---:|---:|---:|
+| 1 | $-1$ | $-2$ | $2$ | $1$ |
+| 2 | $0$ | $1$ | $0$ | $0$ |
+| 3 | $1$ | $1$ | $1$ | $1$ |
+| **Sum** | | | $3$ | $2$ |
+
+**Covariance and variance.** Dividing both sums by $n-1=2$:
+$s_{XY} = 3/2 = 1.5$ and $s_X^2 = 2/2 = 1$.
+
+**Slope and intercept.**
+
+$$
+b_1 = \frac{s_{XY}}{s_X^2} = \frac{1.5}{1} = 1.5,
+\qquad
+b_0 = \bar y - b_1\bar x = 4 - 1.5\times 2 = 1.
+$$
+
+The fitted line is $\widehat y = 1 + 1.5x$. @fig-i01-toy confirms the third
+fact: the line passes exactly through $(\bar x,\bar y)=(2,4)$. The residuals
+are $-0.5$, $+1$, $-0.5$ --- and they sum to zero, as least-squares
+residuals always do when the model has an intercept.
+:::
+
+```{r}
+#| label: fig-i01-toy
+#| code-fold: true
+#| code-summary: "See the R code for this figure"
+#| fig-width: 5.4
+#| fig-height: 4.2
+#| fig-cap: "The three-point toy dataset with its least-squares line. The open diamond marks the point of means (2, 4), which the fitted line passes through exactly."
+library(ggplot2)
+x_toy <- c(1, 2, 3); y_toy <- c(2, 5, 5)
+toy_fit <- lm(y_toy ~ x_toy)
+toy_df <- data.frame(x = x_toy, y = y_toy, fitted = fitted(toy_fit))
+
+ggplot(toy_df, aes(x = x, y = y)) +
+  geom_abline(intercept = coef(toy_fit)[1], slope = coef(toy_fit)[2],
+              colour = "#D55E00", linewidth = 0.9) +
+  geom_segment(aes(xend = x, yend = fitted),
+               colour = "#0072B2", linewidth = 0.8, linetype = "dashed") +
+  geom_point(size = 3, colour = "#009E73") +
+  annotate("point", x = 2, y = 4, shape = 5, size = 3.4, stroke = 1.1,
+           colour = "#17324D") +
+  annotate("text", x = 2.34, y = 3.72,
+           label = "'('*bar(x)*', '*bar(y)*')'", parse = TRUE,
+           colour = "#17324D", size = 3.4) +
+  coord_cartesian(xlim = c(0.5, 3.5), ylim = c(1, 6)) +
+  labs(x = "x", y = "y") +
+  theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    plot.caption = element_text(colour = "#5B6976"),
+    axis.title = element_text(colour = "#17324D")
+  )
+```
+
+You can verify the hand calculation in one line:
+
+```{r}
+#| label: i01-toy-check
+coef(lm(c(2, 5, 5) ~ c(1, 2, 3)))
+```
+
+### Fit and read the Shark Tank model in R
+
+Now the real data. The construction is repeated so this block runs on its
+own --- it is the same subset and the same $1,000-unit columns as the
+warm-up:
+
+```{r}
+#| label: i01-fit
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+deals <- subset(sharks, deal_on_show == 1)
+deals$ask_1k <- deals$ask_amount_usd / 1000
+deals$deal_1k <- deals$deal_amount_usd / 1000
+
+deal_model <- lm(deal_1k ~ ask_1k, data = deals)
+coef(deal_model)
+```
+
+The fitted equation is approximately
+
+$$
+\widehat{\text{deal amount}}
+=27.571+1.0085\times\text{amount requested},
+$$
+
+with both monetary variables measured in $1,000s.
+
+**The slope, with units.** One additional \$1,000 requested is associated
+with about \$1,008.50 more in the fitted agreed amount among pitches that
+reached an on-air deal --- close to dollar-for-dollar. It does not mean that
+asking for more causes investors to offer more.
+
+**The intercept, with units.** The intercept predicts about \$27,571 at a
+request of zero. A zero request lies outside the observed range (the
+smallest request in the data is \$10,000) and is not substantively
+meaningful; an intercept can be mathematically necessary without having a
+useful standalone interpretation.
+
+Observed, fitted, and residual for the first rows:
+
+```{r}
+#| label: i01-fitted-residual
+head(data.frame(
+  observed = deals$deal_1k,
+  fitted = fitted(deal_model),
+  residual = residuals(deal_model)
+))
+```
+
+For every row, `observed = fitted + residual`. Check it on the first row:
+the pitch asked \$50,000 and agreed \$50,000; the model fits
+$27.571 + 1.0085 \times 50 = 77.996$, and indeed
+$50 = 77.996 + (-27.996)$.
+
+### Prediction inside the evidence boundary
+
+```{r}
+#| label: i01-one-prediction
+predict(deal_model, newdata = data.frame(ask_1k = 300))
+```
+
+For a \$300,000 request (`ask_1k = 300`), the fitted mean agreed amount is
+about 330.12, that is, \$330,124. This is a model-based average, not a
+guarantee for a new pitch. If such a pitch actually agreed \$250,000, its
+residual would be
+
+$$
+e = 250 - 330.12 = -80.12,
+$$
+
+about \$80,124 **below** the fitted conditional mean. Predictions are
+defensible only inside the range of requests the data contain; extrapolating
+far beyond it would rely almost entirely on the assumed line.
+
+::: {.caveat-box}
+<span class="label">What this fitted line can and cannot say</span>
+
+The slope 1.0085 describes an **association** among the 882 televised
+pitches that reached an on-air deal. Three limits apply.
+
+- **Association, not causation.** Requests were not randomly assigned.
+  Pitches asking for more differ in many other ways --- stage, industry,
+  revenue --- that also move agreed amounts.
+- **Selection into deals.** The analysis conditions on reaching a deal.
+  Pitches without a deal are structurally excluded, so the line describes
+  deal records, not all pitches, and certainly not all start-ups.
+- **No advice about changing an ask.** The model does not say that a
+  founder who raises their request by \$1,000 will walk away with \$1,008.50
+  more. That is a claim about an intervention, which this observational
+  comparison cannot support.
+:::
+
+### Answering the driving question
+
+Among pitches that reached a deal: yes, asking for more goes together with
+getting more, almost one-for-one. The fitted slope is 1.0085, so each extra
+\$1,000 requested is associated with about \$1,008.50 more agreed on
+air --- about \$1.01 per dollar asked --- with the caveat box's limits
+attached.
+
+**Next:** We now have a fitted line and can read its slope in money terms. But
+least squares will draw an equally confident line through terrible data ---
+the software never warns you. Lecture 2 lays out the assumptions under which
+the line means what we claimed (linearity of the average, equal spread,
+independence, and design conditions no plot can certify) and teaches the
+diagnostics: reading residual plots, and spotting the single influential pitch
+that can bend an entire fit.
+
+:::
+
+::: {.course-phase .phase-after}
+
+## After class
+
+<span class="time-budget">Total practice time: about 60 minutes.</span>
+
+### Retrieval (10 minutes)
+
+1. What is the difference between $\varepsilon_i$ and $e_i$?
+2. What does least squares minimise?
+3. Why must a slope interpretation include units?
+4. Why can an intercept be mathematically valid but substantively unhelpful?
+5. Why is the slope not automatically causal?
+
+::: {.callout-note collapse="true"}
+## Check your answers
+
+1. $\varepsilon_i$ is an unobserved population-model error (distance to the
+   unknown population line); $e_i$ is the observed residual after fitting
+   the sample line.
+2. The sum of squared residuals, $\operatorname{SSE}=\sum_i e_i^2$.
+3. The slope is change in outcome units per one predictor unit; without
+   units the number 1.0085 could mean anything.
+4. The value $X=0$ may lie outside the observed range or lack substantive
+   meaning.
+5. The predictor was not randomly assigned and other factors may affect both
+   variables.
+:::
+
+### From worked to faded (20 minutes)
+
+Re-read the prediction calculation in the chapter (fitted value at
+`ask_1k = 300`). Then complete the same calculation for a new request.
+
+*Step 1 (given).* A pitch requests \$400,000, so `ask_1k = 400`. The fitted
+equation is $\widehat{\text{deal}} = 27.571 + 1.0085 \times \text{ask}$.
+
+*Step 2 (you).* Compute the fitted agreed amount, in $1,000s and in dollars.
+
+*Step 3 (you).* The pitch actually agreed \$350,000. Compute the residual
+and interpret its sign in one sentence.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+Fitted: $27.571 + 1.0085 \times 400 = 430.97$, about \$430,975. Residual:
+$350 - 430.97 = -80.97$, about $-\$80{,}975$. The negative sign means this
+pitch agreed less than the model's fitted conditional mean for a \$400,000
+request.
+
+```{r}
+#| label: i01-faded-check
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+deals <- subset(sharks, deal_on_show == 1)
+deals$ask_1k <- deals$ask_amount_usd / 1000
+deals$deal_1k <- deals$deal_amount_usd / 1000
+deal_model <- lm(deal_1k ~ ask_1k, data = deals)
+unname(350 - predict(deal_model, newdata = data.frame(ask_1k = 400)))
+```
+:::
+
+Then the unassisted set:
+
+1. Use the fitted equation to predict the agreed amount for requests of
+   \$100,000 and \$500,000.
+2. Calculate the residual for a pitch that requested \$300,000 and agreed
+   \$250,000.
+3. Explain why `lm(y ~ x, data = df)` treats the variable left of `~` as
+   the outcome.
+
+::: {.callout-note collapse="true"}
+## Check your answers
+
+1. Substitute `ask_1k = 100` and `ask_1k = 500`; the fitted values are about
+   128.42 and 531.83 in $1,000s --- \$128,422 and \$531,826.
+2. The fitted amount is about 330.12 in $1,000s, so the residual is
+   $250-330.12\approx-80.12$, or about $-\$80{,}124$.
+3. R formulas use `outcome ~ predictors`: the left-hand side is what the
+   model predicts, the right-hand side is what it predicts from.
+:::
+
+### Practice: a regression of your own (15 minutes)
+
+Fit `equity_offered_pct ~ season` on the full dataset (all 1,441 pitches)
+and interpret both coefficients with units. State the unit of every quantity
+you report.
+
+::: {.callout-note collapse="true"}
+## Check your answers
+
+```{r}
+#| label: i01-practice-equity
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+coef(lm(equity_offered_pct ~ season, data = sharks))
+```
+
+The fitted intercept is about 20.46 percentage points and the slope about
+$-0.824$ percentage points per season. Later seasons are associated with
+smaller initial equity offers on average. The outcome and intercept use
+percentage points; the predictor uses seasons; the slope uses percentage
+points per season.
+:::
+
+### Spaced review: one pentad item from QM Basic (5 minutes)
+
+A market survey of $n = 400$ customers gives an average willingness to pay
+of €24.60 with standard error €1.10. Write down the t value for testing a
+benchmark of €22 and the 95% confidence interval, and say in one sentence
+what the interval estimates.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+$t = (24.60-22)/1.10 \approx 2.36$; the interval is
+$24.60 \pm 1.96\times1.10 = (22.44,\; 26.76)$ euros. It is a range of
+plausible values for the population mean willingness to pay, under the
+sampling model from QM Basic.
+:::
+
+### Worked exam interpretation (5 minutes)
+
+**Question** (mock exam Question 1 pattern). A model of venture sales
+growth (percentage points) on marketing spending (€10,000s) reports
+$\widehat{\text{growth}} = 6.60 + 1.38\,\text{spending}$. Interpret the
+slope with units, and calculate the fitted value and residual for a venture
+spending €30,000 with observed growth of 15 percentage points.
+
+::: {.callout-note collapse="true"}
+## Check a model answer
+
+Each additional €10,000 of marketing spending is associated with 1.38
+percentage points higher fitted sales growth among sampled ventures.
+€30,000 is `spending = 3`, so the fitted value is
+$6.60+1.38\times3=10.74$ percentage points; the residual is
+$15-10.74=4.26$ percentage points --- observed growth exceeds the fitted
+value.
+:::
+
+### Make it yours (5 minutes)
+
+:::: {.utility-prompt}
+<span class="label">Utility: two sentences</span>
+
+Think of your EiA3 venture --- or any business you know well. Name one
+numerical outcome and one numerical input you suspect drives it, and write
+two sentences: first state the slope you would expect (sign and units), then
+say what decision would change if the fitted slope turned out to be near
+zero. There is no wrong answer; the point is connecting today's tool to
+something you care about.
+
+::: {.callout-note collapse="true"}
+## See an example, then write your own
+
+Take a student-run campus meal-prep box venture. "Outcome: weekly orders; input: euros of social-media spend that week --- I expect a positive slope of a few orders per extra €100. If the fitted slope came out near zero, I would move the whole budget to campus flyers."
+:::
+
+You can discuss this task --- and any other task in this chapter --- with
+**Tilly**, the course AI assistant on Canvas: ask it whether your
+outcome-input pair is more likely to suffer from selection (like analysing
+only deals) or from reverse causation.
+::::
+
+Continue to Lecture 2: What the model assumes and how residuals betray it.
+
+Formula sheet: Lecture 1 formulas.
+
+For a more formal treatment, see James et al., *An Introduction to
+Statistical Learning*, 2nd ed., Sections 3.1 and 3.6.2, and
+[Nieuwenhuis, *Statistical Methods for Business and Economics*](https://tilburguniversity.on.worldcat.org/oclc/317545871),
+Chapter 19.
+
+:::
