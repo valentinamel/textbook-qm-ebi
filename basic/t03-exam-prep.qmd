@@ -12,24 +12,22 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 ::: {.outcomes}
 <span class="label">By the end of Tutorial 3, you can</span>
 
-- identify a valid population and sampling frame;
-- distinguish parameters, estimators, and estimates;
-- calculate standard errors for a mean and a proportion;
-- calculate and interpret quartiles and the IQR of a realised sample;
+- identify a valid population and sampling frame
+- distinguish parameters, estimators, and estimates
+- calculate standard errors for a mean and a proportion
+- calculate and interpret quartiles and the IQR of an observed sample
 - use normal-model and CLT probabilities without confusing observations
-  and statistics;
+  and statistics
 - qualify conclusions when the sampling design is limited.
 :::
 
-Tutorials are **exam preparation sessions**: every task below follows the
-format of the final exam. The standing routine for each task is the same ---
-the TA states the task, pairs work on it first for a few minutes with AI use
-allowed, and the solution is then discussed in plenary, starting from the
-pair attempts.
+Tutorials are **exam preparation sessions**. Every task below follows the
+format of the final exam. You first try each task in pairs. You may use AI for this, following
+Attempt, Ask, Verify, Explain. Then the solution is discussed together.
 
 This tutorial covers Lectures 6--8. The t distribution belongs to Lecture 9
-and is rehearsed in Tutorial 4; everything here runs on the normal model
-and the CLT.
+and is practised in Tutorial 4. Everything here uses the normal model and
+the CLT.
 
 ::: {.course-phase .phase-before}
 
@@ -58,27 +56,28 @@ Complete from memory:
 2. A parameter describes a population.
 3. An estimator is a sample-based random rule used to estimate a parameter.
 4. $\sigma/\sqrt n$, estimated by $S/\sqrt n$ when $\sigma$ is unknown.
-5. The approximate distribution of a properly standardised sum or mean:
-   nearly normal for a large independent sample.
+5. The distribution of the sample mean across random samples. It is
+   approximately normal for a large independent sample.
 :::
 
 :::
 
 ::: {.course-phase .phase-in-class}
 
-## In class
+## In the tutorial
 
 Attempt each task before opening its answer. A complete written answer
 names the quantity, shows the calculation, reports the value and units,
-interprets it in context, and states an important model or measurement
-boundary.
+interprets it in context, and states one important limit of the model or
+the data.
 
-### Task 1 --- Population, frame, and claim
+### Task 1: Population, frame, and claim
 
-A student randomly selects 100 rows from the teaching file and estimates
-the mean initial equity offered.
+A student randomly selects 100 rows from the Shark Tank file and estimates
+the mean equity offered (`equity_offered_pct`).
 
-1. State the population to which this design directly supports inference.
+1. State the population about which this sample directly supports
+   conclusions.
 2. Explain why it does not represent all *Shark Tank* applicants.
 3. Explain why it does not represent all US entrepreneurs.
 4. State one change needed to target all US entrepreneurs.
@@ -94,7 +93,7 @@ Targeting all US entrepreneurs would require an appropriate national
 sampling frame and random selection from that frame.
 :::
 
-### Task 2 --- Reproduce the realised sample
+### Task 2: Reproduce the realised sample
 
 The sample is drawn with a visible seed, exactly as in Lecture 7, so every
 reader gets the same 100 rows:
@@ -117,17 +116,22 @@ c(
 )
 ```
 
-1. Identify the parameter, estimator, and estimate for mean equity.
-2. Identify the parameter, estimator, and estimate for the deal proportion.
-3. Calculate the IQR of equity and interpret it.
+1. Identify the parameter, estimator, and estimate for the mean equity
+   offered (`equity_offered_pct`).
+2. Identify the parameter, estimator, and estimate for the deal proportion
+   (`deal_on_show`).
+3. Calculate the interquartile range (IQR) of the equity offered in the
+   sample and interpret it. The IQR is defined in
+   [Lecture 1](b01-introduction-data-analysis.qmd#b01-quartiles).
 4. Explain why a different seed can produce different estimates and a
    different IQR.
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-For equity, the parameter is the population mean $\mu$, the estimator is
-$\bar X$, and the estimate is $\bar x=12.76$. For deal outcome, the
+For the equity offered, the parameter is the population mean $\mu$, the
+estimator is $\bar X$, and the estimate is $\bar x=12.76$%. For the deal
+outcome, the
 parameter is the population proportion $p$, the estimator is $\widehat P$,
 and the estimate is $\hat p=0.64$. The sample quartiles are $Q_1=8$ and
 $Q_3=17.75$, so $\operatorname{IQR}=17.75-8=9.75$ percentage points: the
@@ -136,13 +140,15 @@ different seed selects a different random set of rows, so all realised
 sample statistics, including the IQR, can change.
 :::
 
-### Task 3 --- Standard errors and sample size
+### Task 3: Standard errors and sample size
 
 Use the sample output above.
 
-1. Estimate $\operatorname{SE}(\bar X)$.
-2. Estimate $\operatorname{SE}(\widehat P)$.
-3. Check the success--failure condition for $\widehat P$.
+1. Calculate the estimated standard error of the mean equity offered,
+   $\widehat{\operatorname{SE}}(\bar X)$.
+2. Calculate the estimated standard error of the deal proportion,
+   $\widehat{\operatorname{SE}}(\widehat P)$ (Lecture 8).
+3. Check the success-failure condition for $\widehat P$.
 4. Predict how each SE changes if $n$ increases from 100 to 400 while the
    estimated spread remains similar.
 5. The sample SD in part 1 was calculated with `sd()`, which divides by
@@ -160,25 +166,28 @@ $$
 =\sqrt{0.64(0.36)/100}=0.0480.
 $$
 
-The sample contains 64 successes and 36 failures, so both are at least 10.
-Increasing $n$ fourfold divides both SEs by $\sqrt 4=2$. The divisor is
+The first is about 0.77 percentage points of equity, the second about 4.8
+percentage points of the deal rate. The sample contains 64 successes and 36
+failures, so both are at least 10. Increasing $n$ fourfold divides both SEs by $\sqrt 4=2$. The divisor is
 $n-1=99$: the deviations are measured from the estimated sample mean and
 must sum to zero, so only 99 of them vary freely, and dividing by 99
 removes the resulting downward bias (Lecture 7).
 :::
 
-### Task 4 --- One pitch versus one mean
+### Task 4: One pitch versus one mean
 
-Suppose the population mean is $\mu=13.21$, the population SD is
-$\sigma=8.44$, and samples of $n=100$ are drawn independently.
+Suppose the population mean of the equity offered is $\mu=13.21$%, the
+population SD is $\sigma=8.44$ percentage points, and samples of $n=100$ are
+drawn independently. Supplied values: $P(Z\le 2.12)=0.983$ and
+$P(Z\le 0.21)=0.583$.
 
 1. State the approximate sampling distribution of $\bar X$.
 2. Calculate $P(\bar X>15)$.
 3. A classmate instead models a *single* pitch as
    $X\sim N(13.21, 8.44^2)$ and calculates $P(X>15)$. Compute that value
    too, and explain why the two answers are so different.
-4. Which of the two normal models did Lecture 6 reject for equity offers,
-   and why does the CLT nevertheless justify the calculation in part 2?
+4. Which of the two normal models did Lecture 6 reject for the equity
+   offered, and why does the CLT still justify the calculation in part 2?
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
@@ -189,8 +198,8 @@ Therefore
 
 $$
 P(\bar X>15)
-=1-\Phi\!\left(\frac{15-13.21}{0.844}\right)
-=1-\Phi(2.12)
+=1-P\!\left(Z\le\frac{15-13.21}{0.844}\right)
+=1-P(Z\le2.12)
 \approx0.017.
 $$
 
@@ -198,41 +207,42 @@ For a single pitch, $z=(15-13.21)/8.44\approx0.21$, so
 $P(X>15)\approx0.42$. The mean of 100 pitches varies ten times less than
 one pitch ($\sigma/\sqrt{100}$), so 15 is an ordinary value for one pitch
 but an extreme value for a mean of 100. Lecture 6 rejected the normal
-model for the *pitch-level* variable --- equity offers are strongly
-right-skewed --- so part 3 is a bad model. The CLT concerns the *sample
-mean*: averaging 100 independent draws produces a nearly normal sampling
-distribution even from a skewed population, which is why part 2 is
-defensible.
+model for single pitches, because the equity offered is strongly
+right-skewed. So the model in part 3 is a bad model. The CLT concerns the
+sample mean. Averaging 100 independent draws gives a nearly normal sampling
+distribution even from a skewed population, which is why the calculation in
+part 2 is justified.
 :::
 
-### Task 5 --- A proportion through the CLT
+### Task 5: A proportion through the CLT
 
-The frame deal proportion is $p=0.612$. A random sample of $n=100$
-pitches is planned, with sample deal proportion $\widehat P$.
+The deal proportion (`deal_on_show`) in the Shark Tank file is $p=0.612$. A
+random sample of $n=100$ pitches is planned, with sample deal proportion
+$\widehat P$. Supplied value: $P(Z\le -2.30)=0.011$.
 
 1. Calculate $\operatorname{SE}(\widehat P)$ and check the
-   success--failure condition.
+   success-failure condition.
 2. State the approximate sampling distribution of $\widehat P$.
 3. Approximate the probability that the sample shows a deal rate of at
-   most 50%, i.e. $P(\widehat P\le0.50)$.
+   most 50%, that is, $P(\widehat P\le0.50)$.
 4. Interpret the result in one sentence.
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-$\operatorname{SE}(\widehat P)=\sqrt{0.612(0.388)/100}\approx0.0487$;
-the expected counts are $np=61.2$ and $n(1-p)=38.8$, both at least 10.
+$\operatorname{SE}(\widehat P)=\sqrt{0.612(0.388)/100}\approx0.0487$.
+The expected counts are $np=61.2$ and $n(1-p)=38.8$, both at least 10.
 Hence $\widehat P\mathrel{\dot\sim}N(0.612,\,0.0487^2)$. Standardise:
 
 $$
 z=\frac{0.50-0.612}{0.0487}\approx-2.30,
 \qquad
-P(\widehat P\le0.50)\approx\Phi(-2.30)\approx0.011.
+P(\widehat P\le0.50)\approx P(Z\le-2.30)\approx0.011.
 $$
 
-If the frame deal proportion is 61.2%, only about 1% of random samples of
-100 would show a deal rate at or below 50% --- such a sample would be
-surprising, the seed of the testing logic that Lecture 9 formalises.
+If the deal proportion in the file is 61.2%, only about 1% of random samples of
+100 would show a deal rate at or below 50%. Such a sample would be
+surprising. Lecture 10 builds the hypothesis test on this idea.
 :::
 
 :::
@@ -241,12 +251,12 @@ surprising, the seed of the testing logic that Lecture 9 formalises.
 
 ## After class
 
-### Timed individual practice --- 12 minutes
+### Timed individual practice: 15 minutes
 
-Redo this unassisted and against the clock: no notes, no AI, formula sheet
-only --- exam conditions. A random sample of 64 customers has mean monthly
-spending €82 and sample SD €24. Among the 64 customers, 40 renewed their
-subscription.
+Do this task alone and against the clock: no notes, no AI, formula sheet
+only, as in the exam. An invented example: a random sample of 64 customers
+has mean monthly spending €82 and sample SD €24. Among the 64 customers, 40
+renewed their subscription.
 
 1. Estimate the SE of mean spending.
 2. Estimate the SE of the renewal proportion and check its condition.
@@ -255,20 +265,25 @@ subscription.
    bias.
 5. Treating $\mu=82$ and $\sigma=24$ as the population values, use the CLT
    to approximate the probability that a *new* sample of 64 shows a mean
-   above €85.
+   above €85. Supplied value: $P(Z\le 1)=0.841$.
+6. Use $\sigma=24$ as a planning value. How many customers must a new
+   survey include to estimate mean spending to within €3, at the 95% level
+   ($z_{0.975}=1.96$)?
 
 ::: {.callout-note collapse="true"}
 ## Check a model answer
 
 The estimated SE of the mean is $24/\sqrt{64}=3$ euros. The renewal
 estimate is $40/64=0.625$, with estimated SE
-$\sqrt{0.625(0.375)/64}\approx0.0605$; the sample has 40 successes and 24
-failures, so the success--failure condition holds. Increasing the sample
+$\sqrt{0.625(0.375)/64}\approx0.0605$. The sample has 40 successes and 24
+failures, so the success-failure condition holds. Increasing the sample
 size from 64 to 256 would halve both SEs if the spread remained similar.
 These SEs describe random sample-to-sample variation, not bias created by
 an unrepresentative sampling frame. For the new sample,
 $\bar X\mathrel{\dot\sim}N(82,3^2)$, so
-$z=(85-82)/3=1$ and $P(\bar X>85)\approx1-\Phi(1)\approx0.16$.
+$z=(85-82)/3=1$ and $P(\bar X>85)\approx1-P(Z\le1)\approx0.16$. For a margin
+of €3, $n\ge(1.96\times24/3)^2=15.68^2\approx245.9$, so the survey needs 246
+customers (Lecture 8).
 :::
 
 ### Check your understanding
@@ -277,7 +292,7 @@ Complete from memory:
 
 1. A sampling distribution describes ...
 2. The standard error of a mean equals ...
-3. The success--failure condition requires ...
+3. The success-failure condition requires ...
 4. The CLT says ... becomes approximately normal.
 5. A larger sample does not fix ...
 
@@ -287,8 +302,8 @@ Complete from memory:
 1. How a statistic would vary across repeated random samples.
 2. $\sigma/\sqrt n$ (estimated by $S/\sqrt n$).
 3. $np\ge10$ and $n(1-p)\ge10$.
-4. The standardised sample mean (and so, approximately, the sampling
-   distribution of the mean) --- not the original observations.
+4. The sample mean. For a large sample its sampling distribution is
+   approximately normal. The single observations do not become normal.
 5. Selection bias: how units entered the frame or the sample.
 :::
 
@@ -297,25 +312,24 @@ Complete from memory:
 :::: {.utility-prompt}
 <span class="label">Utility: two sentences</span>
 
-Think of your EiA venture --- or any business you know well. Pick one rate
+Think of your EiA venture, or any business you know well. Pick one rate
 or average you could estimate from about 100 observations (conversion
-rate, average basket, renewal share), and write two sentences: first state
+rate, average basket, renewal share), and write two sentences. First state
 the SE you would roughly expect and what range of sample outcomes would
-therefore be unsurprising, then say what observed value would genuinely
-surprise you --- the instinct that next week's hypothesis tests make exact.
+therefore not surprise you. Then say what observed value would surprise you.
+Lecture 10 turns this idea into a hypothesis test.
 
 ::: {.callout-note collapse="true"}
 ## See an example, then write your own
 
-Take a student-run campus meal-prep box venture. "From 100 orders, a renewal share near 60% has an SE of about 5 points, so observed shares between roughly 50% and 70% would not surprise me. A share of 45% would --- that is more than two SEs below what I believe, and that instinct is exactly what next week's tests make precise."
+Take a student-run campus meal-prep box venture. "From 100 orders, a renewal share near 60% has an SE of about 5 points, so observed shares between roughly 50% and 70% would not surprise me. A share of 45% would surprise me, because it is more than two SEs below what I believe."
 :::
 
-You can discuss this task --- and any other task in this tutorial --- with
-**Tilly**, the course AI assistant on Canvas: ask it to sanity-check your
-SE guess for your own numbers.
+You can discuss this task, and any other task in this tutorial, with
+**Tilly**, the course AI assistant: ask it to check the SE you guessed for
+your own numbers.
 ::::
 
-Continue to Lecture 9: The t distribution, confidence intervals, and the
-two-sided test.
+[Continue to Lecture 9: The t distribution and confidence intervals](b09-t-confidence-intervals.qmd).
 
 :::

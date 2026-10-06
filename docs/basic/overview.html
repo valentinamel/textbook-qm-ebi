@@ -40,7 +40,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-ecf4e518a83458a2bb67b2a9bf74271b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-1825cde5eff643560dd74da544ac5848.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -178,7 +178,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../basic/b09-t-confidence-intervals.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 9: The t distribution, confidence intervals, and the two-sided test</span></a>
+  <a href="../basic/b09-t-confidence-intervals.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 9: The t distribution and confidence intervals</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -219,7 +219,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../intermediate/i02-assumptions-diagnostics.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 2: What the model assumes and how residuals betray it</span></a>
+  <a href="../intermediate/i02-assumptions-diagnostics.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 2: What the model assumes and how residuals reveal it</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -297,11 +297,6 @@ ul.task-list li input[type="checkbox"] {
   <a href="../resources/video-guide.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">External Video Guide</span></a>
   </div>
 </li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../resources/reading-ladder.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Reading research papers</span></a>
-  </div>
-</li>
       </ul>
   </li>
     </ul>
@@ -343,15 +338,16 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>QM Basic introduces the language and logic needed to turn data into careful evidence. We begin with data summaries and visualisation, build probability models, and then use sampling distributions to understand confidence intervals and two-sided tests against zero.</p>
+<p>QM Basic is about deciding with data when you do not have all the facts. Can you trust a survey of 40 friends? How many boxes should you prepare for tomorrow? Is your average order really above break-even, or was that luck? Each lecture starts from a question like these and tries to answer it with data. Then it gives you the theory you need to understand the answer and to check it, whether the answer comes from R or from an AI assistant. We begin with describing data, build simple models of chance, and end with intervals and tests.</p>
 <div class="outcomes">
 <p><span class="label">By the end of QM Basic, you can</span></p>
 <ul>
-<li>identify observational units, variables, samples, populations, and selection limits;</li>
-<li>summarise and visualise quantitative and categorical data in R;</li>
-<li>work with events, random variables, distributions, expectation, variance, covariance, and correlation;</li>
-<li>use uniform, normal, and t models with their stated conditions;</li>
-<li>explain sampling variability, standard errors, confidence intervals, and two-sided tests against zero;</li>
+<li>identify observational units, variables, samples, populations, and selection limits</li>
+<li>summarise and visualise quantitative and categorical data in R</li>
+<li>work with events, random variables, distributions, expectation, variance, covariance, and correlation</li>
+<li>update a probability when new information arrives (conditioning and Bayes’ rule)</li>
+<li>use uniform, normal, and t models with their stated conditions</li>
+<li>explain sampling variability, standard errors, confidence intervals, and two-sided tests against zero</li>
 <li>interpret supplied R output with correct units, uncertainty, scope, and causal limits.</li>
 </ul>
 </div>
@@ -387,7 +383,7 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 <tr class="odd">
 <td>Lecture 4</td>
-<td>Conditioning, total probability, Bayes, and independence</td>
+<td>Conditioning, Bayes’ rule, and independence</td>
 </tr>
 <tr class="even">
 <td>Lecture 5</td>
@@ -411,11 +407,11 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 <tr class="odd">
 <td>Tutorial 3</td>
-<td>Sampling and standard errors</td>
+<td>Normal models, sampling, and standard errors</td>
 </tr>
 <tr class="even">
 <td>Lecture 9</td>
-<td>The t distribution, confidence intervals, and the two-sided test</td>
+<td>The t distribution and confidence intervals</td>
 </tr>
 <tr class="odd">
 <td>Lecture 10</td>
@@ -440,21 +436,20 @@ ul.task-list li input[type="checkbox"] {
 <h2 class="anchored" data-anchor-id="how-to-read-every-graph">How to read every graph</h2>
 <p>Use the same sequence whenever a graph appears:</p>
 <ol type="1">
-<li>Read the horizontal axis: identify the variable, its units, and the shown range.</li>
-<li>Read the vertical axis: decide whether it shows a count, proportion, percentage, density, outcome, residual, or fitted value.</li>
-<li>Decode each mark: determine what one point, bar, line, shaded area, or interval represents.</li>
-<li>Check the scale and displayed sample: look for zooming, unequal panel scales, omitted observations, and whether an axis starts at zero when that matters.</li>
-<li>Describe the visible pattern before interpreting it. Then state the population, design, and causal limits.</li>
+<li><strong>Unit and variables.</strong> What does one observation represent, and what is on each axis, in which units?</li>
+<li><strong>Scales.</strong> Read the axis scales: where they start, how wide each interval is, and whether the vertical axis shows a count or a proportion.</li>
+<li><strong>One element.</strong> Put one bar, point, or line into a full sentence.</li>
+<li><strong>Pattern.</strong> Describe the overall shape before you interpret it.</li>
+<li><strong>Limits.</strong> State one thing the graph cannot tell you.</li>
 </ol>
-<p>The graph-specific paragraphs in the lectures apply this sequence directly.</p>
 </section>
 <section id="the-weekly-rhythm" class="level2">
 <h2 class="anchored" data-anchor-id="the-weekly-rhythm">The weekly rhythm</h2>
-<p>Both QM courses run on a fixed prep–class–practice cycle with stated time budgets. The <a href="../resources/how-to-succeed.html">How to succeed in this course</a> page lays out the week, day by day, with printable checklists.</p>
+<p>Both QM courses follow the same weekly routine with stated time budgets: prepare before class, take part in class, read and practise after class. The <a href="../resources/how-to-succeed.html">How to succeed in this course</a> page lays out the week, day by day, with printable checklists.</p>
 </section>
 <section id="tutorials-and-assessment" class="level2">
 <h2 class="anchored" data-anchor-id="tutorials-and-assessment">Tutorials and assessment</h2>
-<p>Four tutorials provide guided exam preparation. Bring your attempted after-class questions and use the cumulative <a href="../basic/formula-sheet.html">QM Basic Formula Sheet</a> during each tutorial. The complete sheet is attached to the closed-book written exam.</p>
+<p>Four tutorials provide guided exam preparation. Bring your attempted after-class questions and use the cumulative <a href="../basic/formula-sheet.html">QM Basic Formula Sheet</a> during each tutorial. The complete sheet is attached to the closed-book written exam. The few multipliers you need are on the formula sheet or in the question. You do not need the large statistical tables.</p>
 <p>The <a href="../basic/mock-exam.html">QM Basic Mock Exam</a> contains 100 points and uses the same calculation, supplied-output interpretation, conditions, and scope language required in the course.</p>
 <p><a href="../basic/b01-introduction-data-analysis.html">Begin Lecture 1: Introduction to data analysis</a>.</p>
 

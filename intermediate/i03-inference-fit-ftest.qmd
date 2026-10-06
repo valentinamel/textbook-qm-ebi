@@ -13,22 +13,39 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 <span class="label">By the end of Lecture 3, you can</span>
 
 - read a coefficient's standard error and build its confidence interval by
-  hand, using the correct degrees of freedom;
+  hand, using the correct degrees of freedom
 - test a regression coefficient against zero and say what the p-value does
-  and does not establish;
-- decompose outcome variation into explained and residual components;
-- calculate and interpret $R^2$ --- and correct four common misreadings;
-- state and interpret the overall F-test for model usefulness;
-- connect the simple-regression F-test to the slope t-test;
+  and does not establish
+- split the variation of the outcome into an explained part and a residual
+  part
+- calculate and interpret $R^2$, and correct four common misreadings
+- state and interpret the overall F-test for model usefulness
+- connect the simple-regression F-test to the slope t-test
 - distinguish fit, statistical evidence, prediction, and causality.
+:::
+
+::: {.must-know}
+<span class="label">Must know</span>
+
+**Be able to do yourself:**
+
+- read a coefficient table: standard error, t value, p-value
+- build a 95% interval for a slope by hand
+- calculate $R^2$ from SST and SSE and say what it is not
+- state the null hypothesis of the overall F-test.
+
+**Enough to recognise:**
+
+- the formula of adjusted $R^2$
+- what robust standard errors fix, and what they do not fix.
 :::
 
 ::: {.driving-question}
 <span class="label">Driving question</span>
 
-<p class="dq-context">A slope is an estimate, not a fact. Before a number goes into a pitch deck or a report, we need to know how precise it is and whether the model behind it earns its keep.</p>
+<p class="dq-context">A slope is an estimate, not a fact. Before a number goes into a pitch deck or a report, we need to know how precise it is and whether the model behind it is of any use.</p>
 
-The ask--deal slope is about 1.01. How precisely do we know that number, how
+The valuation slope is about 0.65. How precisely do we know that number, how
 much of the outcome does the line explain, and is the model useful at all?
 :::
 
@@ -38,19 +55,27 @@ much of the outcome does the line explain, and is the model useful at all?
 
 <span class="time-budget">Total preparation time: about 30 minutes.</span>
 
+**Minimum path:** the video and the R task. **Full path:** everything in this section.
+
 <div class="video-prep">
 <span class="label">Video preparation (10 minutes)</span><br>
 Watch Stanford Statistical Learning
-<a href="https://www.youtube.com/watch?v=50sv4UTjE90&list=PLoROMvodv4rOzrYsAxzQyHb8n_RWNuS1e&index=12">3.4
-Some Important Questions</a>. Focus on the questions "Is there a
-relationship?" and "How accurately can we predict the response?" All links
+<a href="https://www.youtube.com/watch?v=3GiWpRfkSjc&list=PLoROMvodv4rOzrYsAxzQyHb8n_RWNuS1e&index=10">3.2
+Hypothesis Testing and Confidence Intervals</a>. Focus on the standard error of
+the slope, its confidence interval, and the test against zero. The video
+writes RSS for the quantity this book calls SSE. All links
 are also listed in the
 <a href="../resources/video-guide.html">External Video Guide</a>.
 </div>
 
-**Reactivate the recipes (5 minutes).** With the Basic formula sheet open,
-write from memory the general 95% confidence interval recipe and the
-two-sided test of a benchmark value. Today both recipes return, applied to a
+**Reactivate the recipes (5 minutes).** Write from memory the general recipe
+for a 95% confidence interval and the two-sided test of a benchmark value.
+Then compare with the blocks for Lectures 9 and 10 of the
+[QM Basic formula sheet](../basic/formula-sheet.qmd#formula-l9).
+[Basic Lecture 9: The t distribution and confidence intervals](../basic/b09-t-confidence-intervals.qmd)
+explains the interval, and
+[Basic Lecture 10](../basic/b10-testing-errors-power.qmd) explains the
+p-value and the test decision. This lecture applies both recipes to a
 regression slope.
 
 ::: {.callout-note collapse="true"}
@@ -59,13 +84,16 @@ regression slope.
 Interval: $\text{estimate} \pm (\text{multiplier}) \times
 \text{standard error}$, with the multiplier close to 1.96 for large samples.
 Test: $t = (\text{estimate} - \text{benchmark})/\text{standard error}$,
-compared with a t distribution; small p-values are evidence against the
+compared with a t distribution. Small p-values are evidence against the
 benchmark.
 :::
 
-**Classify (5 minutes).** For a *useful* model, decide whether each quantity
-should be relatively small or relatively large: SSE, SSR, $R^2$. Commit to
-your three answers; the lecture defines all three quantities precisely.
+**Classify (5 minutes).** Three quantities measure how well a line fits. SSE
+is the sum of squared residuals from Lecture 1. SSR is the part of the
+variation in the outcome that the line explains. $R^2$ is the share of the
+variation that the line explains. For a useful model, decide whether each of
+the three should be relatively small or relatively large. Commit to your
+three answers. The lecture material defines all three quantities precisely.
 
 ::: {.callout-note collapse="true"}
 ## Check your preparation
@@ -75,229 +103,320 @@ and $R^2$ relatively large. These are comparisons to total outcome
 variation, not universal cut-offs.
 :::
 
-**R warm-up (10 minutes).** The standing warm-up: rebuild the Lecture 1
-model and extract its coefficient table. Bring the table to class ---
-today's first hour reads it line by line:
+**R warm-up (10 minutes).** Rebuild the Lecture 1 model and print its
+coefficient table. Bring the table to class:
 
 ```{r}
 #| label: i03-prep-warmup
 #| eval: false
 sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
-deals <- subset(sharks, deal_on_show == 1)
-deals$ask_1k <- deals$ask_amount_usd / 1000
-deals$deal_1k <- deals$deal_amount_usd / 1000
-deal_model <- lm(deal_1k ~ ask_1k, data = deals)
-summary(deal_model)$coefficients
+vals <- subset(sharks, deal_on_show == 1 & deal_equity_pct > 0)
+vals$claimed_m <- vals$requested_valuation_usd / 1e6
+vals$agreed_m <- vals$deal_valuation_usd / 1e6
+val_model <- lm(agreed_m ~ claimed_m, data = vals)
+summary(val_model)$coefficients
 ```
 
-If squared terms, ratios, or the interval recipe feel rusty, review
+**Code along (bring your laptop).** Bring a charged laptop with RStudio and
+the course project open, so that you can run the code of this chapter
+yourself during the lecture and get the same numbers and figures.
+
+If you are not sure about squared terms, ratios, or the interval recipe,
+review
 [Mathematics Refresher: squares, proportions, and standardisation](../resources/math-refresher.html).
 
 :::
 
 ::: {.course-phase .phase-in-class}
 
-## In class
+## Lecture material
 
-The session opens with the usual four-minute entry quiz on the prep videos,
-then turns to the driving question --- with the warm-up coefficient table on
-screen.
+This section reads the coefficient table of the valuation model: the
+standard error, the t value, the p-value, and the confidence interval of the
+slope. It then measures how well the line fits, with $R^2$, and tests whether
+the model is useful at all, with the F-test.
 
 <p class="concept-video"><strong>Stanford explanation (review):</strong>
-<a href="https://www.youtube.com/watch?v=50sv4UTjE90">3.4 Some Important Questions</a>.</p>
+<a href="https://www.youtube.com/watch?v=3GiWpRfkSjc">3.2 Hypothesis Testing and Confidence Intervals</a>.</p>
+
+### Start with a founder's question
+
+The slope says 65 cents per claimed dollar. Would another set of deals say
+50 cents, or 80? A founder who negotiates with this number wants to know how
+far it can be off. R and every AI assistant answer with a table of standard
+errors, t values, and p-values. This lecture shows how to read that table
+and how to check what is said about it.
 
 ### How precisely do we know the slope?
 
-The warm-up construction once more, so every object on this page is built in
-the open:
+The code below is the warm-up code. It rebuilds the data and the model of
+Lecture 1: the valuation agreed on air (`agreed_m`) regressed on the
+valuation claimed by the founder (`claimed_m`), both in \$ millions, for the
+874 Shark Tank deals for a share of the company. It then prints the
+coefficient table.
 
 ```{r}
 #| label: i03-build-model
 sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
-deals <- subset(sharks, deal_on_show == 1)
-deals$ask_1k <- deals$ask_amount_usd / 1000
-deals$deal_1k <- deals$deal_amount_usd / 1000
-deal_model <- lm(deal_1k ~ ask_1k, data = deals)
-summary(deal_model)$coefficients
+vals <- subset(sharks, deal_on_show == 1 & deal_equity_pct > 0)
+vals$claimed_m <- vals$requested_valuation_usd / 1e6
+vals$agreed_m <- vals$deal_valuation_usd / 1e6
+val_model <- lm(agreed_m ~ claimed_m, data = vals)
+summary(val_model)$coefficients
 ```
 
-Lecture 1 read only the first column. The other three columns --- and the
-interval R computes from them --- are the **pentad** from QM Basic,
-returning unchanged. Nothing in this table is new; only the quantity being
-estimated is:
+Lecture 1 read only the first column, the estimates. The other three
+columns, and the interval that R calculates from them, complete the pentad:
+the five quantities from QM Basic that Lecture 1 reviewed. They work here as
+in QM Basic. Only the quantity that is estimated is new, a slope:
 
-| Pentad ingredient | Where it sits | For the ask--deal slope |
+| Pentad ingredient | Where it sits | For the valuation slope |
 |---|---|---:|
-| estimate | `Estimate` column | $b_1 = 1.0085$ |
-| standard error | `Std. Error` column | $\operatorname{SE}(b_1) = 0.0182$ |
-| t value | `t value` column | $t = 55.4$ |
+| estimate | `Estimate` column | $\hat\beta_1 = 0.649$ |
+| standard error | `Std. Error` column | $\widehat{\operatorname{SE}}(\hat\beta_1) = 0.0111$ |
+| t value | `t value` column | $t = 58.6$ |
 | p-value | `Pr(>|t|)` column | $< 0.001$ |
 | confidence interval | `confint()` | computed below |
 
-The standard error answers the pentad's standing question, now about a
-slope: **if we could redraw the sample, how much would $b_1$ wobble?** The
-estimated slope 1.0085 came from these 882 deals; a different set of deals
-would give a slightly different line. The SE of 0.0182 --- in the slope's
-own units, $1,000 of deal per $1,000 of ask --- estimates the size of that
-sampling wobble under the Lecture 2 model conditions.
+The 874 deals are all the deals for a share of the company in the file, so
+nothing was sampled from it. We treat them as one outcome of a process that
+could have produced a different set of deals. A different set of deals would
+give a slightly different line. The standard error says how much the
+estimated slope $\hat\beta_1$ would vary from one such set to the next.
+
+::: {.definition-box}
+<span class="label">Definition</span>
+
+**Standard error of a coefficient**,
+$\widehat{\operatorname{SE}}(\hat\beta_1)$. An estimate of how much the
+estimated coefficient would vary from sample to sample. It has the units of
+the coefficient.
+:::
+
+Here the standard error is 0.0111, in the units of the slope: \$ million
+agreed per \$ million claimed. It is small compared with the slope, about 2%
+of 0.649. This number holds under the model assumptions of Lecture 2.
 
 **Degrees of freedom.** The interval multiplier comes from a t distribution
-with $n - 2 = 882 - 2 = 880$ degrees of freedom. The subtraction is the same
-bookkeeping as in QM Basic: estimating the intercept and the slope uses two
-pieces of information before any is left over to estimate the residual
-spread. (With $k$ slopes plus an intercept, the residual degrees of freedom
-become $n - k - 1$; that general form matters from Lecture 4 onwards.) At
-880 degrees of freedom, the multiplier $t_{0.975,\,880} = 1.963$ is
-indistinguishable in practice from the familiar 1.96.
+with $n - 2 = 874 - 2 = 872$ degrees of freedom. Two is subtracted because
+two coefficients, the intercept and the slope, are estimated before the
+spread of the residuals can be estimated. With $k$ slopes and an intercept,
+the residual degrees of freedom are $n - k - 1$. This general form is needed
+from Lecture 4 onwards. The multiplier for a 95% interval is written
+$t_{0.975,\,872}$. Basic Lecture 9 calls this number the critical value. It
+is the value that a t distribution with 872 degrees of
+freedom stays below with probability 0.975, so 2.5% lies above it and 2.5%
+lies below its negative. In R it is `qt(0.975, df)`:
+
+```{r}
+#| label: i03-multiplier
+qt(0.975, df = df.residual(val_model))
+```
+
+With 872 degrees of freedom the multiplier is 1.963, almost the same as the
+1.96 of the normal distribution.
+
+::: {.definition-box}
+<span class="label">Definition</span>
+
+**95% confidence interval for a slope.**
+$\hat\beta_1 \pm t_{0.975,\,n-2}\,\widehat{\operatorname{SE}}(\hat\beta_1)$.
+It is the range of values of the population slope $\beta_1$ that the data
+are consistent with, under the model assumptions. In large samples the
+multiplier is close to 1.96.
+:::
 
 ::: {#exm-i03-interval}
 ## Worked example: the slope interval by hand
 
-Everything comes from the coefficient table: $b_1 = 1.0085$,
-$\operatorname{SE}(b_1) = 0.0182$, multiplier $\approx 1.96$.
+Everything comes from the coefficient table. Take the estimate and the
+standard error with one digit more than in the table above, so that rounding
+does not change the result: $\hat\beta_1 = 0.6487$ and
+$\widehat{\operatorname{SE}}(\hat\beta_1) = 0.01107$. The multiplier is about
+1.96.
 
 $$
-b_1 \pm t_{0.975,\,880}\operatorname{SE}(b_1)
-= 1.0085 \pm 1.96 \times 0.0182
-= 1.0085 \pm 0.0357
-= (0.973,\; 1.044).
+\hat\beta_1 \pm t_{0.975,\,872}\,\widehat{\operatorname{SE}}(\hat\beta_1)
+= 0.6487 \pm 1.96 \times 0.01107
+= 0.6487 \pm 0.0217
+= (0.627,\; 0.670).
 $$
 
-In words: under the model conditions, the data are consistent with a
-population slope between about \$973 and \$1,044 of agreed amount per
-\$1,000 requested. The interval's endpoints carry the slope's units ---
-that is the pentad rule that the estimate, SE, and interval share units,
-while t and the p-value are unit-free.
+In words: under the model assumptions, the data are consistent with a
+population slope between about 63 and 67 cents of agreed valuation per dollar
+of claimed valuation. A slope of 1, which would mean that the sharks accept
+the claimed valuation, is far outside this range. The endpoints of the
+interval have the units of the slope. The estimate, its standard error, and
+the interval share these units. The t value and the p-value have no units.
 
 R agrees:
 
 ```{r}
 #| label: i03-confint
-confint(deal_model)
+confint(val_model)
 ```
 :::
 
-The interval describes **sampling uncertainty under the model conditions**.
-It does not include uncertainty from selection into televised pitches, the
-decision to analyse only on-air deals, or measurement choices --- no
-formula widens an interval for a flawed design.
+The interval describes only the variation from sample to sample, under the
+model assumptions. It does not cover other sources of doubt: that only
+televised pitches are recorded, that only pitches with a deal are analysed,
+or how the valuations are measured. No formula makes an interval wider for a
+weak design.
 
 ### The t-test against zero
 
-The standard significance test asks whether the data are consistent with
-**no** linear association:
+The standard test asks whether the data are consistent with no linear
+association between $X$ and $Y$, that is, with a population slope of zero.
+The test is two-sided:
 
 $$
 H_0:\beta_1=0
 \qquad\text{versus}\qquad
 H_1:\beta_1\ne0,
 \qquad
-t=\frac{b_1-0}{\operatorname{SE}(b_1)}.
+t=\frac{\hat\beta_1-0}{\widehat{\operatorname{SE}}(\hat\beta_1)}.
 $$
 
-By hand, once: $t = 1.0085 / 0.0182 \approx 55.4$. An estimate 55 standard
-errors from zero is astronomically far into the tail of a t distribution.
-Live verification, computing the p-value exactly as QM Basic did:
+By hand: $t = 0.6487 / 0.01107 \approx 58.6$. The estimate lies about 59
+standard errors away from zero. For comparison, a t value beyond about 2 in
+either direction is already rare when the population slope is zero. The
+p-value is the probability, if the population slope is zero, of a t value at
+least this far from zero in either direction. The code below calculates it
+as in QM Basic:
 
 ```{r}
 #| label: i03-manual-t
-coef_table <- summary(deal_model)$coefficients
-b1 <- coef_table["ask_1k", "Estimate"]
-se_b1 <- coef_table["ask_1k", "Std. Error"]
+coef_table <- summary(val_model)$coefficients
+b1 <- coef_table["claimed_m", "Estimate"]
+se_b1 <- coef_table["claimed_m", "Std. Error"]
 t_value <- b1 / se_b1
-p_value <- 2 * pt(-abs(t_value), df = df.residual(deal_model))
+p_value <- 2 * pt(-abs(t_value), df = df.residual(val_model))
 c(estimate = b1, standard_error = se_b1,
   t_statistic = t_value, p_value = p_value)
 ```
 
-What the tiny p-value **does** say: if the population slope were zero and
-the model conditions held, a sample slope this far from zero would
-essentially never occur --- strong evidence against a zero linear
-association in this selected sample.
+What the tiny p-value does say: if the population slope were zero and the
+model assumptions held, a sample slope this far from zero would practically
+never occur. This is strong evidence against a zero slope among these deals.
 
-What it does **not** say, one line each:
+What it does not say:
 
-- it does not say the model is correctly specified --- Lecture 2's fan and
-  influential pitches stand as the permanent caveat under this table;
-- it does not say the association is large or important --- with 882
-  observations, even tiny slopes can earn tiny p-values;
-- it does not say that requesting more causes a larger deal --- no test
-  statistic repairs an observational design.
+- It does not say that the model is correct. The fan and the influential
+  deals of Lecture 2 remain a limit on everything in this table.
+- It does not say that the association is large or important. With 874
+  observations, even a very small slope can have a tiny p-value.
+- It does not say that claiming more causes a higher agreed valuation. No
+  test can turn observed deals into an experiment.
 
 ::: {.callout-note collapse="true"}
-## Check: the p-value is 4×10^-289^. Is this slope therefore trustworthy?
+## Check: the p-value is 1×10^-304^. Is this slope therefore trustworthy?
 
-No. The p-value measures distance from zero in standard-error units, and
-the standard error was computed under the classical conditions --- constant
-error variance and independent rows among them. Lecture 2 showed the
-residual fan and the handful of pitches that steer the fit, so this
-particular SE rests on doubtful ground. "Significant" means the data are
-inconsistent with a zero slope, not that 0.0182 is the right measure of
-wobble.
+No. The p-value measures the distance from zero in standard errors, and the
+standard error was calculated under the model assumptions, among them
+constant error variance and independent rows. Lecture 2 showed the fan in
+the residuals and the few deals that steer the fit, so this standard error
+is doubtful. "Significant" means that the data are not consistent with a
+zero slope. It does not mean that 0.0111 is the right standard error.
 :::
 
 ### Decomposing variation
 
-The second part of the driving question --- how much does the line explain?
---- needs a benchmark. Without a predictor, the best single prediction for
-every deal is the mean agreed amount $\bar y$. Regression is useful to the
-extent that the fitted values $\widehat y_i$ improve on that flat
-prediction.
+The second part of the driving question asks how much the line explains.
+This needs a point of comparison. Without a predictor, the best single
+prediction for every deal is the mean agreed valuation $\bar y$. A
+regression is useful to the extent that its fitted values $\widehat y_i$
+come closer to the observed values than this one mean does.
 
-For each observation, the total deviation from the mean splits exactly into
-an explained part and a residual part, as @fig-i03-decomposition shows for
-one point:
+For each observation, the distance from the mean $\bar y$ to the observed
+value $y_i$ is its total deviation. It splits exactly into two parts. The
+part explained by the line runs from the mean to the fitted value
+$\widehat y_i$. The residual runs from the fitted value to the observed
+value.
 
 $$
-\underbrace{y_i-\bar y}_{\text{total}}
+\underbrace{y_i-\bar y}_{\text{total (navy)}}
 =
-\underbrace{(\widehat y_i-\bar y)}_{\text{explained by the line}}
+\underbrace{(\widehat y_i-\bar y)}_{\text{explained by the line (green)}}
 +
-\underbrace{(y_i-\widehat y_i)}_{\text{residual}}.
+\underbrace{(y_i-\widehat y_i)}_{\text{residual (blue)}}.
 $$
+
+@fig-i03-decomposition shows the split for one observation of an invented
+example. On the left, the green bar (explained by the line) and the blue bar
+(residual) are stacked. On the right, the navy bracket (total) has the same
+height as the two bars together.
 
 ```{r}
 #| label: fig-i03-decomposition
 #| code-fold: true
 #| code-summary: "See the R code for this figure"
-#| fig-width: 6.6
-#| fig-height: 4.4
-#| fig-cap: "One observation's total deviation from the mean of Y splits into the part the fitted line explains and the residual. Squaring and summing over all observations gives SST = SSR + SSE."
+#| fig-width: 7.5
+#| fig-height: 4.8
+#| fig-cap: "One observation of an invented example. The dotted lines mark the fitted value and the observed value. Left: the part explained by the line (green, from the mean of Y to the fitted value) and the residual (blue, from the fitted value to the observed value). Right: the total deviation from the mean (navy). The green bar and the blue bar together are exactly as long as the navy bracket."
 library(ggplot2)
-x_d <- c(1, 2.2, 3.4, 4.6, 5.8, 7.0, 8.2)
-y_d <- 1 + 0.8 * x_d + c(1.3, -1.5, 0.9, -0.8, 1.6, -1.2, 0.4)
+# Invented data: eight points, the sixth one is highlighted
+x_d <- c(1, 2, 3, 4, 5, 7, 8.6, 9.6)
+y_d <- c(2.0, 1.7, 3.3, 3.0, 4.0, 8.3, 7.1, 8.0)
 fit_d <- lm(y_d ~ x_d)
 decomp_df <- data.frame(x = x_d, y = y_d)
-i <- 5
-xh <- x_d[i]; yh <- y_d[i]; fh <- fitted(fit_d)[i]; mh <- mean(y_d)
+i <- 6
+xh <- x_d[i]                       # x of the highlighted observation
+yh <- y_d[i]                       # its observed value
+fh <- unname(fitted(fit_d)[i])     # its fitted value
+mh <- mean(y_d)                    # the mean of Y
+x_parts <- xh - 2.6                # where the two stacked parts are drawn
+x_total <- xh + 0.7                # where the total is drawn
+cap <- 0.12                        # half-width of the bracket ends
 
 ggplot(decomp_df, aes(x = x, y = y)) +
   geom_hline(yintercept = mh, colour = "#C98B2E",
              linetype = "dashed", linewidth = 0.8) +
   geom_abline(intercept = coef(fit_d)[1], slope = coef(fit_d)[2],
               colour = "#D55E00", linewidth = 0.9) +
-  annotate("segment", x = xh + 0.55, xend = xh + 0.55, y = mh, yend = yh,
-           colour = "#17324D", linewidth = 0.9) +
-  annotate("segment", x = xh, xend = xh, y = mh, yend = fh,
-           colour = "#009E73", linewidth = 1.3) +
-  annotate("segment", x = xh, xend = xh, y = fh, yend = yh,
-           colour = "#0072B2", linewidth = 1.3) +
-  geom_point(size = 2.6, colour = "#009E73") +
-  annotate("text", x = xh + 1.25, y = (mh + yh) / 2,
-           label = "y[i] - bar(y)", parse = TRUE,
-           colour = "#17324D", size = 3.4) +
-  annotate("text", x = xh - 0.85, y = (mh + fh) / 2,
-           label = "hat(y)[i] - bar(y)", parse = TRUE,
-           colour = "#009E73", size = 3.4) +
-  annotate("text", x = xh - 0.75, y = (fh + yh) / 2 + 0.15,
-           label = "y[i] - hat(y)[i]", parse = TRUE,
-           colour = "#0072B2", size = 3.4) +
-  annotate("text", x = 9.0, y = mh - 0.45, label = "bar(y)",
-           parse = TRUE, colour = "#17324D", size = 3.4) +
-  annotate("text", x = 9.4, y = coef(fit_d)[1] + coef(fit_d)[2] * 9.4 + 0.5,
-           label = "fitted line", hjust = 1,
-           colour = "#D55E00", size = 3.4) +
-  coord_cartesian(xlim = c(0, 9.6), ylim = c(0, 9.6)) +
+  # dotted guides at the fitted value and at the observed value
+  annotate("segment", x = x_parts, xend = x_total, y = fh, yend = fh,
+           colour = "#5B6976", linetype = "dotted", linewidth = 0.6) +
+  annotate("segment", x = x_parts, xend = x_total, y = yh, yend = yh,
+           colour = "#5B6976", linetype = "dotted", linewidth = 0.6) +
+  # the two stacked parts, left of the observation
+  annotate("segment", x = x_parts, xend = x_parts, y = mh, yend = fh,
+           colour = "#009E73", linewidth = 2.2) +
+  annotate("segment", x = x_parts, xend = x_parts, y = fh, yend = yh,
+           colour = "#0072B2", linewidth = 2.2) +
+  # the total, right of the observation, drawn as a bracket
+  annotate("segment", x = x_total, xend = x_total, y = mh, yend = yh,
+           colour = "#17324D", linewidth = 1.1) +
+  annotate("segment", x = x_total - cap, xend = x_total + cap,
+           y = c(mh, yh), yend = c(mh, yh),
+           colour = "#17324D", linewidth = 1.1) +
+  # the other observations, the fitted value, and the observed value
+  geom_point(data = decomp_df[-i, ], size = 2.6, colour = "grey75") +
+  annotate("point", x = xh, y = fh, shape = 21, size = 3.2, stroke = 1.2,
+           colour = "#17324D", fill = "white") +
+  annotate("point", x = xh, y = yh, size = 3.6, colour = "#17324D") +
+  annotate("text", x = xh, y = yh + 0.55,
+           label = "y[i]*' (observed)'", parse = TRUE,
+           colour = "#17324D", size = 4.2) +
+  annotate("text", x = xh - 0.2, y = fh + 0.38,
+           label = "hat(y)[i]*' (on the line)'", parse = TRUE,
+           hjust = 1, colour = "#17324D", size = 4.2) +
+  annotate("text", x = x_parts - 0.25, y = (mh + fh) / 2,
+           label = "'explained by the line: '*hat(y)[i] - bar(y)",
+           parse = TRUE, hjust = 1, colour = "#009E73", size = 4.2) +
+  annotate("text", x = x_parts - 0.25, y = (fh + yh) / 2,
+           label = "'residual: '*y[i] - hat(y)[i]",
+           parse = TRUE, hjust = 1, colour = "#0072B2", size = 4.2) +
+  annotate("text", x = x_total + 0.3, y = (mh + fh) / 2,
+           label = "'total: '*y[i] - bar(y)",
+           parse = TRUE, hjust = 0, colour = "#17324D", size = 4.2) +
+  annotate("text", x = 11.9, y = mh - 0.38,
+           label = "bar(y)*' (mean of Y)'", parse = TRUE,
+           hjust = 1, colour = "#17324D", size = 4.2) +
+  annotate("text", x = 2.5, y = 1.2, label = "fitted line",
+           hjust = 0, colour = "#D55E00", size = 4.2) +
+  scale_x_continuous(breaks = seq(0, 12, 2)) +
+  scale_y_continuous(breaks = seq(0, 10, 2)) +
+  coord_cartesian(xlim = c(0, 12), ylim = c(0, 10.5), expand = FALSE) +
   labs(x = "Predictor X", y = "Outcome Y") +
   theme_minimal(base_size = 13) +
   theme(
@@ -308,23 +427,28 @@ ggplot(decomp_df, aes(x = x, y = y)) +
   )
 ```
 
-Square each piece and sum over all observations. For ordinary least squares
-with an intercept, the cross-terms cancel and the identity holds exactly:
+Now square each of the three pieces and add up over all observations. This
+gives three sums of squares. SST is the total sum of squares, SSR is the
+sum of squares explained by the regression, and SSE is the sum of squared
+residuals from Lecture 1. For a least-squares line with an intercept, the
+same split holds for the sums:
 
 $$
 \underbrace{\sum_i(y_i-\bar y)^2}_{\text{SST: total}}
 =
-\underbrace{\sum_i(\widehat y_i-\bar y)^2}_{\text{SSR: explained}}
+\underbrace{\sum_i(\widehat y_i-\bar y)^2}_{\text{SSR: explained by the line}}
 +
 \underbrace{\sum_i(y_i-\widehat y_i)^2}_{\text{SSE: residual}}.
 $$
 
-Live, on the deal model, with the identity checked:
+The code below calculates the three sums for the valuation model and checks
+that SSR and SSE add up to SST:
 
 ```{r}
 #| label: i03-sums-squares
-y <- deals$deal_1k
-yhat <- fitted(deal_model)
+y <- vals$agreed_m
+yhat <- fitted(val_model)
+mean(y)   # mean agreed valuation, in $ millions
 
 SST <- sum((y - mean(y))^2)
 SSR <- sum((yhat - mean(y))^2)
@@ -333,9 +457,9 @@ SSE <- sum((y - yhat)^2)
 c(SST = SST, SSR = SSR, SSE = SSE, check = SSR + SSE)
 ```
 
-The units are squared thousands of dollars, so the raw magnitudes (around
-$10^8$) mean little on their own --- the sums of squares matter only
-relative to each other, which is exactly what the next section computes.
+The units are squared millions of dollars, so the raw numbers (SST is about
+12,000) mean little on their own. The sums of squares matter only relative
+to each other. The next section compares them.
 
 ::: {#exm-i03-sst-sse}
 ## Worked example: from SST and SSE to SSR and R²
@@ -343,8 +467,8 @@ relative to each other, which is exactly what the next section computes.
 A regression output reports $\text{SST} = 500$ and $\text{SSE} = 125$. Find
 SSR and $R^2$.
 
-By the identity, $\text{SSR} = \text{SST} - \text{SSE} = 500 - 125 = 375$.
-Then
+Because $\text{SST}=\text{SSR}+\text{SSE}$, the explained part is
+$\text{SSR} = \text{SST} - \text{SSE} = 500 - 125 = 375$. Then
 
 $$
 R^2 = \frac{\text{SSR}}{\text{SST}} = \frac{375}{500} = 0.75
@@ -352,122 +476,146 @@ R^2 = \frac{\text{SSR}}{\text{SST}} = \frac{375}{500} = 0.75
 R^2 = 1 - \frac{\text{SSE}}{\text{SST}} = 1 - \frac{125}{500} = 0.75.
 $$
 
-The fitted values account for 75% of the observed sample variation in the
-outcome; 25% remains as residual variation around the line. In class, the
-one-click Mentimeter check on this calculation is posed right before the
-break.
+The fitted values account for 75% of the variation of the outcome in the
+sample. The other 25% remains as residual variation around the line.
 :::
 
-### R²: what 0.777 means --- and four things it is not
+### R²: what 0.798 means, and four things it is not
 
-The general definition, applied to the live numbers:
+::: {.definition-box}
+<span class="label">Definition</span>
+
+**$R^2$** (R squared). The share of the variation of the outcome in the
+sample that the fitted line explains:
 
 $$
 R^2=\frac{\text{SSR}}{\text{SST}}
 =1-\frac{\text{SSE}}{\text{SST}}.
 $$
 
+It lies between 0 and 1.
+:::
+
+For the valuation model:
+
 ```{r}
 #| label: i03-r-squared
 c(
   manual = 1 - SSE / SST,
-  from_R = summary(deal_model)$r.squared,
-  correlation_squared = cor(deals$ask_1k, deals$deal_1k)^2
+  from_R = summary(val_model)$r.squared,
+  correlation_squared = cor(vals$claimed_m, vals$agreed_m)^2
 )
 ```
 
-Here $R^2 \approx 0.777$: **about 77.7% of the observed sample variation in
-agreed on-air deal amounts, among deal records, is explained by the linear
-association with the amount requested.** The third number above shows a
-simple-regression bonus fact: with an intercept, $R^2 = r_{XY}^2$, the
-squared correlation. Squaring discards the sign, so inspect the slope or
-correlation for direction.
+Here $R^2 \approx 0.798$. Among these deals, about 80% of the variation in
+the agreed valuations is explained by the linear association with the
+claimed valuation. The third number in the output shows a fact that holds
+in simple regression: $R^2$ is the squared correlation of $X$ and $Y$,
+$R^2 = r_{XY}^2$. Squaring removes the sign, so look at the slope or the
+correlation for the direction of the association.
 
-$R^2$ is one of the most misquoted numbers in applied work. Four things it
-is **not**, each with a wrong sentence corrected. The first two are worked
-here; the last two are yours.
+$R^2$ is often misread. Below are four things that it is not, each with a
+wrong sentence and its correction. The first two are worked out here. The
+last two are in the Try it task.
 
 **Not the percentage of correct predictions.**
-*Wrong:* "The model predicts 77.7% of deal amounts correctly."
-*Corrected:* the model explains 77.7% of the *variation* in deal amounts;
-individual predictions can still miss by hundreds of thousands of dollars
-(the residual standard error is about \$162,000).
+*Wrong:* "The model predicts 80% of agreed valuations correctly."
+*Corrected:* the model explains 80% of the *variation* in agreed valuations.
+Single predictions can still miss by millions of dollars. The standard
+deviation of the residuals is about \$1.66 million, as the output of
+`summary()` shows later in this section.
 
 **Not proof that the assumptions hold.**
-*Wrong:* "With $R^2$ this high, the model is clearly well specified."
-*Corrected:* $R^2$ measures fit, not validity --- Lecture 2 found a
-residual fan and influential pitches in this very model, and 0.777 is
-silent about both.
+*Wrong:* "With $R^2$ this high, the model is clearly correct."
+*Corrected:* $R^2$ measures fit. It does not check the assumptions. Lecture 2
+found a fan in the residuals and influential deals in this same model, and
+the value 0.798 says nothing about either.
 
 ::: {.callout-caution collapse="true"}
 ## Try it: correct the last two wrong sentences
 
-In class this is the pair task. Correct each sentence in one line, as
+Try this with your neighbour first. Correct each sentence in one line, as
 above.
 
-*Sentence 3 (you).* "Asking explains 78% of the deal, so raising your ask
-will raise your deal."
+*Sentence 3 (you).* "The claim explains 80% of the valuation, so claiming
+more will raise your valuation."
 
-*Sentence 4 (you).* "The model will explain 77.7% of deal-amount variation
-in next year's pitches too."
+*Sentence 4 (you).* "The model will explain 80% of the differences in
+valuations in next year's pitches too."
 
 ::: {.callout-note collapse="true"}
 ## Check your answers
 
-*Sentence 3* claims causation: $R^2$ describes an association among
-observed deals; requests were not randomly assigned, and nothing in a fit
-statistic says what would happen if a founder *changed* their ask.
-*Sentence 4* claims out-of-sample performance: $R^2$ is computed on this
-sample; a new season, a different selection of pitches, or a changed
-negotiation culture can all lower it. In-sample fit is evidence about these
-882 records, not a guarantee for the next 882.
+*Sentence 3* claims causation. $R^2$ describes an association among
+observed deals. Claims were not randomly assigned, and no measure of fit
+says what would happen if a founder *changed* the claim.
+*Sentence 4* claims that the fit holds for new data. $R^2$ is calculated on
+this sample. A new season, a different selection of pitches, or a change in
+how the sharks negotiate can all lower it. The fit is evidence about these
+874 deals, not a guarantee for the next 874.
 :::
 :::
 
 ### The overall F-test
 
-The last part of the driving question: is the model useful **at all**,
-compared with predicting $\bar y$ for everyone? For a regression with $k$
-predictors, the overall usefulness test is
+The last part of the driving question asks whether the model is useful at
+all, compared with predicting the mean $\bar y$ for every deal. The overall
+F-test answers it. It is stated here for a regression with $k$ predictors,
+because Lecture 4 adds more predictors. In this lecture $k=1$.
 
-$$
-H_0:\beta_1=\cdots=\beta_k=0
-$$
+::: {.definition-box}
+<span class="label">Definition</span>
 
-against the alternative that at least one slope is non-zero. The statistic
-is
+**Overall F-test.** A test of the null hypothesis that all slopes of the
+model are zero, $H_0:\beta_1=\cdots=\beta_k=0$, against the alternative that
+at least one slope is not zero. The test statistic is
 
 $$
 F=\frac{\text{SSR}/k}{\text{SSE}/(n-k-1)}.
 $$
 
-Read the ratio the way it is built: the numerator is **explained variation
-per predictor**; the denominator is **residual variation per residual
-degree of freedom**. F asks how many times more explanation the model buys,
-per coefficient spent, than leftover noise would suggest. Values near 1 are
-what pure noise delivers; large values are evidence that the predictors
-jointly matter.
+A large F with a small p-value is evidence that the model explains more than
+the mean alone.
+:::
 
-The whole lecture now sits in one printed block --- read `summary()` from
-top to bottom in this order: (1) formula and analysis sample, (2)
-coefficient estimates and units, (3) standard errors, t statistics, and
-p-values, (4) residual scale, (5) $R^2$ and adjusted $R^2$, (6) the overall
-F-test --- and (7) everything the table does *not* print: assumptions and
-design limits.
+Read the ratio part by part. The numerator is the explained variation per
+predictor. The denominator is the residual variation per residual degree of
+freedom. If no slope differs from zero, the two are of similar size and F is
+near 1. A large F is evidence that the predictors together matter.
+
+All numbers of this lecture appear together in the output of `summary()`.
+Read it from top to bottom in this order: (1) the formula and the data, (2)
+the coefficient estimates and their units, (3) the standard errors, t
+values, and p-values, (4) the residual standard error, (5) $R^2$ and adjusted
+$R^2$, (6) the overall F-test. Then remember (7), which the output does not
+print: the assumptions and the limits of the data.
 
 ```{r}
 #| label: i03-summary
-summary(deal_model)
+summary(val_model)
 ```
 
-The output reports $F \approx 3069$ on 1 and 880 degrees of freedom, with a
-p-value too small to print meaningfully. Rejecting the null says the model
-with requested amount fits better than an intercept-only model, under the
-inferential conditions.
+Two lines of this output are new. The **residual standard error**, 1.664, is
+the standard deviation of the residuals in the units of the outcome:
+$s=\sqrt{\text{SSE}/(n-2)}$, here about \$1.66 million. A few very large
+misses drive this number: Lecture 2 showed that half of the residuals lie
+between $-0.40$ and $0.17$. Still, it is large next to the mean agreed
+valuation of \$2.22 million, so single deals can lie far from the line even
+though $R^2$ is high. **Adjusted $R^2$** is $R^2$ with a small
+penalty for every predictor in the model, $1-(1-R^2)(n-1)/(n-k-1)$. It is
+always a little below $R^2$. Unlike $R^2$, it can fall when a predictor that
+adds almost nothing is included. That makes it the fairer number for
+comparing models with different numbers of predictors. With one predictor
+and 874 observations the two hardly differ (0.7975 and 0.7973).
+
+The last line reports $F \approx 3435$ on 1 and 872 degrees of freedom. The
+p-value is printed as `< 2.2e-16`, which means practically zero. The test
+rejects the null hypothesis: under the model assumptions, the model with the
+claimed valuation fits better than a model with only an intercept.
 
 **In simple regression, F and t answer the same question.** With one
-predictor and a two-sided alternative, $H_0:\beta_1 = 0$ is the entire
-joint null, and
+predictor, the null hypothesis of the F-test is $H_0:\beta_1 = 0$, the same
+as in the two-sided t-test of the slope, and
 
 $$
 F = t^2.
@@ -475,95 +623,111 @@ $$
 
 ```{r}
 #| label: i03-f-t-link
-t_slope <- summary(deal_model)$coefficients["ask_1k", "t value"]
-f_model <- unname(summary(deal_model)$fstatistic["value"])
+t_slope <- summary(val_model)$coefficients["claimed_m", "t value"]
+f_model <- unname(summary(val_model)$fstatistic["value"])
 c(t_squared = t_slope^2, F = f_model)
 ```
 
-Both equal about 3069. This equivalence **dies in multiple regression**,
-where the F-test evaluates several slopes jointly while each t-test
-evaluates one --- Lecture 5 builds a genuine joint test on exactly that
-difference.
+Both equal about 3435. This holds only in simple regression. In multiple
+regression the F-test looks at several slopes together, while each t-test
+looks at one slope. Lecture 5 uses this difference to test several slopes at
+once.
 
 ### Usefulness has more than one meaning
 
-"Is the model useful?" has at least four distinct readings, and a model can
-pass one while failing another:
+The question "Is the model useful?" has at least four different meanings,
+and a model can pass one and fail another. The four examples below are
+invented:
 
-- **Statistically non-zero slope, low $R^2$.** A loyalty-programme analysis
-  on 400,000 customers finds a reliably positive effect of mailings on
-  spending --- real, precisely estimated, and explaining 1% of spending
-  variation. Useful for a mass decision, useless for predicting any one
-  customer.
-- **High $R^2$, poor causal interpretation.** Store revenue regressed on
-  staff count fits beautifully --- because both track store size. Hiring
-  more staff at a small store will not produce a big store's revenue.
-- **Good in-sample fit, fragile out-of-sample prediction.** A travel-demand
-  model fitted on 2015--2019 data explained bookings superbly and collapsed
-  in 2020. In-sample $R^2$ never promised stability.
-- **Accurate predictions, no structural story.** A black-box model may
-  forecast weekly orders extremely well while its coefficients support no
-  explanation of *why* --- fine for stocking decisions, useless for
-  designing a price change.
+- **Slope clearly different from zero, low $R^2$.** A loyalty-programme
+  analysis on 400,000 customers finds a positive association between
+  mailings and spending. It is precisely estimated, and it explains 1% of
+  the variation in spending. This is useful for a decision about all
+  customers, and useless for predicting the spending of one customer.
+- **High $R^2$, no causal reading.** Store revenue regressed on the number
+  of staff fits very well, because both follow the size of the store.
+  Hiring more staff at a small store will not produce the revenue of a big
+  store.
+- **Good fit on the data used, poor prediction for new data.** A
+  travel-demand model fitted on data for 2015--2019 explained bookings very
+  well and failed in 2020. The $R^2$ of the fitted data never promised that
+  the pattern would continue.
+- **Accurate predictions, no explanation.** A complex prediction model may
+  forecast weekly orders very well while its coefficients do not explain
+  *why* orders change. That is fine for stocking decisions, and useless for
+  planning a price change.
 
-Always align the evaluation with the goal: explanation, prediction, or
-decision support.
+Always judge a model by the goal: explanation, prediction, or support for a
+decision.
 
-::: {.optional-box}
-<span class="label">Optional: robust standard errors</span><br>
-Heteroskedasticity-consistent, or **robust**, standard errors relax the
-constant-variance assumption when computing uncertainty. The fitted
-coefficients remain the ordinary least-squares values; only the estimated
-SEs (and hence t values, p-values, and intervals) change. Given Lecture 2's
-residual fan, they are a natural upgrade for this model:
+### Robust standard errors: what they fix {#i03-robust}
+
+Heteroskedasticity-consistent standard errors, called **robust** standard
+errors for short, do not need the constant-variance assumption. The fitted
+coefficients stay the ordinary least-squares values. Only the standard
+errors change, and with them the t values, p-values, and intervals. Lecture 2
+found a fan in the residuals of this model, so robust standard errors are a
+sensible choice here:
 
 ```{r}
 #| label: i03-robust-code
-#| eval: false
-# Run this if these packages are available in the course R environment
 library(lmtest)
 library(sandwich)
 
-coeftest(deal_model, vcov. = vcovHC(deal_model, type = "HC1"))
+coeftest(val_model, vcov. = vcovHC(val_model, type = "HC1"))
+coefci(val_model, vcov. = vcovHC(val_model, type = "HC1"))
 ```
 
-They fix exactly **one** thing: a misspecified conditional error variance.
-They do not repair non-linearity, omitted-variable bias, dependence across
-rows, influential data errors, or non-random selection. A robust SE on a
-biased slope is a precise measurement of the wrong quantity.
-:::
+The function `coeftest()` prints the coefficient table with robust standard
+errors, and `coefci()` prints the robust 95% confidence intervals. The
+robust standard error of the slope is 0.034, about three times the usual
+0.0111. The robust 95% interval runs from about 0.58 to 0.72. It is three
+times as wide as the usual interval and still lies far below 1.
+
+Robust standard errors fix exactly one problem: an error variance that is
+not constant. They
+do not repair a curved relationship, confounding, dependence between rows,
+influential data errors, or a selected sample. A robust standard error on a
+biased slope measures the precision of the wrong number. You do not have to
+calculate robust standard errors by hand. You should know what they are for.
 
 ::: {.caveat-box}
 <span class="label">What a precise slope and a high R² can and cannot say</span>
 
-Every number this lecture produced --- the SE of 0.0182, the interval
-$(0.973, 1.044)$, the p-value, $R^2 = 0.777$, $F \approx 3069$ --- is
-computed *under the model conditions of Lecture 2*, and the diagnostics
-there flagged two of them: the residual spread grows with deal size, and a
-handful of extreme pitches steer the fit. So the classical SE (and
-everything built from it) rests on a doubtful variance assumption, and both
-the slope and $R^2$ are partly the work of a few identifiable records.
-Beyond that, the sample is on-air deals only --- selection travels with
-every estimate --- and none of today's statistics moves the association any
-closer to a causal claim. Precision and fit are internal report cards, not
-external validation.
+- Every number of this lecture is calculated under the assumptions of
+  Lecture 2. The fan makes the usual standard error doubtful, and a few
+  deals shape the fit.
+- The data are deals on a television show, not a random sample of
+  companies. This selection affects every estimate.
+- Precision and fit are not causation.
+
+**What you can do with it:** use the slope and its interval for the decision,
+use the residual standard error to judge how far single cases lie from the
+line, and prefer robust standard errors when the residual plot shows a fan.
 :::
 
 ### Answering the driving question
 
-Precisely, substantially, and yes --- with conditions. The slope 1.0085 has
-standard error 0.0182, so the 95% interval $(0.973, 1.044)$ pins the
-association down to within about seven cents per dollar asked; the t-test
-rejects a zero slope beyond any doubt ($t \approx 55.4$). The line explains
-77.7% of the variation in agreed amounts, and the overall F-test
-($F \approx 3069$) confirms the model beats a flat mean. Every one of those
-statements is conditional on the Lecture 2 diagnostics --- the fan and the
-influential pitches --- and none of them is causal.
+The slope is known precisely, the line explains much of the outcome, and the
+model is useful, all under conditions. The slope 0.649 has standard error
+0.0111. Its 95% interval $(0.627, 0.670)$ is only about four cents per
+claimed dollar wide. With robust standard errors it is about 13 cents wide,
+from 0.58 to 0.72. The t-test clearly rejects a zero slope
+($t \approx 58.6$). The line explains about 80% of the variation in agreed
+valuations, and the overall F-test ($F \approx 3435$) confirms that the
+model fits better than the mean alone. All of these statements depend on the
+assumptions checked in Lecture 2, where the residuals showed a fan and a few
+influential deals. None of them is causal.
 
-**Next:** Tutorial 1 rehearses Lectures 1--3 in exam format and in TestVision
-style: fit a model in R, diagnose it, and defend its coefficients with
-intervals, tests, and $R^2$ --- the complete simple-regression pipeline you
-now own. Bring your attempts; the session starts from them.
+::: {.founder-box}
+<span class="label">A founder's decision (invented example)</span>
+
+Your advertising slope is 0.15 orders per euro, with a standard error of 0.05. The 95% interval runs from 0.05 to 0.25: each 100 euros of advertising goes with between 5 and 25 extra orders. At 4 euros of margin per order, that is between 20 and 100 euros. Even the best case only breaks even. The decision: reduce the advertising budget. The model has an $R^2$ of 0.20, so it predicts single weeks badly. That does not matter here. The decision depends on the slope and its interval, not on predicting next week.
+:::
+
+**Next:** Tutorial 1 practises Lectures 1--3 in the format of the exam: fit a
+model in R, check its residuals, and report its coefficients with intervals,
+tests, and $R^2$. The exam is taken in TestVision with R available.
 
 :::
 
@@ -571,9 +735,18 @@ now own. Bring your attempts; the session starts from them.
 
 ## After class
 
-<span class="time-budget">Total practice time: about 70 minutes.</span>
+<span class="time-budget">Total practice time: about 80 minutes.</span>
 
-### Retrieval (10 minutes)
+**Minimum path (about 35 minutes):** read the lecture material, answer the recall questions, then work for 10 minutes on the tasks that follow. **Full path:** all tasks below.
+
+### Read the lecture material (15 minutes)
+
+Read the Lecture material section above from start to end. The lecture
+covered the core of it. The text has every step, every example, and all the
+code, including parts that were not shown in class. Note what is still
+unclear and bring it to the next tutorial, or ask Tilly.
+
+### Recall questions (10 minutes)
 
 1. Why are the residual degrees of freedom $n-2$ in simple regression?
 2. Which pentad quantities share the slope's units, and which are
@@ -587,71 +760,75 @@ now own. Bring your attempts; the session starts from them.
 ::: {.callout-note collapse="true"}
 ## Check your answers
 
-1. Two coefficients --- intercept and slope --- are estimated before
+1. Two coefficients, intercept and slope, are estimated before
    residual variation can be measured, using up two pieces of information.
 2. The estimate, its SE, and the interval endpoints share the slope's
-   units; the t statistic and p-value are unit-free.
-3. Total, explained (fitted), and residual sample variation in the outcome;
+   units. The t statistic and p-value are unit-free.
+3. Total, explained (fitted), and residual sample variation in the outcome.
    $\text{SST}=\text{SSR}+\text{SSE}$ for OLS with an intercept.
 4. SSE is non-negative and no larger than SST, so $1-\text{SSE}/\text{SST}$
    lies between 0 and 1.
 5. All population slope coefficients are zero. With one predictor that is
    the same hypothesis as the two-sided slope t-test, and $F=t^2$.
-6. Misspecified (non-constant) conditional error variance --- nothing else.
+6. An error variance that is not constant, and nothing else.
 :::
 
-### From worked to faded: an interval for a new row (15 minutes)
+### Finish a half-worked example: an interval for a new row (15 minutes)
 
 Re-read the worked slope interval (@exm-i03-interval). Then build the
 interval for the **intercept row** of the same table.
 
-*Step 1 (given).* From the coefficient table: estimate $27.571$, standard
-error $7.241$, degrees of freedom $880$, multiplier $\approx 1.96$.
+*Step 1 (given).* From the coefficient table: estimate $-0.068$, standard
+error $0.0685$, degrees of freedom $872$, multiplier $\approx 1.96$.
 
 *Step 2 (you).* Compute the 95% interval.
 
-*Step 3 (you).* Interpret it in one sentence --- and say why this
-particular interval has little standalone business value (Lecture 1 told
-you).
+*Step 3 (you).* Interpret it in one sentence, and say why this interval is of
+little use for a business decision (see the intercept in Lecture 1).
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-$27.571 \pm 1.96 \times 7.241 = 27.571 \pm 14.19 = (13.4,\; 41.8)$, in
-$1,000s --- R's exact answer is $(13.36, 41.78)$. Under the model
-conditions, the data are consistent with a population intercept between
-about \$13,400 and \$41,800. But the intercept is the fitted mean at a
-request of zero, outside the observed range of asks, so the interval is
-mathematically sound and substantively unhelpful.
+$-0.068 \pm 1.96 \times 0.0685 = -0.068 \pm 0.134 = (-0.202,\; 0.066)$, in
+\$ millions, which matches R. Under the model assumptions, the data are
+consistent with a population intercept between about $-\$202{,}000$ and
+\$66,000. The interval includes zero, so the line may well pass through the
+origin. But the intercept is the fitted mean at a claimed valuation of zero,
+outside the observed range of claims. The interval is calculated correctly
+and still tells a founder little.
 :::
 
-Then the unassisted set:
+Then four more tasks without given steps:
 
 1. A study reports a coefficient of 2.40 with standard error 0.80 in a
    large sample. Compute the t statistic, decide the 5% two-sided test
    against zero, and give the 95% interval.
 2. Interpret $R^2=0.20$ without calling the model "80% wrong."
-3. A model has $k=3$, $n=104$, SSR = 300, and SSE = 500. Calculate F.
-4. Explain why adding a predictor cannot increase the in-sample SSE in OLS.
+3. A model has $k=3$, $n=104$, SSR = 300, and SSE = 500. Calculate $R^2$
+   and F.
+4. Explain why adding a predictor to a least-squares model cannot increase
+   its SSE.
 
 ::: {.callout-note collapse="true"}
 ## Check your answers
 
-1. $t = 2.40/0.80 = 3$; reject at 5% (well beyond 1.96). Interval:
+1. $t = 2.40/0.80 = 3$. Reject at 5% (well beyond 1.96). Interval:
    $2.40 \pm 1.96 \times 0.80 = (0.83,\; 3.97)$.
-2. The fitted values explain 20% of observed outcome variation; 80% remains
-   as residual variation around the fitted line. Nothing is "wrong" ---
-   the model's predictions are simply far from individual outcomes.
-3. $F=(300/3)/(500/(104-3-1))=100/5=20$.
-4. The expanded model can reproduce the old fit by setting the new slope to
-   zero, so least squares cannot end at a larger minimum SSE.
+2. The fitted values explain 20% of the variation of the outcome in the
+   sample. 80% remains as residual variation around the fitted line. Nothing
+   is "wrong". The fitted values are simply far from many single outcomes.
+3. $\text{SST}=300+500=800$, so $R^2=300/800=0.375$.
+   $F=(300/3)/(500/(104-3-1))=100/5=20$.
+4. The larger model can reproduce the old fit by setting the new slope to
+   zero. Least squares picks the smallest SSE, so the SSE of the larger
+   model cannot be above the old one.
 :::
 
-### Practice: the full pipeline on equity and season (20 minutes)
+### Practice: all steps on equity and season (20 minutes)
 
 Fit `equity_offered_pct ~ season` on all 1,441 pitches. Report the slope's
 95% confidence interval, the t-test against zero, $R^2$, and the overall
-F-test --- then write a 120-word conclusion that separates estimate,
+F-test, then write a 120-word conclusion that separates estimate,
 uncertainty, fit, and scope.
 
 ::: {.callout-note collapse="true"}
@@ -667,30 +844,31 @@ c(r_squared = summary(equity_model)$r.squared,
   F = unname(summary(equity_model)$fstatistic["value"]))
 ```
 
-A complete conclusion reports: one later season is associated with about
-0.824 percentage points less initial equity offered (SE 0.048); the 95%
-interval $(-0.917, -0.731)$ excludes zero and the t-test rejects a zero
-slope ($t\approx-17.3$, p $<$ 0.001); season explains about 17.3% of
-observed equity-offer variation, and the overall F-test
-($F\approx300.7 = t^2$) rejects the intercept-only model. Scope: an
-observational time trend among recorded pitches --- not a causal effect of
-season, and the classical SEs assume the Lecture 2 conditions.
+A complete conclusion reports four things. Estimate: one later season
+(`season`) is associated with about 0.824 percentage points less equity
+offered (`equity_offered_pct`), with standard error 0.048. Uncertainty: the
+95% interval $(-0.917, -0.731)$ excludes zero, and the t-test rejects a zero
+slope ($t\approx-17.3$, p $<$ 0.001). Fit: the season explains about 17.3%
+of the variation in the equity offered, and the overall F-test
+($F\approx300.7 = t^2$) rejects the model with only an intercept. Scope:
+this is a trend over time among recorded pitches, not a causal effect of
+the season, and the standard errors rest on the assumptions of Lecture 2.
 :::
 
-### Spaced review: one diagnostics item from Lecture 2 (5 minutes)
+### Review: one diagnostics question from Lecture 2 (5 minutes)
 
-The residual-versus-fitted plot of the deal model fans out to the right.
-Which of today's printed numbers does that pattern undermine most directly,
-and why?
+The residual-versus-fitted plot of the valuation model shows unequal spread,
+the fan of Lecture 2. Which numbers of the coefficient table in this lecture
+does that pattern put most directly in doubt, and why?
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-The classical standard error 0.0182 --- and with it the t statistic,
-p-value, and confidence interval built from it. The classical SE formula
-assumes one common error variance $\sigma^2$; a fan says the conditional
-variance grows with the fitted value, so the stated precision is doubtful.
-Robust SEs address exactly this one problem; they repair nothing else.
+The standard error 0.0111, and with it the t value, the p-value, and the
+confidence interval that are built from it. The usual formula for the
+standard error assumes one common error variance $\sigma^2$. A fan says that
+the variance is not constant, so the stated precision is doubtful. Robust
+standard errors address exactly this one problem. They repair nothing else.
 :::
 
 ### Worked exam interpretation (5 minutes)
@@ -705,38 +883,30 @@ state in one sentence what the low $R^2$ does and does not imply.
 ::: {.callout-note collapse="true"}
 ## Check a model answer
 
-$t = 1.38/0.46 = 3.0$; with $df = 100$ the multiplier is about 1.98, so the
+$t = 1.38/0.46 = 3.0$. With $n-2 = 100$ degrees of freedom the multiplier
+`qt(0.975, 100)` is about 1.98, so the
 interval is $1.38 \pm 1.98\times0.46 \approx (0.47,\; 2.29)$ percentage
 points per €10,000. The interval excludes zero, so the two-sided 5% test
-rejects $H_0:\beta_1=0$; consistently, $F = t^2 = 9.0$. The low $R^2$ says
-marketing spending explains about 8% of growth variation --- predictions
-for individual ventures will be poor --- but it does not undo the evidence
-that the association is non-zero, and neither number makes the association
-causal.
+rejects $H_0:\beta_1=0$. In agreement with this, $F = t^2 = 9.0$. The low
+$R^2$ says that marketing spending explains about 8% of the variation in
+growth, so predictions for single ventures will be poor. It does not remove
+the evidence that the association is not zero. Neither number makes the
+association causal.
 :::
 
-### From the reading ladder (10 minutes)
+### Check the AI (5 minutes)
 
-The [reading ladder](../resources/reading-ladder.qmd) returns to
-[Tierney & Farmer (2002)](https://doi.org/10.2307/3069429) --- the paper
-whose correlation table you read in Basic Lecture 5. This time find a
-**regression table** and pick one coefficient row. Apply today's pentad
-reading: the estimate and its sign, the reported SE or significance marker,
-what null hypothesis the star implicitly tests, and what the careful
-one-sentence interpretation is. Then find the reported $R^2$ (or change in
-$R^2$) and say in one sentence what it does --- and does not --- tell you
-about the model's usefulness.
+You asked an AI assistant: "R squared is 0.80 and the p-value is below 0.001. Is my model good?" It answered:
+
+> "Yes. The model predicts 80% of the valuations correctly, and the tiny p-value proves that the model assumptions hold."
+
+Find what is wrong and write the corrected answer. This is the **Verify**
+step of Attempt → Ask → Verify → Explain, and the exam asks for it.
 
 ::: {.callout-note collapse="true"}
-## Check your approach
+## Check your answer
 
-Your sentence should name the outcome, the predictor's units or scale, and
-"holding the other included variables fixed", and the significance star
-should translate to "a t-test against zero rejects at the marked level" ---
-nothing more. If the $R^2$ sentence avoided both "the model is good" and
-"the model is bad" and instead said what share of outcome variation the
-predictors account for in this sample, you read the table the way this
-course intends.
+Two errors. R squared is the share of the variation that the line explains, not a share of correct predictions. Single predictions can still miss by millions of dollars (the residual standard error is about 1.7 million). And the p-value is calculated under the assumptions. It cannot prove them. Lecture 2 showed a fan in the residuals, so the standard error behind this p-value is doubtful.
 :::
 
 ### Make it yours (5 minutes)
@@ -744,30 +914,28 @@ course intends.
 :::: {.utility-prompt}
 <span class="label">Utility: two sentences</span>
 
-Think of your EiA3 venture --- or any business you know well --- and one
+Think of your EiA3 venture, or any business you know well, and one
 regression you might run on its data. Write two sentences: first say which
 you would rather have for your next decision, a precise slope (narrow
-interval) or a high $R^2$, and why; then name the usefulness meaning from
-today's four-case list that matters most for that decision. There is no
-wrong answer; the point is noticing that precision and fit answer different
-questions.
+interval) or a high $R^2$, and why. Then name the meaning of "useful" from
+the list of four in this lecture that matters most for that decision. There
+is no wrong answer. Precision and fit answer different questions.
 
 ::: {.callout-note collapse="true"}
 ## See an example, then write your own
 
-Take a student-run campus meal-prep box venture. "For setting next month's ad budget I would take a precise slope over a high $R^2$: I need to know what an extra €100 buys, even if week-to-week orders stay noisy. That is the levers meaning of usefulness --- predicting individual weeks matters less to me than the payoff of an input I control."
+Take a student-run campus meal-prep box venture. "For setting next month's ad budget I would take a precise slope over a high $R^2$: I need to know what an extra €100 buys, even if week-to-week orders stay noisy. That is the first meaning on the list, a reliable slope with a low $R^2$: predicting individual weeks matters less to me than the payoff of an input I control."
 :::
 
-You can discuss this task --- and any other task in this chapter --- with
-**Tilly**, the course AI assistant on Canvas: ask it to invent a business
+You can discuss this task, and any other task in this chapter, with
+**Tilly**, the course AI assistant: ask it to invent a business
 model with a significant slope and a low $R^2$ and challenge you to say
 what the model is still useful for.
 ::::
 
-Continue to Tutorial 1: Simple regression, diagnostics, and model
-usefulness.
+[Continue to Tutorial 1: Simple regression, diagnostics, and model usefulness](t01-exam-prep.qmd).
 
-Formula sheet: Lecture 3 formulas.
+[Code sheet: Lecture 3 commands and formulas](code-sheet.qmd#lecture-3-coefficient-inference-fit-and-the-f-test).
 
 For a more formal treatment, see James et al., *An Introduction to
 Statistical Learning*, 2nd ed., Sections 3.1.2--3.1.3, and

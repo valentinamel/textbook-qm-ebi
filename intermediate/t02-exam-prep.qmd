@@ -12,29 +12,31 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 ::: {.outcomes}
 <span class="label">By the end of Tutorial 2, you can</span>
 
-- fit and interpret multiple regression in R;
-- test individual and grouped coefficients against zero;
-- interpret dummy, interaction, and polynomial terms correctly;
-- compare nested models with a partial F-test;
-- write a complete TestVision-ready analysis with design limits.
+- fit and interpret a multiple regression in R
+- test single coefficients and groups of coefficients against zero
+- interpret dummy, interaction, and quadratic terms correctly
+- compare nested models with a partial F-test
+- read a regression table as printed in a research paper
+- write a complete analysis that is ready for the exam format and states
+  its limits.
 :::
 
-Tutorials are **exam preparation sessions**: every task below follows the
-format of the final exam. The standing routine for each task is the same ---
-the TA states the task, pairs work on it first for a few minutes with AI use
-allowed, and the solution is then discussed in plenary, starting from the
-pair attempts.
+Tutorials are **exam preparation sessions**. Every task below follows the
+format of the final exam. You first try each task in pairs. You may use AI for this, following
+Attempt, Ask, Verify, Explain. Then the solution is discussed together.
 
-One note on the order. The tasks run in course order: Task 1 rests on
-Lecture 4, Task 2 on Lecture 5, and Tasks 3--4 on yesterday's Lecture 6.
-This is deliberate --- the tutorial meets the day after Lecture 6, so you
-warm up on settled material before testing what you learned yesterday.
+The tasks follow the order of the course. Task 1 uses Lecture 4, Task 2
+uses Lecture 5, and Tasks 3 and 4 use Lecture 6. A regression table then
+puts the models of Tasks 2 to 4 side by side. Task 5 applies Lectures 3 to 5
+to a table in the style of a published paper.
 
 ::: {.course-phase .phase-before}
 
 ## Before class
 
-Complete the after-class practice from Lectures 4--6. Use the complete
+Complete the after-class practice from Lectures 4 and 5. Lecture 6 is on the
+day before this tutorial: read its lecture material, and do its practice
+after the tutorial. Use the complete
 [QM Intermediate Code Sheet](#intermediate-code-sheet) while working, and
 review
 [Mathematics Refresher: multivariable equations, indicators, products, and powers](../resources/math-refresher.html)
@@ -60,11 +62,11 @@ Complete from memory:
 
 ::: {.course-phase .phase-in-class}
 
-## In class
+## In the tutorial
 
-Attempt each task in R before opening the answer. All tasks use the Shark
-Tank teaching file and the running money unit of **thousands of dollars**.
-Build the analysis data once --- the same constructions as Lectures 4--6:
+Try each task in R before you open the answer. Tasks 1 to 4 use the Shark
+Tank file, and money is measured in thousands of dollars (`ask_1k`). First
+build the data for the analysis. The code is the same as in Lectures 4--6:
 
 ```{r}
 #| label: iep02-load
@@ -80,7 +82,7 @@ known_gender$women <- as.integer(
 known_gender$season_c <- known_gender$season - mean(known_gender$season)
 ```
 
-### Task 1 --- Multiple-regression coefficients (Lecture 4)
+### Task 1: Multiple-regression coefficients (Lecture 4)
 
 Fit:
 
@@ -93,27 +95,31 @@ m1 <- lm(
 summary(m1)
 ```
 
-1. Interpret all three slopes with units and conditioning.
-2. Identify which 95% coefficient interval includes zero.
+1. Interpret all three slopes with units and with the predictors that are
+   held fixed.
+2. Find out which 95% confidence interval of a coefficient includes zero.
 3. Interpret adjusted $R^2$ and the overall F-test.
-4. State two threats to causal interpretation.
+4. Give two reasons why the coefficients cannot be read as causal effects.
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
 At fixed values of the other included predictors, among the 1,441 recorded
 pitches: one later season is associated with about 0.836 percentage points
-less initial equity; an extra \$1,000 requested with about 0.0029
-percentage points less equity (about 0.29 points per \$100,000); and one
-additional description word with about 0.128 percentage points less equity.
-The description-word interval, about $(-0.351,\; 0.095)$, includes zero.
-Adjusted $R^2\approx0.186$, and the overall F-test
-($F\approx110.6$ on 3 and 1437 df) rejects the joint zero-slope null.
-Selection into the show, unmeasured venture quality, reverse relationships,
-and measurement choices are all possible causal threats.
+less equity offered, an extra \$1,000 requested with about 0.0029
+percentage points less (about 0.29 points per \$100,000), and one
+additional description word with about 0.128 percentage points less.
+`confint(m1)` shows that the interval for the description words, about
+$(-0.351, 0.095)$, includes zero. Adjusted $R^2\approx0.186$: the model
+accounts for about 19% of the variation in the equity offered. The overall
+F-test ($F\approx110.6$ on 3 and 1437 df) rejects the null hypothesis that
+all three slopes are zero. Possible reasons against a causal reading: only
+selected pitches reach the show, the quality of the venture is not
+measured, the equity offered may influence the amount requested, and the
+variables may be measured with error.
 :::
 
-### Task 2 --- Dummy variables and a partial F-test (Lecture 5)
+### Task 2: Dummy variables and a partial F-test (Lecture 5)
 
 ```{r}
 #| label: iep02-gender-models
@@ -127,26 +133,27 @@ anova(reduced, complete)
 
 1. Name the reference category.
 2. Interpret both dummy coefficients.
-3. State and decide the partial F-test.
-4. Explain why the partial test and the individual t-tests answer different
-   questions.
+3. State the hypotheses of the partial F-test and decide.
+4. Explain why the partial F-test and the individual t-tests answer
+   different questions.
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-The reference is all-men. At the same season and requested amount,
+The reference category is all-men. At the same season and requested amount,
 all-women presenting teams are fitted to offer about 1.28 equity percentage
-points more, and mixed teams about 0.12 points more, than all-men teams ---
-percentage points, not percent. The partial null is that both dummy
-coefficients equal zero; $F\approx3.76$, p $\approx$ 0.023, so reject at
-5%: the terms are jointly useful even though the mixed dummy's own t-test
-(p $\approx$ 0.82) is far from significant. The F-test asks whether the
-pair improves the model together; each t-test asks about one
-reference-group contrast. The broad source coding and observational design
-prohibit a causal gender claim.
+points more than all-men teams, and mixed teams about 0.12 points more. The
+unit is percentage points, not percent. The null hypothesis of the partial
+F-test is that both dummy coefficients are zero. $F\approx3.76$ and
+p $\approx$ 0.023, so reject at 5%. The two terms are jointly useful, even
+though the t-test of the mixed dummy alone (p $\approx$ 0.82) is far from
+significant. The F-test asks whether the two terms together improve the
+model. Each t-test asks about one comparison with the reference group. The
+categories are broad and the data do not come from an experiment, so the
+result does not show a causal effect of gender.
 :::
 
-### Task 3 --- Interaction (Lecture 6)
+### Task 3: Interaction (Lecture 6)
 
 ```{r}
 #| label: iep02-interaction
@@ -157,28 +164,31 @@ m_interaction <- lm(
 summary(m_interaction)
 ```
 
-1. Write the fitted line for `women = 0` and `women = 1` at a fixed
-   request.
+1. Write the fitted line for `women = 0` and for `women = 1` at a fixed
+   requested amount.
 2. Calculate both season slopes.
-3. Interpret the interaction estimate and p-value without overclaiming in
-   either direction.
-4. Explain the role of centering.
+3. Interpret the interaction estimate and its p-value without claiming too
+   much in either direction.
+4. Explain what centering does.
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-For all-men teams the season slope is about $-0.799$ percentage points per
-season; for teams with women represented it is
-$-0.799-0.061=-0.861$. The estimated slope difference is $-0.061$
-percentage points per season with p $\approx$ 0.520: this model provides no
-evidence of different season trends between the two source-defined groups
---- and no proof of equal trends, since the estimate is imprecise.
-Centering makes the lower-order group coefficient compare the groups at the
-average season (about 8.8) instead of at the unobserved Season 0; it
-changes neither the fitted values nor the interaction estimate.
+At a fixed requested amount, the fitted line for all-men teams is
+$13.625-0.799\,season\_c$ plus the term for the requested amount. For teams
+with women the intercept is $13.625+0.807=14.432$ and the slope is
+$-0.7994-0.0615=-0.861$. So the season slope is about $-0.799$ percentage
+points per season for all-men teams and about $-0.861$ for teams with
+women. The estimated difference in slopes is $-0.061$ percentage points per
+season with p $\approx$ 0.520. The model gives no evidence that the season
+trends differ between the two groups. It also does not prove that the trends
+are equal, because the estimate is imprecise. Centering makes the `women`
+coefficient compare the groups at the average season (about 8.8) and not at
+Season 0, which does not exist. It changes neither the fitted values nor the
+interaction estimate.
 :::
 
-### Task 4 --- Polynomial term (Lecture 6)
+### Task 4: Polynomial term (Lecture 6)
 
 ```{r}
 #| label: iep02-polynomial
@@ -192,21 +202,152 @@ anova(m_linear, m_quadratic)
 ```
 
 1. Why must `I(season^2)` be used in the R formula?
-2. Decide whether the quadratic term adds fit under the classical test.
+2. Decide with the partial F-test whether the quadratic term improves the
+   model.
 3. Calculate the fitted change from Season 10 to Season 11.
 4. State why the curve should not be extrapolated beyond Season 16.
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-`I()` tells R to square arithmetically rather than read `^` as formula
-syntax. The partial F-test gives $F\approx20.1$ with p $<$ 0.001, so the
-quadratic term adds detectable fit. With $b_1\approx-1.713$ and
-$b_2\approx0.051$, the change from Season 10 to 11 is
-$b_1+b_2(2\times10+1)=b_1+21b_2\approx-0.64$ percentage points --- never
-read $b_1$ alone while the squared term is in the model. Beyond Season 16
-the fitted parabola turns upward with no data support; polynomials can
-behave sharply outside the observed range.
+`I()` tells R to calculate the square. Without it, R would read `^` as
+formula syntax. The partial F-test gives $F\approx20.1$ with p $<$ 0.001,
+so the quadratic term improves the model. With $\hat\beta_1\approx-1.713$
+and $\hat\beta_2\approx0.051$, the change from Season 10 to 11 is
+$\hat\beta_1+\hat\beta_2(2\times10+1)=\hat\beta_1+21\hat\beta_2\approx-0.64$
+percentage points. Never read $\hat\beta_1$ alone while the squared term is
+in the model. Beyond Season 16 the fitted curve turns upward, and no data
+support that turn. A quadratic curve can change direction sharply outside
+the observed range.
+:::
+
+### The models of Tasks 2 to 4 in one table {#iep02-spec-table}
+
+Lecture 4 showed how research papers put several models side by side in one
+regression table. The table below does this for the models of Tasks 2 to 4.
+All columns of such a table must use the same observations. Tasks 2 and 3
+use the 1,434 pitches with a known team classification (`known_gender`).
+Task 4 uses all 1,441 pitches. So first fit the quadratic model again on the
+1,434 pitches. The code then prints the two outputs that are not shown
+above.
+
+```{r}
+#| label: iep02-table-models
+m_quadratic_known <- lm(
+  equity_offered_pct ~ season + I(season^2) + ask_1k,
+  data = known_gender
+)
+summary(reduced)
+summary(m_quadratic_known)
+```
+
+Column (1) is the reduced model of Task 2 (`reduced`), column (2) the
+complete model of Task 2 (`complete`), column (3) the interaction model of
+Task 3 (`m_interaction`), and column (4) the quadratic model
+(`m_quadratic_known`).
+
+::: {.reg-table}
+| | (1) | (2) | (3) | (4) |
+|:---|---:|---:|---:|---:|
+| Season | −0.815\*\*\* | −0.824\*\*\* | −0.799\*\*\* | −1.713\*\*\* |
+| | (0.047) | (0.048) | (0.066) | (0.206) |
+| Season squared | | | | 0.051\*\*\* |
+| | | | | (0.011) |
+| Amount requested (\$1,000s) | −0.0029\*\*\* | −0.0027\*\*\* | −0.0027\*\*\* | −0.0027\*\*\* |
+| | (0.0006) | (0.0006) | (0.0006) | (0.0006) |
+| All-women team | | 1.284\*\* | | |
+| | | (0.481) | | |
+| Mixed team | | 0.121 | | |
+| | | (0.541) | | |
+| Team with women (all-women or mixed) | | | 0.807 | |
+| | | | (0.412) | |
+| Season × team with women | | | −0.061 | |
+| | | | (0.096) | |
+| Intercept | 21.185\*\*\* | 20.839\*\*\* | 13.625\*\*\* | 24.168\*\*\* |
+| | (0.484) | (0.506) | (0.335) | (0.822) |
+| Observations | 1,434 | 1,434 | 1,434 | 1,434 |
+| $R^2$ | 0.187 | 0.191 | 0.189 | 0.198 |
+| Adjusted $R^2$ | 0.186 | 0.189 | 0.187 | 0.197 |
+:::
+
+Outcome: equity offered (%). Ordinary least squares. Standard errors in
+parentheses. All four columns use the same 1,434 pitches with a known team
+classification. The reference group is all-men teams. In column (3) season
+is centred at its mean (about 8.8), so the intercept and the coefficient of
+"Team with women" refer to the average season.
+\* p < 0.05, \*\* p < 0.01, \*\*\* p < 0.001.
+
+Read along the Season row. The coefficient is close to $-0.8$ in columns
+(1) to (3). In column (4) it is $-1.713$, because with the squared term in
+the model the season coefficient alone is not the trend. Read down a column
+to see one model. Columns (2), (3), and (4) each add terms to column (1), so
+each can be compared with column (1) by a partial F-test. The bottom rows
+show that the four models fit almost equally well: adjusted $R^2$ lies
+between 0.186 and 0.197, a difference of about one percentage point of the
+variation in the equity offered. Use this layout for regression results in
+your thesis.
+
+### Task 5: Read a regression table from a paper
+
+The table below is invented for this tutorial. It has the layout of a table
+in a management journal, the same layout as the table above. The outcome is
+entrepreneurial intention on a scale from 1 to 7, measured in a survey of
+265 students. Self-efficacy is a score from 1 to 7 for how confident a
+student is that he or she can start a business. The intercept is left out,
+as some journals do.
+
+::: {.reg-table}
+| | (1) | (2) |
+|:---|---:|---:|
+| Age (years) | 0.02 | 0.01 |
+| | (0.02) | (0.02) |
+| Female (1 = yes) | −0.21\* | −0.15 |
+| | (0.10) | (0.10) |
+| Prior entrepreneurial experience (1 = yes) | | 0.42\*\* |
+| | | (0.13) |
+| Entrepreneurial self-efficacy (1--7) | | 0.38\*\*\* |
+| | | (0.07) |
+| Observations | 265 | 265 |
+| $R^2$ | 0.03 | 0.19 |
+| Adjusted $R^2$ | 0.02 | 0.18 |
+:::
+
+Outcome: entrepreneurial intention (scale from 1 to 7). Ordinary least
+squares. Standard errors in parentheses.
+\* p < 0.05, \*\* p < 0.01, \*\*\* p < 0.001.
+
+1. What do the numbers in parentheses and the stars mean? Check the stars
+   of the self-efficacy coefficient with its t statistic.
+2. Interpret the self-efficacy coefficient in column (2) in one complete
+   sentence.
+3. The coefficient of Female changes from $-0.21$ with a star in column (1)
+   to $-0.15$ without a star in column (2). Explain what happened with the
+   ideas of Lecture 4, and say what the missing star does and does not
+   mean.
+4. $R^2$ rises from 0.03 to 0.19. What does that say, and which test would
+   judge whether the two added predictors are jointly useful?
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+1. The numbers in parentheses are standard errors. The stars show the
+   p-value of the two-sided t-test of each coefficient against zero. For
+   self-efficacy, $t=0.38/0.07\approx5.4$. This is far beyond the multiplier
+   $t_{0.975,\,260}\approx1.97$, and p is below 0.001, so three stars are
+   correct.
+2. Among the 265 surveyed students, a self-efficacy score that is one point
+   higher is associated with an entrepreneurial intention that is 0.38
+   points higher, holding age, gender, and prior experience fixed.
+3. Model (2) holds two more variables fixed than model (1). The Female
+   coefficient now compares women and men with the same experience and
+   self-efficacy. Part of the raw gap of 0.21 points went together with
+   differences in those two variables. The missing star says that the
+   confidence interval around $-0.15$ includes zero. It does not show that
+   the gap is zero.
+4. The two added predictors account for a further 16 percentage points of
+   the variation in intentions in this sample. A partial F-test of the two
+   nested models, `anova(reduced, complete)`, would judge whether they are
+   jointly useful.
 :::
 
 :::
@@ -215,29 +356,31 @@ behave sharply outside the observed range.
 
 ## After class
 
-### Timed integrated task --- 30 minutes
+### Timed integrated task: 30 minutes
 
-Develop one model of `equity_offered_pct` using season, the requested
-amount in $1,000s, the three known source gender groups, and one justified
-extension.
+Build one model of the equity offered (`equity_offered_pct`) in the Shark
+Tank file. Use season, the requested amount in \$1,000s, the three known
+categories of presenting teams, and one extension that you can justify: an
+interaction or a quadratic term.
 
-Your submission must include:
+Your answer must include:
 
-1. a precise research question;
-2. reproducible data preparation;
-3. one pre-model visual;
-4. the R formula and model summary;
-5. coefficient interpretations with units and reference groups;
-6. an individual t-test and an overall or partial F-test;
-7. $R^2$, adjusted $R^2$, and residual diagnostics;
-8. one graph of fitted conditional predictions;
-9. a 150-word conclusion separating association, uncertainty, and causal
-   limits.
+1. a precise research question
+2. the code that prepares the data, so that someone else can repeat it
+3. one graph of the data before you fit the model
+4. the R formula and the model summary. If you compare several models, show
+   them in one regression table in the layout of this tutorial
+5. interpretations of the coefficients with units and reference groups
+6. a t-test of one coefficient and an overall or partial F-test
+7. $R^2$, adjusted $R^2$, and residual diagnostics
+8. one graph of fitted values from the model
+9. a conclusion of 150 words that keeps apart the association, its
+   uncertainty, and the reasons why it is not causal.
 
 ::: {.callout-note collapse="true"}
 ## Check a model structure
 
-A defensible solution could fit
+A good solution could fit
 
 ```r
 m <- lm(
@@ -246,13 +389,15 @@ m <- lm(
 )
 ```
 
-or a quadratic-season model with group dummies. Keep lower-order terms,
-name the reference group, interpret combined slopes or fitted contrasts,
-compare a nested reduced model with `anova(reduced, complete)`, inspect
-residuals (including `rstandard()` and Cook's distance), and plot
-predictions within Seasons 1--16. The conclusion must state that the
-source's broad presenter classification and the selected televised records
-do not identify a causal effect of gender or season.
+or a model with a quadratic term for season and the group dummies. Keep
+`season` and `gender` in the model next to their interaction (the hierarchy
+principle), and name the reference group. Interpret slopes that combine
+several coefficients, or differences between fitted values. Compare the
+model with a nested reduced model with `anova(reduced, complete)`. Inspect
+the residuals, including `rstandard()` and Cook's distance, and plot fitted
+values inside Seasons 1--16. The conclusion must say that the team
+categories are broad, that only broadcast pitches are in the file, and that
+the results therefore do not show a causal effect of gender or season.
 :::
 
 ### Make it yours (5 minutes)
@@ -260,23 +405,22 @@ do not identify a causal effect of gender or season.
 :::: {.utility-prompt}
 <span class="label">Utility: two sentences</span>
 
-Think of your EiA3 venture --- or any business you know well. Sketch, in
-two sentences, the integrated analysis you would actually run on its data:
-first name the outcome, two predictors, and the one extension (a dummy set,
-an interaction, or a quadratic) that a real question motivates, then say
-which single caveat --- selection, measurement, or omitted variables ---
-would headline your 150-word conclusion. There is no wrong answer; the
-point is noticing that you now own the entire pipeline.
+Think of your EiA3 venture, or any business you know well. Describe in two
+sentences the full analysis that you would run on its data. First, name the
+outcome, two predictors, and one extension (a set of dummies, an
+interaction, or a quadratic term) that a real question motivates. Second,
+say which limit you would put first in your conclusion: selection,
+measurement, or omitted variables. There is no wrong answer.
 
 ::: {.callout-note collapse="true"}
 ## See an example, then write your own
 
-Take a student-run campus meal-prep box venture. "Outcome: weekly orders; predictors: ad spend and price, plus an exam-week dummy interacted with ad spend, because I believe ads work mainly when students are on campus. The headlining caveat is omitted variables: weather drives both my flyer effort and campus foot traffic, and nothing in my data measures it."
+Take a student-run venture that sells meal-prep boxes on campus (an invented example). "Outcome: weekly orders. Predictors: advertising spend and price, plus a dummy for exam weeks and its interaction with advertising spend, because I believe ads work mainly when students are on campus. The first limit is omitted variables: the weather drives both how many flyers I hand out and how many people are on campus, and nothing in my data measures it."
 :::
 
-You can discuss this task --- and any other task in this tutorial --- with
-**Tilly**, the course AI assistant on Canvas: ask it to referee your
-two-sentence design before you invest a weekend in the data.
+You can discuss this task, and any other task in this tutorial, with
+**Tilly**, the course AI assistant. Ask it to review your two sentences
+before you spend a weekend on the data.
 ::::
 
 QM Intermediate is complete. Review the

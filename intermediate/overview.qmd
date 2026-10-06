@@ -4,37 +4,98 @@ QM Intermediate builds on the probability, inference, and R skills from QM
 Basic. The central question changes from "What does this sample show?" to
 "How is an outcome related to several variables at the same time?"
 
+For a founder these are the questions behind most decisions. What does an
+extra euro of advertising bring? Does a lower price sell more, once the
+season is taken into account? Does the new page beat the old one? Regression
+is the tool that R and every AI assistant use to answer them. This course
+teaches you to read its output, to check it, and to decide with it.
+
 ::: {.outcomes}
 <span class="label">By the end of QM Intermediate, you can</span>
 
-- formulate simple and multiple-regression questions from E&BI problems;
-- fit, diagnose, and interpret linear regression models in R;
+- formulate simple and multiple-regression questions from E&BI problems
+- fit, diagnose, and interpret linear regression models in R
 - distinguish a coefficient, fitted value, residual, and uncertainty
-  interval;
-- interpret tests against zero, $R^2$, and F-tests for model usefulness;
-- use dummy predictors, interactions, and polynomial terms;
+  interval
+- interpret tests against zero, $R^2$, and F-tests for model usefulness
+- use dummy predictors, interactions, and polynomial terms
 - explain how controls change an estimate without automatically making it
-  causal;
+  causal
 - read the central regression evidence in a business or management paper.
 :::
 
-## How this course connects
+## The data we use
 
-Expectation and variance become the foundations for regression coefficients
-and residual variation. Covariance and correlation motivate linear
-relationships, while the inference tools from Basic return when we quantify
-uncertainty around model estimates.
+All lectures use the Shark Tank teaching file. One row is one pitch on the
+US television show *Shark Tank*: 1,441 pitches from Seasons 1 to 16.
+Founders ask a panel of investors, the sharks, for money in exchange for a
+share of their company. The file records what they asked for, the share they
+offered, and whether a deal was agreed on air and on which terms.
 
-The Shark Tank data continue as the main shared example, with money amounts
-measured in thousands of dollars throughout so that axes and coefficients
-stay readable. Additional datasets are not required for the core sequence.
+- The variables are listed in
+  [Basic Lecture 1, "The variables in the Shark Tank file"](../basic/b01-introduction-data-analysis.qmd#b01-variable-table).
+- The [welcome page](../index.qmd) describes where the data come from and
+  what they cannot show: these are selected television pitches, not a random
+  sample of all ventures.
+- Lectures 1 to 3 study valuations, in millions of dollars: the valuation a
+  founder claims and the valuation agreed on air. From Lecture 4 on, the
+  outcome is the equity offered, in percent, and the requested amount is
+  measured in thousands of dollars. These units keep axes and coefficients
+  easy to read.
+
+No other dataset is needed for the lectures. The mock exam uses a second,
+invented dataset that you download from its page.
+
+## What this course builds on
+
+QM Intermediate uses a small set of ideas from QM Basic. Each row of the
+table says where this book explains the idea, so you can look it up when a
+lecture uses it.
+
+| Idea | Used here for | Where to read it again |
+|---|---|---|
+| Mean, variance, standard deviation | slopes, residual spread | [Basic Lecture 3](../basic/b03-discrete-distributions.qmd) |
+| Covariance, correlation, conditional mean | the slope formula, what a regression line estimates | [Basic Lecture 5](../basic/b05-joint-covariance-correlation.qmd) |
+| Sample and population, estimator and estimate | $\hat\beta_1$ as an estimate of $\beta_1$ | [Basic Lecture 7](../basic/b07-samples-estimators.qmd) |
+| Standard error | the "Std. Error" column of R output | [Basic Lecture 8](../basic/b08-sampling-distributions.qmd) |
+| Confidence interval, t distribution | intervals for coefficients | [Basic Lecture 9](../basic/b09-t-confidence-intervals.qmd) |
+| p-value, test against zero | the "t value" and "Pr(>\|t\|)" columns | [Basic Lecture 10](../basic/b10-testing-errors-power.qmd) |
+
+The preparation for Lecture 1 has a ten-minute warm-up on five quantities
+from the last four rows: estimate, standard error, t value, p-value, and
+confidence interval.
+
+### If you took QM Basic before 2026
+
+The Basic chapters in this book are new. If you took the course in its
+earlier form, you know the ideas in the table, but three things look
+different here.
+
+- **Values come from R, not from tables.** Where you looked up a z or t
+  table, this book uses `pnorm()`, `qnorm()`, and `qt()`. In the exam the
+  values you need are in the R output.
+- **Notation for multipliers.** You may know $z_{\alpha/2}$ and
+  $t_{\alpha/2;\,n-1}$. This book writes $z_{0.975}=1.96$ and
+  $t_{0.975,\,df}$, the way R does: `qnorm(0.975)` and `qt(0.975, df)`. The
+  numbers are the same.
+- **Tests are tests against zero.** A test of "the mean equals 15" is
+  written as "the difference from 15 equals zero". Regression output tests
+  every coefficient against zero in the same way. All tests in this course
+  are two-sided.
+
+It is worth one hour to read the lecture material of
+[Basic Lecture 9](../basic/b09-t-confidence-intervals.qmd) and
+[Basic Lecture 10](../basic/b10-testing-errors-power.qmd) before the course
+starts. The [welcome page](../index.qmd) explains how every chapter of this
+book is built, and [How to succeed in this course](../resources/how-to-succeed.qmd)
+shows what a week looks like.
 
 ## Course sequence
 
 | Chapter | Central question |
 |---|---|
 | Lecture 1 | What line best summarises the relationship between two variables? |
-| Lecture 2 | What does the model assume, and what do its residuals confess? |
+| Lecture 2 | What does the model assume, and what do its residuals reveal? |
 | Lecture 3 | How precise are the coefficients, and is the model useful at all? |
 | Tutorial 1 | Can you fit, diagnose, and communicate a simple regression? |
 | Lecture 4 | How do we interpret one predictor while holding others fixed? |
@@ -57,20 +118,31 @@ notation, examples, and practice required for this course.
 
 One lecture per week, with tutorials the day after the lecture in weeks 45
 and 48. The [How to succeed in this course](../resources/how-to-succeed.qmd)
-page lays out the cycle with printable checklists, including the deliberate
-ordering of tutorial preparation.
+page lays out the week with printable checklists.
+
+Bring a charged laptop to every lecture, with RStudio and your course
+project open. All code shown in the lecture is in the chapter, ready to copy.
+You can run each step yourself while it is explained and get the same
+numbers and figures on your own screen.
 
 ## Tutorials and assessment
 
-Two tutorials---one after Lecture 3 and one after Lecture 6---combine
-interpretation with hands-on R work. They prepare you to work with data in R
-during the TestVision assessment. If an R workflow has become rusty, return
-to the [R Refresher](../resources/r-refresher.qmd) or the earlier
+Two tutorials, one after Lecture 3 and one after Lecture 6, combine
+interpretation with hands-on R work. If an R workflow has become rusty,
+return to the [R Refresher](../resources/r-refresher.qmd) or the earlier
 [Programming for E&BI](https://walshc.github.io/ebi-prog/) textbook.
 
-Use the cumulative [QM Intermediate Code Sheet](code-sheet.qmd) throughout
-the tutorials and when preparing for the final exam. After completing
-Tutorial 2, attempt the [QM Intermediate Mock Exam](mock-exam.qmd) in R under
-timed conditions.
+The exam is taken in TestVision, with R available. You work with data in R
+and write your answers in TestVision. The
+[QM Intermediate Code Sheet](code-sheet.qmd) is provided at the exam. Use it
+during the tutorials too, so that you know where everything is.
+
+The [QM Intermediate Mock Exam](mock-exam.qmd) is open from the first week.
+Look at it early to see what the exam asks. After Tutorial 2, attempt it in
+R under timed conditions. A practice exam in TestVision itself appears in
+your TestVision account once it is published. You log in with your
+university account, and there is no separate link. The university explains
+TestVision for students
+[on this page](https://www.tilburguniversity.edu/students/studying/exams/e-assessment/testvision).
 
 [Begin Lecture 1: Simple linear regression](i01-simple-linear-regression.qmd).

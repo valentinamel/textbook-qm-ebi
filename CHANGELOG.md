@@ -1170,3 +1170,92 @@ details follow.
 
 - GitHub repository icon removed from the sidebar title area (repo-url
   unset; the repo is maintenance infrastructure, not a student link).
+
+## 2026-10-06 — Freeze round
+
+Three layers, applied in this order on the state of 29 September.
+
+**1. Claude's review of 3 October** (`qm-fixes-all.patch`): 159 text fixes
+and the structural changes A1 to A22 (founder's question at the start of
+every lecture, founder's decision boxes, must-know boxes, valuations as the
+running example of Intermediate Lectures 1 to 3, Basic Lectures 7 to 10
+rebalanced, reading block removed, QM Advanced marked as work in progress,
+hats on estimates, plain-language pass). Details in
+`Review round Oct 6/Claude's independent review/files/qm-fixes-all.md`.
+
+**2. Merged plan** (Gabriela's notes and gap analysis plus the check of the
+patched text, `Review round Oct 6/merged-review-plan.md`), with Valentina's
+decisions of 6 October (see `DECISIONS.md`).
+
+- Whole book: "In class" renamed "Lecture material". Session narration and
+  lecturer-facing remarks removed. After class starts with "Read the lecture
+  material (15 minutes)", new minimum path, total times updated. After-class
+  headings in plain words. Definition boxes and collapsed Optional boxes
+  introduced, old optional boxes converted. Variables and data named at
+  every data reference.
+- Basic 1: definition boxes for population and sample, variable types,
+  median, quartiles and IQR. Proportion and range explained. Complete
+  variable table. Valuation numbers moved to where the code shows them.
+- Basic 2: why data analysis needs probability. Three more properties of
+  probability. Optional box with set rules. Capital and lower-case
+  convention. Probability 0 and 1 stated correctly for all variables.
+- Basic 3: CDF figure with flat ends. mu, sigma squared, sigma introduced.
+  Bernoulli box. A function of a random variable is a random variable.
+  Shifting and rescaling with the SD rule, practised after class and in
+  Tutorial 1. Interval rule for the CDF.
+- Basic 4: conditional probability in words before the symbol. Complement
+  rule under a condition. Definition boxes.
+- Basic 5: new section "Sums of two variables". Covariance as a sum over the
+  joint PMF. Conditional mean practised. Third variable explained.
+- Basic 6: single value has probability zero and density explained with
+  shrinking windows on equity offered (after Gabriela's text). Complement
+  and symmetry rules. Quantile and percentile defined. Central 95% brought
+  forward. Four new figures. Optional box with the integral. Sum of
+  independent normals.
+- Basic 7: random sample X_1..X_n and iid. Table parameter, estimator,
+  estimate. Unbiasedness with a figure. Optional box on sampling without
+  replacement.
+- Basic 8: binomial section with figure. Estimated standard error of a
+  proportion. Consistency. Sample size for a target margin of error.
+  Probability for a sample mean worked in the lecture material.
+- Basic 9: new title. Condition added to the interval recipe. Margin of
+  error as precision. Multipliers come from the question or the sheet.
+- Basic 10: critical-value rule. One-sided tests in one optional box. Two
+  exam-style items given new numbers.
+- Tutorials 1 to 4: new task parts for the added skills, one-sided leftovers
+  removed, Phi notation removed, a model report added in Tutorial 4.
+- Formula sheet: rules moved to the lectures that teach them (Lecture 3:
+  shifting and rescaling, Lecture 5: sums). Added: quartiles and IQR, three
+  properties of probability, short Bayes rule, conditional mean, uniform SD,
+  complement and symmetry, unbiasedness, estimated SE of a proportion,
+  binomial mean and variance, sample size, critical-value rule. Formal
+  random-variable mapping and the perp symbol removed.
+- Basic mock exam: Questions 3 and 5 given new numbers, because the lectures
+  used the old ones.
+
+**3. Intermediate points of 6 October.**
+
+- Overview: the data, what the course builds on (table with links into
+  Basic), a part for students who took Basic before 2026, laptop and
+  code-along note, TestVision note.
+- Lecture 1: least-squares formulas explained in words, slope as covariance
+  over variance and as correlation times s_Y over s_X, R check. Units
+  example moved after the fitted model.
+- Lecture 3: decomposition figure redrawn. Residual standard error worded
+  correctly. Robust standard errors as a normal section with output.
+- Lecture 4 and Tutorial 2: specification tables in the layout of a research
+  paper, with a `modelsummary` snippet.
+- Lecture 6: founder's decision with consistent arithmetic.
+- Mock exam: TestVision paragraph, wording, one answer extended.
+- How to succeed: routine, minimum path, "what is examined", hours and
+  checklists recomputed.
+
+Verification: full render with Quarto 1.6.42 without errors or warnings, all
+R chunks run from a clean session, internal links and anchors checked, three
+independent reviews of the final text (statistics, order, wording) with all
+findings applied.
+
+How to succeed, same day: the calendar now gives dates and start times from
+the programme timetable (TimeEdit export of 6 October), including the one
+Basic lecture at 10:45 on Monday 26 October and the two tutorial slots per
+group.

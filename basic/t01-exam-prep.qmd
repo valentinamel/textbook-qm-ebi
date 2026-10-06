@@ -12,18 +12,19 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 ::: {.outcomes}
 <span class="label">By the end of Tutorial 1, you can</span>
 
-- distinguish data, events, random variables, and distributions;
-- apply probability rules to the Shark Tank record-selection experiment;
-- calculate and interpret a Bernoulli PMF, CDF, and expectation;
-- calculate a variance and standard deviation from a small PMF;
-- write a concise interpretation of supplied R output.
+- distinguish data, events, random variables, and distributions
+- apply probability rules to the Shark Tank record-selection experiment
+- calculate and interpret a Bernoulli PMF, CDF, and expectation
+- calculate a variance and standard deviation from a small PMF
+- calculate the expected value and standard deviation of a shifted and
+  rescaled variable $aX+b$
+- write a concise interpretation of supplied R output
+- read a histogram by hand and find the interval that contains the median.
 :::
 
-Tutorials are **exam preparation sessions**: every task below follows the
-format of the final exam. The standing routine for each task is the same ---
-the TA states the task, pairs work on it first for a few minutes with AI use
-allowed, and the solution is then discussed in plenary, starting from the
-pair attempts.
+Tutorials are **exam preparation sessions**. Every task below follows the
+format of the final exam. You first try each task in pairs. You may use AI for this, following
+Attempt, Ask, Verify, Explain. Then the solution is discussed together.
 
 ::: {.course-phase .phase-before}
 
@@ -38,7 +39,7 @@ chapters, complete these definitions:
 4. A PMF is ...
 5. The variance of a random variable averages ...
 
-Use the cumulative formula sheet through Lecture 3.
+Use the [formula sheet](formula-sheet.qmd) up to and including Lecture 3.
 
 Review [Mathematics Refresher: sets, fractions, and
 sums](../resources/math-refresher.html) if the notation is slowing you down.
@@ -48,9 +49,10 @@ sums](../resources/math-refresher.html) if the notation is slowing you down.
 
 1. An observational unit is the entity represented by one row of the data.
 2. An event is a specified subset of the sample space.
-3. A random variable is a real-valued function on the sample space.
+3. A random variable is a numerical measurement of the outcome: a fixed rule
+   that turns each outcome into a number.
 4. A PMF assigns probability $P(X=x)$ to each value in the support of a
-   discrete random variable; its masses are non-negative and sum to 1.
+   discrete random variable. Its masses are non-negative and sum to 1.
 5. Variance averages squared deviations from the variable's mean:
    $\operatorname{Var}(X)=E\!\left[(X-E[X])^2\right]$.
 :::
@@ -59,20 +61,22 @@ sums](../resources/math-refresher.html) if the notation is slowing you down.
 
 ::: {.course-phase .phase-in-class}
 
-## In class
+## In the tutorial
 
 Attempt each task before opening its answer. A complete written answer should
 name the quantity, show the calculation, report the value and units, interpret
-it in context, and state an important model or measurement boundary.
+it in context, and state one important limit of the model or of the
+measurement.
 
-All tasks use the Shark Tank teaching file. Load it once:
+Tasks 1 to 3 and the timed practice after class use the Shark Tank teaching
+file. Tasks 4 and 5 use invented examples. Load the file once:
 
 ```{r}
 #| label: bep01-load
 sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
 ```
 
-### Task 1 --- Data and measurement
+### Task 1: Data and measurement
 
 R reports:
 
@@ -105,7 +109,7 @@ show, not completed funding or later venture performance. Word count
 describes the written text in the source dataset, not the spoken pitch.
 :::
 
-### Task 2 --- Events and probability rules
+### Task 2: Events and probability rules
 
 The experiment selects one of the 1,441 records uniformly. The two events are
 built exactly as in Lecture 2:
@@ -134,15 +138,16 @@ c(P_D = mean(D), P_L = mean(L), P_D_and_L = mean(D & L))
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-The sample space is the set of 1,441 complete pitch records; one selected
+The sample space is the set of 1,441 complete pitch records. One selected
 record is an outcome, while $D$ is the subset of 882 deal records. The
 complement is no on-air deal, the intersection is a late-season deal, and the
 union is late-season, deal, or both. $P(D^c)=1-882/1441=559/1441\approx0.388$.
-The union is $P(D)+P(L)-P(D\cap L)\approx0.771$. Future use requires a
-defined target population and comparable selection, time period, and outcome.
+The union is $P(D)+P(L)-P(D\cap L)\approx0.771$. To use these probabilities
+for a future entrepreneur, you need a defined target population and a
+comparable selection, time period, and outcome.
 :::
 
-### Task 3 --- PMF, CDF, and expectation
+### Task 3: PMF, CDF, and expectation
 
 Let $X=1$ for an on-air deal and $X=0$ otherwise. Use $p=882/1441$.
 
@@ -173,14 +178,16 @@ $$
 
 The expectation is $E[X]=0(1-p)+1p=p\approx0.612$. Because the indicator
 contains 882 ones among 1,441 observations, its mean is also $882/1441$.
-$X$ is the mapping defined before selection; $x=1$ is one possible
-realised value.
+$X$ is the random variable: a numerical measurement of the outcome, a fixed
+rule that turns each outcome into a number (1 for a deal, 0 for no deal).
+$x=1$ is one realised value, the number obtained when the selected pitch
+has a deal.
 :::
 
-### Task 4 --- Variance from a small PMF
+### Task 4: Variance from a small PMF
 
-A venture studio models $N$, the number of investors who make an offer to one
-of its startups, with the PMF
+An invented example. A venture studio models $N$, the number of investors who
+make an offer to one of its startups, with the PMF
 
 | $n$ | 0 | 1 | 2 |
 |---|---:|---:|---:|
@@ -193,6 +200,9 @@ of its startups, with the PMF
    $E[N^2]-\left(E[N]\right)^2$.
 4. Report the standard deviation with its unit, and state in one sentence
    what it measures here.
+5. Each offer costs the studio 3 hours of meetings, and every startup needs
+   2 hours of preparation. The time spent on one startup is therefore
+   $T=3N+2$ hours. Calculate $E[T]$ and $\operatorname{SD}(T)$.
 
 ::: {.callout-note collapse="true"}
 ## Check a model answer
@@ -211,6 +221,38 @@ $\operatorname{Var}(N)=1.1-0.7^2=1.1-0.49=0.61$. The two routes agree.
 The standard deviation is $\sqrt{0.61}\approx0.78$ offers. It measures the
 typical distance of the realised number of offers from the mean of 0.7,
 in the original unit (offers), whereas the variance is in squared offers.
+
+Time per startup: use the rules for $aX+b$ with $a=3$ and $b=2$.
+$E[T]=3E[N]+2=3\times0.7+2=4.1$ hours.
+$\operatorname{SD}(T)=|3|\operatorname{SD}(N)\approx3\times0.78=2.34$ hours,
+more than half of the expected time. The 2 hours of preparation raise the
+expected time and leave the spread unchanged.
+:::
+
+### Task 5: Read a histogram by hand
+
+An invented example. A venture records the delivery times of 120 orders. A histogram groups them
+into intervals of 10 minutes, and each bar includes its upper limit. The bar
+counts, from the first interval (0 to 10 minutes) to the fifth (above 40, up
+to 50 minutes), are 18, 46, 32, 16, and 8.
+
+1. What does one observation represent, and what is on each axis?
+2. Put the tallest bar into one full sentence.
+3. Which interval contains the median? Show the cumulative counts.
+4. Describe the shape, and state one thing the histogram cannot tell you.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+One observation is one order. The horizontal axis is the delivery time in
+minutes and the vertical axis is the number of orders. The tallest bar: 46
+orders took more than 10 and at most 20 minutes. With 120 orders the median
+lies between the 60th and the 61st ordered value. The cumulative counts are
+18 and then 18 + 46 = 64, so both values lie in the second interval: the
+median delivery time is above 10 and at most 20 minutes. The distribution is
+right-skewed: most orders arrive within 30 minutes and a few take much
+longer. The histogram cannot say which orders were late or why, and it hides
+the exact times inside each interval.
 :::
 
 :::
@@ -219,9 +261,10 @@ in the original unit (offers), whereas the variance is in squared offers.
 
 ## After class
 
-### Timed individual practice --- 10 minutes
+### Timed individual practice: 10 minutes
 
-An output block describes word count:
+The R output below describes the number of words in the written description
+(`description_words`) in the Shark Tank file:
 
 ```{r}
 #| label: bep01-timed
@@ -236,18 +279,19 @@ c(
 ```
 
 Write no more than 100 words. Compare mean and median, calculate the range,
-and state the measurement boundary. Then explain which value equals the
-expectation if the empirical distribution gives mass $1/1441$ to each record.
+and say what the variable does and does not measure. Then explain which value
+equals the expectation if every record receives probability $1/1441$.
 
 ::: {.callout-note collapse="true"}
 ## Check a model answer
 
 The written descriptions have a mean length of about 5.0 words and a median
-of 5 words. Their range is $13-1=12$ words. The thin upper tail is consistent
-with the mildly right-skewed histogram seen in Lecture 1. If each record
-receives probability $1/1441$, the empirical expectation is the mean, about
-5.0 words. These values describe written dataset text, not spoken-pitch
-length or quality.
+of 5 words, so the two agree. Their range is $13-1=12$ words. The maximum
+lies 8 words above the median and the minimum only 4 words below it, so the
+distribution has a longer tail to the right (it is mildly right-skewed). If
+each record receives probability $1/1441$, the expectation of this
+distribution is the mean, about 5.0 words. These values describe the written
+text in the dataset, not the length or quality of the spoken pitch.
 :::
 
 ### Check your understanding
@@ -269,7 +313,7 @@ Complete from memory:
 4. $E[X]=\sum_x x\, p_X(x)$, the probability-weighted average of the possible
    values.
 5. Variance is the probability-weighted average of squared deviations from
-   the mean, $\operatorname{Var}(X)=E[X^2]-\left(E[X]\right)^2$; its square
+   the mean, $\operatorname{Var}(X)=E[X^2]-\left(E[X]\right)^2$. Its square
    root is the standard deviation, in the variable's original unit.
 :::
 
@@ -278,7 +322,7 @@ Complete from memory:
 :::: {.utility-prompt}
 <span class="label">Utility: two sentences</span>
 
-Think of your EiA venture --- or any business you know well. Pick one
+Think of your EiA venture, or any business you know well. Pick one
 uncertain count that matters for it (customers who sign up in a week, offers
 received, orders returned), and write two sentences: first sketch a small PMF
 for it (three or four values with rough probabilities), then say what its
@@ -287,14 +331,13 @@ expectation and standard deviation would tell you about a real decision.
 ::: {.callout-note collapse="true"}
 ## See an example, then write your own
 
-Take a student-run campus meal-prep box venture. "Weekly catering requests: 0 with probability 0.4, 1 with 0.4, 2 with 0.15, and 3 with 0.05, so I expect about 0.85 requests per week. The standard deviation tells me whether a weekend helper is justified --- with high spread, some weeks genuinely need one even though the average says no."
+Take a student-run campus meal-prep box venture. "Weekly catering requests: 0 with probability 0.4, 1 with 0.4, 2 with 0.15, and 3 with 0.05, so I expect about 0.85 requests per week. The standard deviation tells me whether a weekend helper is justified. With a high spread, some weeks need a helper even though the average says no."
 :::
 
-You can discuss this task --- and any other task in this tutorial --- with
-**Tilly**, the course AI assistant on Canvas.
+You can discuss this task, and any other task in this tutorial, with
+**Tilly**, the course AI assistant.
 ::::
 
-Continue to Lecture 4: Conditioning, total probability, Bayes, and
-independence.
+[Continue to Lecture 4: Conditioning, Bayes' rule, and independence](b04-conditioning-bayes-independence.qmd).
 
 :::

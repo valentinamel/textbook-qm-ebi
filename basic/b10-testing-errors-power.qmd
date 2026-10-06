@@ -12,24 +12,41 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 ::: {.outcomes}
 <span class="label">By the end of Lecture 10, you can</span>
 
-- rewrite benchmark and comparison questions as tests of a zero contrast;
-- complete and communicate a two-sided test using the seven-step workflow;
-- distinguish a p-value, a significance level, and a test decision;
-- describe Type I error, Type II error, and power in context;
-- explain when a one-sided alternative is legitimate and why this course's
-  exams are two-sided;
+- rewrite benchmark and comparison questions as tests of a zero contrast
+- complete and communicate a two-sided test using the seven-step workflow
+- distinguish a p-value, a significance level, and a test decision
+- describe Type I error, Type II error, and power in context
+- interpret a two-sided p-value and connect a 95% confidence interval to a 5%
+  two-sided test
 - separate statistical significance from magnitude, practical importance,
-  and causality;
+  and causality
 - interpret the zero-null test printed for a regression coefficient.
+:::
+
+::: {.must-know}
+<span class="label">Must know</span>
+
+**Be able to do yourself:**
+
+- explain a p-value in one sentence
+- make the decision at 5% and link it to the 95% interval
+- test a proportion by hand with the null standard error
+- describe a Type I and a Type II error in context and name two ways to raise power
+- read a regression row: estimate, standard error, t, p-value, interval.
+
+**Enough to recognise:**
+
+- the critical-value rule: reject $H_0$ at 5% when $|t|\ge t_{0.975,\,df}$
+- the power figure.
 :::
 
 ::: {.driving-question}
 <span class="label">Driving question</span>
 
-<p class="dq-context">Launch the product or wait. Approve the loan or decline. Decisions made from data can err in two directions, and the two mistakes usually cost very different amounts.</p>
+<p class="dq-context">Launch the product or wait. Approve the loan or decline. Decisions made from data can be wrong in two directions, and the two mistakes usually cost very different amounts.</p>
 
-Every test can be wrong in two ways. Which wrong call is which, what makes
-wrong calls rarer, and how does all of this reappear in a regression table?
+Every test can be wrong in two ways. Which error is which, what makes
+errors rarer, and how does all of this reappear in a regression table?
 :::
 
 ::: {.course-phase .phase-before}
@@ -37,6 +54,8 @@ wrong calls rarer, and how does all of this reappear in a regression table?
 ## Before class
 
 <span class="time-budget">Total preparation time: about 25 minutes.</span>
+
+**Minimum path:** the video preparation and the prediction. **Full path:** everything in this section.
 
 <div class="video-prep">
 <span class="label">Video preparation (15 minutes)</span><br>
@@ -48,29 +67,30 @@ and why "do not reject" is not "accept." All links are also listed in the
 <a href="../resources/video-guide.html">External Video Guide</a>.
 </div>
 
-**Reactivate (8 minutes).** Suppose R reports the following coefficient row:
+**Reactivate (8 minutes).** Lecture 9 ended with the t statistic for the
+equity gap, $t=-2.91$ with 99 degrees of freedom.
 
-| Estimate | SE | t | p-value |
-|---:|---:|---:|---:|
-| -0.290 | 0.058 | -5.00 | < 0.001 |
-
-State the hypotheses being tested and give a careful one-sentence
-statistical conclusion.
+1. Write the two hypotheses of that test.
+2. Say in one sentence what the number $-2.91$ measures.
+3. Guess: if the true gap were zero, would a t statistic this far from zero
+   be common or rare?
 
 ::: {.callout-note collapse="true"}
 ## Check your preparation
 
-The default two-sided coefficient test is $H_0:\beta=0$ against
-$H_1:\beta\ne0$. Because the p-value is below 0.05, reject $H_0$: the data
-provide evidence that the population-model coefficient differs from zero.
-A full interpretation still needs the outcome, predictor, units, held-fixed
-variables, population, and causal limit.
+$H_0:\delta=0$ against $H_1:\delta\ne0$, where $\delta$ is the population
+mean of the equity offered minus 15. The statistic says that the estimated
+gap lies 2.91 standard errors below zero. Such a value would be rare: about
+95% of a t distribution with 99 degrees of freedom lies within 1.98 of zero.
+The p-value says exactly how rare. It is the first topic of the lecture
+material.
 :::
 
-**Predict (2 minutes).** Answer the one-click Mentimeter question posted on
+**Predict (2 minutes).** Answer the one-click Wooclap question posted on
 Canvas before you come to class: a test at $\alpha=0.05$ returns
-$p=0.20$. Has the study **shown that the null is true** --- yes, no, or
-cannot tell? Commit to an answer; the lecture resolves it.
+$p=0.20$. Has the study **shown that the null is true**: yes, no, or
+cannot tell? Commit to an answer. You find the answer in the lecture
+material.
 
 Review [Mathematics Refresher: zero contrasts, inequalities, and
 standardisation](../resources/math-refresher.html) if needed.
@@ -79,26 +99,196 @@ standardisation](../resources/math-refresher.html) if needed.
 
 ::: {.course-phase .phase-in-class}
 
-## In class
+## Lecture material
 
-The session opens with the usual four-minute entry quiz on the prep videos,
-then turns to the driving question. Lecture 9 delivered one complete test.
-This final lecture makes testing a *routine*: one recipe, an honest account
-of the two ways any decision can be wrong, and the payoff --- the same
-machinery reappearing, unchanged, in every regression table you will read
-from Intermediate onwards.
+### Start with a founder's question
+
+An advisor said that founders offer 15% of their company on average. Your
+sample of 100 pitches says 12.76%. Should you tell the advisor that the
+number is wrong? And what does it cost you if you are the one who is wrong?
+Lecture 9 ended with a t statistic and no decision. This section adds the
+p-value and the decision rule. It then gives one workflow for every test
+and names the two ways a decision can be wrong. It ends with the same test
+in a regression table, the main object of QM Intermediate.
 
 <p class="concept-video"><strong>Video explanations (review):</strong>
 <a href="https://www.youtube.com/watch?v=ti9NFdjf3sM">Introduction to Hypothesis Testing</a> and
 <a href="https://www.youtube.com/watch?v=JNOWWJeZBTc">Type I and Type II Errors</a>.</p>
 
+### Where Lecture 9 stopped
+
+Lecture 9 compared the mean equity offered (`equity_offered_pct`) with the
+benchmark of 15 percentage points, using the random sample of 100 pitches
+(seed 123). The estimated gap was $-2.24$ points with standard error $0.77$,
+so $t=-2.91$ with 99 degrees of freedom. The estimate lies almost three
+standard errors below zero. The open question is how surprising such a value
+would be if the true gap were zero. The p-value answers it.
+
+### A two-sided p-value uses both tails
+
+::: {.definition-box}
+<span class="label">Definition</span>
+
+**p-value.** The probability, calculated as if $H_0$ were true, of a test
+statistic at least as far from zero as the observed one, in either
+direction. A small p-value means that the data would be surprising if $H_0$
+were true.
+:::
+
+For the equity gap, with $t_{obs}$ the observed t statistic:
+
+$$
+p=P\!\left(|T_{99}|\ge|t_{obs}|\mid H_0\right).
+$$
+
+Here $T_{99}$ is a variable that follows the t distribution with 99 degrees
+of freedom.
+
+In R, `pt()` gives the area under a t curve to the left of a value. The
+two-sided p-value is twice the area to the left of $-|t_{obs}|$:
+
+```{r}
+#| label: b10-gap-p-value
+t_value <- -2.906   # the t statistic from Lecture 9
+df <- 99
+p_value <- 2 * pt(-abs(t_value), df = df)
+c(t_statistic = t_value, degrees_of_freedom = df, two_sided_p_value = p_value)
+```
+
+The p-value is 0.0045. @fig-b09-two-sided-p shows it as an area.
+
+```{r}
+#| label: fig-b09-two-sided-p
+#| code-fold: true
+#| code-summary: "See the R code for this figure"
+#| fig-cap: "The t distribution with 99 degrees of freedom under the null hypothesis. Dashed lines mark statistics as far from zero as the observed t = −2.91. The two orange tail areas together are the two-sided p-value, about 0.005."
+library(ggplot2)
+
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+set.seed(123)
+sample_rows <- sample(seq_len(nrow(sharks)), size = 100, replace = FALSE)
+pitch_sample <- sharks[sample_rows, ]
+pitch_sample$equity_gap_pp <- pitch_sample$equity_offered_pct - 15
+gap_bar <- mean(pitch_sample$equity_gap_pp)
+gap_se <- sd(pitch_sample$equity_gap_pp) / sqrt(nrow(pitch_sample))
+df <- nrow(pitch_sample) - 1
+t_value <- gap_bar / gap_se
+
+null_curve <- data.frame(x = seq(-4.5, 4.5, length.out = 1200))
+null_curve$density <- dt(null_curve$x, df = df)
+left_tail <- subset(null_curve, x <= -abs(t_value))
+right_tail <- subset(null_curve, x >= abs(t_value))
+
+ggplot(null_curve, aes(x, density)) +
+  geom_area(data = left_tail, fill = "#D55E00", alpha = 0.85) +
+  geom_area(data = right_tail, fill = "#D55E00", alpha = 0.85) +
+  geom_vline(xintercept = c(-abs(t_value), abs(t_value)),
+             linetype = "dashed", colour = "#D55E00", linewidth = 0.6) +
+  geom_line(colour = "#17324D", linewidth = 0.9) +
+  annotate("text", x = -abs(t_value), y = 0.33,
+           label = "t == -2.91", parse = TRUE,
+           colour = "#17324D", size = 3.4, hjust = 1.15) +
+  annotate("text", x = abs(t_value), y = 0.33,
+           label = "t == +2.91", parse = TRUE,
+           colour = "#17324D", size = 3.4, hjust = -0.15) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
+  labs(x = "t statistic under the null", y = "Density") +
+  theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    plot.caption = element_text(colour = "#5B6976"),
+    axis.title = element_text(colour = "#17324D")
+  )
+```
+
+Read @fig-b09-two-sided-p with the five-step sequence. (1) *Unit and
+variables:* the curve is not data. It is the distribution of the t statistic
+**if the null were true**. The horizontal axis is the possible t statistic.
+(2) *Scales:* the vertical axis is density, so probability is area. (3) *One
+element:* the dashed lines mark $-2.91$ and $+2.91$, statistics as far from
+zero as the one observed. (4) *Pattern:* the two orange tail areas beyond the
+dashed lines are tiny, together about 0.0045. If the true mean gap were zero,
+a sample this far from zero would occur in roughly 5 of every 1,000 samples.
+(5) *Limits:* that number is **not** the probability that $H_0$ is true, and
+it is not the size of the gap.
+
+The convention is to reject $H_0$ when the p-value is at most 0.05. This
+threshold is called the significance level.
+
+::: {.definition-box}
+<span class="label">Definition</span>
+
+**Significance level $\alpha$.** The threshold for the test decision, fixed
+before the data are inspected, usually $\alpha=0.05$. Reject $H_0$ when
+$p\le\alpha$. Do not reject $H_0$ when $p>\alpha$.
+:::
+
+Here $p=0.0045<0.05$, so reject $H_0$. The random sample provides evidence
+that the mean equity offered in the recorded-pitch frame differs from 15
+percentage points. The negative estimate indicates that it is lower.
+
+The same decision can be read from the t statistic. Reject $H_0$ at the 5%
+level when $|t|$ is at least $t_{0.975,\,df}$, the critical value of
+Lecture 9. In symbols, $|t|\ge t_{0.975,\,df}$. That is the same decision as
+$p\le0.05$.
+
+```{r}
+#| label: b10-critical-value
+c(abs_t = abs(t_value), critical_value = qt(0.975, df = df))
+```
+
+Here $|t|=2.91$ is larger than $t_{0.975,\,99}=1.984$, so the critical-value
+rule also rejects $H_0$.
+
+### The confidence interval and test tell the same story
+
+For the same two-sided t procedure:
+
+- reject $H_0:\delta=0$ at level $\alpha$ exactly when the
+  $100(1-\alpha)\%$ confidence interval excludes zero
+- do not reject when the interval includes zero.
+
+Here the gap interval $(-3.77,\,-0.71)$ from Lecture 9 excludes zero, in
+line with the rejection. The interval adds information that the p-value does
+not give. It shows the direction, the plausible size, and the precision of
+the difference. In this course and in QM Intermediate, always report the
+estimate and the interval together with the test decision.
+
+::: {.callout-caution collapse="true"}
+## Try it: read the decision straight from an interval
+
+Try this with your neighbour first. A colleague reports a 95% confidence
+interval for a mean gap: $(-1.4,\,3.8)$ percentage points (invented
+numbers). The report gives no t statistic and no p-value.
+
+*Step 1 (given).* The two-sided t test rejects $H_0:\delta=0$ at 5% exactly
+when the 95% interval excludes zero.
+
+*Step 2 (you).* Does this interval exclude zero? State the test decision
+without computing anything.
+
+*Step 3 (you).* What may you conclude about the population mean gap,
+and what may you *not* conclude?
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+Zero lies inside $(-1.4,\,3.8)$, so the 5% two-sided test does not reject
+$H_0:\delta=0$. The data are compatible with a zero gap, and also with gaps
+as large as 3.8 points in one direction and 1.4 in the other. You may not
+conclude that the gap is zero. "Do not reject" is not "accept". The workflow
+below returns to this difference.
+:::
+:::
+
 ### Why zero is the universal benchmark
 
-Many empirical questions ask whether a population contrast is absent:
+Many questions about data ask whether a population contrast is zero:
 
-- difference from a target: $\delta=\mu-15$;
-- difference in probabilities: $\delta_p=p-0.50$;
-- difference between two group means: $\mu_1-\mu_0$;
+- difference from a target: $\delta=\mu-15$
+- difference in probabilities: $\delta_p=p-0.50$
+- difference between two group means: $\mu_1-\mu_0$
 - a regression slope: $\beta_j$.
 
 In every case, "no difference" or "no linear association" becomes
@@ -109,69 +299,83 @@ H_0:\theta=0
 H_1:\theta\ne0.
 $$
 
-Testing a non-zero benchmark can always be rewritten as a test of a
-zero-valued contrast --- Lecture 9's gap device. This common structure is
-the bridge from Basic inference to regression inference: learn to test one
-zero, and you can test them all.
+Here $\theta$ stands for any of the four parameters in the list. A test
+against a non-zero benchmark can always be rewritten as a test of a contrast
+equal to zero, as with the gap in Lecture 9. The tests in a regression table
+have the same structure.
 
 ### The seven-step testing workflow
 
-Use the same sequence every time --- on the exam, in your EiA venture, in
-any report you ever write:
+Use the same sequence for every test:
 
 1. Define the population parameter and its units.
-2. State $H_0$ and the two-sided $H_1$ **before** inspecting the result.
-3. Check the sampling and model conditions.
-4. Calculate the estimate and its SE under the null model.
+2. State $H_0$ and the two-sided $H_1$ before you inspect the result.
+3. Check the conditions on the sample and on the shape of the data.
+4. Calculate the estimate and its SE. For a proportion test, calculate the
+   SE with the null value $p_0$.
 5. Standardise: $(\text{estimate}-0)/\text{SE}$.
-6. Calculate the two-sided p-value and compare it with the pre-specified
-   significance level $\alpha$.
-7. Report the estimate, uncertainty, decision, contextual meaning, and
-   limits.
+6. Calculate the two-sided p-value and compare it with the significance
+   level $\alpha$ that was fixed in advance.
+7. Report the estimate, its uncertainty, the decision, the meaning in
+   context, and the limits.
 
-The significance level $\alpha$ is a long-run decision threshold, commonly
-0.05, fixed in advance. The p-value is calculated from the observed data
-under $H_0$. They are not the same object: one is a rule, the other a
-result.
+The significance level $\alpha$ and the p-value are different things.
+$\alpha$ is a rule, fixed in advance. The p-value is a result, calculated
+from the observed data as if $H_0$ were true.
 
-If $p\le\alpha$, reject $H_0$. If $p>\alpha$, **do not reject** $H_0$ ---
-and do not say "accept $H_0$." This resolves the prep prediction: a study
-with $p=0.20$ has *not* shown the null is true; it may simply lack the
-precision to distinguish a meaningful non-zero parameter from zero. The
-power section below makes that precise.
+If $p\le\alpha$, reject $H_0$. If $p>\alpha$, do not reject $H_0$, and do
+not say "accept $H_0$". This answers the prediction question from the
+preparation: a study with $p=0.20$ has not shown that the null hypothesis is
+true. The study may only be too imprecise to tell a real non-zero parameter
+from zero. The section on power below explains this.
 
 ::: {#exm-b10-launch-test}
 ## Worked example: a proportion test by hand
 
-An accelerator claims that half of its alumni launch a trading venture
-within a year. In a random sample of 400 former participants, 232 had
-launched. Let $p$ be the launch proportion in the alumni frame and define
-$\delta_p=p-0.50$. Test $H_0:\delta_p=0$ against $H_1:\delta_p\ne0$ at 5%,
-voicing every arithmetic step.
+This is an invented example. An accelerator claims that half of its alumni
+launch a trading venture within a year. In a random sample of 400 former
+participants, 232 had launched. Let $p$ be the launch proportion among all
+alumni and define $\delta_p=p-0.50$. Test $H_0:\delta_p=0$ against
+$H_1:\delta_p\ne0$ at 5%, step by step.
 
 - **Estimate.** $\hat p=232/400=0.58$, so the estimated gap is
   $\widehat\delta_p=0.58-0.50=0.08$, eight percentage points.
-- **Conditions under the null.** $np_0=400(0.50)=200$ and
-  $n(1-p_0)=200$, both far above 10 --- the normal approximation is safe.
+- **Conditions under the null.** The test uses a normal approximation, so
+  check the success-failure rule of
+  [Lecture 8](b08-sampling-distributions.qmd#b08-binomial): $np\ge10$ and
+  $n(1-p)\ge10$. Lecture 8 gives the reason for the rule. In a test, use the
+  null value $p_0$: $np_0=400(0.50)=200$ and $n(1-p_0)=200$. Both are far
+  above 10, so the normal approximation can be used.
 - **Null SE.** Under $H_0$ the true proportion is 0.50, so
   $\operatorname{SE}_0=\sqrt{0.50(0.50)/400}=\sqrt{0.25/400}
   =\sqrt{0.000625}=0.025$.
-- **Standardise.** $z=0.08/0.025=3.20$: the observed gap sits 3.2 null
-  standard errors above zero.
+- **Standardise.** $z=0.08/0.025=3.20$. The observed gap lies 3.2 null
+  standard errors above zero. The statistic is called $z$ here because it is
+  compared with the standard normal distribution.
 - **p-value and decision.** The two-sided p-value is
-  $2\,P(Z\le-3.20)\approx 0.0014 < 0.05$: reject $H_0$. The sample
-  provides strong evidence that the frame launch proportion differs from
-  50%; the positive estimate places it above.
+  $2\,P(Z\le-3.20)\approx 0.0014 < 0.05$, so reject $H_0$. The sample
+  provides strong evidence that the launch proportion among all alumni
+  differs from 50%. The positive estimate places it above 50%.
 
-Note step 4's subtlety: the SE was computed with $p_0=0.50$, not with
-$\hat p$ --- the test measures how surprising the sample is *in the null's
-world*, so the null supplies the spread.
+**Report the interval too.** A decision alone is not a report. The
+large-sample 95% interval uses the estimated SE:
+$0.58\pm1.96\sqrt{0.58(0.42)/400}=0.58\pm0.048=(0.532,\,0.628)$. It excludes
+0.50, in line with the test.
+
+Look again at step 4 of the workflow. The SE was calculated with $p_0=0.50$,
+not with $\hat p$. The test measures how surprising the sample would be if
+$H_0$ were true, so the null value supplies the spread.
 :::
 
-### The Shark Tank deal proportion, in R
+### In R: the Shark Tank deal proportion
 
-The same recipe on our reproducible sample of 100: is the frame's deal
-proportion different from 50%? Every object is constructed on screen:
+Tutorial 4, Task 2 uses the code of this section and the next. Read both
+sections before the tutorial.
+
+Now apply the same workflow to the random sample of 100 pitches from
+Lecture 9. Is the proportion of pitches that end with a deal
+(`deal_on_show`) in the recorded-pitch frame different from 50%? The code
+builds every object step by step:
 
 ```{r}
 #| label: b10-proportion-objects
@@ -201,12 +405,14 @@ c(
 )
 ```
 
-The estimate is $\widehat\delta_p=0.14$, fourteen percentage points. The
-null SE is $\sqrt{0.50(0.50)/100}=0.05$, the statistic is $z=2.80$, and
-the two-sided p-value is about 0.005. The success--failure condition holds
-under the null: $np_0=50$ and $n(1-p_0)=50$. Reject the zero-gap null at
-5%: the random sample provides evidence that the recorded-pitch-frame deal
-proportion differs from 50%, and the positive estimate places it above.
+In the sample, 64 of the 100 pitches end with a deal, so $\hat p=0.64$. The
+estimate is $\widehat\delta_p=0.14$, fourteen percentage points. The null SE
+is $\sqrt{0.50(0.50)/100}=0.05$, the statistic is $z=2.80$, and the
+two-sided p-value is about 0.005. The success-failure rule holds under the
+null: $np_0=50$ and $n(1-p_0)=50$. Reject the zero-gap null at 5%. The
+random sample provides evidence that the deal proportion in the
+recorded-pitch frame differs from 50%, and the positive estimate places it
+above 50%.
 
 ### Interval and test: report both
 
@@ -229,39 +435,42 @@ c(proportion_lower = proportion_ci[1],
 c(gap_lower = gap_ci[1], gap_upper = gap_ci[2])
 ```
 
-The proportion interval is approximately $(0.546,\,0.734)$; the equivalent
+The proportion interval is approximately $(0.546,\,0.734)$. The equivalent
 gap interval is $(0.046,\,0.234)$, which excludes zero and agrees with the
 test decision here.
 
-::: {.optional-box}
-<span class="label">Optional: estimated versus null standard errors</span><br>
-Look closely: the test divided by the **null** SE
-$\sqrt{p_0(1-p_0)/n}=0.050$, while the interval used the **estimated** SE
-$\sqrt{\hat p(1-\hat p)/n}=0.048$. The test asks how surprising the sample
-is if $H_0$ were true, so the null supplies the spread; the interval makes
-no null assumption, so the data supply it. Because these are not exactly
-the same procedure, interval and test decisions need not match perfectly
-when a result sits very near the boundary. Exact equivalence requires an
-interval obtained by inverting the same test --- beyond this course. For
-the mean-gap t procedures of Lecture 9 the same SE is used in both, so
-there the match is exact.
+::: {.callout-tip collapse="true"}
+## Optional: estimated versus null standard errors
+
+The test divided by the null SE $\sqrt{p_0(1-p_0)/n}=0.050$. The interval
+used the estimated SE $\sqrt{\hat p(1-\hat p)/n}=0.048$. The test asks how
+surprising the sample would be if $H_0$ were true, so the null value
+supplies the spread. The interval does not assume $H_0$, so the data supply
+the spread. The two procedures are therefore not exactly the same. When a
+result lies very close to the 5% boundary, the interval and the test can
+disagree. An interval that always agrees with the test exists, but it is
+beyond this course. For the mean gap, the interval of Lecture 9 and the t
+test of this lecture use the same SE, so there they always agree.
 :::
 
 ### What a p-value is not
 
-The two-sided p-value is
+The two-sided p-value is the probability
 
 $$
 P\!\left(|\text{test statistic}|
 \ge|\text{observed statistic}|\mid H_0\right)
 $$
 
---- and nothing else. Before the break you receive four sentences about the
-launch test of @exm-b10-launch-test ($z=3.20$, $p\approx 0.0014$). Each
-one is wrong. In pairs, correct all four; the plenary compares repairs.
+and nothing else. The task below gives four sentences that read more into
+it. All four are wrong.
 
 ::: {.callout-caution collapse="true"}
 ## Try it: correct the four wrong p-value sentences
+
+Try this with your neighbour first. The four sentences are about the launch
+test of @exm-b10-launch-test ($z=3.20$, $p\approx 0.0014$). Each one is
+wrong. Write a correct version of each sentence.
 
 *Sentence 1 (you).* "There is only a 0.14% probability that the launch
 proportion really is 50%."
@@ -281,52 +490,66 @@ its alumni to launch ventures."
 1. A p-value is not $P(H_0\mid\text{data})$. Correct: "If the launch
    proportion were exactly 50%, a sample gap at least this far from zero
    in either direction would occur in about 0.14% of random samples."
-2. The p-value is computed *assuming* chance alone (the null model)
-   generated the gap; it is the probability of data this extreme under
-   that assumption, not the probability that the assumption holds.
-3. A p-value measures surprise, not size. The magnitude is the estimate:
-   8 percentage points, with an interval around it. A tiny p-value can
-   accompany a tiny gap when $n$ is huge.
-4. Significance says nothing about why. Alumni self-selected into the
-   accelerator; without a design that isolates its effect, "causes" is
-   unsupported. Correct: the frame's launch proportion differs from 50%.
+2. The p-value is calculated under the assumption that $H_0$ is true and
+   chance alone produced the gap. It is the probability of data this
+   extreme under that assumption. It is not the probability that the
+   assumption holds. Correct: "If chance alone were at work, a gap this
+   large would occur in about 0.14% of random samples."
+3. A p-value measures surprise, not size. The size is the estimate, 8
+   percentage points, with an interval around it. A tiny p-value can go
+   together with a tiny gap when $n$ is very large. Correct: "The launch
+   proportion is estimated at 58%, plausibly between 53.2% and 62.8%."
+4. A significant result says nothing about the cause. The alumni chose to
+   join the accelerator themselves, so they may differ from other founders
+   in many ways. Correct: "The launch proportion among all alumni differs
+   from 50%."
 :::
 :::
 
 ### Type I error, Type II error, and power
 
-A test is a decision rule, and any decision rule can be wrong in exactly
-two ways:
+A test is a decision rule, and a decision can be wrong in two ways:
 
 | Reality | Reject $H_0$ | Do not reject $H_0$ |
 |---|---|---|
 | $H_0$ true | Type I error | Correct decision |
 | $H_1$ true | Correct decision | Type II error |
 
-The significance level controls the first:
+::: {.definition-box}
+<span class="label">Definition</span>
+
+**Type I error and Type II error.** A Type I error is rejecting $H_0$ when
+$H_0$ is true (a false alarm). A Type II error is not rejecting $H_0$ when
+$H_1$ is true (a missed difference).
+:::
+
+The significance level is the probability of a Type I error:
 
 $$
 P(\text{reject }H_0\mid H_0\text{ true})=\alpha.
 $$
 
-**Power** is the ability to avoid the second:
+::: {.definition-box}
+<span class="label">Definition</span>
 
-$$
-\text{power}=P(\text{reject }H_0\mid H_1\text{ true}).
-$$
+**Power.** The probability that the test rejects $H_0$ when $H_1$ is true:
+$\text{power}=P(\text{reject }H_0\mid H_1\text{ true})$. Power is one minus
+the probability of a Type II error.
+:::
 
-For the launch test, in context: a **Type I error** would be concluding
-that the alumni launch proportion differs from 50% when it is exactly 50%
---- crying wolf about a fictitious difference, embarrassing the analyst who
-advises repricing the programme. A **Type II error** would be failing to
-detect a launch proportion that genuinely differs from 50% --- missing a
-real signal because the sample was too small or noisy.
+Power depends on how far the true parameter lies from zero, so it is always
+calculated for one given alternative value.
+
+In the launch test of @exm-b10-launch-test, a Type I error would be to
+conclude that the launch proportion among all alumni differs from 50% when
+it is exactly 50%. A Type II error would be to miss a launch proportion
+that really differs from 50%, for example because the sample was too small.
 
 ```{r}
 #| label: fig-b10-errors-power
 #| code-fold: true
 #| code-summary: "See the R code for this figure"
-#| fig-cap: "Two-sided testing at α = 0.05. Left: when the null is true, the z statistic follows the dark curve and the orange rejection regions have total probability 0.05 — the Type I error rate. Right: when a positive alternative is true, the statistic follows the shifted blue curve; the green area is the power, and the unshaded middle is the Type II error probability. Both panels use the same axes."
+#| fig-cap: "Two-sided testing at α = 0.05. Left: when the null is true, the z statistic follows the dark curve and the orange rejection regions have total probability 0.05, the Type I error rate. Right: when a positive alternative is true, the statistic follows the shifted blue curve. The green area is the power, and the unshaded middle is the Type II error probability. Both panels use the same axes."
 library(ggplot2)
 
 z_grid <- seq(-4.5, 6.5, length.out = 1600)
@@ -390,38 +613,41 @@ ggplot(test_curves, aes(z, density)) +
 In both panels of @fig-b10-errors-power, the horizontal axis is the
 possible z statistic, the vertical axis is density, and probability is
 area. The dashed vertical lines mark the same two-sided critical values,
-$\pm 1.96$. In the left panel the null is true: the two orange rejection
-tails have total probability $\alpha=0.05$, which is exactly the Type I
-error rate --- the test is *built* to cry wolf 5% of the time. In the right
-panel a particular positive alternative is true, so the curve has shifted:
-the green area is the power, and whatever probability remains between the
+$\pm 1.96$. The test rejects $H_0$ when the statistic falls beyond these
+lines. This part of the axis is called the rejection region. In the left
+panel the null is true. The two orange tails have total probability
+$\alpha=0.05$, which is the Type I error rate. The test is built to give a
+false alarm in 5% of samples when $H_0$ is true. In the right panel one
+positive alternative value is true, so the curve has shifted to the right.
+The green area is the power. The probability that remains between the
 dashed lines is the Type II error rate.
 
-Four levers raise power:
+Four changes raise power:
 
-- a larger true distance from zero (an effect that is easier to see);
-- a larger sample (a smaller SE);
-- lower unexplained variation (also a smaller SE);
-- a larger $\alpha$ --- but this lever is a trade-off, not a free gain:
-  widening the rejection region catches more true effects *and* raises the
-  Type I error rate in lockstep.
+- a larger true distance from zero (a difference that is easier to see)
+- a larger sample (a smaller SE)
+- less variation in the data (also a smaller SE)
+- a larger $\alpha$. This last one has a price. A wider rejection region
+  finds more true differences, but it also raises the Type I error rate.
 
-### One-sided alternatives
+::: {.callout-tip collapse="true"}
+## Optional: one-sided alternatives
 
-A two-sided test asks whether a parameter differs from zero in **either**
-direction. A one-sided test asks a directional question chosen before the
-sample is examined:
+This box is not covered in the lecture and is not examined. All tests in
+this course are two-sided.
 
-| Research question | Alternative | Relevant tail(s) |
+A two-sided test asks whether a parameter differs from zero in either
+direction. A one-sided test asks about one direction only:
+
+| Research question | Alternative | Tail that counts |
 |---|---|---|
 | Does the gap differ from zero? | $H_1:\delta\ne0$ | both tails |
 | Is the gap below zero? | $H_1:\delta<0$ | left tail |
 | Is the gap above zero? | $H_1:\delta>0$ | right tail |
 
-In all three cases the test statistic is compared with its distribution
-under the zero boundary $H_0:\delta=0$. What changes is which values count
-as evidence for the stated alternative --- that is, where the rejection
-region sits.
+The t statistic is the same in all three cases. Only the rejection region
+changes. A one-sided test at $\alpha=0.05$ puts the whole 5% in one tail, as
+@fig-b10-one-sided shows.
 
 ```{r}
 #| label: fig-b10-one-sided
@@ -429,7 +655,7 @@ region sits.
 #| code-summary: "See the R code for this figure"
 #| fig-width: 7
 #| fig-height: 3.25
-#| fig-cap: "Rejection regions at α = 0.05 for the two-sided and both one-sided alternatives, on the same null t distribution (df = 99). The two-sided test places 2.5% in each tail; a one-sided test moves the full 5% into the tail named by its alternative, so its critical value is closer to zero in that direction."
+#| fig-cap: "Rejection regions at α = 0.05 for the two-sided and both one-sided alternatives, on the same null t distribution (df = 99). The two-sided test places 2.5% in each tail. A one-sided test moves the full 5% into the tail named by its alternative, so its critical value is closer to zero in that direction."
 library(ggplot2)
 
 alpha_tail <- 0.05
@@ -501,37 +727,36 @@ ggplot(null_curve, aes(x, density)) +
   )
 ```
 
-Compare @fig-b10-one-sided with the left panel of
-@fig-b10-errors-power: same logic, different placement of the 5%. Moving
-the full 5% into one tail pulls that critical value closer to zero, so a
-one-sided test is *more* able to detect an effect in its chosen direction
---- a power gain. The price: results in the opposite direction, however
-extreme, do not support the stated alternative at all.
+A one-sided alternative is legitimate only when the direction follows from
+the research question and is fixed before the data are inspected. Choosing
+the tail after seeing the estimate doubles the true Type I error rate, from
+5% to about 10%.
 
-That power gain is exactly why the direction must follow from the research
-question and be **fixed before the data are inspected**. Choosing the tail
-because the observed estimate happens to point that way --- or simply to
-obtain a smaller p-value --- silently doubles the true Type I error rate:
-you would take the 5% tail on whichever side the noise landed. For
-Lecture 9's equity-gap statistic, $t=-2.91$ with $df=99$:
+The one-sided p-value follows from the two-sided one. When the estimate
+points in the direction of the alternative, it is half the two-sided
+p-value. When the estimate points in the other direction, it is one minus
+that half. For the equity gap, $t=-2.91$ with $df=99$:
 
-- the two-sided p-value is about 0.0045;
-- a **pre-specified** left-sided alternative $H_1:\delta<0$ gives about
-  0.0023;
-- a **pre-specified** right-sided alternative $H_1:\delta>0$ gives about
-  0.9977.
+```{r}
+#| label: b10-one-sided-p
+t_gap <- -2.906   # the t statistic of the equity gap
+df_gap <- 99
+c(two_sided = 2 * pt(-abs(t_gap), df = df_gap),
+  left_sided = pt(t_gap, df = df_gap),
+  right_sided = 1 - pt(t_gap, df = df_gap))
+```
 
-The negative estimate agrees with the left-sided alternative and points
-away from the right-sided one. Course convention, on the exam and in every
-chapter: **tests are two-sided**, because in business research a
-difference in either direction is usually relevant --- and because the
-convention removes any temptation to pick the convenient tail.
+The two-sided p-value is 0.0045. The left-sided alternative $H_1:\delta<0$
+gives 0.0023, and the right-sided alternative $H_1:\delta>0$ gives 0.9977.
+:::
 
 ### Preview: the test attached to a regression slope
 
-R applies the same zero-null logic to every regression coefficient.
-Consider the simple model of initial equity offered on season, fitted to
-all 1,441 records:
+A regression fits a straight line through a cloud of points. Here the line
+describes how the equity offered (`equity_offered_pct`) changes from season
+to season (`season`). Its slope says by how much per season on average. R
+tests every regression coefficient against zero in the way described above.
+The code fits the line to all 1,441 records of the Shark Tank file:
 
 ```{r}
 #| label: b10-regression-preview
@@ -540,66 +765,84 @@ summary(preview_model)$coefficients
 confint(preview_model)
 ```
 
-Read the `season` row with the vocabulary you now own. The **estimate** is
-$-0.824$: about 0.82 percentage points less equity offered per additional
-season. The **SE**, 0.048, is its sampling uncertainty in the same units.
-The **t value**, $-17.3$, is estimate divided by SE --- step 5 of the
-workflow. The **p-value** belongs to the printed two-sided test
+One point before you read the output. In Lectures 7 to 9 we sampled 100
+records from the file, so the uncertainty came from the random draw. Here
+the model uses all 1,441 records. The standard error now answers a different
+question: how much would the slope vary if the same process produced another
+set of pitches? The recorded pitches are treated as one possible outcome of
+that process.
+
+Now read the `season` row. The slope of the line in the population is
+written $\beta_1$, and its estimate is $\hat\beta_1$.
+
+The estimate is $\hat\beta_1=-0.824$. Each additional season goes together
+with about 0.82 percentage points less equity offered. For comparison, the
+mean equity offered in the file is 13.21 points, so this is about 6% of the
+mean per season. The SE, 0.048, is the sampling uncertainty of the estimate,
+in the same units. The t value, $-17.3$, is the estimate divided by the SE.
+This is step 5 of the workflow. The p-value in the last column belongs to
+the two-sided test
 
 $$
 H_0:\beta_1=0
 \qquad\text{versus}\qquad
-H_1:\beta_1\ne0,
+H_1:\beta_1\ne0.
 $$
 
-and the 95% **interval** $(-0.92,\,-0.73)$ excludes zero, agreeing with
-the rejection. Every column is a Lecture 9--10 object wearing a regression
-name. What the row does *not* say: this is an observational time
-association, not a causal effect of moving a pitch to a later season.
+The p-value is far below 0.05, so reject $H_0$. The 95% interval
+$(-0.92,\,-0.73)$ excludes zero, in line with the rejection.
 
-Intermediate begins from this familiar estimate--SE--t--p-value structure
-and adds careful coefficient interpretation, multiple predictors, and
-model diagnostics.
+Every column is something you know from Lectures 9 and 10. The row does not
+say that a later season causes lower offers. Nobody assigned pitches to
+seasons, so this is an association over time, not a causal effect.
+
+QM Intermediate starts from this row (estimate, SE, t, p-value, interval).
+It adds the interpretation of coefficients, models with several predictors,
+and checks of the model.
 
 ::: {.caveat-box}
 <span class="label">What a significant result does and does not establish</span>
 
-Three separations to carry out of this course. **Significance is not
-magnitude:** a tiny effect can be significant in a large sample, and a
-meaningful effect can be non-significant in a small or noisy one --- the
-p-value measures surprise under the null, the estimate measures size.
-**Significance is not causation:** none of this lecture's machinery knows
-whether the predictor was randomly assigned. **And no test repairs the
-frame:** selection into the recorded-pitch file, measurement of "deal" as
-an on-air agreement, and dependence between observations are untouched by
-any p-value. The standing reporting list, for every analysis from now on:
-the estimate in substantive units; a confidence interval; the p-value or
-decision; whether the magnitude matters for the business question; and the
-sampling, measurement, and causal limits.
+- Significant is not large. A tiny gap can be significant with a lot of data,
+  and a real gap can be missed with little.
+- Significant is not causal. The test does not know how the data came about.
+- No test repairs the data. Selection and measurement stay as they were.
+
+**What to report, every time:** the estimate with its units, the interval,
+the decision, whether the size matters for the business question, and the
+limits of the data.
+
+**What you can do with it:** weigh the two errors before you decide how much
+evidence you need.
 :::
 
 ### Answering the driving question
 
-The two wrong calls: rejecting a true null (Type I, rate set by $\alpha$)
-and missing a true effect (Type II, rate cut by power). Wrong calls become
-rarer with more data, less noise, bigger true effects --- and, for Type I
-only, a stricter $\alpha$, at the price of more Type II. And the
-regression table? Each coefficient row *is* a Lecture 9 test: estimate,
-SE, t, two-sided p against zero, interval.
+The two wrong decisions are rejecting a true null hypothesis (Type I error,
+with probability $\alpha$) and missing a true difference (Type II error,
+less likely when power is high). Type II errors become rarer with more data,
+less variation, and larger true differences. Type I errors become rarer with
+a smaller $\alpha$, at the price of more Type II errors. In a regression
+table, each coefficient row is the test of Lectures 9 and 10: estimate, SE,
+t, two-sided p-value against zero, and interval.
 
-That closes the arc of QM Basic. Ten lectures ago a Shark Tank pitch was
-an anecdote. Now you can define events and variables on a frame, describe
-their distributions, condition without confusing directions, model
-sampling variation, and turn "our sample mean is 12.76" into a defensible,
-properly hedged claim about a population --- with its uncertainty, its
-decision, and its limits stated. That is the difference between an opinion
-with a spreadsheet and evidence.
+This completes QM Basic. You can now define events and variables on a
+frame, describe their distributions, work with conditional probabilities,
+and model sampling variation. You can turn "our sample mean is 12.76" into a
+claim about a population, with its uncertainty, its decision, and its
+limits.
 
-**Next:** Tutorial 4 rehearses Lectures 9--10 in exam format, and the Mock
-Exam then integrates the whole course under exam conditions. The story itself
-continues next year: QM Intermediate picks up exactly where today's regression
-preview left off, and the coefficient row you can already read becomes the
-central object of six lectures on linear regression.
+::: {.founder-box}
+<span class="label">A founder's decision (invented example)</span>
+
+Your sign-up page converts 10% of visitors. You try a new page on 400 visitors and 52 sign up, which is 13%. The null standard error is 0.015, so z = 0.03/0.015 = 2.0 and the two-sided p-value is about 0.046. Now weigh the two errors. Switching pages for nothing costs you almost nothing, because you can switch back. Missing a page that is really better costs you sign-ups every week. The decision: switch. For a kitchen lease the logic turns around. A false alarm there is expensive and hard to undo, so you would ask for more data and stronger evidence before you sign.
+:::
+
+**Next:** Tutorial 4 practises Lectures 9--10 in exam format. The Mock Exam
+then covers the whole course under exam conditions. QM Intermediate, in the
+second year, continues from the regression preview above. The coefficient
+row that you can already read is the main object of its six lectures on
+linear regression.
 
 :::
 
@@ -607,9 +850,18 @@ central object of six lectures on linear regression.
 
 ## After class
 
-<span class="time-budget">Total practice time: about 65 minutes.</span>
+<span class="time-budget">Total practice time: about 85 minutes.</span>
 
-### Retrieval (10 minutes)
+**Minimum path (about 35 minutes):** read the lecture material, answer the recall questions, then work for 10 minutes on the tasks that follow. **Full path:** all tasks below.
+
+### Read the lecture material (15 minutes)
+
+Read the Lecture material section above from start to end. The lecture
+covered the core of it. The text has every step, every example, and all the
+code, including parts that were not shown in class. Note what is still
+unclear and bring it to the next tutorial, or ask Tilly.
+
+### Recall questions (10 minutes)
 
 1. Why can most comparison hypotheses be written as a parameter equal to
    zero?
@@ -623,161 +875,241 @@ central object of six lectures on linear regression.
 ::: {.callout-note collapse="true"}
 ## Check your answers
 
-1. Subtracting the benchmark or reference value creates a contrast; "no
-   difference" corresponds to a zero contrast.
-2. $\alpha$ is a pre-specified long-run decision threshold; the p-value is
-   calculated from the observed statistic under the null.
+1. Subtracting the benchmark or reference value creates a contrast. "No
+   difference" then means that the contrast is zero.
+2. $\alpha$ is the decision threshold, fixed in advance. The p-value is
+   calculated from the observed statistic as if $H_0$ were true.
 3. Rejecting $H_0$ when it is true.
-4. Not rejecting $H_0$ when a specified alternative is true.
-5. Any three of: larger sample size, larger true effect, lower noise, or
-   larger $\alpha$ (the last at the cost of more Type I errors).
-6. A non-significant result may simply be too imprecise to distinguish a
-   meaningful parameter from zero.
-7. Holding the other included predictors fixed, the population-model
-   coefficient for predictor $j$ is zero.
+4. Not rejecting $H_0$ when $H_1$ is true.
+5. Any three of: a larger sample, a larger true difference, less variation
+   in the data, or a larger $\alpha$ (the last at the cost of more Type I
+   errors).
+6. A result that is not significant may only be too imprecise to tell a
+   real non-zero parameter from zero.
+7. The population slope for that predictor is zero. The outcome has no
+   linear association with it.
 :::
 
-### From worked to faded, then unassisted (20 minutes)
+### Finish a half-worked example, then do one on your own (20 minutes)
 
 Re-read the hand-worked launch test (@exm-b10-launch-test). Then complete
-the same recipe with new numbers: in 200 independent trials there are 120
-successes, and the benchmark is $p_0=0.50$.
+the same steps with new invented numbers: in 200 independent trials there
+are 120 successes, and the benchmark is $p_0=0.50$.
 
-*Step 1 (given).* $\hat p=120/200=0.60$, so $\widehat\delta_p=0.10$; the
+*Step 1 (given).* $\hat p=120/200=0.60$, so $\widehat\delta_p=0.10$. The
 null counts are $200(0.50)=100$ successes and 100 failures, both above 10.
 
 *Step 2 (you).* Calculate the null SE and the z statistic.
 
-*Step 3 (you).* The two-sided p-value and the 5% decision, in context.
+*Step 3 (you).* The two-sided p-value is about 0.005. Give the 5% decision
+in context.
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
 $\operatorname{SE}_0=\sqrt{0.50(0.50)/200}\approx 0.0354$, so
-$z=0.10/0.0354\approx 2.83$ and the two-sided p-value is about 0.005.
-Reject the zero-gap null at 5%: the data provide evidence that the success
-proportion differs from 50%, with the positive estimate placing it above.
+$z=0.10/0.0354\approx 2.83$. The two-sided p-value, about 0.005, is below
+0.05. Reject the zero-gap null at 5%. The data provide evidence that the
+success proportion differs from 50%, and the positive estimate places it
+above 50%.
 :::
 
-Now unassisted:
+Now solve these tasks on your own:
 
-1. A sample of $n=49$ difference scores has $\bar d=3$ and $s_d=14$. Test
-   $H_0:\delta=0$ against $H_1:\delta\ne0$ at 5%.
+1. A random sample of $n=49$ differences has mean $\bar d=3$ and sample SD
+   $s_d=14$ (invented numbers). Test $H_0:\delta=0$ against
+   $H_1:\delta\ne0$ at 5%. The two-sided p-value for your t statistic is
+   about 0.14.
 2. Describe the Type I and Type II errors for the 120-of-200 test above,
    in context.
-3. A multiple-regression coefficient is $-0.290$ percentage points per
-   €100,000, with SE 0.058 and a large $df$. Calculate its t statistic and
-   approximate 95% interval, and interpret the row.
-4. A coefficient estimate is economically negligible but has $p<0.001$.
-   Explain how both facts can be true.
-5. State two reasons the regression preview cannot support a causal
+3. A regression of the equity offered (in percentage points) on the amount
+   requested has the coefficient $-0.360$ percentage points per \$100,000,
+   with SE 0.090 and a large $df$ (invented numbers). Calculate its t
+   statistic and approximate 95% interval, and interpret the row.
+4. A coefficient estimate is too small to matter for any business decision,
+   but it has $p<0.001$. Explain how both facts can be true.
+5. State two reasons why the regression preview cannot support a causal
    conclusion.
 
 ::: {.callout-note collapse="true"}
 ## Check your answers
 
-1. The SE is $14/\sqrt{49}=2$, so $t=3/2=1.50$ with $df=48$; the two-sided
-   p-value is about 0.14. Do not reject the zero mean-difference null at
-   5% --- which is not evidence that the difference is zero.
-2. Type I: concluding the population success proportion differs from 0.50
-   when it equals 0.50. Type II: failing to detect a genuine specified
-   difference from 0.50.
-3. $t=-0.290/0.058=-5.00$. With a large $df$, the 95% interval is
-   approximately $-0.290\pm1.96(0.058)=(-0.404,\,-0.176)$ percentage
-   points per €100,000. Holding the model's other predictors fixed, an
-   additional €100,000 requested is associated with between about 0.18 and
-   0.40 percentage points less fitted equity; reject the zero-coefficient
-   null.
-4. A very large sample or low noise makes the SE tiny, so even a
-   negligible coefficient sits many SEs from zero. Precision does not
-   confer importance.
-5. Season was not randomly assigned, and omitted factors, selection,
-   reverse direction, or measurement error can all remain.
+1. The SE is $14/\sqrt{49}=2$, so $t=3/2=1.50$ with $df=48$. The two-sided
+   p-value, about 0.14, is above 0.05. Do not reject the null hypothesis of
+   a zero mean difference at 5%. This is not evidence that the difference
+   is zero.
+2. Type I: concluding that the population success proportion differs from
+   0.50 when it equals 0.50. Type II: not detecting a success proportion
+   that really differs from 0.50.
+3. $t=-0.360/0.090=-4.00$. With a large $df$, the 95% interval is
+   approximately $-0.360\pm1.96(0.090)=(-0.536,\,-0.184)$ percentage
+   points per \$100,000. An additional \$100,000 requested goes together
+   with between about 0.18 and 0.54 percentage points less equity offered.
+   The interval excludes zero and $|t|=4.00$ is far above 1.96, so reject
+   the null hypothesis of a zero coefficient.
+4. A very large sample or very little variation makes the SE tiny. Then
+   even a very small coefficient lies many SEs from zero. A precise
+   estimate is not automatically an important one.
+5. Nobody assigned pitches to seasons at random. Other factors that
+   changed over the seasons, the selection of pitches for the show, and
+   measurement error can all play a role.
 :::
 
-### One-sided reasoning (10 minutes)
+### Optional: one-sided reasoning
 
-Lecture 9's equity-gap test gave $t=-2.91$ with $df=99$.
+This task belongs to the optional box on one-sided alternatives. It is not
+examined.
 
-1. State all three p-values: two-sided, left-sided ($H_1:\delta<0$), and
-   right-sided ($H_1:\delta>0$).
-2. Which of the three alternatives would have been legitimate to
-   pre-specify, and what determines that?
-3. A classmate, seeing the negative estimate, switches to the left-sided
-   alternative "because it fits the data." What exactly is wrong?
+The equity gap gave $t=-2.91$ with $df=99$ and a two-sided p-value of
+0.0045.
+
+1. State the left-sided ($H_1:\delta<0$) and the right-sided
+   ($H_1:\delta>0$) p-value.
+2. Which of the three alternatives could have been chosen legitimately, and
+   what decides that?
+3. A classmate sees the negative estimate and then switches to the
+   left-sided alternative "because it fits the data". What is wrong?
 
 ::: {.callout-note collapse="true"}
 ## Check your answers
 
-1. Two-sided: about 0.0045. Left-sided: about 0.0023 (the single left tail
-   beyond $-2.91$). Right-sided: about 0.9977 (everything to the right of
-   $-2.91$).
-2. Any of the three --- **provided** it was fixed before inspecting the
-   sample and follows from the research question. Legitimacy is about
-   timing and motivation, not about which alternative is "correct."
-3. Choosing the tail after seeing the estimate means the 5% rejection mass
-   would follow the data to whichever side the noise landed, so the true
-   Type I error rate is doubled to about 10%. The smaller p-value is
-   bought by an invalid procedure. Course convention: two-sided, always,
-   on the exam.
+1. Left-sided: about 0.0023, half of the two-sided p-value. Right-sided:
+   about 0.9977, one minus that half.
+2. Any of the three, if it follows from the research question and was
+   fixed before the sample was inspected.
+3. If the tail is chosen after seeing the estimate, the 5% always lies on
+   the side where the estimate happens to fall. The true Type I error rate
+   is then about 10%, not 5%. All tests in this course are two-sided.
 :::
 
-### Spaced review: one item each from Lectures 9 and 5 (10 minutes)
+### Review: one question each from Lectures 9 and 5 (10 minutes)
 
 1. *(Lecture 9.)* A 95% confidence interval for a mean gap is
-   $(0.4,\,5.2)$ units. State the 5% two-sided test decision without
-   computing, and name one thing the interval reports that the decision
-   does not.
-2. *(Lecture 5.)* In the full file, the correlation between season and
-   initial equity offered is about $-0.42$. Interpret this number in one
-   sentence, and state one claim it cannot support.
+   $(0.4,\,5.2)$ units (invented numbers). Give the estimate and the margin
+   of error, and say what "95%" refers to.
+2. *(Lecture 5.)* In the full Shark Tank file, the correlation between
+   season (`season`) and equity offered (`equity_offered_pct`) is about
+   $-0.42$. Interpret this number in one sentence, and state one claim it
+   cannot support.
 
 ::: {.callout-note collapse="true"}
 ## Check your answers
 
-1. The interval excludes zero, so the matched two-sided test rejects
-   $H_0:\delta=0$ at 5%. The interval additionally shows direction,
-   plausible magnitude (0.4 to 5.2 units), and precision.
-2. Season and offered equity have a moderate negative linear association:
-   later-season pitches tend to offer less equity. It cannot support a
-   causal claim --- nothing assigned pitches to seasons, and other factors
-   changed over time.
+1. The estimate is the midpoint, $(0.4+5.2)/2=2.8$ units. The margin of
+   error is half the width, $(5.2-0.4)/2=2.4$ units. "95%" refers to the
+   procedure: about 95% of intervals built in this way from random samples
+   contain the parameter.
+2. Season and equity offered have a moderate negative linear association.
+   Pitches in later seasons tend to offer less equity. The correlation
+   cannot support a causal claim. Nothing assigned pitches to seasons, and
+   other factors changed over time.
 :::
 
 ### Worked exam interpretation (10 minutes)
 
-**Question (Mock Exam Q5 pattern).** In a simple random sample of 400
-former accelerator participants, 232 had launched a trading venture within
-one year; a two-sided test of $H_0:p=0.50$ is planned. The same study
-fits a regression of monthly revenue (thousands of euros) on weekly
-mentoring hours; one row of the output is:
+**Question (same format as Mock Exam Question 5).** This is an invented
+example. A crowdfunding platform states that 40% of its campaigns reach
+their funding goal. In a simple random sample of 600 campaigns from last
+year, 270 reached the goal. Let $p$ be the proportion of all campaigns of
+last year that reached the goal. A two-sided test of $H_0:p=0.40$ is
+planned. The same study fits a regression of the amount raised (thousands
+of euros) on the number of updates that the founder posted during the
+campaign. One row of the output is:
 
 ```text
                  Estimate  Std. Error  t value  Pr(>|t|)  95% CI
-mentoring_hours     0.80       0.25       3.20     0.0016  [0.31, 1.29]
+updates_posted      0.60       0.25       2.40     0.0167  [0.11, 1.09]
 ```
 
-Complete the proportion test at 5% (a large-sample 95% interval for $p$ is
-$(0.532,\,0.628)$), define a Type I error for it, name two power levers
-that hold $\alpha$ fixed, and interpret the regression row without causal
-language.
+Supplied values: the two-sided p-value of the proportion test is 0.0124,
+and a large-sample 95% interval for $p$ is $(0.410,\,0.490)$.
+
+Complete the proportion test at 5%, define a Type I error for it, name two
+changes that raise power while $\alpha$ stays fixed, and interpret the
+regression row without causal language.
 
 ::: {.callout-note collapse="true"}
 ## Check a model answer
 
-Under $H_0$, $np_0=n(1-p_0)=200\ge 10$. $\hat p=232/400=0.58$,
-$\operatorname{SE}_0=\sqrt{0.50(0.50)/400}=0.025$, and $z=0.08/0.025=3.20$
-with two-sided p-value about 0.0014: reject $H_0$; the frame launch
-proportion differs from 50%, plausibly between 53.2% and 62.8% --- the
-interval excludes 0.50, agreeing with the test. A Type I error would be
-concluding the launch proportion differs from 50% when it equals 50%.
-With $\alpha$ fixed, power rises with a larger sample or lower outcome
-variability (or a larger true gap, though that is not chosen). The
-regression row: each additional weekly mentoring hour is associated with
-0.80 thousand euros more fitted monthly revenue; $t=0.80/0.25=3.20$,
-$p=0.0016$, and the interval $(0.31,\,1.29)$ excludes zero, so reject
-$H_0:\beta=0$. Mentoring hours were not randomly assigned, so this is an
+Under $H_0$, $np_0=600(0.40)=240$ and $n(1-p_0)=600(0.60)=360$. Both are at
+least 10. The estimate is $\hat p=270/600=0.45$. The null SE is
+$\operatorname{SE}_0=\sqrt{0.40(0.60)/600}=\sqrt{0.0004}=0.02$, so
+$z=(0.45-0.40)/0.02=2.50$. The two-sided p-value, 0.0124, is below 0.05, so
+reject $H_0$. The sample provides evidence that the proportion of campaigns
+that reach their goal differs from 40%. The estimate is 45%, and plausible
+values run from 41.0% to 49.0%. The interval excludes 0.40, in line with
+the test.
+
+A Type I error would be to conclude that the proportion differs from 40%
+when it equals 40%. With $\alpha$ fixed, power rises with a larger sample
+and with a larger true difference from 0.40, although the researcher cannot
+choose the true difference. For a 0/1 outcome the spread is fixed by $p$,
+so less variation is not an option here.
+
+The regression row: each additional update goes together with 0.60 thousand
+euros (€600) more raised. $t=0.60/0.25=2.40$, the p-value, 0.0167, is
+below 0.05, and the interval $(0.11,\,1.09)$ excludes zero, so reject
+$H_0:\beta=0$. The
+founders decided themselves how many updates to post, so this is an
 association, not a causal effect.
+:::
+
+### Worked exam interpretation: a mean test (10 minutes)
+
+**Question (same format as Mock Exam Question 4).** This is an invented
+example. A webshop promises that an order arrives after 3 days on average.
+From the 1,200 orders that it shipped last month, a simple random sample of
+100 orders was selected without replacement. `arrival_days` is the number
+of days between the order and its arrival. $\mu$ is the mean of
+`arrival_days` among all 1,200 orders. The sample has $\bar x=3.3$ days and
+$s=2.0$ days. R produced:
+
+```text
+One Sample t-test
+
+data: arrival_days
+t = 1.500, df = 99, p-value = 0.1368
+alternative hypothesis: true mean is not equal to 3
+95 percent confidence interval:
+ 2.90 3.70
+sample estimate:
+mean of x = 3.30
+```
+
+Verify the SE and the t statistic, explain the degrees of freedom,
+interpret the p-value and the interval, give the 5% decision, and check the
+10% condition.
+
+::: {.callout-note collapse="true"}
+## Check a model answer
+
+$\widehat{\operatorname{SE}}=2.0/\sqrt{100}=0.2$ days, so
+$t=(3.3-3)/0.2=1.5$, as in the output. $df=100-1=99$, because the
+deviations from the sample mean must sum to zero, which leaves 99 of them
+free. If the mean of all 1,200 orders were 3 days, a sample mean at least
+1.5 SEs from 3 in either direction would occur in about 14% of random
+samples. Since $0.1368>0.05$, do not reject $H_0:\mu=3$. This is not
+evidence that the mean is exactly 3 days. The interval $(2.90,\,3.70)$
+contains 3, in line with the test, but it also contains values up to 3.7
+days. It was produced by a procedure that captures $\mu$ in about 95% of
+random samples. The 10% condition holds, because $100\le0.10(1200)=120$.
+The conclusion concerns the 1,200 orders of last month, not the orders of
+other months.
+:::
+
+### Check the AI (5 minutes)
+
+You asked an AI assistant: "The p-value of my test of the equity gap is 0.0045. What does that tell me?" It answered:
+
+> "There is only a 0.45% probability that the null hypothesis is true, so the difference must be large."
+
+Find what is wrong and write the corrected answer. This is the **Verify**
+step of Attempt → Ask → Verify → Explain, and the exam asks for it.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+Two errors. The p-value is not the probability that the null hypothesis is true. It says: if the true gap were zero, a sample this far from zero would occur in about 0.45% of samples. And it says nothing about size. The size is the estimate, 2.24 points below the benchmark, with its interval.
 :::
 
 ### Make it yours (5 minutes)
@@ -785,29 +1117,29 @@ association, not a causal effect.
 :::: {.utility-prompt}
 <span class="label">Utility: two sentences</span>
 
-Think of your EiA venture --- or any business you know well. Name one
-yes-or-no claim you will realistically have to defend with data (our
-conversion rate beats the sector's 3%; our average order exceeds the
-break-even basket), and write two sentences: first state it as a two-sided
-zero-contrast test and say which of the two errors would be more costly
-for you and why, then name the one power lever you could actually pull
-before your next pitch.
+Think of your EiA venture, or any business you know well. Name one
+yes-or-no claim that you will have to defend with data, for example "our
+conversion rate differs from the sector's 3%" or "our average order differs
+from the break-even value". Write two sentences. First state the claim as a
+two-sided test of a zero contrast and say which of the two errors would cost
+you more, and why. Then name the one way to raise power that you could
+really use before your next pitch.
 
 ::: {.callout-note collapse="true"}
 ## See an example, then write your own
 
-Take a student-run campus meal-prep box venture. "My claim: our conversion rate differs from the sector's 3% --- $H_0\!: p = 0.03$ against a two-sided alternative. A false alarm is the costlier error, because I would sign a bigger kitchen lease on an effect that is not real; the one power lever I can pull before the next pitch is sample size, by running the tasting stand two more weeks."
+Take a student-run campus meal-prep box venture. "My claim: our conversion rate differs from the sector's 3%, $H_0\!: p = 0.03$ against a two-sided alternative. A false alarm is the costlier error, because I would sign a bigger kitchen lease on a difference that is not real. The one way to raise power that I can use before the next pitch is a larger sample, by running the tasting stand two more weeks."
 :::
 
-You can discuss this task --- and any other task in this chapter --- with
-**Tilly**, the course AI assistant on Canvas: ask it to draft the
+You can discuss this task, and any other task in this chapter, with
+**Tilly**, the course AI assistant: ask it to draft the
 seven-step workflow for your claim and challenge your choice of the more
 costly error.
 ::::
 
-Continue to Tutorial 4: Inference and tests against zero.
+[Continue to Tutorial 4: Inference and tests against zero](t04-exam-prep.qmd).
 
-Formula sheet: Lecture 10 formulas.
+[Formula sheet: Lecture 10 formulas](formula-sheet.qmd#formula-l10).
 
 For a more formal explanation, consult
 [Nieuwenhuis, *Statistical Methods for Business and Economics*](https://tilburguniversity.on.worldcat.org/oclc/317545871),

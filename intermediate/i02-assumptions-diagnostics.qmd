@@ -1,4 +1,4 @@
-# Lecture 2: What the model assumes and how residuals betray it {#i02}
+# Lecture 2: What the model assumes and how residuals reveal it {#i02}
 
 ```{r}
 #| label: i02-setup
@@ -12,115 +12,143 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 ::: {.outcomes}
 <span class="label">By the end of Lecture 2, you can</span>
 
-- state the assumptions behind ordinary least-squares estimation and
-  inference, and say what each one supports;
-- explain why the outcome itself does not need to be normally distributed;
-- inspect residual plots for non-linearity and unequal variance;
-- explain which assumptions no plot can establish, and what design
-  knowledge assesses them;
+- state the assumptions behind a least-squares regression and its standard
+  errors, and say what each one supports
+- explain why the outcome itself does not need to be normally distributed
+- inspect residual plots for non-linearity and unequal variance
+- explain which assumptions no plot can show, and what knowledge about the
+  data is needed to judge them
 - compute standardised residuals and Cook's distance, and identify
-  influential observations;
-- read a normal Q--Q plot and say when normality matters;
+  influential observations
+- read a normal Q--Q plot and say when normality matters
 - respond to an influential observation properly: investigate, report,
   never silently delete.
+:::
+
+::: {.must-know}
+<span class="label">Must know</span>
+
+**Be able to do yourself:**
+
+- make and read a residual-versus-fitted plot and a Q--Q plot
+- say which assumption a visible pattern challenges
+- find large standardised residuals and influential observations
+- apply the rule: investigate, report, never silently delete
+- name the conditions that no plot can show.
+
+**Enough to recognise:**
+
+- the wording of the assumptions table
+- the notation $E[\,\cdot\mid X]$.
 :::
 
 ::: {.driving-question}
 <span class="label">Driving question</span>
 
-<p class="dq-context">Every fitted line looks authoritative --- the software draws it with equal confidence through good data and bad. Whether the line deserves trust depends on assumptions no software checks for you.</p>
+<p class="dq-context">R draws a fitted line in the same way through good data and bad. Whether the line deserves trust depends on assumptions that no software checks for you.</p>
 
 The fitted line from Lecture 1 looks convincing. Under what conditions
-should we trust it, and what do its residuals confess?
+should we trust it, and what do its residuals reveal?
 :::
 
 ::: {.course-phase .phase-before}
 
 ## Before class
 
-<span class="time-budget">Total preparation time: about 25 minutes.</span>
+<span class="time-budget">Total preparation time: about 15 minutes.</span>
+
+**Minimum path:** the R task and the prediction. **Full path:** everything in this section.
 
 <div class="video-prep">
-<span class="label">Video preparation (10 minutes)</span><br>
-Watch the first half of Stanford Statistical Learning
-<a href="https://www.youtube.com/watch?v=3GiWpRfkSjc&list=PLoROMvodv4rOzrYsAxzQyHb8n_RWNuS1e&index=10">3.2
-Hypothesis Testing and Confidence Intervals</a>, focusing on what can go
-wrong in a regression rather than on the test mechanics --- Lecture 3
-handles those. All links are also listed in the
-<a href="../resources/video-guide.html">External Video Guide</a>.
+<span class="label">No video this week</span><br>
+The preparation for this lecture is your own residual plot. Do the R warm-up
+below and bring the plot to class.
 </div>
 
-**Predict (5 minutes).** Answer the one-click Mentimeter question posted on
-Canvas before you come to class: can a **steep** fitted slope still be an
-**imprecise** estimate? Commit to an answer and write one sentence
-explaining why; the lecture resolves it.
+**Predict (5 minutes).** Answer the one-click Wooclap question posted on
+Canvas before you come to class: the agreed valuations are strongly
+right-skewed (most are small and a few are very large), far from a normal
+distribution. Does that alone make the
+Lecture 1 regression invalid, **yes** or **no**? Commit to an answer and write
+one sentence explaining why. You find the answer in the lecture material.
 
-**R warm-up (10 minutes).** Rebuild the Lecture 1 model and produce its
-residual-versus-fitted plot. Bring the plot to class:
+**R warm-up (10 minutes).** Rebuild the Lecture 1 model and make its
+residual-versus-fitted plot: the fitted values on the horizontal axis and the
+residuals on the vertical axis. Bring the plot to class:
 
 ```{r}
 #| label: i02-prep-warmup
 #| eval: false
 sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
-deals <- subset(sharks, deal_on_show == 1)
-deals$ask_1k <- deals$ask_amount_usd / 1000
-deals$deal_1k <- deals$deal_amount_usd / 1000
-deal_model <- lm(deal_1k ~ ask_1k, data = deals)
-plot(fitted(deal_model), residuals(deal_model))
+vals <- subset(sharks, deal_on_show == 1 & deal_equity_pct > 0)
+vals$claimed_m <- vals$requested_valuation_usd / 1e6
+vals$agreed_m <- vals$deal_valuation_usd / 1e6
+val_model <- lm(agreed_m ~ claimed_m, data = vals)
+plot(fitted(val_model), residuals(val_model))
 abline(h = 0, lty = 2)
 ```
+
+**Code along (bring your laptop).** Bring a charged laptop with RStudio and
+the course project open, so that you can run the code of this chapter
+yourself during the lecture and get the same numbers and figures.
 
 :::
 
 ::: {.course-phase .phase-in-class}
 
-## In class
+## Lecture material
 
-The session opens with the usual four-minute entry quiz on the prep videos,
-then turns to the driving question --- with the class's own warm-up plots on
-screen.
+This section states what the regression model assumes. It then shows how to
+check these assumptions with the residuals of the Lecture 1 model, and which
+assumptions no plot can check.
 
-<p class="concept-video"><strong>Stanford explanation (review):</strong>
-<a href="https://www.youtube.com/watch?v=3GiWpRfkSjc">3.2 Hypothesis Testing and Confidence Intervals</a>.</p>
+### Start with a founder's question
 
-### The plot you brought
+Lecture 1 gave you a number: the sharks accept about 65 cents of every
+claimed dollar. Before you plan a negotiation around it, ask whether the line
+behind the number deserves trust. R draws a line through any data, also
+through data that do not support one, and it never warns you.
 
-The warm-up code, run once more so every object on this page is built in
-the open:
+### The residual plot from the warm-up
+
+The code below is the warm-up code. It rebuilds the data and the model of
+Lecture 1: the valuation agreed on air (`agreed_m`) regressed on the
+valuation claimed by the founder (`claimed_m`), both in \$ millions, for the
+874 Shark Tank deals for a share of the company.
 
 ```{r}
 #| label: i02-build-model
 sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
-deals <- subset(sharks, deal_on_show == 1)
-deals$ask_1k <- deals$ask_amount_usd / 1000
-deals$deal_1k <- deals$deal_amount_usd / 1000
-deal_model <- lm(deal_1k ~ ask_1k, data = deals)
+vals <- subset(sharks, deal_on_show == 1 & deal_equity_pct > 0)
+vals$claimed_m <- vals$requested_valuation_usd / 1e6
+vals$agreed_m <- vals$deal_valuation_usd / 1e6
+val_model <- lm(agreed_m ~ claimed_m, data = vals)
 ```
 
 ```{r}
 #| label: fig-i02-warmup-residuals
 #| code-fold: true
 #| code-summary: "See the R code for this figure"
-#| fig-cap: "Residuals against fitted values for the Lecture 1 deal model, both in $1,000s. Reading this plot --- and knowing what it cannot show --- is the whole of today's lecture."
+#| fig-cap: "Residuals against fitted values for the Lecture 1 valuation model, both in $ millions. On the left the residuals lie close to zero. On the right they spread over several million dollars."
 library(ggplot2)
 sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
-deals <- subset(sharks, deal_on_show == 1)
-deals$ask_1k <- deals$ask_amount_usd / 1000
-deals$deal_1k <- deals$deal_amount_usd / 1000
-deal_model <- lm(deal_1k ~ ask_1k, data = deals)
+vals <- subset(sharks, deal_on_show == 1 & deal_equity_pct > 0)
+vals$claimed_m <- vals$requested_valuation_usd / 1e6
+vals$agreed_m <- vals$deal_valuation_usd / 1e6
+val_model <- lm(agreed_m ~ claimed_m, data = vals)
 resid_df <- data.frame(
-  fitted = fitted(deal_model),
-  residual = residuals(deal_model)
+  fitted = fitted(val_model),
+  residual = residuals(val_model)
 )
 
 ggplot(resid_df, aes(x = fitted, y = residual)) +
   geom_hline(yintercept = 0, colour = "#C98B2E",
              linetype = "dashed", linewidth = 0.8) +
   geom_point(alpha = 0.45, size = 1.6, colour = "#009E73") +
-  annotate("text", x = 5050, y = 170, label = "residual = 0",
+  annotate("text", x = 31.5, y = 0.9, label = "residual = 0",
            hjust = 1, colour = "#17324D", size = 3.4) +
-  labs(x = "Fitted agreed amount ($1,000s)",
-       y = "Residual ($1,000s)") +
+  labs(x = "Fitted agreed valuation ($ millions)",
+       y = "Residual ($ millions)") +
   theme_minimal(base_size = 13) +
   theme(
     panel.grid.minor = element_blank(),
@@ -130,58 +158,89 @@ ggplot(resid_df, aes(x = fitted, y = residual)) +
   )
 ```
 
-In @fig-i02-warmup-residuals, fitted outcomes run horizontally and
-observed-minus-fitted residuals vertically, both in the outcome's units of
-$1,000. A point above zero is a pitch that agreed more than its fitted
-value. Before reading patterns out of this cloud, we need to know what the
-model actually assumes.
+::: {.definition-box}
+<span class="label">Definition</span>
+
+**Residual plot** (residual-versus-fitted plot). A scatterplot with the
+fitted values $\widehat Y_i$ on the horizontal axis and the residuals $e_i$
+on the vertical axis. It shows how the misses of the line change along the
+line.
+:::
+
+In @fig-i02-warmup-residuals, both axes are in the units of the outcome,
+\$1 million. A point above zero is a deal that closed at a higher valuation
+than its fitted value. A point below zero closed at a lower valuation. To
+read patterns in this plot, you first need to know what the model assumes.
 
 ### What each assumption supports
 
-For
+The model of Lecture 1 is
 
 $$
-Y_i=\beta_0+\beta_1X_i+\varepsilon_i,
+Y_i=\beta_0+\beta_1X_i+\varepsilon_i.
 $$
 
-separate the conditions below rather than memorising one vague statement
-that "the data are normal." Each condition supports a different part of the
-analysis --- take the table one row at a time.
+It rests on several separate assumptions, and each of them supports a
+different part of the analysis.
+
+::: {.definition-box}
+<span class="label">Definition</span>
+
+**Model assumptions.** The conditions under which the fitted line and its
+standard errors can be trusted:
+
+- **Linearity.** The average of $Y$ at each value of $X$ lies on a straight
+  line.
+- **Independence.** The observations do not depend on each other. Every row
+  brings new information.
+- **Constant variance.** The errors spread equally at every value of $X$.
+- **Normal errors.** At each value of $X$, the errors follow a normal
+  distribution. This one matters only in small samples.
+:::
+
+The table repeats these four assumptions in symbols and adds two more
+conditions. Without variation in $X$ no slope can be calculated. And reading
+the slope as an effect needs one more condition, no confounding. A
+**confounder** is a variable that is not in the model and that drives both
+$X$ and $Y$.
 
 | Condition | Meaning | What it supports |
 |---|---|---|
-| Linear conditional mean | $E[Y\mid X=x]=\beta_0+\beta_1x$ over the modelled range | One constant slope summarises the mean relationship |
-| Zero conditional mean | $E[\varepsilon\mid X]=0$ | The slope is not systematically absorbing omitted components related to $X$ |
-| Independent observations | Errors from different rows do not supply duplicate information | The usual standard-error calculation and effective sample size |
-| Positive variation in $X$ | Not all observations have the same predictor value | A slope can be estimated |
-| Constant conditional variance | $\operatorname{Var}(\varepsilon\mid X)=\sigma^2$ | Classical OLS standard errors have the stated form |
-| Conditional normality | $\varepsilon\mid X$ follows a normal distribution | Exact t and F reference distributions in small samples |
+| Linear conditional mean | $E[Y\mid X=x]=\beta_0+\beta_1x$ over the range of the data | One constant slope summarises how the average of $Y$ changes with $X$ |
+| No confounding (for a causal reading only) | Nothing unrecorded drives both $X$ and $Y$ | Reading the slope as the effect of changing $X$. Describing how average outcomes differ across values of $X$ does not need it |
+| Independent observations | The errors of different rows are unrelated, so no row repeats the information of another | The usual standard-error formula |
+| Variation in $X$ | Not all observations have the same predictor value | A slope can be calculated |
+| Constant conditional variance | $\operatorname{Var}(\varepsilon\mid X)=\sigma^2$, the same at every value of $X$ | The usual standard-error formula |
+| Conditional normality | At each value of $X$, $\varepsilon$ follows a normal distribution | Exact t and F distributions in small samples |
 
-Say it early and loudly: **the outcome does not need to be normally
-distributed, and neither does the predictor.** Agreed deal amounts are
-strongly right-skewed, and that alone breaks nothing. The assumptions
-concern the conditional mean, the errors, and the sampling process --- not
-the marginal histograms of $Y$ and $X$.
+No row of the table says that the data are normal. This answers the Wooclap
+question from Before class: the outcome does not need to be normally
+distributed, and neither does the predictor. The agreed valuations are
+strongly right-skewed, and that alone breaks nothing. The assumptions are
+about the average of $Y$ at each $X$, about the errors, and about how the
+data came about. They are not about the histogram of $Y$ or the histogram of
+$X$.
 
 ### Linearity is about the average, not every point
 
 Individual outcomes need not lie on a line. Linearity says that the
-*average* outcome at each predictor value follows a line. A systematic
-curve in residuals means one constant slope misses part of that average
-pattern.
+*average* outcome at each predictor value follows a line. If the residual
+plot shows a curve, one constant slope misses part of that average pattern.
 
-Constant variance is the vertical counterpart: homoskedasticity says the
-conditional variance is the same at each predictor value. It does not say
-all residuals have the same size. A fan-shaped residual plot --- in which
-the vertical band widens or narrows --- suggests changing conditional
-variance. @fig-i02-assumption-panels shows both stories.
+Constant variance is about the vertical spread. It says that the variance of
+the errors is the same at each predictor value. It does not say that all
+residuals have the same size. The technical name for constant variance is
+**homoskedasticity**, and for changing variance **heteroskedasticity**. In a
+residual plot, changing variance shows as a fan: the vertical band of points
+widens or narrows from left to right. @fig-i02-assumption-panels shows both
+problems.
 
 ```{r}
 #| label: fig-i02-assumption-panels
 #| code-fold: true
 #| code-summary: "See the R code for this figure"
 #| fig-height: 6
-#| fig-cap: "Four simulated situations. Top row: a linear mean fits (left, outcome against predictor); a curved mean leaves a U-shaped residual pattern (right). Bottom row: constant vertical spread (left); spread growing with the fitted value, a fan (right). The three residual panels share the gold dashed line at residual zero."
+#| fig-cap: "Four simulated situations. Top row: a linear mean fits (left, outcome against predictor), a curved mean leaves a U-shaped residual pattern (right). Bottom row: constant vertical spread (left), spread growing with the fitted value, a fan (right). The three residual panels share the gold dashed line at residual zero."
 library(ggplot2)
 set.seed(802)
 n_demo <- 90
@@ -249,27 +308,43 @@ straight line misses part of the mean relationship. A **fan** challenges
 with the fitted value. A real plot can show both problems at once.
 :::
 
-### Reading the deal model's vertical spread
+### Reading the valuation model's vertical spread
 
-Now apply the fan test to @fig-i02-warmup-residuals. At small fitted values
-the residuals hug the zero line; at larger fitted values they range over
-hundreds of thousands of dollars. The conditional variance of agreed
-amounts grows with the size of the deal --- an economically unsurprising
-fan. Classical standard errors, which assume one common $\sigma^2$, are
-therefore built on a doubtful assumption here. Lecture 3 returns to exactly
+Now look for a fan in @fig-i02-warmup-residuals. At small fitted values the
+residuals stay close to the zero line. At larger fitted values they spread
+over several million dollars. A short calculation confirms the picture. The
+code sorts the deals by the claimed valuation into five groups, each with
+about a fifth of the deals, and gives the standard deviation of the residuals
+in each group:
+
+```{r}
+#| label: i02-spread-by-fifth
+fifth <- cut(vals$claimed_m,
+             breaks = quantile(vals$claimed_m, probs = seq(0, 1, 0.2)),
+             include.lowest = TRUE)
+round(tapply(residuals(val_model), fifth, sd), 2)
+```
+
+The standard deviation of the residuals is about \$0.14 million in the fifth
+of deals with the smallest claimed valuations and about \$3.6 million in the
+fifth with the largest, about 25 times as much. The spread of agreed
+valuations grows with the size of the claim. This makes economic sense: there
+is more room to disagree about a \$20 million company than about a \$200,000
+one. This is a fan. The usual standard errors assume one common variance
+$\sigma^2$, so here they rest on a doubtful assumption. Lecture 3 returns to
 this point.
 
 ::: {.callout-caution collapse="true"}
 ## Try it: annotate a residual plot
 
-In class this is done in pairs on a printed copy of
-@fig-i02-warmup-residuals. On your own copy (or a sketch):
+Try this with your neighbour first. Use a printed copy or a sketch of
+@fig-i02-warmup-residuals.
 
 *Step 1 (given).* The horizontal dashed line marks residual zero: points
 above it agreed more than fitted, points below agreed less.
 
-*Step 2 (you).* Draw the rough envelope of the residuals --- one curve
-above, one below --- from the left edge to the right edge of the plot. Does
+*Step 2 (you).* Draw the rough envelope of the residuals, one curve
+above, one below, from the left edge to the right edge of the plot. Does
 the band stay equally wide?
 
 *Step 3 (you).* Name the assumption your envelope challenges, and write
@@ -279,12 +354,13 @@ from zero anywhere.
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-The envelope widens sharply from left to right: small fitted deals sit
-within tens of thousands of the line, large fitted deals within hundreds of
-thousands. That fan challenges **constant conditional variance**. The
+The envelope widens strongly from left to right: deals with small fitted
+valuations lie within a few hundred thousand dollars of the line, deals with
+large fitted valuations within several million. That fan challenges
+**constant conditional variance**. The
 average residual stays near zero across the range, so the plot does not
-show a clear violation of the **linear conditional mean** --- two different
-assumptions, two different readings of the same picture.
+show a clear violation of the **linear conditional mean**. The same picture
+is read twice, once for each assumption.
 :::
 :::
 
@@ -292,119 +368,135 @@ assumptions, two different readings of the same picture.
 
 Two rows of the assumptions table never appear in any residual plot.
 
-**Zero conditional mean.** Fitted OLS residuals are mechanically centred
-around the fitted line --- the least-squares algebra forces it --- so a
-residual plot cannot reveal whether $E[\varepsilon\mid X]=0$ holds in the
-population. Unobserved confounders are, by definition, not on the plot. Ask
-instead how the observations came about: what plausible common causes were
-omitted, whether measurement error or reverse direction is credible.
+**No confounding.** A curve in the residual plot can show that a straight
+line misses the average pattern. No plot can show whether a confounder
+exists, that is, whether something unrecorded drives both the predictor and
+the outcome. Least squares always makes the residuals average zero and
+leaves no linear relation between them and $X$. The residuals therefore look
+clean even when a confounder exists. Ask how the observations came about:
+which common causes of $X$ and $Y$ are plausible and not in the data?
 
-**Independence.** Whether rows share information is a fact about the data
-collection, not about the residuals. If rows are related, treating them as
-independent makes the effective sample size look larger than it is and
-standard errors too small.
+**Independence.** Whether rows share information is a fact about how the
+data were collected, not about the residuals. If rows are related and you
+treat them as independent, the data seem to contain more information than
+they do, and the standard errors come out too small.
 
-Two short Shark Tank stories, classified:
+Two examples from Shark Tank:
 
-- **Repeat pitchers.** Some ventures appear in more than one season, and
-  some founders pitch multiple products. Their rows share a founder, a
-  negotiation style, a network of sharks. This is an **independence**
-  problem: the 882 deal rows carry less than 882 rows' worth of
-  information.
-- **Network ties.** Suppose founders with strong investor networks both ask
-  for more (they know the market) and get systematically better deals (the
-  sharks know them). Network strength is unrecorded, related to the
-  predictor, and moves the outcome: this is a **zero conditional mean**
-  problem --- the slope partly absorbs the omitted network effect.
+- **Shared episodes.** Pitches in the same episode face the same panel of
+  sharks on the same day, and the same few sharks appear in hundreds of
+  deals. Their rows share negotiators, moods, and editing decisions. This is
+  an **independence** problem: the 874 deals carry somewhat less information
+  than 874 unrelated deals would.
+- **Network ties.** Suppose founders with strong investor networks both
+  claim higher valuations (they know the market) and get better deals (the
+  sharks know them). Network strength is not recorded, it is related to the
+  predictor, and it moves the outcome. This is a **confounding** problem. The
+  slope still describes how average agreed valuations differ across claims,
+  but it cannot be read as what a higher claim would achieve.
 
-Neither story is visible in @fig-i02-warmup-residuals. Both come from
+Neither problem is visible in @fig-i02-warmup-residuals. Both come from
 knowing how the show works.
 
 ### Influence: when a few rows steer the line
 
-A diagnosis can start before any plot, in one line of printed output. The
-five-number summary of the residuals is the first thing `summary()` reports
-for any model; here it is on its own:
+A first check needs no plot. The function `summary()` gives the smallest
+residual, the largest residual, the mean, the median, and the two quartiles.
+[Basic Lecture 1](../basic/b01-introduction-data-analysis.qmd#b01-quartiles)
+defines the median and the quartiles: a quarter of the values lie below the
+first quartile, half below the median, and three quarters below the third
+quartile.
 
 ```{r}
 #| label: i02-residual-line
-summary(residuals(deal_model))
+summary(residuals(val_model))
 ```
 
 ::: {#exm-i02-residual-line}
-## Worked example: reading the residual line as a red flag
+## Worked example: reading the summary of the residuals
 
-Same five numbers, read slowly, all in $1,000s:
+Read the numbers one by one, all in \$ millions:
 
-- The **median** residual is about $-28.8$: the typical deal sits
-  \$28,800 *below* the fitted line.
-- The middle half of all residuals --- first to third quartile --- spans
-  only $-30.1$ to $-28.2$: a band about \$2,000 wide. Most deals sit in a
-  tight bundle just under the line.
-- The **maximum** residual is about $2821$: one deal came in \$2.82
-  million *above* its fitted value.
+- The **median** residual is about $-0.01$: the typical deal sits almost
+  exactly on the fitted line.
+- The middle half of all residuals, from the first to the third quartile,
+  runs from $-0.40$ to $0.17$: a band about \$570,000 wide.
+- The **minimum** is about $-7.8$ and the **maximum** about $13.4$: one deal
+  closed \$7.8 million below its fitted valuation and another \$13.4 million
+  above.
 
-A symmetric, well-behaved residual distribution would have a median near
-zero and a maximum and minimum of comparable size. Here the mean is zero
-(it always is, with an intercept), but the distribution is wildly
-asymmetric: a dense mass slightly below the line, balanced by a few
-enormous positive misses. Before computing anything else, this one line
-says the fit is being shaped by a handful of extreme pitches. The same five
-numbers sit at the top of `summary(deal_model)`, which Lecture 3 reads in
-full.
+The mean is zero, as it always is when the model has an intercept. If no
+deal were extreme, the largest misses would be a few times the width of the
+middle half. Here they are 14 to 24 times as large. A few deals miss the line
+by far more than the typical deal does, and such deals can shape the fit. The
+same numbers, without the mean, appear at the top of `summary(val_model)`,
+which Lecture 3 reads.
 :::
 
-Two standard tools quantify the suspicion. A **standardised residual**,
-`rstandard()`, re-expresses each residual in standard-deviation units, so
-values beyond about $\pm 3$ are large by any convention. **Cook's
-distance**, `cooks.distance()`, measures how much the entire fitted line
-would move if one observation were removed; a common screening threshold is
+Two standard tools make this check precise. A **standardised residual**,
+`rstandard()`, is a residual divided by its standard deviation, so it counts
+the miss in standard deviations. Values beyond about $\pm 3$ are large by any
+convention. **Cook's distance**, `cooks.distance()`, measures how much the
+whole fitted line would move if one observation were removed. A common
+threshold for a closer look is $4/n$.
+
+::: {.definition-box}
+<span class="label">Definition</span>
+
+**Outlier.** An observation with an unusually large residual: its outcome
+lies far from the fitted line. A common rule is a standardised residual
+beyond $\pm 3$.
+
+**Influential observation.** An observation that changes the fitted line
+noticeably when it is removed. A common rule is a Cook's distance above
 $4/n$.
+:::
 
 ```{r}
 #| label: i02-influence
-rs <- rstandard(deal_model)
-cd <- cooks.distance(deal_model)
+rs <- rstandard(val_model)
+cd <- cooks.distance(val_model)
 
 sum(abs(rs) > 3)          # unusually large standardised residuals
-sum(cd > 4 / nrow(deals)) # influential by the 4/n screen
-deals[order(cd, decreasing = TRUE)[1:3],
-      c("ask_1k", "deal_1k")]
+sum(cd > 4 / nrow(vals)) # Cook's distance above 4/n
+vals[order(cd, decreasing = TRUE)[1:3],
+      c("claimed_m", "agreed_m")]
 ```
 
-Twelve pitches have standardised residuals beyond $\pm 3$, and 21 exceed
-the $4/n$ Cook's screen. The single most influential record asked for
-\$150,000 and agreed \$3,000,000 --- twenty times its request.
-@fig-i02-influence places the flagged pitches on the scatter.
+Twenty-five deals have standardised residuals beyond $\pm 3$, and 64 have a
+Cook's distance above $4/n$. These are 3% and 7% of the 874 deals. The most
+influential deal claimed a valuation of \$50 million and closed at
+\$25 million, half of the claim. @fig-i02-influence marks the 64 deals in the
+scatterplot.
 
 ```{r}
 #| label: fig-i02-influence
 #| code-fold: true
 #| code-summary: "See the R code for this figure"
-#| fig-cap: "The 882 deal records with the fitted line, full range shown. Orange points exceed the 4/n Cook's distance screen; the labelled pitch (ask $150,000, deal $3,000,000) moves the fitted line most. The $5 million ask at the far right is also influential --- not because its residual is large, but because it sits so far right that it pulls on the line like a lever."
+#| fig-cap: "The 874 deals with the fitted line, full range shown. Orange points have a Cook's distance above 4/n. The labelled deal (claimed $50 million, agreed $25 million) moves the fitted line most: it sits far to the right, so it pulls on the line like a lever."
 library(ggplot2)
 sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
-deals <- subset(sharks, deal_on_show == 1)
-deals$ask_1k <- deals$ask_amount_usd / 1000
-deals$deal_1k <- deals$deal_amount_usd / 1000
-deal_model <- lm(deal_1k ~ ask_1k, data = deals)
-cd <- cooks.distance(deal_model)
-deals$flagged <- cd > 4 / nrow(deals)
+vals <- subset(sharks, deal_on_show == 1 & deal_equity_pct > 0)
+vals$claimed_m <- vals$requested_valuation_usd / 1e6
+vals$agreed_m <- vals$deal_valuation_usd / 1e6
+val_model <- lm(agreed_m ~ claimed_m, data = vals)
+cd <- cooks.distance(val_model)
+vals$flagged <- cd > 4 / nrow(vals)
 top <- which.max(cd)
 
-ggplot(deals, aes(x = ask_1k, y = deal_1k)) +
-  geom_point(data = subset(deals, !flagged),
+ggplot(vals, aes(x = claimed_m, y = agreed_m)) +
+  geom_point(data = subset(vals, !flagged),
              colour = "grey75", alpha = 0.45, size = 1.6) +
-  geom_abline(intercept = coef(deal_model)[1],
-              slope = coef(deal_model)[2],
+  geom_abline(intercept = coef(val_model)[1],
+              slope = coef(val_model)[2],
               colour = "#D55E00", linewidth = 0.9) +
-  geom_point(data = subset(deals, flagged),
+  geom_point(data = subset(vals, flagged),
              colour = "#D55E00", size = 2.2) +
-  annotate("text", x = deals$ask_1k[top] + 60, y = deals$deal_1k[top],
-           label = "ask 150, deal 3,000",
-           hjust = 0, colour = "#17324D", size = 3.4) +
-  labs(x = "Amount requested ($1,000s)",
-       y = "Agreed on-air deal amount ($1,000s)") +
+  annotate("text", x = vals$claimed_m[top] - 1.2, y = vals$agreed_m[top],
+           label = "claimed 50, agreed 25",
+           hjust = 1, colour = "#17324D", size = 3.4) +
+  labs(x = "Valuation claimed by the founder ($ millions)",
+       y = "Valuation agreed on air ($ millions)") +
   theme_minimal(base_size = 13) +
   theme(
     panel.grid.minor = element_blank(),
@@ -414,34 +506,37 @@ ggplot(deals, aes(x = ask_1k, y = deal_1k)) +
   )
 ```
 
-What to do with a flagged observation --- the standing rule, in order:
+What should you do with a flagged observation? Follow three steps, in this
+order:
 
-1. **Investigate.** Is it a data error, or a real pitch? (These are real:
-   some sharks buy whole companies.)
-2. **Report.** State that results depend on a few identifiable
-   observations; show the fit with and without them if it matters.
-3. **Never silently delete.** Dropping inconvenient rows without saying so
-   is not cleaning, it is misrepresentation.
+1. **Investigate.** Is it a data error, or a real pitch? Here the flagged
+   deals agree with their recorded amounts and shares, so they are treated
+   as real.
+2. **Report.** State that the results depend on a few observations and say
+   which ones. Show the fit with and without them if it matters.
+3. **Never silently delete.** Dropping rows that do not suit you, without
+   saying so, misrepresents the data.
 
 ### Q--Q plots: how to read them, when normality matters
 
 The last assumption in the table is conditional normality of the errors. A
-**normal Q--Q plot** compares the ordered standardised residuals with the
-values expected under a normal distribution; agreement appears as points
-along the reference line.
+**normal Q--Q plot** (quantile-quantile plot) puts the standardised residuals
+in order and compares them with the values that a normal distribution would
+give. If the residuals are close to normal, the points lie along the
+reference line.
 
 ```{r}
 #| label: fig-i02-qq
 #| code-fold: true
 #| code-summary: "See the R code for this figure"
-#| fig-cap: "Normal Q--Q plot of the standardised residuals of the deal model. The heavy departure in the upper tail is the same handful of enormous positive residuals flagged by Cook's distance."
+#| fig-cap: "Normal Q--Q plot of the standardised residuals of the valuation model. Both ends leave the line: a few deals closed far above and far below their fitted valuation."
 library(ggplot2)
 sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
-deals <- subset(sharks, deal_on_show == 1)
-deals$ask_1k <- deals$ask_amount_usd / 1000
-deals$deal_1k <- deals$deal_amount_usd / 1000
-deal_model <- lm(deal_1k ~ ask_1k, data = deals)
-qq_df <- data.frame(rs = rstandard(deal_model))
+vals <- subset(sharks, deal_on_show == 1 & deal_equity_pct > 0)
+vals$claimed_m <- vals$requested_valuation_usd / 1e6
+vals$agreed_m <- vals$deal_valuation_usd / 1e6
+val_model <- lm(agreed_m ~ claimed_m, data = vals)
+qq_df <- data.frame(rs = rstandard(val_model))
 
 ggplot(qq_df, aes(sample = rs)) +
   geom_qq_line(colour = "#D55E00", linewidth = 0.9) +
@@ -457,53 +552,59 @@ ggplot(qq_df, aes(sample = rs)) +
   )
 ```
 
-Read the horizontal axis as "where a residual of this rank *should* sit if
-errors were normal" and the vertical axis as where it actually sits. In
-@fig-i02-qq the middle of the distribution is close to the line while the
-upper tail shoots far above it: the residual distribution has a much
-heavier right tail than a normal.
+The horizontal axis shows where a residual of this rank would sit if the
+errors were normal. The vertical axis shows where it actually sits. In
+@fig-i02-qq the middle of the distribution is close to the line. Both ends
+bend away from it, the upper end more strongly. The residuals have more
+extreme values on both sides than a normal distribution has. Such a
+distribution is said to have heavy tails.
 
-When does this matter? Normality is used to derive **exact** t and F
-distributions in **small samples**. With 882 reasonably independent
-observations, central-limit arguments make the inference of Lecture 3
-approximately valid even without normal errors --- but "approximately" is
-doing real work when the same few pitches that break normality also
-dominate the fit. Severe outliers distort both the line and its
-uncertainty, whatever the sample size.
+When does this matter? Normal errors are needed for exact t and F
+distributions in small samples. With 874 observations the tests and
+intervals of Lecture 3 still hold approximately without normal errors,
+because averages over many observations are close to normal. The
+approximation is weaker when the few deals that break normality also
+dominate the fit. Severe outliers distort both the line and its standard
+errors, whatever the sample size.
 
 ::: {.caveat-box}
 <span class="label">What a residual check can and cannot certify</span>
 
-- **No visible pattern is not proof.** A clean residual plot is consistent
-  with the assumptions; it does not establish them. Omitted confounders and
-  dependent rows leave no trace on any plot.
-- **Diagnostics start the conversation, they do not end it.** A fan or an
-  influential pitch is a finding to investigate and report, not an
-  automatic verdict on the model --- and not a licence to delete rows until
-  the pictures look better.
-- **Keeping or dropping an influential observation is a substantive
-  decision**, made from knowledge of the data, stated openly in the
-  report --- never made silently by the software or the analyst.
+- A clean residual plot fits the assumptions. It does not prove them.
+  Confounders and dependent rows leave no trace on a plot.
+- A fan or an influential deal is a finding to look into and to report. It is
+  not a verdict on the model.
+- Keeping or dropping an unusual observation is a decision that you make from
+  knowledge of the data and that you state openly.
+
+**What you can do with it:** before you trust a fitted line, look at its
+residual plot and at the few points that move it most. If the story changes
+without them, say so.
 :::
 
 ### Answering the driving question
 
-Trust in the Lecture 1 line is conditional. Its residuals confess two
-things: the vertical spread grows with the size of the deal (the fan), and
-a handful of extreme pitches --- flagged by standardised residuals beyond
-$\pm3$ and Cook's distances above $4/n$ --- steer both the line and its
-apparent precision. Nothing in the plots contradicts a linear conditional
-mean, but zero conditional mean and independence rest on how the show
-works, not on any picture. Lecture 3 computes standard errors, intervals,
-and tests for this model --- and must respect exactly these two confessions.
+You can trust the Lecture 1 line only under conditions. Its residuals
+reveal two things. The vertical spread grows with the size of the claim (the
+fan). And a few extreme deals, flagged by standardised residuals beyond
+$\pm3$ and Cook's distances above $4/n$, steer both the line and its
+standard errors. Nothing in the plots contradicts a linear conditional mean.
+Independence and the absence of confounding cannot be seen in any plot. They
+depend on how the show works. Lecture 3 calculates standard errors,
+intervals, and tests for this model, and these two findings limit how far
+they can be trusted.
 
-**Next:** We now know when a fitted line deserves provisional trust. What we
-still lack is precision and worth: the slope is an estimate from one sample,
-and a model can pass every diagnostic while explaining almost nothing. Lecture
-3 brings the inference machinery from QM Basic to the coefficient --- standard
-error, interval, t-test --- and adds the fit toolkit: the SST = SSR + SSE
-decomposition, $R^2$, and the overall F-test for whether the model is useful
-at all.
+::: {.founder-box}
+<span class="label">A founder's decision (invented example)</span>
+
+One week in your data includes a catering order of 200 boxes, in a week with high advertising. With that week the advertising slope is 0.15. Without it the slope is 0.09. The decision: do not base next term's budget on a fit that one week controls. Catering is a different business from daily boxes. You report both fits, plan the daily business with the slope of 0.09, and look at catering separately.
+:::
+
+**Next:** The slope is an estimate from one set of deals. Lecture 3 shows
+how precise it is, with its standard error, its confidence interval, and a
+t-test. It also shows how much of the variation in the outcome the line
+explains ($R^2$) and how to test whether the model is useful at all (the
+F-test).
 
 :::
 
@@ -511,9 +612,18 @@ at all.
 
 ## After class
 
-<span class="time-budget">Total practice time: about 55 minutes.</span>
+<span class="time-budget">Total practice time: about 75 minutes.</span>
 
-### Retrieval (10 minutes)
+**Minimum path (about 35 minutes):** read the lecture material, answer the recall questions, then work for 10 minutes on the tasks that follow. **Full path:** all tasks below.
+
+### Read the lecture material (15 minutes)
+
+Read the Lecture material section above from start to end. The lecture
+covered the core of it. The text has every step, every example, and all the
+code, including parts that were not shown in class. Note what is still
+unclear and bring it to the next tutorial, or ask Tilly.
+
+### Recall questions (10 minutes)
 
 1. Which assumption concerns the conditional mean?
 2. Must the outcome variable be normally distributed? Why or why not?
@@ -525,15 +635,15 @@ at all.
 ::: {.callout-note collapse="true"}
 ## Check your answers
 
-1. The linear conditional mean, $E[Y\mid X=x]=\beta_0+\beta_1x$ (and zero
-   conditional mean of the errors).
-2. No. The assumptions concern the errors conditional on the predictor and
-   the sampling process, not the marginal distribution of $Y$ or $X$.
+1. The linear conditional mean, $E[Y\mid X=x]=\beta_0+\beta_1x$ .
+2. No. The assumptions are about the errors at each value of the predictor
+   and about how the data came about, not about the distribution of $Y$ or
+   of $X$ on its own.
 3. Non-constant conditional variance (heteroskedasticity).
-4. Zero conditional mean and independence; they require knowledge of the
-   design and data-generating process.
+4. Independence and the absence of confounding. They require knowledge of
+   how the data were collected.
 5. A standardised residual measures how unusual one observation's vertical
-   miss is, in standard-deviation units; Cook's distance measures how much
+   miss is, in standard-deviation units. Cook's distance measures how much
    the whole fitted line moves if that observation is removed.
 6. Investigate, report, never silently delete.
 :::
@@ -589,19 +699,20 @@ ggplot(plots_df, aes(x = fitted, y = residual)) +
 ::: {.callout-note collapse="true"}
 ## Check your answers
 
-**Plot A**: the residuals follow a U shape --- the average residual is
-negative in the middle and positive at the ends --- challenging the linear
+**Plot A**: the residuals follow a U shape. The average residual is
+negative in the middle and positive at the ends, which challenges the linear
 conditional mean. **Plot B**: the vertical band widens with the fitted
-value --- a fan challenging constant conditional variance. **Plot C**: no
-visible pattern; consistent with the assumptions the plot *can* speak to,
-which is not the same as proof that all assumptions hold.
+value. This fan challenges constant conditional variance. **Plot C**: no
+visible pattern. The plot agrees with linearity and constant variance, the
+two assumptions it can show. That is not proof that all assumptions hold.
 :::
 
 ### Practice: diagnostics for your own model (15 minutes)
 
 Fit `equity_offered_pct ~ season` on all 1,441 pitches. Produce the
 residual-versus-fitted plot and the normal Q--Q plot, and interpret each in
-one or two sentences.
+one or two sentences. Then count the standardised residuals beyond $\pm 3$
+and the observations with a Cook's distance above $4/n$.
 
 ::: {.callout-note collapse="true"}
 ## Check your answers
@@ -624,32 +735,37 @@ qqnorm(rstandard(equity_model), pch = 16,
        ylab = "Standardised residual")
 qqline(rstandard(equity_model), col = "#D55E00", lwd = 2)
 par(old_par)
+max(residuals(equity_model))
+c(big_rstandard = sum(abs(rstandard(equity_model)) > 3),
+  cooks_flagged = sum(cooks.distance(equity_model) > 4 / nrow(sharks)))
 ```
 
-The residual plot shows sixteen vertical stripes --- season takes only
-whole-number values, so only sixteen fitted values exist; that is a feature
-of the predictor, not a violation. The vertical spread is broadly similar
-across stripes, so no strong fan. The Q--Q plot shows a heavy right tail:
-a minority of pitches offered far more equity than the fitted trend (the
-maximum residual is above 80 percentage points --- founders offering
-essentially the whole company), so the normality assumption is doubtful,
-which matters little for inference at $n = 1441$ but flags rows worth
-investigating.
+The residual plot shows sixteen vertical stripes. The season
+(`season`) takes only whole-number values, so only sixteen fitted values
+exist. That is a feature of the predictor, not a violation. The vertical
+spread is broadly similar across the stripes, so there is no strong fan. The
+Q--Q plot bends upwards at the right end: some pitches offered far more
+equity than the fitted trend. The largest residual is about 83 percentage
+points, from founders who offered almost the whole company. The normality
+assumption is therefore doubtful. With $n = 1441$ this matters little for
+tests and intervals, but the extreme rows are worth a closer look. Eighteen
+standardised residuals lie beyond $\pm 3$, and 58 pitches have a Cook's
+distance above $4/n$. These are about 1% and 4% of the 1,441 pitches.
 :::
 
-### Spaced review: one residual-arithmetic item from Lecture 1 (5 minutes)
+### Review: one residual-arithmetic question from Lecture 1 (5 minutes)
 
 Using the Lecture 1 fitted equation
-$\widehat{\text{deal}} = 27.571 + 1.0085 \times \text{ask}$ (both in
-$1,000s): a pitch asked \$200,000 and agreed \$180,000. Compute the fitted
-value and the residual.
+$\widehat{\text{agreed}} = -0.068 + 0.649 \times \text{claimed}$ (both in
+\$ millions): a founder claimed a valuation of \$3 million and the deal
+closed at \$1.5 million. Compute the fitted value and the residual.
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-Fitted: $27.571 + 1.0085\times200 = 229.27$, about \$229,273. Residual:
-$180 - 229.27 = -49.27$, about $-\$49{,}273$ --- the pitch agreed less than
-the model's fitted conditional mean.
+Fitted: $-0.068 + 0.649\times3 = 1.88$, about \$1.88 million. Residual:
+$1.5 - 1.88 = -0.38$, about $-\$380{,}000$: the deal closed below the
+model's fitted conditional mean.
 :::
 
 ### Worked exam interpretation (5 minutes)
@@ -665,9 +781,24 @@ assess it.
 
 The pattern is a fan: residual spread grows with the fitted value,
 challenging constant conditional variance (homoskedasticity). The plot
-cannot assess independence of observations; that requires knowledge of the
-data collection --- for example whether some ventures appear in multiple
+cannot assess independence of observations. That requires knowledge of the
+data collection, for example whether some ventures appear in multiple
 rows or were sampled in clusters.
+:::
+
+### Check the AI (5 minutes)
+
+You asked an AI assistant: "My residuals look strange. What should I do?" It answered:
+
+> "The agreed valuations are not normally distributed, so the regression is invalid. I removed the 25 outliers and now the model is fine."
+
+Find what is wrong and write the corrected answer. This is the **Verify**
+step of Attempt → Ask → Verify → Explain, and the exam asks for it.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+Two errors. The outcome does not have to be normally distributed. The assumptions are about the errors and about how the data came about. And unusual deals are never removed silently. Investigate them, report the fit with and without them, and say which one you use and why.
 :::
 
 ### Make it yours (5 minutes)
@@ -675,27 +806,27 @@ rows or were sampled in clusters.
 :::: {.utility-prompt}
 <span class="label">Utility: two sentences</span>
 
-Think of your EiA3 venture --- or any business you know well --- and a
+Think of your EiA3 venture, or any business you know well, and a
 regression you might one day run on its data (sales on advertising, orders
 on price, sign-ups on campaign week). Write two sentences: first name the
 assumption from today's table you would worry about most for that data, then
 describe one observation that could dominate the fit and what you would do
-about it --- investigate and report, not delete.
+about it. Investigate and report, do not delete.
 
 ::: {.callout-note collapse="true"}
 ## See an example, then write your own
 
-Take a student-run campus meal-prep box venture. "For orders-on-price data I would worry most about zero conditional mean: I cut prices exactly in the weeks demand is already weak, so the error and the predictor move together. One 200-box catering order would dominate any fit --- I would report the model with and without it and investigate whether catering is a different business, not delete the row."
+Take a student-run campus meal-prep box venture. "For orders-on-price data I would worry most about confounding: I cut prices exactly in the weeks demand is already weak, so weak demand drives both my price and my orders. One 200-box catering order would dominate any fit: I would report the model with and without it and investigate whether catering is a different business, not delete the row."
 :::
 
-You can discuss this task --- and any other task in this chapter --- with
-**Tilly**, the course AI assistant on Canvas: describe your venture's data
+You can discuss this task, and any other task in this chapter, with
+**Tilly**, the course AI assistant: describe your venture's data
 and ask it to argue which assumption is least plausible.
 ::::
 
-Continue to Lecture 3: Coefficient inference, fit, and the F-test.
+[Continue to Lecture 3: Coefficient inference, fit, and the F-test](i03-inference-fit-ftest.qmd).
 
-Formula sheet: Lecture 2 formulas.
+[Code sheet: Lecture 2 commands and formulas](code-sheet.qmd#lecture-2-assumptions-residual-diagnostics-and-influence).
 
 For a more formal treatment, see James et al., *An Introduction to
 Statistical Learning*, 2nd ed., Sections 3.1.2 and 3.3.3, and

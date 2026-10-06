@@ -12,48 +12,48 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 ::: {.outcomes}
 <span class="label">By the end of Tutorial 1, you can</span>
 
-- fit and interpret a simple regression in R, with units;
-- calculate fitted values and residuals by hand;
-- diagnose assumption problems from residual plots and influence measures;
-- interpret coefficient inference, $R^2$, and the F-test together;
-- produce a concise TestVision-ready model interpretation.
+- fit and interpret a simple regression in R, with units
+- calculate fitted values and residuals by hand
+- find problems with the assumptions from residual plots, standardised
+  residuals, and Cook's distance
+- interpret the coefficient table, $R^2$, and the F-test together
+- write a short interpretation of a model that is ready for the exam format.
 :::
 
-Tutorials are **exam preparation sessions**: every task below follows the
-format of the final exam. The standing routine for each task is the same ---
-the TA states the task, pairs work on it first for a few minutes with AI use
-allowed, and the solution is then discussed in plenary, starting from the
-pair attempts.
+Tutorials are **exam preparation sessions**. Every task below follows the
+format of the final exam, which is taken in TestVision with R available.
+You first try each task in pairs. You may use AI for this, following
+Attempt, Ask, Verify, Explain. Then the solution is discussed together.
 
-One note on the order. The tasks run in course order: Tasks 1--2 rest on
-Lecture 1, Task 3 on Lecture 2, and Tasks 4--5 on yesterday's Lecture 3.
-This is deliberate --- the tutorial meets the day after Lecture 3, so you
-warm up on settled material before testing what you learned yesterday.
+The tasks follow the order of the course. Tasks 1 and 2 use Lecture 1, Task 3
+uses Lecture 2, and Tasks 4 and 5 use Lecture 3. Task 6 applies all steps to
+a new question that matters to founders.
 
 ::: {.course-phase .phase-before}
 
 ## Before class
 
-Complete the after-class practice from Lectures 1--3. Keep the Lectures
+Complete the after-class practice from Lectures 1 and 2. Lecture 3 is on the
+day before this tutorial: read its lecture material, and do its practice
+after the tutorial. Keep the Lectures
 1--3 sections of the
-[QM Intermediate Code Sheet](#intermediate-code-sheet) open while working,
-and review
-[Mathematics Refresher: lines, squares, and standardisation](../resources/math-refresher.html)
-if the notation is slowing you down.
+[QM Intermediate Code Sheet](#intermediate-code-sheet) open while working.
+If the notation slows you down, review
+[Mathematics Refresher: lines, squares, and standardisation](../resources/math-refresher.html).
 
 Write from memory:
 
-1. the simple linear regression model;
-2. the fitted line;
-3. the residual;
-4. the formula for $R^2$;
+1. the simple linear regression model
+2. the fitted line
+3. the residual
+4. the formula for $R^2$
 5. the null hypothesis of the overall model F-test.
 
 ::: {.callout-note collapse="true"}
 ## Check your preparation
 
 1. $Y_i=\beta_0+\beta_1X_i+\varepsilon_i$.
-2. $\widehat Y_i=b_0+b_1X_i$.
+2. $\widehat Y_i=\hat\beta_0+\hat\beta_1X_i$.
 3. $e_i=Y_i-\widehat Y_i$.
 4. $R^2=1-\text{SSE}/\text{SST}=\text{SSR}/\text{SST}$.
 5. $H_0:\beta_1=0$ in simple regression (all slopes zero in general).
@@ -63,50 +63,54 @@ Write from memory:
 
 ::: {.course-phase .phase-in-class}
 
-## In class
+## In the tutorial
 
 Attempt each task in R before opening the answer. A complete written answer
 names the sample, shows the calculation, reports values with units,
-interprets in context, and states an important model or design boundary.
+interprets them in context, and states one important limit of the model or
+of the data.
 
-All tasks use the Shark Tank teaching file and the running money unit of
-**thousands of dollars**. Build the analysis data once --- this is the same
-construction as Lectures 1--3:
+All tasks use the Shark Tank teaching file and the valuations of Lectures 1
+to 3, in **millions of dollars**: the valuation agreed on air (`agreed_m`)
+and the valuation claimed by the founder (`claimed_m`). Build the data once,
+in the same way as in Lectures 1--3:
 
 ```{r}
 #| label: iep01-load
 sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
-deals <- subset(sharks, deal_on_show == 1)
-deals$ask_1k <- deals$ask_amount_usd / 1000
-deals$deal_1k <- deals$deal_amount_usd / 1000
+vals <- subset(sharks, deal_on_show == 1 & deal_equity_pct > 0)
+vals$claimed_m <- vals$requested_valuation_usd / 1e6
+vals$agreed_m <- vals$deal_valuation_usd / 1e6
+nrow(vals)   # deals for a share of the company
 ```
 
-### Task 1 --- Fit and interpret (Lecture 1)
+### Task 1: Fit and interpret (Lecture 1)
 
-Fit `deal_1k ~ ask_1k` among the on-air deal records. Report the sample,
-the fitted equation, the slope interpretation with units, and the intercept
-limitation.
+Fit `agreed_m ~ claimed_m` among the deals for a share of the company.
+Report the sample, the fitted equation, the interpretation of the slope with
+units, and the limit of the intercept.
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
 ```{r}
 #| label: iep01-task1
-deal_model <- lm(deal_1k ~ ask_1k, data = deals)
-coef(deal_model)
+val_model <- lm(agreed_m ~ claimed_m, data = vals)
+coef(val_model)
 ```
 
-Among the 882 pitches with an on-air deal, the fitted equation is
-$\widehat y = 27.571 + 1.0085x$, with both variables in $1,000s. One
-additional \$1,000 requested is associated with about \$1,008.50 more in
-fitted agreed amount. A zero request is outside the observed range, so the
-intercept (about \$27,600) lacks a useful standalone business
-interpretation.
+Among the 874 deals for a share of the company, the fitted equation is
+$\widehat y = -0.068 + 0.649x$, with both valuations in \$ millions. A
+claimed valuation that is \$1 million higher is associated with an agreed
+valuation about \$0.65 million higher. A claimed valuation of zero is outside
+the observed range, so the intercept (about $-\$68{,}000$) has no useful
+business meaning of its own.
 :::
 
-### Task 2 --- Fitted value and residual (Lecture 1)
+### Task 2: Fitted value and residual (Lecture 1)
 
-A pitch requested \$500,000 and agreed \$450,000.
+A founder claimed a valuation of \$5 million and the deal closed at a
+valuation of \$2.5 million.
 
 1. Calculate its fitted value.
 2. Calculate its residual.
@@ -115,28 +119,27 @@ A pitch requested \$500,000 and agreed \$450,000.
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-With $x=500$ (in $1,000s),
-$\widehat y = 27.571 + 1.0085 \times 500 \approx 531.83$, or about
-\$531,826. The observed $y = 450$, so
-$e = 450 - 531.83 = -81.83$, about $-\$81{,}826$. The negative sign means
-this pitch agreed less than the model's fitted conditional mean for a
-\$500,000 request.
+With $x=5$ (in \$ millions),
+$\widehat y = -0.068 + 0.649 \times 5 \approx 3.18$, or about \$3.18 million.
+The observed $y = 2.5$, so $e = 2.5 - 3.18 = -0.68$, about $-\$680{,}000$.
+The negative sign means this deal closed below the model's fitted conditional
+mean for a claimed valuation of \$5 million.
 
 ```{r}
 #| label: iep01-task2
-deal_model <- lm(deal_1k ~ ask_1k, data = deals)
-unname(450 - predict(deal_model, newdata = data.frame(ask_1k = 500)))
+val_model <- lm(agreed_m ~ claimed_m, data = vals)
+unname(2.5 - predict(val_model, newdata = data.frame(claimed_m = 5)))
 ```
 :::
 
-### Task 3 --- Diagnostics and influence (Lecture 2)
+### Task 3: Diagnostics and influence (Lecture 2)
 
 Produce the residual-versus-fitted plot and the normal Q--Q plot for the
 Task 1 model.
 
-1. Name two visible assumption concerns.
+1. Name two problems with the assumptions that you can see in the plots.
 2. Count the standardised residuals beyond $\pm 3$ and the observations
-   above the $4/n$ Cook's distance screen.
+   with a Cook's distance above $4/n$.
 3. State the three-step rule for handling a flagged observation.
 4. Name one assumption these plots cannot assess and what would assess it.
 
@@ -146,64 +149,66 @@ Task 1 model.
 ```{r}
 #| label: iep01-task3
 #| fig-height: 3.6
-deal_model <- lm(deal_1k ~ ask_1k, data = deals)
+val_model <- lm(agreed_m ~ claimed_m, data = vals)
 old_par <- par(no.readonly = TRUE)
 par(mfrow = c(1, 2), mar = c(4.5, 4.4, 1.3, 0.7), las = 1)
-plot(fitted(deal_model), residuals(deal_model),
+plot(fitted(val_model), residuals(val_model),
      pch = 16, col = grDevices::adjustcolor("#0072B2", alpha.f = 0.35),
-     bty = "n", xlab = "Fitted agreed amount ($1,000s)",
-     ylab = "Residual ($1,000s)")
+     bty = "n", xlab = "Fitted agreed valuation ($ millions)",
+     ylab = "Residual ($ millions)")
 abline(h = 0, lty = 2, lwd = 2, col = "#D55E00")
-qqnorm(rstandard(deal_model), pch = 16,
+qqnorm(rstandard(val_model), pch = 16,
        col = grDevices::adjustcolor("#009E73", alpha.f = 0.40),
        bty = "n", main = "", xlab = "Normal theoretical quantile",
        ylab = "Standardised residual")
-qqline(rstandard(deal_model), col = "#D55E00", lwd = 2)
+qqline(rstandard(val_model), col = "#D55E00", lwd = 2)
 par(old_par)
-c(big_rstandard = sum(abs(rstandard(deal_model)) > 3),
-  cooks_flagged = sum(cooks.distance(deal_model) > 4 / nrow(deals)))
+c(big_rstandard = sum(abs(rstandard(val_model)) > 3),
+  cooks_flagged = sum(cooks.distance(val_model) > 4 / nrow(vals)))
 ```
 
-Residual spread widens with the fitted value (a fan, challenging constant
-conditional variance), and the Q--Q plot shows a heavy right tail with
-several extreme positive residuals (challenging normality and flagging
-influence). Twelve standardised residuals exceed $\pm3$ and 21 observations
-exceed the $4/n$ Cook's screen --- the most influential pitch asked
-\$150,000 and agreed \$3,000,000. The rule: investigate, report, never
-silently delete. The plots cannot assess independence (or zero conditional
-mean); those need knowledge of the data collection --- for example whether
-founders or ventures appear in multiple rows.
+The spread of the residuals widens with the fitted value. This fan
+challenges constant conditional variance. The Q--Q plot leaves the line at
+both ends, with several extreme residuals on both sides. This challenges
+normality and points to possibly influential deals. Twenty-five standardised
+residuals lie beyond $\pm3$, and 64 observations have a Cook's distance above
+$4/n$. The rule for flagged observations: investigate, report, never
+silently delete. The plots cannot assess independence or the absence of
+confounding. Those need knowledge of how the data were collected, for
+example whether the same sharks or founders appear in several rows.
 :::
 
-### Task 4 --- Coefficient inference (Lecture 3)
+### Task 4: Coefficient inference (Lecture 3)
 
 Use `summary()` and `confint()` on the Task 1 model.
 
 1. Test $H_0:\beta_1=0$ against the two-sided alternative.
 2. Report the 95% confidence interval for $\beta_1$, and verify it by hand
-   from the estimate and SE.
-3. Would robust standard errors fix both concerns from Task 3?
+   from the estimate and the standard error.
+3. Would robust standard errors ([Lecture 3](i03-inference-fit-ftest.qmd#i03-robust)) fix both
+   problems from Task 3?
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
 ```{r}
 #| label: iep01-task4
-deal_model <- lm(deal_1k ~ ask_1k, data = deals)
-summary(deal_model)$coefficients
-confint(deal_model)
+val_model <- lm(agreed_m ~ claimed_m, data = vals)
+summary(val_model)$coefficients
+confint(val_model)
 ```
 
-The slope is $1.0085$ with classical SE $0.0182$, so
-$t = 1.0085/0.0182 \approx 55.4$ on $880$ degrees of freedom and the
-p-value is far below 0.001: reject a zero slope. By hand,
-$1.0085 \pm 1.96 \times 0.0182 = (0.973,\; 1.044)$, matching `confint()`
---- in $1,000s of deal per $1,000 asked. Robust SEs address the unequal
-variance only; they do not remove influential observations, selection into
-deals, or a misspecified mean.
+The slope is $0.649$ with standard error $0.0111$, so $t \approx 58.6$ on
+$872$ degrees of freedom and the p-value is far below 0.001: reject a zero
+slope. By hand, with one more digit to avoid rounding error,
+$0.6487 \pm 1.96 \times 0.01107 = 0.6487 \pm 0.0217 = (0.627,\; 0.670)$. This
+matches `confint()`, in \$ million agreed per \$ million claimed. Robust
+standard errors address the unequal variance only. They do not help with
+influential observations, with the selection of pitches that ended in a
+deal, or with a relationship that is not linear.
 :::
 
-### Task 5 --- R² and F (Lecture 3)
+### Task 5: R² and F (Lecture 3)
 
 1. Calculate SST, SSE, SSR, and $R^2$ manually.
 2. Verify them against `summary()`.
@@ -215,25 +220,65 @@ deals, or a misspecified mean.
 
 ```{r}
 #| label: iep01-task5
-deal_model <- lm(deal_1k ~ ask_1k, data = deals)
-y <- deals$deal_1k
-yhat <- fitted(deal_model)
+val_model <- lm(agreed_m ~ claimed_m, data = vals)
+y <- vals$agreed_m
+yhat <- fitted(val_model)
 SST <- sum((y - mean(y))^2)
 SSE <- sum((y - yhat)^2)
 SSR <- sum((yhat - mean(y))^2)
 c(R2_manual = 1 - SSE / SST,
-  R2_summary = summary(deal_model)$r.squared,
-  F_summary = unname(summary(deal_model)$fstatistic["value"]),
-  t_squared = summary(deal_model)$coefficients["ask_1k", "t value"]^2)
+  R2_summary = summary(val_model)$r.squared,
+  F_summary = unname(summary(val_model)$fstatistic["value"]),
+  t_squared = summary(val_model)$coefficients["claimed_m", "t value"]^2)
 ```
 
-The sums (in squared $1,000s) satisfy $\text{SST}=\text{SSR}+\text{SSE}$,
-and $R^2 \approx 0.777$. The overall F statistic is about 3069, equal to
-the squared slope t statistic, as it must be in simple regression. A
-sentence that does not overclaim: requested amount explains about 78% of
-the observed variation in agreed amounts among on-air deals, but this
-selected observational association --- shaped partly by a few influential
-pitches --- is not a causal effect of changing an ask.
+The sums (in squared \$ millions) satisfy $\text{SST}=\text{SSR}+\text{SSE}$,
+and $R^2 \approx 0.798$. The overall F statistic is about 3435, equal to the
+squared slope t statistic, as it must be in simple regression. A sentence
+that does not overclaim: among these deals, the claimed valuation explains
+about 80% of the variation in the agreed valuations, but this is an
+association in a selected set of deals, shaped partly by a few influential
+ones, and not the effect of changing a claim.
+:::
+
+### Task 6: A new question: how much more equity do the sharks take?
+
+Lecture 1 showed that the sharks usually pay the amount asked and take a
+larger share of the company. Model that directly. Use all 882 deals and
+regress the equity agreed in the deal on the equity the founder first
+offered, both in percent of the company:
+
+```{r}
+#| label: iep01-equity
+all_deals <- subset(sharks, deal_on_show == 1)
+equity_model <- lm(deal_equity_pct ~ equity_offered_pct, data = all_deals)
+nrow(all_deals)
+summary(equity_model)$coefficients
+confint(equity_model)
+summary(equity_model)$r.squared
+```
+
+1. Interpret the slope and the intercept with units.
+2. A founder offers 10% of the company. Which agreed share does the model
+   fit?
+3. Compare the $R^2$ with the valuation model. What does the difference tell
+   a founder?
+4. Advise the founder in two sentences.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+The slope is about 1.21 percentage points of agreed equity per percentage
+point offered, with a 95% interval of about 1.11 to 1.31. The intercept is
+about 8.3 percentage points. A founder who offers 10% is fitted to give up
+$8.3 + 1.21\times10\approx20.4$% of the company, about twice the offer. $R^2$
+is about 0.39, against 0.80 for the valuations. The offered share says much
+less about the agreed share than the claimed valuation says about the agreed
+valuation, so single deals scatter widely around the line. Advice: expect to
+give up roughly twice the share you offer, and decide before the pitch how
+far you are willing to go. These are deals that happened on a television
+show. They describe what founders who closed a deal gave up, not what would
+happen to you if you offered a different share.
 :::
 
 :::
@@ -242,31 +287,42 @@ pitches --- is not a causal effect of changing an ask.
 
 ## After class
 
-### Timed individual practice --- 20 minutes
+### Timed individual practice: 20 minutes
 
 Fit `equity_offered_pct ~ season` using all 1,441 records.
 
 1. Make and read the scatterplot with the fitted line.
 2. Report the fitted equation and units.
-3. Report the slope SE, t statistic, p-value, and 95% interval.
+3. Report the standard error of the slope, its t value, its p-value, and its
+   95% interval.
 4. Report $R^2$ and the overall F-test.
-5. Inspect the residual plots and write a 120-word model conclusion.
+5. Inspect the residual plots and write a conclusion of about 120 words.
 
 ::: {.callout-note collapse="true"}
 ## Check a model answer
 
+```{r}
+#| label: iep01-practice-equity
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+season_model <- lm(equity_offered_pct ~ season, data = sharks)
+summary(season_model)$coefficients
+confint(season_model)
+c(r_squared = summary(season_model)$r.squared,
+  F = unname(summary(season_model)$fstatistic["value"]))
+```
+
 The fitted equation is
 $\widehat{equity}=20.457-0.824\,season$: one later season is associated
 with about 0.824 percentage points less initial equity offered on average.
-The classical SE is about 0.048, $t\approx-17.3$, and the p-value is below
-0.001; the 95% interval $(-0.917,\,-0.731)$ excludes zero.
-$R^2\approx0.173$, so season explains about 17.3% of observed equity-offer
-variation, and the overall F-test ($F\approx300.7=t^2$) reaches the same
-conclusion as the slope test. The residual plot shows sixteen vertical
-stripes (season is whole-numbered) with broadly similar spread, and the
-Q--Q plot a heavy right tail from very high offers. This is an
-observational time association among recorded pitches, not a causal effect
-of progressing to a later season.
+The standard error is about 0.048, $t\approx-17.3$, and the p-value is below
+0.001. The 95% interval $(-0.917,\,-0.731)$ excludes zero.
+$R^2\approx0.173$, so the season explains about 17.3% of the variation in
+the equity offered, and the overall F-test ($F\approx300.7=t^2$) reaches the
+same conclusion as the slope test. The residual plot shows sixteen vertical
+stripes (the season takes whole numbers only) with broadly similar spread.
+The Q--Q plot bends upwards at the right end because of some very high
+offers. This is a trend over time among recorded pitches, not a causal
+effect of a later season.
 :::
 
 ### Check your understanding
@@ -283,12 +339,12 @@ Complete from memory:
 ## Check your answers
 
 1. The observed outcome minus the fitted value, $e_i=Y_i-\widehat Y_i$.
-2. How much the estimated slope would vary across repeated samples under
-   the model conditions.
-3. Constant conditional variance (homoskedasticity) --- and with it the
-   classical standard errors.
-4. Observed sample variation in the outcome explained by the fitted values,
-   $\text{SSR}/\text{SST}$.
+2. How much the estimated slope would vary from sample to sample, under the
+   model assumptions.
+3. Constant conditional variance (homoskedasticity), and with it the
+   usual standard errors.
+4. The variation of the outcome in the sample that the fitted values
+   explain, $\text{SSR}/\text{SST}$.
 5. The squared slope t statistic, $F=t^2$.
 :::
 
@@ -297,25 +353,24 @@ Complete from memory:
 :::: {.utility-prompt}
 <span class="label">Utility: two sentences</span>
 
-Think of your EiA3 venture --- or any business you know well. Imagine the
+Think of your EiA3 venture, or any business you know well. Imagine the
 one simple regression you would show an investor (revenue on customers,
-orders on ad spend), and write two sentences: first name the number from
-today's pipeline you would put in the headline --- slope, interval, or
-$R^2$ --- and why, then name the caveat from Task 3 or Task 5 you would be
-honest about in the footnote. There is no wrong answer; the point is
-pairing every headline number with its boundary.
+orders on ad spend), and write two sentences. First name the number from
+this tutorial you would put in the headline, slope, interval, or $R^2$, and
+say why. Then name the limit from Task 3 or Task 5 that you would state
+openly next to it. There is no wrong answer.
 
 ::: {.callout-note collapse="true"}
 ## See an example, then write your own
 
-Take a student-run campus meal-prep box venture. "Headline: the slope with its 95% interval --- each extra €100 of ads is associated with roughly 12 to 19 more orders --- because an investor asks what money buys, and the interval carries the honesty. Footnote: the fan shape in my residual plot means busy weeks are noisier, so that interval leans on an assumption my own diagnostics question."
+Take a student-run campus meal-prep box venture. "Headline: the slope with its 95% interval. Each extra €100 of ads is associated with roughly 12 to 19 more orders. An investor asks what money buys, and the interval shows how uncertain the number is. Limit: the fan in my residual plot means that busy weeks vary more, so the interval rests on an assumption that my own residual plot puts in doubt."
 :::
 
-You can discuss this task --- and any other task in this tutorial --- with
-**Tilly**, the course AI assistant on Canvas: paste your two sentences and
+You can discuss this task, and any other task in this tutorial, with
+**Tilly**, the course AI assistant: paste your two sentences and
 ask it to play the sceptical investor.
 ::::
 
-Continue to Lecture 4: Multiple regression and what controls do.
+[Continue to Lecture 4: Multiple regression and what controls do](i04-multiple-regression.qmd).
 
 :::

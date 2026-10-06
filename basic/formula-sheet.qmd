@@ -2,15 +2,15 @@
 
 <!--
 The two-page exam PDF attached to the closed-book written exam must be
-generated from THIS same content — do not maintain a separate copy of the
+generated from THIS same content. Do not maintain a separate copy of the
 formulas. The old prototype's exam-materials/formula-sheet-basic.Rmd holds
-the print layout (A4, two-column, 8.5pt, qm colours); reuse those settings
+the print layout (A4, two-column, 8.5pt, qm colours). Reuse those settings
 with this file's body when producing the PDF. Pagination (\newpage) is
 handled at PDF-generation time, not here.
 -->
 
 This is the cumulative formula sheet for QM Basic. Each section is
-labelled by the lecture in which its material is first introduced. Use only
+labelled by the lecture that introduces its material. Use only
 the sections reached so far:
 
 | Session | Formula-sheet sections |
@@ -37,12 +37,12 @@ A^c&\text{complement of }A\\
 X,Y&\text{random variables}\\
 x_i,y_i&\text{observed values in row }i\\
 n_A,n,N&\text{count in }A\text{, sample size, population size}\\
-\mu,\sigma^2,p&\text{population mean, variance, proportion}\\
-\bar X,S^2,\widehat P&\text{sample mean, variance, proportion estimators}\\
-\bar x,s^2,\hat p&\text{corresponding realised estimates}\\
+\mu,\sigma^2,\sigma,p&\text{population mean, variance, standard deviation, proportion}\\
+\bar X,S^2,\widehat P&\text{estimators: sample mean, variance, proportion}\\
+\bar x,s^2,\hat p&\text{estimates: their values in one sample}\\
 \theta,\theta_0&\text{parameter of interest, value specified by }H_0\\
-b_j,\beta_j&\text{estimated coefficient, population coefficient}\\
-\operatorname{SE}(\cdot)&\text{standard error}\\
+\hat\beta_j,\beta_j&\text{estimated coefficient (with a hat), population coefficient}\\
+\operatorname{SE}(\cdot),\ \widehat{\operatorname{SE}}(\cdot)&\text{standard error, and its estimate from the sample}\\
 \alpha&\text{significance level}\\
 df&\text{degrees of freedom}
 \end{array}
@@ -73,7 +73,16 @@ $$
 \text{range}=\max_i x_i-\min_i x_i.
 $$
 
-**Changes between two percentages $a$ and $b$**
+**Median, quartiles, and interquartile range**
+
+$$
+Q_1,\ \text{median},\ Q_3:
+\ \text{values with at least 25, 50, and 75 percent of the observations at or below them},
+\qquad
+\operatorname{IQR}=Q_3-Q_1.
+$$
+
+**Changes between two percentages $a$ and $b$ (see the Mathematics Refresher)**
 
 $$
 \begin{aligned}
@@ -114,10 +123,14 @@ P(A)=\frac{|A|}{|\Omega|}
 \quad\text{(equally likely outcomes)}.
 $$
 
-**Random variable**
+**Three more properties**
 
 $$
-X:\Omega\rightarrow\mathbb R.
+P(\varnothing)=0,
+\qquad
+A\subseteq B\ \Longrightarrow\ P(A)\le P(B),
+\qquad
+P(A)=P(A\cap B)+P(A\cap B^c).
 $$
 
 **Partition of the sample space**
@@ -163,12 +176,20 @@ $$
 $$
 \mu=E[X],
 \qquad
-\operatorname{Var}(X)=E[(X-\mu)^2]
-=E[X^2]-\{E[X]\}^2.
+\sigma^2=\operatorname{Var}(X)=E[(X-\mu)^2]
+=E[X^2]-\left(E[X]\right)^2,
+\qquad
+\sigma=\operatorname{SD}(X)=\sqrt{\operatorname{Var}(X)}.
 $$
 
+**Shifting and rescaling a variable**
+
 $$
-\operatorname{SD}(X)=\sqrt{\operatorname{Var}(X)}.
+E[aX+b]=aE[X]+b,
+\qquad
+\operatorname{Var}(aX+b)=a^2\operatorname{Var}(X),
+\qquad
+\operatorname{SD}(aX+b)=|a|\operatorname{SD}(X).
 $$
 
 **Bernoulli distribution**
@@ -194,7 +215,7 @@ $$
 
 ## Lecture 4 - Conditioning, Bayes' rule, and independence {#formula-l4}
 
-**Conditional probability and product rule**
+**Conditional probability and multiplication rule**
 
 $$
 P(A\mid B)=\frac{P(A\cap B)}{P(B)},
@@ -217,10 +238,18 @@ P(B_i\mid A)
 {\sum_{j=1}^{k}P(A\mid B_j)P(B_j)}.
 $$
 
+**Bayes' rule for one event $B$**
+
+$$
+P(B\mid A)=\frac{P(A\mid B)P(B)}{P(A)},
+\qquad
+P(A^c\mid B)=1-P(A\mid B).
+$$
+
 **Independence of events**
 
 $$
-A\perp B
+A\text{ and }B\text{ independent}
 \quad\Longleftrightarrow\quad
 P(A\cap B)=P(A)P(B).
 $$
@@ -241,10 +270,16 @@ p_X(x)=\sum_y p_{X,Y}(x,y),
 p_{X\mid Y}(x\mid y)=\frac{p_{X,Y}(x,y)}{p_Y(y)}.
 $$
 
+**Conditional mean**
+
+$$
+E[X\mid Y=y]=\sum_x x\,p_{X\mid Y}(x\mid y).
+$$
+
 **Independence of random variables**
 
 $$
-X\perp Y
+X\text{ and }Y\text{ independent}
 \quad\Longleftrightarrow\quad
 p_{X,Y}(x,y)=p_X(x)p_Y(y)
 \quad\text{for every }x,y.
@@ -273,12 +308,28 @@ s_{XY}=\frac{1}{n-1}\sum_{i=1}^{n}(x_i-\bar x)(y_i-\bar y),
 r_{XY}=\frac{s_{XY}}{s_Xs_Y}.
 $$
 
-## Lecture 6 - Continuous distributions and quantiles {#formula-l6}
+**Sums of two variables**
+
+$$
+E[X+Y]=E[X]+E[Y],
+\qquad
+\operatorname{Var}(X+Y)=\operatorname{Var}(X)+\operatorname{Var}(Y)+2\operatorname{Cov}(X,Y).
+$$
+
+$$
+X\text{ and }Y\text{ independent}
+\quad\Longrightarrow\quad
+\operatorname{Var}(X+Y)=\operatorname{Var}(X)+\operatorname{Var}(Y).
+$$
+
+## Lecture 6 - Continuous distributions and the normal model {#formula-l6}
 
 **Continuous-distribution probabilities**
 
 $$
 f_X(x)\ge0,
+\qquad
+\text{total area under }f_X=1,
 \qquad
 P(X=x)=0,
 \qquad
@@ -302,19 +353,9 @@ P(c<X<d)=\frac{d-c}{b-a},
 \qquad
 E[X]=\frac{a+b}{2},
 \qquad
-\operatorname{Var}(X)=\frac{(b-a)^2}{12}.
-$$
-
-**Quartiles and interquartile range**
-
-$$
-Q_1=q_{0.25},
+\operatorname{Var}(X)=\frac{(b-a)^2}{12},
 \qquad
-Q_2=q_{0.50},
-\qquad
-Q_3=q_{0.75},
-\qquad
-\operatorname{IQR}=Q_3-Q_1.
+\operatorname{SD}(X)=\frac{b-a}{\sqrt{12}}.
 $$
 
 **Normal distribution and standardisation**
@@ -323,6 +364,14 @@ $$
 X\sim N(\mu,\sigma^2),
 \qquad
 Z=\frac{X-\mu}{\sigma}\sim N(0,1).
+$$
+
+$$
+P(Z>z)=1-P(Z\le z),
+\qquad
+P(Z\le -z)=P(Z>z),
+\qquad
+x=\mu+z\sigma.
 $$
 
 $$
@@ -352,6 +401,14 @@ S^2=\frac{1}{n-1}\sum_{i=1}^{n}(X_i-\bar X)^2,
 df=n-1.
 $$
 
+**Unbiased estimator**
+
+$$
+E[\hat\theta]=\theta,
+\qquad\text{for example}\qquad
+E[\bar X]=\mu,\quad E[\widehat P]=p,\quad E[S^2]=\sigma^2.
+$$
+
 **10% condition for sampling without replacement**
 
 $$
@@ -359,22 +416,7 @@ n\le0.10N
 \quad\text{(sampling without replacement)}.
 $$
 
-## Lecture 8 - Linearity rules, sampling distributions, and SEs {#formula-l8}
-
-**Linearity rules for expectation and variance**
-
-$$
-E[aX+b]=aE[X]+b,
-\qquad
-E[X+Y]=E[X]+E[Y].
-$$
-
-$$
-\operatorname{Var}(aX+b)=a^2\operatorname{Var}(X),
-\qquad
-\operatorname{Var}(X+Y)=\operatorname{Var}(X)+\operatorname{Var}(Y)
-\quad(X\perp Y).
-$$
+## Lecture 8 - Sampling distributions and standard errors {#formula-l8}
 
 **Sampling distribution of the sample mean**
 
@@ -383,8 +425,9 @@ E[\bar X]=\mu,
 \qquad
 \operatorname{Var}(\bar X)=\frac{\sigma^2}{n},
 \qquad
-\operatorname{SE}(\bar X)=\frac{\sigma}{\sqrt n}
-\approx\frac{S}{\sqrt n}.
+\operatorname{SE}(\bar X)=\frac{\sigma}{\sqrt n},
+\qquad
+\widehat{\operatorname{SE}}(\bar X)=\frac{S}{\sqrt n}.
 $$
 
 $$
@@ -398,7 +441,21 @@ $$
 $$
 E[\widehat P]=p,
 \qquad
-\operatorname{SE}(\widehat P)=\sqrt{\frac{p(1-p)}{n}}.
+\operatorname{SE}(\widehat P)=\sqrt{\frac{p(1-p)}{n}},
+\qquad
+\widehat{\operatorname{SE}}(\widehat P)=\sqrt{\frac{\hat p(1-\hat p)}{n}}.
+$$
+
+**Number of successes in $n$ independent trials (binomial)**
+
+$$
+Y\sim\operatorname{Bin}(n,p):
+\qquad
+E[Y]=np,
+\qquad
+\operatorname{Var}(Y)=np(1-p),
+\qquad
+\widehat P=\frac{Y}{n}.
 $$
 
 **Success-failure condition**
@@ -409,12 +466,19 @@ np\ge10,
 n(1-p)\ge10.
 $$
 
-## Lecture 9 - The t distribution, confidence intervals, and tests {#formula-l9}
+**Sample size for a 95% margin of error $m$ around a mean**
+
+$$
+n\ge\left(\frac{1.96\,\sigma}{m}\right)^2.
+$$
+
+## Lecture 9 - The t distribution and confidence intervals {#formula-l9}
 
 **One-sample $t$ statistic**
 
 $$
-T=\frac{\bar X-\mu}{S/\sqrt n}\sim t_{n-1}.
+T=\frac{\bar X-\mu}{S/\sqrt n}\sim t_{n-1}
+\quad\text{(normal population, or approximately for large }n\text{)}.
 $$
 
 **General confidence-interval form**
@@ -434,14 +498,15 @@ $$
 $$
 z_{0.975}=1.960,
 \qquad
-\begin{array}{c|rrrrrr}
-df&5&10&20&30&60&\infty\\ \hline
-t_{0.975,df}&2.571&2.228&2.086&2.042&2.000&1.960
+\begin{array}{c|rrrrrrrr}
+df&5&10&20&30&60&100&120&\infty\\ \hline
+t_{0.975,df}&2.571&2.228&2.086&2.042&2.000&1.984&1.980&1.960
 \end{array}
 $$
 
-In R: $z_{1-\alpha/2}$ is `qnorm(1 - alpha/2)` and $t_{1-\alpha/2,df}$ is
-`qt(1 - alpha/2, df)`; for example, `qnorm(0.975)` returns 1.960.
+If your degrees of freedom are not in this row, use the closest value that
+is. In R: $z_{1-\alpha/2}$ is `qnorm(1 - alpha/2)` and $t_{1-\alpha/2,df}$ is
+`qt(1 - alpha/2, df)`. For example, `qnorm(0.975)` returns 1.960.
 
 **Difference from a hypothesised mean**
 
@@ -454,13 +519,15 @@ T=\frac{\widehat\delta}{S/\sqrt n},
 \qquad df=n-1.
 $$
 
-**Two-sided hypothesis test for a mean**
+**Two-sided hypotheses for a mean**
 
 $$
 H_0:\delta=0
 \qquad\text{versus}\qquad
 H_1:\delta\ne0.
 $$
+
+## Lecture 10 - Tests, errors, and power {#formula-l10}
 
 **Two-sided $p$-value and decision rule**
 
@@ -470,7 +537,13 @@ p=P\!\left(|T_{df}|\ge|t_{obs}|\mid H_0\right),
 p\le\alpha\ \Longrightarrow\ \text{reject }H_0.
 $$
 
-## Lecture 10 - Tests, errors, and power {#formula-l10}
+**The same decision with a critical value (5% level)**
+
+$$
+|t_{obs}|\ge t_{0.975,df}
+\quad\Longleftrightarrow\quad
+p\le0.05.
+$$
 
 **Two-sided hypothesis test for a proportion**
 
@@ -512,9 +585,9 @@ $$
 **Two-sided test and confidence interval for a regression coefficient**
 
 $$
-t=\frac{b_j}{\operatorname{SE}(b_j)},
+t=\frac{\hat\beta_j}{\widehat{\operatorname{SE}}(\hat\beta_j)},
 \qquad
-b_j\pm t_{1-\alpha/2,df}\operatorname{SE}(b_j).
+\hat\beta_j\pm t_{1-\alpha/2,df}\widehat{\operatorname{SE}}(\hat\beta_j).
 $$
 
 $$
@@ -523,7 +596,7 @@ H_0:\beta_j=0
 H_1:\beta_j\ne0.
 $$
 
-*Note.* A pre-specified one-sided alternative uses a single tail for its
-$p$-value (Lecture 10 discusses this); course exams use two-sided tests only.
+Note: all tests in this course are two-sided. One-sided alternatives appear
+only in an optional box of Lecture 10 and are not examined.
 
 :::

@@ -12,38 +12,58 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 ::: {.outcomes}
 <span class="label">By the end of Lecture 3, you can</span>
 
-- construct, check, and interpret a probability mass function;
-- construct and interpret a discrete cumulative distribution function;
-- calculate and interpret expectation and the expectation of a function;
+- construct, check, and interpret a probability mass function
+- construct and interpret a discrete cumulative distribution function
+- calculate and interpret expectation and the expectation of a function
 - calculate and interpret variance and standard deviation, including the
-  Bernoulli case $p(1-p)$;
+  Bernoulli case $p(1-p)$
+- calculate the expected value, variance, and standard deviation of a
+  shifted and rescaled variable $aX+b$
 - connect model expectation to an empirical mean, and distribution variance
   to sample variance, without confusing them.
+:::
+
+::: {.must-know}
+<span class="label">Must know</span>
+
+**Be able to do yourself:**
+
+- check that a table of probabilities is a valid PMF
+- calculate an expected value, a variance, and a standard deviation from a small PMF
+- use $p$ and $p(1-p)$ for a 0/1 variable
+- shift and rescale: $E[aX+b]$, $\operatorname{Var}(aX+b)$, and
+  $\operatorname{SD}(aX+b)$.
+
+**Enough to recognise:**
+
+- the notation $p_X(x)$ and $F_X(a)$, and the symbols $\mu$, $\sigma^2$,
+  and $\sigma$
+- that R's `var()` and `sd()` divide by $n-1$.
 :::
 
 ::: {.driving-question}
 <span class="label">Driving question</span>
 
-<p class="dq-context">Anyone preparing a pitch wants to know what to expect: the typical outcome, and how far reality tends to stray from it. Centre and spread are the two numbers every summary of business risk starts from.</p>
+<p class="dq-context">Anyone preparing a pitch wants to know what to expect: the typical outcome, and how far reality tends to differ from it. Centre and spread are the two numbers every summary of business risk starts from.</p>
 
-What does a typical recorded pitch look like, and how much do pitches differ
-from that typical value?
+If your pitch ends in a deal, how many sharks will you be dealing with, and
+how much does that number differ from deal to deal?
 :::
 
 ::: {.course-phase .phase-before}
 
 ## Before class
 
-<span class="time-budget">Total preparation time: about 30 minutes.</span>
+<span class="time-budget">Total preparation time: about 25 minutes.</span>
+
+**Minimum path:** the video preparation and the prediction. **Full path:** everything in this section.
 
 <div class="video-prep">
-<span class="label">Video preparation (20 minutes)</span><br>
+<span class="label">Video preparation (15 minutes)</span><br>
 Watch
-<a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/probability-mass-functions/">Probability Mass Functions</a>,
-<a href="https://www.youtube.com/watch?v=4QeL1ma_XJ0">Cumulative Distribution
-Functions</a>, and
+<a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/probability-mass-functions/">Probability Mass Functions</a> and
 <a href="https://www.youtube.com/watch?v=_yJsO5955ZE">Expectation</a>.
-Be ready to explain what $p_X(x)$ and $F_X(a)$ measure and why an expected
+Be ready to explain what $p_X(x)$ measures and why an expected
 value need not be a possible realised value. All links are also listed in
 the <a href="../resources/video-guide.html">External Video Guide</a>.
 </div>
@@ -61,13 +81,14 @@ reached an on-air deal and $X=0$ otherwise. Define $S$ as its season number.
 1. $X$ can take the values 0 and 1. $S$ can take the values
    $1,2,\ldots,16$.
 2. No. The support lists the possible values. A probability distribution
-   must also assign probability to them --- that is what this lecture adds.
+   must also assign a probability to each value. This lecture adds that
+   step.
 :::
 
-**Predict (5 minutes).** Answer the one-click Mentimeter question posted on
+**Predict (5 minutes).** Answer the one-click Wooclap question posted on
 Canvas before you come to class: can the **expected season** be a number
-that is not a whole season --- yes or no? Commit to an answer; the lecture
-resolves it.
+that is not a whole season, yes or no? Commit to an answer. You find the
+answer in the lecture material.
 
 If functions, support, or summation notation are unfamiliar, review
 [Mathematics Refresher: functions and sums](../resources/math-refresher.html).
@@ -76,13 +97,48 @@ If functions, support, or summation notation are unfamiliar, review
 
 ::: {.course-phase .phase-in-class}
 
-## In class
+## Lecture material
 
-The session opens with the usual four-minute entry quiz on the prep videos,
-then turns to the driving question. On screen is a figure with sixteen
-probability masses, one per season, heights unlabelled --- by the end of the first block
-you can name every height, and by the end of the session you can compress
-all sixteen into two numbers: a centre and a spread.
+This section starts with a table that a founder can read without any theory.
+It answers four questions from that table and then gives each step its name.
+
+### Start with a founder's question
+
+Suppose your pitch ends in a deal. Will you work with one investor who gives
+you full attention, or with a group of sharks who share the deal? The Shark
+Tank file records the number of sharks in each deal in the variable
+`number_sharks_in_deal`. The code below counts the deals by this number:
+
+```{r}
+#| label: b03-sharks-table
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+deals <- subset(sharks, deal_on_show == 1)
+shark_counts <- table(deals$number_sharks_in_deal)
+shark_counts
+round(prop.table(shark_counts), 3)
+```
+
+Of the 882 deals, 648 have one shark, 203 have two, 22 have three, 3 have
+four, and 6 have five. As shares: 0.735, 0.230, 0.025, 0.003, and 0.007.
+
+#### Four questions, answered from the shares
+
+1. **How likely is a deal with exactly one shark?** Read it off: 73.5%.
+2. **How likely is a deal with at most two sharks?** Add the first two
+   shares: 73.5% + 23.0% = 96.5%.
+3. **How many sharks should you expect?** Weigh each number by its share and
+   add: $1\times0.735+2\times0.230+3\times0.025+4\times0.003+5\times0.007
+   \approx1.32$. No deal has 1.32 sharks. The section on expectation
+   explains how to read such a number.
+4. **How much do deals differ from that number?** Not much: most deals have
+   one shark and nearly all others have two. The section on variance gives
+   one number for this spread.
+
+Each of the four steps has a name. The list of shares is a probability mass
+function. The running total in question 2 is a cumulative distribution
+function. The weighted average in question 3 is an expected value. The spread
+in question 4 is measured by the variance and the standard deviation. The
+sections below take them one at a time.
 
 ### A PMF assigns probability to each possible value
 
@@ -107,7 +163,8 @@ Read this notation in parts:
 | $p_X$ | the PMF belonging to $X$ |
 | $p_X(x)$ | the probability that $X$ equals exactly $x$ |
 
-A valid PMF must satisfy
+The probability attached to one value is also called its probability mass,
+or mass for short. A valid PMF must satisfy
 
 $$
 p_X(x)\ge 0\quad\text{for every }x,
@@ -122,8 +179,8 @@ probability. The second says that one of the possible values must occur.
 ## Worked example: the deal-indicator PMF, checked
 
 Under the uniform selection experiment from Lecture 2, the deal indicator
-$X$ has support $\{0,1\}$. From the counts --- 882 deals among 1,441
-records ---
+$X$ has support $\{0,1\}$. The Shark Tank file has 882 deals among 1,441
+records, so 559 records have no deal. The PMF is
 
 $$
 p_X(0)=\frac{559}{1441}\approx 0.388,
@@ -140,8 +197,8 @@ $$
 This is a valid PMF.
 :::
 
-The same objects in R --- the data, the deal proportion `p_hat`, and the PMF
-are all built in visible code:
+The code below builds the same objects in R: the data, the deal proportion
+`p_hat`, and the PMF.
 
 ```{r}
 #| label: b03-deal-pmf
@@ -156,8 +213,9 @@ deal_pmf
 sum(deal_pmf)
 ```
 
-For season $S$, the empirical PMF assigns each season its relative
-frequency under the uniform record-selection experiment:
+For the season $S$ (`season` in the Shark Tank file), the PMF under the
+uniform record-selection experiment gives each season its share of the
+1,441 records:
 
 ```{r}
 #| label: b03-season-pmf
@@ -198,8 +256,8 @@ ggplot(pmf_df, aes(x = season, y = probability)) +
 The probability mass above season 5 in @fig-b03-season-pmf has height
 $p_S(5)=P(S=5)=116/1441\approx0.080$. A PMF is represented by separated
 probability masses because $S$ can take only the listed discrete values.
-The term **probability density function (PDF)** is reserved for continuous
-random variables and is introduced later in the course.
+The term probability density function (PDF) is reserved for continuous
+random variables and is introduced in Lecture 6.
 
 ### A CDF accumulates probability up to a threshold
 
@@ -220,6 +278,15 @@ discrete random variable,
 
 $$F_X(a)=\sum_{x\le a}p_X(x).$$
 
+::: {.definition-box}
+<span class="label">Definition</span>
+
+**Probability mass function (PMF)** and **cumulative distribution function
+(CDF).** The PMF, $p_X(x)=P(X=x)$, gives the probability that $X$ equals
+exactly the value $x$. The CDF, $F_X(a)=P(X\le a)$, gives the probability
+that $X$ is at or below the threshold $a$.
+:::
+
 ::: {#exm-b03-cdf-hand}
 ## Worked example: F(3) for season, by hand
 
@@ -235,8 +302,8 @@ $$
 About 11% of the probability sits at or below season 3.
 :::
 
-The full running total in R --- each CDF value is the current PMF value
-plus all earlier PMF values:
+The code below builds the full running total in R. Each CDF value is the
+current PMF value plus all earlier PMF values:
 
 ```{r}
 #| label: b03-season-distribution
@@ -254,7 +321,7 @@ season_distribution
 #| label: fig-b03-season-cdf
 #| code-fold: true
 #| code-summary: "See the R code for this figure"
-#| fig-cap: "The CDF of season: a step graph that never falls, jumping at each possible value by that value's probability mass."
+#| fig-cap: "The CDF of season: a step graph that never falls. It is 0 to the left of Season 1, jumps at each possible value by that value's probability mass, and stays at 1 from Season 16 on."
 library(ggplot2)
 sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
 season_pmf <- prop.table(table(sharks$season))
@@ -262,9 +329,15 @@ cdf_df <- data.frame(
   threshold = as.numeric(names(season_pmf)),
   cdf = cumsum(as.numeric(season_pmf))
 )
+# For the line only: a flat part at 0 before Season 1 and at 1 after Season 16
+step_df <- rbind(
+  data.frame(threshold = 0, cdf = 0),
+  cdf_df,
+  data.frame(threshold = 17, cdf = 1)
+)
 
 ggplot(cdf_df, aes(x = threshold, y = cdf)) +
-  geom_step(linewidth = 0.9, colour = "#009E73") +
+  geom_step(data = step_df, linewidth = 0.9, colour = "#009E73") +
   geom_point(size = 1.9, colour = "#17324D") +
   scale_x_continuous(breaks = 1:16) +
   scale_y_continuous(limits = c(0, 1)) +
@@ -279,8 +352,10 @@ ggplot(cdf_df, aes(x = threshold, y = cdf)) +
 ```
 
 A CDF accumulates probability as the threshold moves from left to right. It
-can stay flat or rise, but it cannot fall. It begins near 0 before any
-possible values and reaches 1 after all possible values have been included.
+can stay flat or rise, but it cannot fall. It equals 0 below the smallest
+possible value and reaches 1 after all possible values have been included.
+In @fig-b03-season-cdf the line is flat at 0 to the left of Season 1 and
+flat at 1 to the right of Season 16.
 
 For a discrete variable, the CDF is a step graph. It stays flat between
 possible values and jumps at each value that has positive probability. A
@@ -292,9 +367,16 @@ larger jump means that more probability is attached to that value.
 $F_S(8)=P(S\le 8)$ is the height of the step graph at threshold 8: the
 first eight seasons contain $64+36+60+103+116+116+116+96=707$ records, so
 $F_S(8)=707/1441\approx0.491$. Just under half of the probability lies in
-Seasons 1--8 --- consistent with Lecture 2, where the early-period event
+Seasons 1--8. This agrees with Lecture 2, where the early-period event
 $L^c$ had probability $707/1441$.
 :::
+
+The probability of an interval is a difference of two CDF values:
+
+$$P(a<X\le b)=F_X(b)-F_X(a).$$
+
+For example, $P(3<S\le 8)=F_S(8)-F_S(3)=(707-160)/1441=547/1441\approx0.380$:
+38.0% of the probability lies in Seasons 4 to 8.
 
 For the deal indicator:
 
@@ -307,28 +389,43 @@ F_X(a)=
 \end{cases}
 $$
 
-where $p=P(X=1)$. Thus $p_X(1)=P(X=1)=p$, while $F_X(1)=P(X\le1)=1$. The
-PMF measures mass at exactly 1; the CDF includes all mass through 1.
+where $p=P(X=1)$. So $p_X(1)=P(X=1)=p$, while $F_X(1)=P(X\le1)=1$. The
+PMF measures the mass at exactly 1. The CDF includes all mass up to and
+including 1.
 
 ### Expectation is the distribution's weighted centre
 
 <p class="concept-video"><strong>MIT explanation (review):</strong>
 <a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/expectation/">05.8 Expectation</a>.</p>
 
-A distribution can contain many possible values and probabilities.
-**Expectation** summarises its centre in one number. Values with larger
-probabilities receive more weight:
+A distribution can contain many possible values and probabilities. The
+**expected value**, or expectation, summarises its centre in one number.
+Values with larger probabilities receive more weight:
 
 $$E[X]=\sum_{x\in\mathcal X}x\,p_X(x).$$
 
-This definition applies when the probability-weighted sum is well defined
-and finite. The notation $E[X]$ is read "the expected value of $X$." The
-calculation multiplies each possible value by its probability and adds the
-contributions. It can also be viewed as the balance point of the
-probability distribution.
+The notation $E[X]$ is read "the expected value of $X$". The expected value
+is also called the mean of $X$ and written $\mu$ (the Greek letter mu) or
+$\mu_X$. The calculation multiplies each possible value by its probability
+and adds the products. The result can also be viewed as the balance point of
+the probability distribution.
 
-Before touching the Shark Tank data, run the calculation once on a
-distribution small enough to hold in your head.
+::: {.definition-box}
+<span class="label">Definition</span>
+
+**Expected value.** The probability-weighted average of the possible values
+of $X$, written $E[X]$, $\mu$, or $\mu_X$. If the experiment is repeated
+many times, the average of the observed values comes close to $E[X]$.
+:::
+
+This long-run reading does not make the expected value a guarantee for a
+single observation. The weighted average in question 3 of the opening was
+this calculation: the expected number of sharks in a deal is about 1.32. No
+single deal has 1.32 sharks, but over many deals the average number of
+sharks per deal comes close to 1.32.
+
+Before using the Shark Tank data again, try the calculation once on a very
+small invented distribution.
 
 ::: {#exm-b03-tiny-expectation}
 ## Worked example: expectation of a tiny PMF
@@ -337,7 +434,8 @@ Let $Y$ have support $\{0,1,2\}$ with masses
 
 $$p_Y(0)=0.2,\qquad p_Y(1)=0.5,\qquad p_Y(2)=0.3.$$
 
-(Valid: all non-negative, and $0.2+0.5+0.3=1$.) Write every product:
+This is a valid PMF: all masses are non-negative and $0.2+0.5+0.3=1$. Write
+every product:
 
 $$
 E[Y]
@@ -346,20 +444,20 @@ E[Y]
 =1.1.
 $$
 
-Each possible value contributes its value times its probability; the sum,
-1.1, is the balance point. Note that 1.1 is not in the support --- $Y$
+Each possible value contributes its value times its probability. The sum,
+1.1, is the balance point. Note that 1.1 is not in the support: $Y$
 never equals 1.1.
 :::
 
-Now the same recipe on the Shark Tank distributions. For the deal
+Now apply the same steps to the Shark Tank distributions. For the deal
 indicator,
 
 $$E[X]=0\times(1-p)+1\times p=p.$$
 
-This identity explains why the mean of a 0/1 variable equals its proportion
-of 1s: here $E[X]=882/1441\approx0.612$.
+This result explains why the mean of a 0/1 variable equals its proportion
+of 1s. Here $E[X]=882/1441\approx0.612$.
 
-For season, sixteen products instead of two:
+For the season, the sum has sixteen products instead of two:
 
 ```{r}
 #| label: b03-expectation
@@ -373,30 +471,31 @@ c(
 )
 ```
 
-The expected season is about **8.8** --- and there is no Season 8.8. This
-resolves the prediction from your prep: an expectation is a
+The expected season is about **8.8**, and there is no Season 8.8. This
+answers the prediction question from before class: an expectation is a
 probability-weighted average, so it need not be a possible value of the
 random variable.
 
-Under independent repetitions of the same distribution, provided
-$E[|X|]<\infty$, the sample average tends to become close to $E[X]$ as the
-number of observations grows. This long-run interpretation does not make
-the expected value a guarantee for a single observation.
-
 ### Expectation after transforming a variable
+
+Many quantities are built from a random variable by a fixed rule. Examples
+for the variable $Y$ of the worked example are the profit $10Y-3$ (10 euros
+per unit of $Y$ minus a fixed cost of 3 euros) and the square $Y^2$. Such a
+function $g(X)$ of a random variable $X$ is itself a random variable, with
+its own possible values and its own distribution.
 
 If $g$ transforms each possible value of $X$, the expected transformed
 value is
 
 $$E[g(X)]=\sum_{x\in\mathcal X}g(x)\,p_X(x).$$
 
-The probabilities do not change: apply $g$ to each possible value, weight
+The probabilities do not change. Apply $g$ to each possible value, weight
 the transformed values by the original PMF, and add.
 
 ::: {.callout-caution collapse="true"}
 ## Try it: E[Y²] for the tiny PMF
 
-In class this is the pair task before the break. Same distribution as the
+Try this with your neighbour first. Same distribution as the
 worked example: $Y\in\{0,1,2\}$ with masses $0.2,0.5,0.3$, and $g(y)=y^2$.
 
 *Step 1 (given).* Square each possible value: $0^2=0$, $1^2=1$, $2^2=4$.
@@ -414,9 +513,9 @@ $$
 E[Y^2]=0\times0.2+1\times0.5+4\times0.3=0+0.5+1.2=1.7.
 $$
 
-It is **not** $\left(E[Y]\right)^2=1.21$: squaring then averaging differs
-from averaging then squaring. The gap between the two, $1.7-1.21=0.49$, is
-about to get a name.
+It is **not** $\left(E[Y]\right)^2=1.21$. Squaring and then averaging
+differs from averaging and then squaring. The gap between the two is
+$1.7-1.21=0.49$. The section on variance gives this gap a name.
 :::
 :::
 
@@ -437,9 +536,9 @@ c(
 
 Expectation locates the centre of a distribution, but it does not describe
 how tightly values cluster around that centre. Two distributions can have
-the same expectation and very different spreads --- this is the Mentimeter
-question posed before the break: both distributions in
-@fig-b03-same-mean-spread have expectation 1, so which is riskier, and why?
+the same expectation and very different spreads. Both distributions in
+@fig-b03-same-mean-spread have expectation 1. Which one is riskier, and
+why?
 
 ```{r}
 #| label: fig-b03-same-mean-spread
@@ -483,12 +582,12 @@ ggplot(spread_df, aes(x = x, y = probability)) +
 The horizontal axis lists the possible values and the vertical axis gives
 their probabilities. The centre is the same, but Distribution B has greater
 spread because values 0 and 2 receive much more probability. If these were
-payoffs, most students call B riskier --- variance is the number that backs
-that intuition.
+payoffs, B would be the riskier choice. Variance is the number that measures
+this difference.
 
 To measure spread, start with the deviation $X-\mu$, where $\mu=E[X]$.
 Positive and negative deviations would cancel if they were averaged
-directly, so variance squares each deviation before taking its
+directly, so the **variance** squares each deviation before taking its
 probability-weighted average:
 
 $$
@@ -497,12 +596,13 @@ $$
 =\sum_x (x-\mu)^2\,p_X(x).
 $$
 
-Read the calculation as four steps:
+The variance is also written $\sigma^2$, read "sigma squared" ($\sigma$ is
+the Greek letter sigma). Read the calculation as four steps:
 
-1. locate the centre, $\mu=E[X]$;
-2. measure each possible deviation, $x-\mu$;
-3. square the deviation, $(x-\mu)^2$;
-4. weight it by $p_X(x)$ and add across the support.
+1. Locate the centre, $\mu=E[X]$.
+2. Measure each possible deviation, $x-\mu$.
+3. Square the deviation, $(x-\mu)^2$.
+4. Weight it by $p_X(x)$ and add across the support.
 
 Large deviations therefore contribute more than small deviations. Variance
 is zero only when all probability is concentrated at one value.
@@ -514,14 +614,24 @@ $$\operatorname{Var}(X)=E[X^2]-\left(E[X]\right)^2.$$
 It gives the same result, but the definition $E[(X-\mu)^2]$ is usually
 easier to interpret.
 
-The **standard deviation** is
+The **standard deviation** is the square root of the variance. It is also
+written $\sigma$:
 
 $$\operatorname{SD}(X)=\sqrt{\operatorname{Var}(X)}.$$
 
-Variance has squared units; standard deviation returns to the units of $X$.
+Variance has squared units. Standard deviation returns to the units of $X$.
 If $X$ is measured in seasons, $\operatorname{Var}(X)$ is in seasons
-squared --- a unit nobody can picture --- while $\operatorname{SD}(X)$ is
+squared, a unit nobody can picture, while $\operatorname{SD}(X)$ is
 back in seasons.
+
+::: {.definition-box}
+<span class="label">Definition</span>
+
+**Variance and standard deviation.** The variance, $\operatorname{Var}(X)$
+or $\sigma^2$, is the probability-weighted average of the squared deviations
+of $X$ from its mean $\mu$. The standard deviation, $\operatorname{SD}(X)$ or
+$\sigma$, is the square root of the variance and has the same units as $X$.
+:::
 
 ::: {#exm-b03-tiny-variance}
 ## Worked example: variance of the tiny PMF, both ways
@@ -529,7 +639,7 @@ back in seasons.
 Same $Y$ as before: values $0,1,2$ with masses $0.2,0.5,0.3$, and
 $\mu=E[Y]=1.1$.
 
-**By the definition** --- the four steps:
+**By the definition**, in four steps:
 
 $$
 \operatorname{Var}(Y)
@@ -541,26 +651,39 @@ $$
 =0.49.
 $$
 
-**By the computational form** --- using $E[Y^2]=1.7$ from the faded task:
+**By the computational form**, using $E[Y^2]=1.7$ from the Try it task:
 
 $$
 \operatorname{Var}(Y)=E[Y^2]-\left(E[Y]\right)^2=1.7-1.21=0.49.
 $$
 
-Both routes give 0.49, so $\operatorname{SD}(Y)=\sqrt{0.49}=0.7$ --- in the
+Both routes give 0.49, so $\operatorname{SD}(Y)=\sqrt{0.49}=0.7$, in the
 same units as $Y$.
 :::
 
-For a Bernoulli variable (the deal indicator), the computational form gives
-a formula worth memorising. Since $X^2=X$ when $X$ is 0 or 1,
-$E[X^2]=E[X]=p$, so
+A variable with only the values 0 and 1, such as the deal indicator, is so
+common that its distribution has a name.
+
+::: {.definition-box}
+<span class="label">Definition</span>
+
+**Bernoulli distribution.** A random variable $X$ that takes only the values
+0 and 1, with $P(X=1)=p$ and $P(X=0)=1-p$, has a Bernoulli distribution,
+written $X\sim\text{Bernoulli}(p)$. Its expected value is $p$ and its
+variance is $p(1-p)$.
+:::
+
+The symbol $\sim$ is read "is distributed as". The expected value $p$ was
+found in the section on expectation. The variance follows from the
+computational form. Since $X^2=X$ when $X$ is 0 or 1, $E[X^2]=E[X]=p$, so
 
 $$
 \operatorname{Var}(X)=p-p^2=p(1-p).
 $$
 
-With $p=882/1441\approx0.612$, the variance is
-$0.612\times0.388\approx0.237$ and the standard deviation is about 0.49.
+The deal indicator is a Bernoulli variable with $p=882/1441\approx0.612$.
+Its variance is $0.612\times0.388\approx0.237$ and its standard deviation is
+about 0.49.
 
 ```{r}
 #| label: b03-variance
@@ -571,13 +694,66 @@ c(
   Var_X = p_hat * (1 - p_hat),
   SD_X = sqrt(p_hat * (1 - p_hat)),
   Var_S = var_s,
-  SD_S = sqrt(var_s)
+  SD_S = sqrt(var_s),
+  average_distance_S = sum(abs(s - mu_s) * p_s)
 )
 ```
 
-Season has variance of about 18.1 seasons squared and standard deviation of
-about **4.3 seasons**: the typical distance between a randomly selected
-pitch's season and the expected season 8.8 is roughly four seasons.
+The season has a variance of about 18.1 seasons squared and a standard
+deviation of about **4.3 seasons**. The typical distance between the season
+of a randomly selected pitch and the expected season 8.8 is roughly four
+seasons, a quarter of the 16 seasons. The standard deviation is somewhat
+larger than the plain average distance (about 3.7 seasons here), because
+squaring gives large deviations more weight.
+
+The opening question asked how much deals differ in their number of sharks.
+The same two steps answer it:
+
+```{r}
+#| label: b03-sharks-spread
+k <- as.numeric(names(shark_counts))
+p_k <- as.numeric(prop.table(shark_counts))
+mu_k <- sum(k * p_k)
+c(expected_sharks = mu_k,
+  variance = sum((k - mu_k)^2 * p_k),
+  sd = sqrt(sum((k - mu_k)^2 * p_k)))
+```
+
+The expected number of sharks is 1.32 and the standard deviation is about
+0.61 sharks, which is less than one shark. Deals differ little in this
+respect.
+
+### Shifting and rescaling a variable {#b03-shift-rescale}
+
+Business quantities are often built from other quantities: revenue is price
+times units, profit is revenue minus a fixed cost. For constants $a$ and $b$,
+
+$$
+E[aX+b]=aE[X]+b,
+\qquad
+\operatorname{Var}(aX+b)=a^2\operatorname{Var}(X),
+$$
+$$
+\operatorname{SD}(aX+b)=|a|\operatorname{SD}(X).
+$$
+
+Adding a constant $b$ moves the centre and leaves the spread unchanged.
+Multiplying by $a$ multiplies the centre by $a$ and the standard deviation
+by $|a|$, the size of $a$ without its sign. The variance is therefore
+multiplied by $a^2$.
+
+An example with the tiny PMF: $Y$ has $E[Y]=1.1$,
+$\operatorname{Var}(Y)=0.49$, and $\operatorname{SD}(Y)=0.7$. If each unit of
+$Y$ earns 10 euros and there is a fixed cost of 3 euros, the profit is
+$10Y-3$. Its expectation is $10\times1.1-3=8$ euros. Its variance is
+$10^2\times0.49=49$ euros squared, and its standard deviation is
+$10\times0.7=7$ euros.
+
+Standardising in [Lecture 6](b06-continuous-normal.qmd) is this rule at
+work. Subtract the mean $\mu$ from $X$ and divide by the standard deviation
+$\sigma$. The result $(X-\mu)/\sigma$ then has mean 0 and standard
+deviation 1. Lecture 8 uses the same rules to find the spread of a sample
+mean.
 
 ### Model expectation and the sample mean
 
@@ -585,25 +761,27 @@ For observed values $x_1,\ldots,x_n$, the sample mean is
 
 $$\bar{x}=\frac{1}{n}\sum_{i=1}^n x_i.$$
 
-If the empirical distribution assigns probability $1/n$ to every observed
-row, its expectation is
+Now give every observed row the same probability, $1/n$. This distribution
+is called the **empirical distribution** of the data. Its expectation is
 
 $$\sum_{i=1}^n x_i\,\frac{1}{n}=\bar{x}.$$
 
-The numerical answers agree, but the terms identify different objects.
-Expectation describes a probability distribution; the sample mean
-summarises observed data.
+The two numbers agree, but the terms name different objects. Expectation
+describes a probability distribution. The sample mean summarises observed
+data.
 
-The same split exists for spread. The **empirical-distribution variance**
-weights each of the $n$ observations by $1/n$ --- it divides by $n$. The
-usual **sample variance** instead divides by $n-1$:
+The same split exists for spread. The variance of the empirical
+distribution weights each of the $n$ observations by $1/n$, so it divides
+by $n$. The usual **sample variance** divides by $n-1$:
 
 $$s^2=\frac{1}{n-1}\sum_{i=1}^n\left(x_i-\bar{x}\right)^2.$$
 
-R's `var()` and `sd()` use the $n-1$ denominator. Why $n-1$ is the right
-choice when estimating a population variance is a Lecture 7 question; for
-now, only recognise which convention a number uses. Live in R, on the
-description word counts:
+Its square root $s$ is the sample standard deviation. R's `var()` and `sd()`
+divide by $n-1$. [Lecture 7](b07-samples-estimators.qmd) explains why $n-1$
+is used when a population variance is estimated. For now, only recognise
+which of the two versions a number uses. The code below computes both for
+the number of words in the written description (`description_words`) in the
+Shark Tank file:
 
 ```{r}
 #| label: b03-word-mean-variance
@@ -617,45 +795,51 @@ c(
 )
 ```
 
-Both centre calculations give about 5.0 words for these 1,441 records, and
-the two variance conventions differ only in the third decimal because $n$
-is large. These are different summaries of the same observations; calling
-any of them an estimate for a wider population additionally requires a
-sampling model.
+Both centre calculations give about 5.0 words for these 1,441 records. The
+two variances, 3.647 and 3.649, differ only in the third decimal because $n$
+is large. All these numbers summarise the same observations. To use one of
+them as an estimate for a wider population, you also need to know how the
+sample was drawn. Lecture 7 covers this.
 
 ::: {.caveat-box}
 <span class="label">What an expected value can and cannot promise</span>
 
-- **Expectation is not a guarantee.** $E[X]=0.612$ does not mean any single
-  pitch gets "0.612 of a deal," and an expected season of 8.8 belongs to no
-  actual season. Expectation describes the distribution's balance point;
-  single realisations can sit far from it --- how far, on typical, is
-  exactly what the standard deviation measures.
-- **File values are not forecasts.** Every number in this lecture is
-  computed under the model "select one of the 1,441 recorded pitches
-  uniformly at random." Treating 0.612, 8.8, or 4.3 as statements about
-  future pitches or new entrepreneurs requires the population, selection,
-  stability, and outcome-definition assumptions from Lecture 2 --- the file
-  cannot supply them.
+- An expected value is not a promise for one case. No deal has 1.32 sharks,
+  and no pitch gets "0.612 of a deal".
+- Single outcomes can lie far from the expected value. The standard deviation
+  says how far, typically.
+- All numbers here describe the recorded pitches. For future pitches they are
+  forecasts that rest on the assumptions of Lecture 2.
+
+**What you can do with it:** plan with the expected value when a decision
+repeats many times, and look at the spread when one bad outcome would hurt.
 :::
 
 ### Answering the driving question
 
-A typical recorded pitch, in two numbers per variable: it reaches an on-air
-deal with probability $0.612$ (a Bernoulli distribution with variance
-$0.612\times0.388\approx0.24$), and it comes from around season
-$E[S]\approx8.8$ --- with a standard deviation of about $4.3$ seasons, so
-"typical" spans a wide stretch of the show's history. Centre and spread
-together describe the distribution; either alone misleads.
+If your pitch ends in a deal, expect to deal with one shark. 73.5% of deals
+have exactly one shark and 96.5% have at most two. The expected number is
+1.32, with a standard deviation of about 0.61. The same two numbers, centre
+and spread, describe the other variables of this lecture. The deal indicator
+is a Bernoulli variable: a recorded pitch reaches an on-air deal with
+probability 0.612, and the variance is about 0.24. The season has expected
+value $E[S]\approx8.8$ and a standard deviation of about 4.3 seasons. Centre
+and spread together describe a distribution. One of them alone can mislead.
+
+::: {.founder-box}
+<span class="label">A founder's decision (invented example)</span>
+
+Tomorrow you sell 20 boxes with probability 0.2, 30 with probability 0.5, and 40 with probability 0.3. The expected value is 31 boxes and the standard deviation is 7. An unsold box costs you 3 euros of ingredients. A customer you cannot serve costs you 5 euros of margin. Compare the expected cost of three plans: preparing 20 boxes costs 55 euros a day on average, preparing 30 costs 21 euros, and preparing 40 costs 27 euros. The decision: prepare 30. The expected value told you where to aim. The spread and the two costs told you what a wrong guess is worth.
+:::
 
 **Next:** We can now say what a typical pitch looks like and how much pitches
-vary around it. But those are answers about a pitch we know *nothing* about
---- and in practice we always know something: its season, its industry, a flag
-from a screening model. Lecture 4 asks how probabilities change when
-information arrives: conditional probability, the total-probability rule that
+vary around it. But those are answers about a pitch we know nothing about.
+In practice we always know something: its season, its industry, a flag from
+a screening model. Lecture 4 asks how probabilities change when information
+arrives. It covers conditional probability, the total-probability rule that
 rebuilds an overall rate from group rates, Bayes' rule for reversing the
-direction of a question, and independence --- the exact case in which
-information changes nothing.
+direction of a question, and independence, the case in which information
+changes nothing.
 
 :::
 
@@ -663,9 +847,18 @@ information changes nothing.
 
 ## After class
 
-<span class="time-budget">Total practice time: about 60 minutes.</span>
+<span class="time-budget">Total practice time: about 85 minutes.</span>
 
-### Retrieval (10 minutes)
+**Minimum path (about 35 minutes):** read the lecture material, answer the recall questions, then work for 10 minutes on the tasks that follow. **Full path:** all tasks below.
+
+### Read the lecture material (15 minutes)
+
+Read the Lecture material section above from start to end. The lecture
+covered the core of it. The text has every step, every example, and all the
+code, including parts that were not shown in class. Note what is still
+unclear and bring it to the next tutorial, or ask Tilly.
+
+### Recall questions (10 minutes)
 
 1. What information does a PMF add to the support of a random variable?
 2. What two requirements must every PMF satisfy?
@@ -678,26 +871,27 @@ information changes nothing.
 ::: {.callout-note collapse="true"}
 ## Check your answers
 
-1. The support lists possible values; the PMF assigns probability to each
+1. The support lists possible values. The PMF assigns probability to each
    value.
 2. Every probability mass is non-negative, and the masses sum to 1.
-3. $p_X(x)=P(X=x)$ is the mass at exactly $x$; $F_X(x)=P(X\le x)$ is all
-   probability accumulated through $x$.
+3. $p_X(x)=P(X=x)$ is the mass at exactly $x$. $F_X(x)=P(X\le x)$ is all
+   probability accumulated up to and including $x$.
 4. Expectation is a probability-weighted average and need not belong to the
    support.
-5. Variance averages squared deviations from the distribution mean; the
+5. Variance averages squared deviations from the distribution mean. The
    probability-weighted raw deviations sum to zero, so squaring stops
    positive and negative deviations from cancelling.
-6. Variance is in squared units of $X$; the standard deviation is its
+6. Variance is in squared units of $X$. The standard deviation is its
    square root and returns to the units of $X$, which makes it the easier
    summary to interpret.
 :::
 
-### From worked to faded (10 minutes)
+### Finish a half-worked example (10 minutes)
 
 Re-read the two tiny-PMF worked examples (@exm-b03-tiny-expectation and
-@exm-b03-tiny-variance). Then run the full ladder on a new distribution:
-let $W$ have support $\{0,1,2\}$ with masses $0.3$, $0.4$, and $0.3$.
+@exm-b03-tiny-variance). Then do all the steps on a new invented
+distribution. Let $W$ have support $\{0,1,2\}$ with masses $0.3$, $0.4$,
+and $0.3$.
 
 *Step 1 (given).* Validity: all masses are non-negative and
 $0.3+0.4+0.3=1$.
@@ -717,13 +911,15 @@ $E[W]=0(0.3)+1(0.4)+2(0.3)=1.0$.
 $E[W^2]=0(0.3)+1(0.4)+4(0.3)=1.6$, so
 $\operatorname{Var}(W)=1.6-1.0^2=0.6$ and
 $\operatorname{SD}(W)=\sqrt{0.6}\approx0.77$.
-Note $W$ has the same expectation as a coin-like centre of 1 but a larger
-spread than $Y$ from class ($0.6>0.49$): more mass sits at the ends.
+Compare $W$ with the variable $Y$ of the worked examples. Both take the
+values 0, 1, and 2, but $W$ has the larger variance ($0.6>0.49$), because
+more of its probability sits at the two ends, 0 and 2.
 :::
 
-### Practice (10 minutes)
+### Practice (15 minutes)
 
-Now unassisted, using the Shark Tank distributions built in class.
+Tasks 1 to 5 use the Shark Tank distributions of the lecture material.
+Task 6 uses an invented example.
 
 1. For the deal indicator with $p=882/1441$, calculate $F_X(0.4)$.
 2. Use the season CDF table to calculate $P(3<S\le6)$.
@@ -733,21 +929,33 @@ Now unassisted, using the Shark Tank distributions built in class.
    interpreting this number, naming its units.
 5. Why is $\operatorname{Var}(S)\approx18.1$ harder to interpret than
    $\operatorname{SD}(S)\approx4.3$?
+6. An invented example. A founder sells phone cases at a weekend market.
+   The number of cases sold on one day, $X$, has $E[X]=12$ and
+   $\operatorname{SD}(X)=4$. Each case brings in 15 euros and the stall
+   costs 60 euros per day, so the profit of one day is $15X-60$ euros.
+   Calculate the expected value, the variance, and the standard deviation
+   of the profit.
 
 ::: {.callout-note collapse="true"}
 ## Check your answers
 
 1. Because $0\le0.4<1$, $F_X(0.4)=P(X=0)=559/1441\approx0.388$.
 2. $P(3<S\le6)=F_S(6)-F_S(3)=(495-160)/1441=335/1441\approx0.232$.
-3. $\operatorname{Var}=0.25\times0.75=0.1875$;
+3. $\operatorname{Var}=0.25\times0.75=0.1875$.
    $\operatorname{SD}=\sqrt{0.1875}\approx0.43$.
 4. The season of a randomly selected pitch typically differs from the
    expected season (about 8.8) by roughly 4.3 **seasons**.
 5. Variance is measured in seasons squared, a unit without a direct
-   picture; the standard deviation is back in seasons.
+   picture. The standard deviation is back in seasons.
+6. Use the rules for $aX+b$ with $a=15$ and $b=-60$. The expected profit is
+   $15\times12-60=120$ euros. $\operatorname{Var}(X)=4^2=16$, so the
+   variance of the profit is $15^2\times16=3600$ euros squared. The standard
+   deviation of the profit is $15\times4=60$ euros, half of the expected
+   profit. The stall cost of 60 euros lowers the expected profit and leaves
+   the spread unchanged.
 :::
 
-### Spaced review: one item from Lecture 2 (5 minutes)
+### Review: one question from Lecture 2 (5 minutes)
 
 Using the Lecture 2 counts table ($|D^c|=559$, $|L|=734$,
 $|D^c\cap L|=229$, $n=1441$), calculate $P(D^c\cup L)$ and interpret it in
@@ -765,7 +973,7 @@ so no record is counted twice.
 ### Worked exam interpretation (10 minutes)
 
 **Question.** R reports `mean(deal_on_show) = 0.612`. Explain this number
-as both a sample mean and an empirical expectation.
+as both a sample mean and the expectation of the empirical distribution.
 
 ::: {.callout-note collapse="true"}
 ## Check a model answer
@@ -777,10 +985,10 @@ same weighted average, 0.612. This does not show later venture success or
 guarantee the probability for a future pitch.
 :::
 
-### Exam practice: a full moment set (10 minutes)
+### Exam practice: from a PMF to the standard deviation (10 minutes)
 
-**Question.** A venture sells one product per customer at three price
-points. Let $V$ be the price paid by a randomly selected customer, in
+**Question.** An invented example. A venture sells one product per customer
+at three price points. Let $V$ be the price paid by a randomly selected customer, in
 euros, with PMF $p_V(10)=0.5$, $p_V(20)=0.3$, $p_V(40)=0.2$. (a) Verify
 that this is a valid PMF. (b) Calculate $F_V(20)$. (c) Calculate $E[V]$
 and $E[V^2]$. (d) Calculate $\operatorname{Var}(V)$ and
@@ -791,11 +999,27 @@ $\operatorname{SD}(V)$, stating the units of each.
 
 (a) All masses are non-negative and $0.5+0.3+0.2=1$.
 (b) $F_V(20)=P(V\le20)=0.5+0.3=0.8$.
-(c) $E[V]=10(0.5)+20(0.3)+40(0.2)=5+6+8=19$ euros;
+(c) $E[V]=10(0.5)+20(0.3)+40(0.2)=5+6+8=19$ euros.
 $E[V^2]=100(0.5)+400(0.3)+1600(0.2)=50+120+320=490$.
-(d) $\operatorname{Var}(V)=490-19^2=490-361=129$ euros squared;
+(d) $\operatorname{Var}(V)=490-19^2=490-361=129$ euros squared.
 $\operatorname{SD}(V)=\sqrt{129}\approx11.4$ euros. The expected revenue
-per customer is 19 euros, with a typical deviation of about 11 euros.
+per customer is 19 euros. The typical deviation from it is about 11 euros,
+more than half of the expected value.
+:::
+
+### Check the AI (5 minutes)
+
+You asked an AI assistant: "How many sharks will I deal with if I get a deal?" It answered:
+
+> "The expected number of sharks is 1.32. The expected value is the most likely value, so in most deals you negotiate with 1.32 sharks."
+
+Find what is wrong and write the corrected answer. This is the **Verify**
+step of Attempt → Ask → Verify → Explain, and the exam asks for it.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+No deal has 1.32 sharks. The expected value is a weighted average, not the most likely value. The most likely number is one shark: 73.5% of deals have exactly one. The 1.32 is still useful, for example to plan with many deals, but it describes the centre of the distribution, not a single deal.
 :::
 
 ### Make it yours (5 minutes)
@@ -803,29 +1027,27 @@ per customer is 19 euros, with a typical deviation of about 11 euros.
 :::: {.utility-prompt}
 <span class="label">Utility: two sentences</span>
 
-Think of your EiA venture --- or any business you know well. Pick one
+Think of your EiA venture, or any business you know well. Pick one
 uncertain quantity with a handful of possible values (units sold next
 week, price a customer picks, orders per day) and write two sentences:
 first sketch its rough PMF and expected value, then say whether the centre
 or the spread matters more for a real decision you would take, and why.
-There is no wrong answer; the point is connecting today's tools to
-something you care about.
+There is no wrong answer.
 
 ::: {.callout-note collapse="true"}
 ## See an example, then write your own
 
-Take a student-run campus meal-prep box venture. "Daily orders next week are roughly 20 with probability 0.2, 30 with probability 0.5, and 40 with probability 0.3, so the expected value is about 31. The spread matters more than the centre for me, because I prep ingredients in advance --- a 40-order day with 20-order stock hurts more than an average day helps."
+Take a student-run campus meal-prep box venture. "Daily orders next week are roughly 20 with probability 0.2, 30 with probability 0.5, and 40 with probability 0.3, so the expected value is about 31. The spread matters more than the centre for me, because I prep ingredients in advance: a 40-order day with 20-order stock hurts more than an average day helps."
 :::
 
-You can discuss this task --- and any other task in this chapter --- with
-**Tilly**, the course AI assistant on Canvas: ask it to check whether your
+You can discuss this task, and any other task in this chapter, with
+**Tilly**, the course AI assistant: ask it to check whether your
 sketched PMF is valid and to compute its standard deviation with you.
 ::::
 
-Continue to Lecture 4: Conditioning, total probability, Bayes, and
-independence.
+[Continue to Lecture 4: Conditioning, Bayes' rule, and independence](b04-conditioning-bayes-independence.qmd).
 
-Formula sheet: Lecture 3 formulas.
+[Formula sheet: Lecture 3 formulas](formula-sheet.qmd#formula-l3).
 
 For a more formal explanation, consult
 [Nieuwenhuis, *Statistical Methods for Business and Economics*](https://tilburguniversity.on.worldcat.org/oclc/317545871),

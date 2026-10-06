@@ -12,19 +12,37 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 ::: {.outcomes}
 <span class="label">By the end of Lecture 4, you can</span>
 
-- state a multiple linear regression model;
-- interpret a coefficient while holding the other included predictors fixed;
-- explain, with a constructed example, why simple and multiple-regression
-  coefficients can differ;
-- fit and compare multiple-regression specifications in R;
-- scale a coefficient to a comparison a reader cares about;
-- distinguish statistical control from causal identification.
+- state a multiple linear regression model
+- interpret a coefficient while holding the other included predictors fixed
+- explain, with an invented example, why the coefficients of a simple and a
+  multiple regression can differ
+- fit several models in R and compare them in one regression table
+- scale a coefficient to a comparison a reader cares about
+- say what a control variable can and cannot do.
+:::
+
+::: {.must-know}
+<span class="label">Must know</span>
+
+**Be able to do yourself:**
+
+- interpret a coefficient while holding the other included predictors fixed
+- scale a coefficient to a step that matters, and add up several contributions
+- explain why a coefficient changes when a predictor is added
+- say what controls can and cannot do.
+
+**Enough to recognise:**
+
+- the model written with $k$ predictors
+- the word collinearity
+- the layout of a regression table with several models (you practise reading
+  one in Tutorial 2).
 :::
 
 ::: {.driving-question}
 <span class="label">Driving question</span>
 
-<p class="dq-context">Two stories can produce the same pattern: perhaps equity offers genuinely fell over time, or perhaps later pitches simply ask for different amounts. Separating overlapping explanations is the core job of multiple regression --- and of most business analytics.</p>
+<p class="dq-context">Two stories can produce the same pattern. Perhaps the equity offered (<code>equity_offered_pct</code>) in the Shark Tank file really fell over the seasons. Or perhaps later pitches simply ask for different amounts. Multiple regression separates such overlapping explanations.</p>
 
 Later seasons show smaller equity offers. Is that a time story, or is it
 really a money story in disguise, since later pitches also ask for different
@@ -37,20 +55,29 @@ amounts?
 
 <span class="time-budget">Total preparation time: about 30 minutes.</span>
 
+**Minimum path:** the video and the R task. **Full path:** everything in this section.
+
+Bring a charged laptop with RStudio and the course project open. The code of
+the lecture is in this chapter, ready to copy, so you can run each step
+yourself during the lecture and get the same numbers and figures.
+
 <div class="video-prep">
 <span class="label">Video preparation (15 minutes)</span><br>
 Watch Stanford Statistical Learning
 <a href="https://www.youtube.com/watch?v=o9hoLdylWKo&list=PLoROMvodv4rOzrYsAxzQyHb8n_RWNuS1e&index=11">3.3
-Multiple Linear Regression</a>. Focus on the conditional interpretation of
-one coefficient and the reason several predictors may be included together.
+Multiple Linear Regression</a>. Focus on how one coefficient is interpreted
+when the other predictors are held fixed, and on why several predictors are
+included together.
 All links are also listed in the
 <a href="../resources/video-guide.html">External Video Guide</a>.
 </div>
 
-**Reactivate (10 minutes).** In Lecture 3 you fitted the simple season model
-and tested its slope. Fit it again, then fit the two-predictor model that adds
-the requested amount in thousands of dollars, and bring **both season
-coefficients** to class:
+**Reactivate (10 minutes).** Make the prediction below first, then run this
+code. In Lecture 3 you fitted the simple model of the equity offered
+(`equity_offered_pct`) on season and tested its slope. Fit it again. Then fit
+the model with two predictors, which adds the requested amount in thousands
+of dollars (`ask_1k`). Write down both season coefficients and bring them to
+class:
 
 ```{r}
 #| label: i04-prep-warmup
@@ -61,12 +88,13 @@ coef(lm(equity_offered_pct ~ season, data = sharks))
 coef(lm(equity_offered_pct ~ season + ask_1k, data = sharks))
 ```
 
-**Predict (5 minutes).** Answer the one-click Mentimeter question posted on
+**Predict (5 minutes).** Answer the one-click Wooclap question posted on
 Canvas before you come to class: once the requested amount is added, will the
 season coefficient move **towards zero**, **away from zero**, or **barely
-move**? Think about why the slope might change at all: if the requested
-amount is associated with both season and offered equity, the simple slope
-mixes their relationships. Commit to an answer; the lecture resolves it.
+move**? Think about why the slope might change at all. If the requested
+amount is related to both the season and the equity offered, the simple slope
+mixes the two relationships. Choose one answer. You find the answer in the
+lecture material.
 
 If subscripts or multivariable equations feel rusty, review
 [Mathematics Refresher: subscripts and multivariable equations](../resources/math-refresher.html).
@@ -75,13 +103,21 @@ If subscripts or multivariable equations feel rusty, review
 
 ::: {.course-phase .phase-in-class}
 
-## In class
+## Lecture material
 
-The session opens with the usual four-minute entry quiz on the prep videos,
-then turns to the driving question. Your warm-up produced two season
-coefficients --- about $-0.824$ without the requested amount and $-0.814$
-with it. This lecture explains what the second number means, why the two can
-differ, and why here they barely do.
+The R task before class produced two season coefficients: about $-0.824$
+without the requested amount and about $-0.814$ with it. This section
+explains what the second number means, why the two numbers can differ, and
+why they hardly differ here.
+
+### Start with a founder's question
+
+Your sales rose after you cut the price. But it was also December. Was it
+the price or the season? Founders meet this problem all the time: two things
+changed together, and a simple comparison cannot separate them. The Shark
+Tank file has the same problem. The equity offered (`equity_offered_pct`)
+fell over the seasons, and the requested amounts also changed over the
+seasons. Multiple regression compares pitches that asked for the same amount.
 
 ### More than one predictor
 
@@ -101,23 +137,32 @@ E[Y_i\mid X_{i1}=x_1,\ldots,X_{ik}=x_k]
 =\beta_0+\beta_1x_1+\cdots+\beta_kx_k.
 $$
 
-The coefficient $\beta_j$ is the expected change in $Y$ for a one-unit
-increase in $X_j$, **holding the other included predictors fixed**. That
-phrase must appear in every multiple-regression slope interpretation you
-write in this course.
+::: {.definition-box}
+<span class="label">Definition</span>
 
-It describes a **model-based comparison**. It does not require that two real
-pitches exist that are identical on every feature; it compares fitted
-conditional means at fixed values of the included variables. The model does
-the holding fixed --- the data need not contain twins.
+**Partial slope.** The coefficient $\beta_j$ of one predictor in a model with
+several predictors. It is the expected difference in $Y$ that goes with a
+one-unit difference in $X_j$, holding the other included predictors fixed.
 
-### Why coefficients change: a constructed demonstration
+**Holding the other predictors fixed.** The comparison is between cases that
+have the same values of all other predictors in the model and differ only in
+$X_j$.
+:::
 
-Before touching the Shark Tank data, watch the mechanism operate where we
-control it completely, because we built the data ourselves. Imagine 200 small
-firms. A single background variable --- firm **size** --- drives both
-advertising spend and revenue. Advertising itself contributes nothing: the
-revenue line below contains `size` but no `adspend` term.
+Write the phrase "holding the other included predictors fixed" in every
+interpretation of a slope from a multiple regression.
+
+The comparison is made by the model. The data do not need to contain two
+real pitches that are the same in every other respect. The model compares
+conditional means at fixed values of the included predictors.
+
+### Why coefficients change: an invented example
+
+Start with an invented example. We build the data ourselves, so we know the
+truth. Imagine 200 small firms. One background variable, the size of the
+firm (`size`), drives both advertising spend (`adspend`) and revenue
+(`revenue`). Advertising itself adds nothing to revenue: the line of code
+that builds `revenue` contains `size` but not `adspend`.
 
 ```{r}
 #| label: i04-sim-build
@@ -131,25 +176,38 @@ coef(lm(revenue ~ adspend, data = demo))
 coef(lm(revenue ~ adspend + size, data = demo))
 ```
 
-The simple slope of `adspend` is about $1.39$: strongly positive, and highly
-significant if you check its t statistic. Yet we *know* advertising does
-nothing here. Once `size` enters the model, the `adspend` slope collapses to
-about $0.10$ with a p-value around $0.39$ --- indistinguishable from the zero
-we built in. The simple slope was entirely an **omitted-variable** artefact:
-`adspend` earned credit for the size differences it was correlated with.
+The simple slope of `adspend` is about $1.39$, clearly positive. Yet we know
+that advertising does nothing in these data. Once `size` is in the model, the
+slope of `adspend` falls to about $0.10$, close to the zero that we built in.
+The simple slope gave `adspend` the credit for differences in size. As a
+description the simple slope is correct: firms that advertise more do have
+higher revenue on average. As an answer to the question of what advertising
+does, it is wrong.
 
-@fig-i04-ovb-scatter makes the mechanism visible. Larger firms (orange) sit
-high on *both* axes; smaller firms (blue) sit low on both. Sliding along the
-overall cloud from left to right, you move from small firms to large firms
---- so the simple slope compares different kinds of firms. *Within* each
-colour, the cloud is nearly flat: at a given size, spending more is not
-associated with more revenue.
+::: {.definition-box}
+<span class="label">Definition</span>
+
+**Omitted variable.** A variable that is related to the outcome but is left
+out of the model.
+
+**Confounder.** An omitted variable that is related to both a predictor and
+the outcome. The slope of that predictor then also picks up the relationship
+between the confounder and the outcome. This distortion is called
+omitted-variable bias. In the invented example, `size` is the confounder of
+`adspend`.
+:::
+
+@fig-i04-ovb-scatter shows why. Larger firms (orange) are high on both axes.
+Smaller firms (blue) are low on both. Moving along the whole cloud from left
+to right, you move from small firms to large firms, so the simple slope
+compares different kinds of firms. Within each colour the cloud is nearly
+flat: at a given size, more advertising does not go with more revenue.
 
 ```{r}
 #| label: fig-i04-ovb-scatter
 #| code-fold: true
 #| code-summary: "See the R code for this figure"
-#| fig-cap: "Constructed data: revenue against advertising spend for 200 simulated firms, coloured by firm size. The overall upward drift comes entirely from size; within a colour group the relationship is nearly flat."
+#| fig-cap: "Invented data: revenue against advertising spend for 200 simulated firms, coloured by firm size. The upward direction of the whole cloud comes from size alone. Within a colour group the relationship is nearly flat."
 library(ggplot2)
 set.seed(42)
 n <- 200
@@ -181,8 +239,8 @@ ggplot(demo, aes(x = adspend, y = revenue,
     "Larger firms (size above median)" = 17,
     "Smaller firms (size below median)" = 16
   )) +
-  labs(x = "Advertising spend (constructed units)",
-       y = "Revenue (constructed units)",
+  labs(x = "Advertising spend (invented units)",
+       y = "Revenue (invented units)",
        colour = NULL, shape = NULL) +
   theme_minimal(base_size = 13) +
   theme(
@@ -194,17 +252,17 @@ ggplot(demo, aes(x = adspend, y = revenue,
   )
 ```
 
-A coefficient changes when an added predictor accounts for variation that the
-simpler association had absorbed. That is the entire mechanism --- and it is
-why "holding the other included predictors fixed" is not decoration but the
-substance of the estimate.
+A coefficient changes when the added predictor accounts for differences that
+the simple slope had picked up. This is why the phrase "holding the other
+included predictors fixed" matters: it says which comparison the estimate
+makes.
 
 ### The real-data contrast: the season slope barely moves
 
-Now the same comparison on the Shark Tank data. The running money unit from
-here on is **thousands of dollars**: `ask_1k` is the requested amount divided
-by 1,000, so one unit is $1,000 and 100 units are $100,000 (Lecture 1 showed
-how a coefficient rescales when the unit changes).
+Now make the same comparison on the Shark Tank data. From here on, money is
+measured in thousands of dollars: `ask_1k` is the requested amount divided by
+1,000. One unit is \$1,000 and 100 units are \$100,000. Lecture 1 showed how
+a coefficient changes when the unit changes.
 
 ```{r}
 #| label: i04-compare-slopes
@@ -218,28 +276,30 @@ c(
 )
 ```
 
-The season slope moves from about $-0.824$ to about $-0.814$: hardly at all.
-Contrast this with the constructed example, where adjustment destroyed the
-simple slope. Here, adjusting for the requested amount leaves the season
-trend essentially intact, so within these data the time story is not a
-disguised money story.
+The season slope moves from about $-0.824$ to about $-0.814$. That is a
+change of 0.01 percentage points per season, about 1% of the slope. This
+answers the Wooclap question from before class: the coefficient barely moves.
+In the invented example, adding `size` removed almost the whole simple slope.
+Here, adding the requested amount leaves the season trend almost unchanged.
+In these data the time story is not a money story in disguise.
 
-Read the stability correctly. It is **informative**: the measured requested
-amount does not account for the season trend. It is **not proof** that
-omitted-variable bias is absent: an unmeasured variable --- venture maturity,
-founder experience, editorial selection --- could still play exactly the role
-`size` played in the constructed data. Stability with respect to the
-variables you have says nothing about the variables you do not have.
+The stable slope tells you something useful: the requested amount does not
+explain the season trend. It does not rule out every other explanation. A
+variable that is not in the file, such as the maturity of the venture or the
+experience of the founder, could still play the role that `size` played in
+the invented data. A slope that is stable when you add the variables you
+have says nothing about the variables you do not have.
 
 ### A three-predictor Shark Tank model
 
-Add a third predictor and fit the model this lecture works with. The outcome
-is initial equity offered, in percentage points. The predictors are:
+Now add a third predictor. The outcome is the equity that the founders
+offered at the start of the pitch (`equity_offered_pct`), in percent. The
+predictors are:
 
-- `season` --- the season number, 1 to 16;
-- `ask_1k` --- requested amount in thousands of dollars;
-- `description_words` --- the number of words in the source's short
-  description of the business.
+- `season`: the season number, 1 to 16
+- `ask_1k`: the requested amount in thousands of dollars
+- `description_words`: the number of words in the short description of the
+  business in the data source.
 
 ```{r}
 #| label: i04-fit
@@ -265,53 +325,136 @@ Use the same five checks every time you interpret a slope:
 1. **Estimate and direction:** state the fitted change and its sign.
 2. **Predictor step and unit:** say what a one-unit increase means.
 3. **Outcome unit:** state the unit in which the outcome changes.
-4. **Conditioning:** name the other included predictors being held fixed.
-5. **Scope:** identify the analysed records and say "associated with" unless
-   a research design justifies a causal claim.
+4. **Conditioning:** name the other included predictors that are held fixed.
+5. **Scope:** name the analysed records and write "associated with", unless
+   the data come from an experiment that justifies a causal claim.
 
-The variables in this model use deliberately different units:
+The three predictors have different units:
 
 | Term | A one-unit increase means | Coefficient unit |
 |---|---|---|
 | `season` | one later season | equity percentage points per season |
-| `ask_1k` | $1,000 more requested | equity percentage points per $1,000 |
+| `ask_1k` | \$1,000 more requested | equity percentage points per \$1,000 |
 | `description_words` | one additional word | equity percentage points per word |
 
-Applying the protocol to each slope in turn, always among the 1,441 recorded
-pitches:
+Apply the five checks to each slope in turn. All three sentences are about
+the 1,441 recorded pitches:
 
 - **Season.** At the same requested amount and description length, one later
-  season is associated with about $0.836$ percentage points less initial
-  equity offered.
+  season is associated with about $0.836$ percentage points less equity
+  offered.
 - **Requested amount.** At the same season and description length, an
-  additional $1,000 requested is associated with about $0.0029$ percentage
-  points less initial equity offered. The number is tiny because the unit
-  step is tiny; per additional $100,000 the association is about $0.29$
-  percentage points, and its t statistic (about $-5.0$) does not depend on
-  the unit chosen.
-- **Description length.** At the same season and request, one additional
-  description word is associated with about $0.128$ percentage points less
-  initial equity offered. This estimate is **not statistically
-  distinguishable from zero** at 5% (p $\approx$ 0.26). Report the point
-  estimate anyway: "not significant" is not the same as "exactly zero" ---
-  the data are simply consistent with a range of values that includes zero.
+  additional \$1,000 requested is associated with about $0.0029$ percentage
+  points less equity offered. The number is tiny because the unit step is
+  tiny. Per additional \$100,000 the association is about $0.29$ percentage
+  points. The t statistic (about $-5.0$) does not depend on the unit.
+- **Description length.** At the same season and requested amount, one
+  additional description word is associated with about $0.128$ percentage
+  points less equity offered. This estimate is not statistically
+  distinguishable from zero at 5% (p $\approx$ 0.26). Report the estimate
+  anyway. "Not significant" does not mean "exactly zero". It means that the
+  data fit a range of values that includes zero.
 
 ::: {.callout-note collapse="true"}
 ## Check: the season slope was −0.814 with two predictors and −0.836 with three. Contradiction?
 
-No. Each coefficient answers a different conditional question: $-0.814$ holds
-only `ask_1k` fixed; $-0.836$ holds `ask_1k` *and* `description_words` fixed.
-Adding a predictor changes what is being held fixed, so the coefficient may
-shift. Here the shift is small --- the same stability, and the same limits to
-it, as before.
+No. The two coefficients answer different questions. $-0.814$ holds only
+`ask_1k` fixed. $-0.836$ holds `ask_1k` and `description_words` fixed.
+Adding a predictor changes what is held fixed, so the coefficient may change.
+Here the change is small, as it was when `ask_1k` was added.
 :::
+
+### Three models in one table {#i04-spec-table}
+
+This lecture has now fitted three models of the equity offered
+(`equity_offered_pct`): season alone (`m_simple`), season and requested
+amount (`m_adjusted`), and the three-predictor model (`equity_model`).
+Research papers show such models side by side in one table, with one column
+per model. The table needs the standard error of every coefficient and the
+fit of every model. `summary()` prints them for the first two models. The
+output for the third model is above.
+
+```{r}
+#| label: i04-spec-summaries
+summary(m_simple)
+summary(m_adjusted)
+```
+
+The table below collects the three outputs.
+
+::: {.reg-table}
+| | (1) | (2) | (3) |
+|:---|---:|---:|---:|
+| Season | −0.824\*\*\* | −0.814\*\*\* | −0.836\*\*\* |
+| | (0.048) | (0.047) | (0.051) |
+| Amount requested (\$1,000s) | | −0.0029\*\*\* | −0.0029\*\*\* |
+| | | (0.0006) | (0.0006) |
+| Description length (words) | | | −0.128 |
+| | | | (0.114) |
+| Intercept | 20.457\*\*\* | 21.185\*\*\* | 22.025\*\*\* |
+| | (0.464) | (0.483) | (0.888) |
+| Observations | 1,441 | 1,441 | 1,441 |
+| $R^2$ | 0.173 | 0.187 | 0.188 |
+| Adjusted $R^2$ | 0.172 | 0.186 | 0.186 |
+:::
+
+Outcome: equity offered (%). Ordinary least squares. Standard errors in
+parentheses. All three columns use the same 1,441 pitches.
+\* p < 0.05, \*\* p < 0.01, \*\*\* p < 0.001.
+
+Each column is one model and each row is one predictor. An empty space means
+that the predictor is not in that model. The number in parentheses under a
+coefficient is its standard error, and the stars show the p-value of the
+two-sided test of that coefficient against zero. Read along a row to see how
+a coefficient changes when predictors are added: the season coefficient stays
+between $-0.836$ and $-0.814$ in all three columns. Read down a column to see
+one model: column (3) is `equity_model`. The bottom rows give the number of
+observations and the fit of each model. This is the layout to use for
+regression results in your thesis.
+
+The last two rows need one more term, which Lecture 3 introduced.
+
+::: {.definition-box}
+<span class="label">Definition</span>
+
+**Adjusted $R^2$.** $R^2$ with a small penalty for every predictor in the
+model. $R^2$ never falls when a predictor is added. Adjusted $R^2$ can fall
+when the new predictor adds almost nothing. Use adjusted $R^2$ to compare
+models with different numbers of predictors.
+:::
+
+The formula is on the
+[code sheet](code-sheet.qmd#lecture-3-coefficient-inference-fit-and-the-f-test).
+In the table, adding the requested amount raises $R^2$ from 0.173 to 0.187.
+The model then accounts for 18.7% of the variation in the equity offered, up
+from 17.3%. Adjusted $R^2$ rises with it, from 0.172 to 0.186. Adding the
+description length leaves adjusted $R^2$ at 0.186: this predictor adds almost
+nothing to the fit.
+
+R can build such a table for you with the package `modelsummary`:
+
+```{r}
+#| label: i04-modelsummary
+#| eval: false
+library(modelsummary)
+modelsummary(
+  list("(1)" = m_simple, "(2)" = m_adjusted, "(3)" = equity_model),
+  stars = c("*" = 0.05, "**" = 0.01, "***" = 0.001),
+  gof_map = c("nobs", "r.squared", "adj.r.squared")
+)
+```
+
+The package must be installed once with `install.packages("modelsummary")`.
+The table in this chapter was not made with this code. It was typed by hand
+from the `summary()` outputs above. `modelsummary` rounds to three decimals,
+so in its table the coefficient of the requested amount appears as −0.003.
 
 ### Scaling to comparisons readers care about
 
-Nobody plans in single seasons of a TV show or single thousands of dollars.
-Scale the coefficient to the step a reader cares about: **fitted change =
+A reader rarely cares about one season or one thousand dollars. Scale the
+coefficient to a step that matters to the reader: **fitted change =
 coefficient × number of unit steps**, holding the other included predictors
-fixed. This resolves the Mentimeter question posed before the break.
+fixed.
 
 ::: {#exm-i04-scaling}
 ## Worked example: five seasons, half a million dollars, ten words
@@ -323,21 +466,21 @@ Holding the other included predictors fixed in `equity_model`:
 - **$500,000 more requested:** $500{,}000/1{,}000 = 500$ units of `ask_1k`,
   so $500\times(-0.0029)=-1.45$ fitted percentage points.
 - **Ten additional description words:** $10\times(-0.128)=-1.28$ fitted
-  percentage points --- with the reminder that this coefficient is not
-  significantly different from zero, so the scaled version is not either.
+  percentage points. This coefficient is not significantly different from
+  zero, so the scaled version is not either.
 
-Rescaling a predictor changes the numerical coefficient and its SE by the
-same factor, but not the fitted values, t statistic, or substantive
-relationship. A "per dollar" coefficient of $-0.0000029$ would be correct and
-unreadable; per $1,000 is readable on the data's scale; per $100,000 is often
-the best unit for a sentence.
+Changing the unit of a predictor changes the coefficient and its standard
+error by the same factor. It does not change the fitted values, the t
+statistic, or the relationship itself. A coefficient "per dollar" of
+$-0.0000029$ would be correct and unreadable. Per \$1,000 is readable. Per
+\$100,000 is often the best unit for a sentence.
 :::
 
 ::: {.callout-caution collapse="true"}
 ## Try it: three seasons later and $200,000 more
 
-In class this is the pair task. Two pitches are identical in description
-length; one is three seasons later and requests $200,000 more. Complete the
+Try this with your neighbour first. Two pitches are identical in description
+length. One is three seasons later and requests $200,000 more. Complete the
 steps before opening the answer.
 
 *Step 1 (given).* Three seasons contribute $3\times(-0.836)$ fitted
@@ -346,8 +489,9 @@ percentage points.
 *Step 2 (you).* Convert $200,000 into `ask_1k` units and multiply by the
 `ask_1k` coefficient.
 
-*Step 3 (you).* Add the two contributions --- the model is additive --- and
-state the combined fitted difference in one protocol-complete sentence.
+*Step 3 (you).* Add the two contributions. This is allowed because the model
+is additive. State the combined fitted difference in one sentence that
+passes the five checks.
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
@@ -356,8 +500,8 @@ $200{,}000/1{,}000=200$ units, so the request contributes
 $200\times(-0.0029)\approx-0.58$. Combined:
 $3(-0.836)+200(-0.0029)\approx-2.51-0.58=-3.09$ percentage points. Sentence:
 among the recorded pitches, a pitch three seasons later that requests
-$200,000 more is fitted to offer about 3.1 percentage points less initial
-equity, holding description length fixed --- an association, not an effect.
+\$200,000 more is fitted to offer about 3.1 percentage points less equity,
+holding description length fixed. This is an association, not an effect.
 
 ```{r}
 #| label: i04-faded-check
@@ -371,32 +515,36 @@ b <- coef(equity_model)
 
 Including a control **can**:
 
-- make a comparison more like-for-like on measured dimensions;
-- reduce residual variation, tightening intervals;
-- reveal that a simple association was partly compositional;
-- increase uncertainty when predictors overlap strongly.
+- make a comparison fairer, because the compared cases are alike on the
+  measured variables
+- reduce the residual variation, which makes confidence intervals narrower
+- show that a simple association partly came from comparing different kinds
+  of cases
+- make a coefficient less precise when the predictors overlap strongly.
 
 Including a control **cannot**:
 
-- adjust for unmeasured factors;
-- fix reverse causality;
-- repair selection into the sample;
-- remove measurement error.
+- adjust for variables that were not measured
+- fix reverse causality, where the outcome influences the predictor
+- repair selection, where the cases in the file are not typical of the
+  cases you want to talk about
+- remove errors in how a variable was measured.
 
-A "control variable" is just an included predictor. Nothing about the word
-*control* grants it a causal role; only a research design can do that.
+A control variable is simply a predictor that is included in the model. The
+word "control" does not make any coefficient causal. Only the way the data
+were produced can do that, for example an experiment.
 
 ::: {.callout-note collapse="true"}
 ## Check: which of these four problems does adding `ask_1k` address?
 
-(a) later pitches request different amounts; (b) founder experience is not
-recorded; (c) equity offers may influence how much is asked; (d) only pitches
-that reached broadcast are in the file.
+(a) Later pitches request different amounts. (b) The experience of the
+founder is not recorded. (c) The equity offered may influence how much is
+asked. (d) Only pitches that were broadcast are in the file.
 
-Only (a). It is a measured compositional difference, and holding `ask_1k`
-fixed removes it from the season comparison. Problems (b), (c), and (d) are
-unmeasured confounding, reverse causality, and sample selection --- none of
-them touched by adding a measured control.
+Only (a). The requested amount is measured, and holding `ask_1k` fixed
+removes it from the season comparison. Problem (b) is an unmeasured
+confounder, (c) is reverse causality, and (d) is selection. Adding a measured
+control does not solve any of these three.
 :::
 
 ### Assumptions extend to the full predictor set
@@ -404,28 +552,33 @@ them touched by adding a measured control.
 For multiple regression, the Lecture 2 assumption list applies to the whole
 set of included predictors:
 
-1. the conditional mean is linear in the included terms;
-2. $E[\varepsilon_i\mid X_{i1},\ldots,X_{ik}]=0$ --- zero conditional mean at
-   every combination of predictor values;
-3. observations are independent under the design;
-4. no predictor is an exact linear combination of the others;
-5. classical SEs require constant conditional error variance;
-6. exact small-sample t/F inference uses conditional normality.
+1. The conditional mean is linear in the included terms.
+2. For a causal reading only: nothing outside the model drives both an
+   included predictor and the outcome (no confounding).
+3. The observations are independent.
+4. No predictor is an exact linear combination of the others.
+5. The usual standard errors require a constant conditional error
+   variance.
+6. In small samples, exact t and F inference also requires normally
+   distributed errors.
 
-High correlation among predictors --- **collinearity** --- does not bias OLS
-by itself, but it makes individual coefficients unstable and imprecise: the
-data contain little information to separate overlapping predictors. Exact
-linear dependence is worse: the coefficients are then **not identified** at
-all, and R drops a term. Instability is a precision problem; exact dependence
-is a no-answer-exists problem.
+A high correlation among the predictors is called **collinearity**. It does
+not bias the coefficients. It makes the single coefficients imprecise and
+unstable, because the data contain little information to separate predictors
+that move together. An exact linear dependence is worse: the coefficients
+then cannot be estimated at all (they are "not identified"), and R drops a
+term. Collinearity costs precision. Exact dependence leaves no answer.
 
 ### A coefficient plot keeps units visible
+
+@fig-i04-coefplot shows the three slope estimates of `equity_model` with
+their 95% confidence intervals.
 
 ```{r}
 #| label: fig-i04-coefplot
 #| code-fold: true
 #| code-summary: "See the R code for this figure"
-#| fig-cap: "Coefficient estimates from the three-predictor model with 95% confidence intervals. Each row uses a different predictor unit, so magnitudes are not comparable across rows without the units table."
+#| fig-cap: "Coefficient estimates from the three-predictor model of the equity offered, with 95% confidence intervals. Each row uses a different predictor unit, so the sizes cannot be compared across rows without the table of units."
 library(ggplot2)
 sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
 sharks$ask_1k <- sharks$ask_amount_usd / 1000
@@ -461,53 +614,60 @@ ggplot(coef_df, aes(x = estimate, y = term)) +
   )
 ```
 
-Read @fig-i04-coefplot with the standing five-step sequence:
+Read @fig-i04-coefplot with the
+[five steps for reading a figure](../basic/overview.qmd#how-to-read-every-graph):
 
-1. **Axes:** rows are predictors; the horizontal axis is the estimated change
-   in initial equity offered, in percentage points.
-2. **Units:** each row's estimate is *per one unit of that predictor* ---
-   per season, per $1,000, per word. The rows are not on a common scale.
-3. **Marks:** a dot is the coefficient estimate; its horizontal line is the
-   95% confidence interval; the dashed line marks zero.
-4. **Pattern:** season and requested amount sit clearly left of zero; the
-   description-words interval crosses zero. The `ask_1k` row hugs the zero
-   line only because its unit step ($1,000) is tiny --- its t statistic is
-   about $-5$. Visual size on this plot is a unit artefact, not evidence
-   strength.
-5. **Limits:** intervals reflect model-based sampling uncertainty among these
-   recorded pitches; they say nothing about causation or unmeasured
-   variables.
+1. **Unit and variables:** the rows are the predictors. The horizontal axis
+   is the estimated change in the equity offered, in percentage points.
+2. **Scales:** each estimate is per one unit of its own predictor: per
+   season, per \$1,000, per word. The rows are not on a common scale.
+3. **One element:** a dot is a coefficient estimate, and its horizontal line
+   is the 95% confidence interval. The dashed line marks zero.
+4. **Pattern:** the season interval lies clearly left of zero. The interval
+   for the description length crosses zero. The `ask_1k` row lies almost on
+   the zero line only because its unit step (\$1,000) is tiny: its t
+   statistic is about $-5$. The distance from zero in this plot depends on
+   the unit. It does not show how strong the evidence is.
+5. **Limits:** the intervals show sampling uncertainty under the model,
+   among these recorded pitches. They say nothing about causation or about
+   variables that were not measured.
 
 ::: {.caveat-box}
 <span class="label">What an adjusted coefficient can and cannot say</span>
 
-Every slope in `equity_model` is a model-based comparison among the 1,441
-recorded pitches: fitted conditional means at fixed values of the *included*
-predictors. "Holding the other included predictors fixed" never extends to
-variables outside the model --- maturity, revenue, founder experience, and
-editorial selection are all unheld. The stability of the season slope across
-specifications is informative about the measured controls only; it proves no
-absence of omitted-variable bias. Initial equity offered is an on-air opening
-position, not a completed investment, and none of these associations is a
-causal effect of time, money, or word count.
+- "Holding fixed" covers only the predictors in the model. The maturity of
+  the venture, its revenue, and the experience of the founder are not held
+  fixed.
+- A coefficient that stays stable across models is good news about the
+  measured controls. It proves nothing about variables that were not
+  measured.
+- The equity offered is the opening offer in the pitch, not a completed
+  investment.
+
+**What you can do with it:** add the controls that a critic would name first.
+If your coefficient survives them, act on it for cheap decisions and test it
+for expensive ones.
 :::
 
 ### Answering the driving question
 
-At the same requested amount (and description length), the season trend
-persists: about $-0.836$ equity percentage points per season, versus $-0.824$
-unadjusted. The money story does not absorb the time story here --- later
-pitches offer less equity even compared at the same ask. And neither story is
-causal: an unmeasured driver could still lie behind both, exactly as firm
-size did in the constructed example.
+At the same requested amount and description length, the season trend
+remains: about $-0.836$ equity percentage points per season, against $-0.824$
+without the two controls. The money story does not replace the time story.
+Later pitches offer less equity even when they are compared at the same
+requested amount. Neither story is causal. A variable that is not in the file
+could still lie behind both, as firm size did in the invented example.
 
-**Next:** We can now hold other predictors fixed --- as long as they are
-numerical. But many of the most interesting business comparisons are
-categorical: channels, segments, team compositions. Lecture 5 shows how
-categories enter a regression correctly --- dummy variables and a reference
-group chosen deliberately --- and how to judge a whole set of category terms
-at once with the partial F-test, because individually insignificant dummies
-can still be jointly worth having.
+::: {.founder-box}
+<span class="label">A founder's decision (invented example)</span>
+
+Weeks with lower prices show more orders: the simple slope is 12 more orders per euro of price cut. But you lowered prices mainly in exam weeks, when demand is high anyway. With exam week in the model, the slope is 5 orders per euro. You sell about 150 boxes a week at 4 euros of margin. A price cut of 1 euro costs 150 euros of margin on the boxes you sell anyway, and it brings about 5 more orders at 3 euros each, 15 euros. The decision: keep the price. The simple slope would have overstated what a price cut brings by more than double.
+:::
+
+**Next:** You can now hold other predictors fixed, as long as they are
+numbers. Many business comparisons are between categories: sales channels,
+customer segments, kinds of teams. Lecture 5 shows how categories enter a
+regression and how to test a whole set of category terms at once.
 
 :::
 
@@ -515,54 +675,68 @@ can still be jointly worth having.
 
 ## After class
 
-<span class="time-budget">Total practice time: about 75 minutes.</span>
+<span class="time-budget">Total practice time: about 85 minutes.</span>
 
-### Retrieval (10 minutes)
+**Minimum path (about 35 minutes):** read the lecture material, answer the recall questions, then work for 10 minutes on the tasks that follow. **Full path:** all tasks below.
 
-1. What phrase must appear in a multiple-regression slope interpretation?
+### Read the lecture material (15 minutes)
+
+Read the Lecture material section above from start to end. The lecture
+covered the core of it. The text has every step, every example, and all the
+code, including parts that were not shown in class. Note what is still
+unclear and bring it to the next tutorial, or ask Tilly.
+
+### Recall questions (10 minutes)
+
+1. Which phrase belongs in every interpretation of a slope from a multiple
+   regression?
 2. Why can a coefficient change after another predictor is added?
-3. What is the zero conditional mean assumption?
-4. Why do controls not automatically identify causality?
+3. What does the no-confounding condition say, and when is it needed?
+4. Why does adding controls not make a coefficient causal?
 5. What problem can strongly overlapping predictors create?
-6. What five elements belong in a slope interpretation?
+6. Which five elements belong in the interpretation of a slope?
 
 ::: {.callout-note collapse="true"}
 ## Check your answers
 
 1. "Holding the other included predictors fixed."
-2. The simpler slope may absorb relationships involving omitted correlated
-   predictors; the added predictor takes back its share.
-3. The error has mean zero at every combination of included predictor values.
-4. Unmeasured confounding, selection, reverse causality, and measurement
-   error can all remain after adjustment.
-5. Unstable, imprecise individual coefficient estimates; exact overlap makes
-   the model unidentified.
-6. Estimate and direction, predictor step and unit, outcome unit, held-fixed
-   predictors, and the sample/causal scope.
+2. The simple slope also picks up the relationship between the outcome and an
+   omitted variable that is related to the predictor. When that variable is
+   added, the slope no longer includes this part.
+3. Nothing outside the model drives both an included predictor and the
+   outcome. It is needed only when a coefficient is read as the effect of
+   changing that predictor.
+4. Unmeasured confounders, selection, reverse causality, and measurement
+   error can all remain after a control is added.
+5. Imprecise and unstable estimates of the single coefficients. With an exact
+   dependence the coefficients cannot be estimated at all.
+6. Estimate and direction, predictor step and unit, outcome unit, the
+   predictors that are held fixed, and the scope (which records, association
+   or effect).
 :::
 
 ### Practice (30 minutes)
 
-Items 1--5 are unassisted checks of the core skills. **Items 6--9 form the
-faded-to-unassisted ladder**: item 6 repeats a calculation worked in class,
-items 7--8 change the numbers, and item 9 is the combined contrast you met
-half-finished in the pair task --- now do it start to finish.
+Items 1 to 5 practise the core skills. Items 6 to 8 repeat the calculations
+of @exm-i04-scaling in your own words. Item 9 is the Try it task, now done
+from start to finish.
 
-1. Interpret all three slopes from `equity_model` with units and
-   conditioning.
+1. Interpret all three slopes from `equity_model` with units and with the
+   predictors that are held fixed.
 2. Calculate 95% confidence intervals with `confint(equity_model)`.
-3. Test each coefficient against zero and distinguish three individual tests
-   from one joint model test.
-4. Remove `description_words`. Compare the season and request coefficients
-   with the full model's.
-5. Name one plausible omitted variable and explain which model assumption it
-   could threaten.
-6. Interpret a five-season difference using the fitted season coefficient.
-7. Interpret a $500,000 difference in requested amount.
-8. Interpret a ten-word difference in description length and use its 95%
-   interval to assess $H_0:\beta=0$.
-9. Compare two otherwise identical fitted pitches when one is three seasons
-   later and requests $200,000 more. Calculate the combined fitted
+3. Test each coefficient against zero. Explain how these three single tests
+   differ from the one overall F-test of the model.
+4. Remove `description_words`. Compare the coefficients of season and
+   requested amount with those of the full model.
+5. Name one plausible omitted variable and explain which reading of the
+   coefficients it would put in doubt.
+6. Interpret a difference of five seasons with the fitted season
+   coefficient.
+7. Interpret a difference of \$500,000 in the requested amount.
+8. Interpret a difference of ten words in description length and use the 95%
+   interval to judge $H_0:\beta=0$.
+9. Compare two fitted pitches that are the same except that one is three
+   seasons later and requests \$200,000 more. Calculate the combined fitted
    difference.
 
 ::: {.callout-note collapse="true"}
@@ -570,57 +744,62 @@ half-finished in the pair task --- now do it start to finish.
 
 1. Holding the other two predictors fixed, among the recorded pitches: one
    later season is associated with about 0.836 percentage points less
-   initial equity; an additional $1,000 requested with about 0.0029
-   percentage points less (0.29 per $100,000); one additional description
-   word with about 0.128 percentage points less.
+   equity offered, an additional \$1,000 requested with about 0.0029
+   percentage points less (0.29 per \$100,000), and one additional
+   description word with about 0.128 percentage points less.
 2. The season interval is approximately $(-0.936, -0.736)$, the `ask_1k`
    interval $(-0.0040, -0.0018)$, and the description interval
    $(-0.351, 0.095)$.
-3. Individual t-tests evaluate one $\beta_j=0$ at a time; the overall F-test
-   (F $\approx$ 110.6 on 3 and 1437 df) evaluates all slope coefficients
-   jointly.
+3. Each t-test evaluates one $\beta_j=0$ at a time. The overall F-test
+   (F $\approx$ 110.6 on 3 and 1437 df) evaluates all three slope
+   coefficients together.
 4. Without `description_words`, the season coefficient is about $-0.814$ and
-   the `ask_1k` coefficient about $-0.0029$. They change only slightly here;
-   that empirical stability does not prove absence of omitted-variable bias.
-5. Examples include venture maturity, revenue, founder experience, or editing
-   decisions; if related to both an included predictor and offered equity,
-   the omitted variable violates zero conditional mean.
-6. Holding request and description length fixed, a pitch five seasons later
-   is fitted to offer about $5(-0.836)=-4.18$ equity percentage points less.
-7. $500,000 equals 500 `ask_1k` units. Holding season and description length
-   fixed, the fitted difference is $500\times(-0.0029)\approx-1.45$
+   the `ask_1k` coefficient about $-0.0029$. These are columns (2) and (3) of
+   the table in the lecture material. The coefficients change only slightly.
+   That does not prove that there is no omitted-variable bias.
+5. Examples are the maturity of the venture, its revenue, the experience of
+   the founder, or decisions of the producers about what is broadcast. If
+   such a variable is related to both an included predictor and the equity
+   offered, it is a confounder. The coefficient is then still a correct
+   description, but it is not the effect of the predictor.
+6. Holding requested amount and description length fixed, a pitch five
+   seasons later is fitted to offer about $5(-0.836)=-4.18$ equity
+   percentage points less.
+7. \$500,000 equals 500 units of `ask_1k`. Holding season and description
+   length fixed, the fitted difference is $500\times(-0.0029)\approx-1.45$
    percentage points.
-8. Ten words correspond to about $-1.28$ fitted percentage points, holding
-   season and request fixed. Multiplying the interval by 10 gives
-   approximately $(-3.51, 0.95)$; because zero remains plausible, the
+8. Ten words go with about $-1.28$ fitted percentage points, holding season
+   and requested amount fixed. Multiplying the interval by 10 gives
+   approximately $(-3.51, 0.95)$. The interval contains zero, so the
    two-sided 5% test does not reject a zero coefficient.
 9. The fitted difference is $3(-0.836)+200(-0.0029)\approx-3.09$ percentage
-   points, holding description length fixed. Coefficient contributions add
+   points, holding description length fixed. The two contributions add
    because the model is additive.
 :::
 
 ### Cumulative mini-task (10 minutes)
 
-Write **one paragraph** connecting the Lecture 2 diagnostics to
-`equity_model`: which residual checks would you run on this three-predictor
-fit, what would each look for, and what would you do about a highly
+Write one paragraph that connects the diagnostics of Lecture 2 to
+`equity_model`. Which residual checks would you run on this three-predictor
+model? What would each check look for? What would you do about a highly
 influential pitch if you found one?
 
 ::: {.callout-note collapse="true"}
 ## Check a model answer
 
-A residuals-versus-fitted plot checks that the conditional mean is roughly
-linear in the included terms and that spread is roughly constant; curvature
-would question assumption 1, a funnel shape would question the classical SEs.
-Standardised residuals (`rstandard`) flag pitches the model fits unusually
-badly, and Cook's distance flags pitches that individually move the
-coefficients. A flagged pitch --- say, an extreme requested amount --- gets
-investigated, not deleted: check the recorded values, refit with and without
-it, and report both fits if they disagree. Silent deletion is never an
-option.
+A plot of residuals against fitted values checks that the conditional mean
+is roughly linear in the included terms and that the spread is roughly
+constant. A curve would put assumption 1 in doubt. A funnel shape would put
+the usual standard errors in doubt. Standardised residuals (`rstandard`)
+flag pitches that the model fits unusually badly. Cook's distance flags
+pitches that move the coefficients on their own. A flagged pitch, for
+example one with an extreme requested amount, is investigated, not deleted:
+check the recorded values, fit the model with and without it, and report
+both fits if they disagree. Never delete an observation without reporting
+it.
 :::
 
-### Spaced review: one item from Lecture 3 (5 minutes)
+### Review: one question from Lecture 3 (5 minutes)
 
 For the simple model `equity_offered_pct ~ season`, the slope's t statistic
 is about $-17.34$. What is the overall F statistic of this one-predictor
@@ -631,8 +810,8 @@ model, and why?
 
 $F = t^2 \approx 300.7$. With a single slope, the overall F-test and the
 two-sided t-test of that slope test the same hypothesis, and F is exactly the
-square of t. With several predictors that equivalence disappears --- which is
-why Lecture 5 needs a genuine joint test.
+square of t. With several predictors this is no longer true. Lecture 5
+therefore introduces a test of several coefficients at once.
 :::
 
 ### Worked exam interpretation (5 minutes)
@@ -640,40 +819,34 @@ why Lecture 5 needs a genuine joint test.
 **Question.** A summary table reports, for the three-predictor model,
 `season  -0.836  (SE 0.051)` and `description_words  -0.128  (SE 0.114)`. A
 student writes: "Season matters and word count does not, so descriptions have
-no effect on equity." Give two corrections in the mock-exam Q4 style.
+no effect on equity." Give two corrections, in the style of Question 4 of the
+mock exam.
 
 ::: {.callout-note collapse="true"}
 ## Check a model answer
 
-First, "no effect" misreads non-significance: the interval
-$(-0.351, 0.095)$ contains zero *and* values near $-0.35$, so the data are
-consistent with no association and with a modest negative one --- not
-significant is not zero. Second, "effect" claims causation; both estimates
-are associations among recorded pitches, holding the other included
-predictors fixed, with no design that identifies a causal effect.
+First, "no effect" misreads a result that is not significant. The interval
+$(-0.351, 0.095)$ contains zero and also values near $-0.35$. The data fit
+no association and they also fit a small negative one. Not significant does
+not mean zero. Second, "effect" claims causation. Both estimates are
+associations among the recorded pitches, holding the other included
+predictors fixed. The data do not come from an experiment, so they do not
+show a causal effect.
 :::
 
-### From the reading ladder (10 minutes)
+### Check the AI (5 minutes)
 
-Next rung of the [reading ladder](../resources/reading-ladder.qmd): open
-[Zhao, Seibert & Hills (2005)](https://doi.org/10.1037/0021-9010.90.6.1265)
-via the university library and find the table predicting **entrepreneurial
-intentions**. Identify the outcome, the predictors of substantive interest,
-and the variables included as controls. Pick one coefficient and write the
-full protocol sentence --- including "holding the other included predictors
-fixed" and the sample scope. Then name one variable *not* in the model that
-could drive both the predictor and the outcome, exactly like the
-constructed demonstration from today's lecture.
+You asked an AI assistant: "I added the requested amount as a control. Is the season coefficient of -0.81 now the effect of time?" It answered:
+
+> "Yes. Because you controlled for the requested amount, one later season now causes 0.81 percentage points less equity."
+
+Find what is wrong and write the corrected answer. This is the **Verify**
+step of Attempt → Ask → Verify → Explain, and the exam asks for it.
 
 ::: {.callout-note collapse="true"}
-## Check your approach
+## Check your answer
 
-Any defensible answer names the model-based nature of the comparison (no
-claim that identical students exist), keeps the units or scale of the
-predictor visible, and proposes an omitted variable with a plausible path to
-both sides --- family business background, access to capital, and general
-self-confidence are all fair candidates. If your sentence could be read as
-causal advice ("increase X to raise intentions"), tighten it.
+A control only holds fixed what was measured and included. Venture maturity, founder experience, and the choices of the producers are not in the model. The correct sentence: at the same requested amount, one later season is associated with about 0.81 percentage points less equity offered.
 :::
 
 ### Make it yours (5 minutes)
@@ -681,29 +854,28 @@ causal advice ("increase X to raise intentions"), tighten it.
 :::: {.utility-prompt}
 <span class="label">Utility: two sentences</span>
 
-Think of your EiA3 venture --- or any business you know well. Name one
+Think of your EiA3 venture, or any business you know well. Name one
 outcome you care about and two of its drivers that are correlated with each
-other (say, price and quality tier, or marketing spend and firm age), and
-write two sentences: which comparison would a regression of the outcome on
-only one driver mix together, and what would "holding the other fixed" let
-you see? There is no wrong answer; the point is spotting the confound in a
-business you actually know.
+other (for example price and quality tier, or marketing spend and firm age).
+Then write two sentences. Which comparison would a regression of the outcome
+on only one driver mix together? What would "holding the other fixed" let
+you see? There is no wrong answer.
 
 ::: {.callout-note collapse="true"}
 ## See an example, then write your own
 
-Take a student-run campus meal-prep box venture. "Outcome: weekly orders; drivers: price and quality tier, which move together because premium boxes cost more. Orders-on-price alone would mix cheaper with lower-tier; holding tier fixed shows what a price cut does within a tier --- the number I actually control."
+Take a student-run venture that sells meal-prep boxes on campus (an invented example). "Outcome: weekly orders. Drivers: price and quality tier, which move together because premium boxes cost more. A regression of orders on price alone would mix cheaper boxes with lower-tier boxes. Holding the tier fixed shows what a price cut does within a tier, and that is the number I can act on."
 :::
 
-You can discuss this task --- and any other task in this chapter --- with
-**Tilly**, the course AI assistant on Canvas: ask it to propose an omitted
-variable for your venture's regression and challenge you to say whether a
-measured control could fix it.
+You can discuss this task, and any other task in this chapter, with
+**Tilly**, the course AI assistant. Ask it to propose an omitted variable for
+the regression of your venture, and to ask you whether a measured control
+could fix it.
 ::::
 
-Continue to Lecture 5: Categories as predictors and joint tests.
+[Continue to Lecture 5: Categories as predictors and joint tests](i05-categories-joint-tests.qmd).
 
-Formula sheet: Lecture 4 formulas.
+[Code sheet: Lecture 4 commands and formulas](code-sheet.qmd#lecture-4-multiple-linear-regression).
 
 For a more formal treatment, see James et al., *An Introduction to
 Statistical Learning*, 2nd ed., Sections 3.2 and 3.3.3, and

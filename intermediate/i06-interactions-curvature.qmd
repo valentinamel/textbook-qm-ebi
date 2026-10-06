@@ -12,26 +12,44 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 ::: {.outcomes}
 <span class="label">By the end of Lecture 6, you can</span>
 
-- read a two-lines picture as four numbers: two intercepts and two slopes;
-- explain an interaction coefficient as a difference in slopes, with units;
-- interpret lower-order terms in a model containing an interaction, and use
-  centering to make them meaningful;
-- report a non-significant interaction without overclaiming in either
-  direction;
-- apply the hierarchy principle and the `x * z` formula shorthand;
-- fit a quadratic term, explain why it is still linear regression, and
-  compute a fitted change without reading coefficients separately;
-- test added terms with a partial F-test and refuse to extrapolate a
-  polynomial.
+- read a picture of two lines as four numbers: two intercepts and two slopes
+- explain an interaction coefficient as a difference in slopes, with units
+- interpret the other coefficients in a model with an interaction, and use
+  centering to give them a useful meaning
+- report an interaction that is not significant without claiming too much in
+  either direction
+- apply the hierarchy principle and the `x * z` formula shorthand
+- fit a quadratic term, explain why the model is still a linear regression,
+  and compute a fitted change from both coefficients together
+- test added terms with a partial F-test, and explain why a curve must not be
+  used outside the range of the data.
+:::
+
+::: {.must-know}
+<span class="label">Must know</span>
+
+**Be able to do yourself:**
+
+- write the two lines of an interaction model
+- interpret an interaction as a difference in slopes
+- say what centering changes and what it cannot change
+- calculate a fitted change in a quadratic model with $\hat\beta_1+\hat\beta_2(2x+1)$
+- explain why a curve must not be used beyond the range of the data.
+
+**Enough to recognise:**
+
+- the `I()` syntax, which is on the code sheet
+- the name hierarchy principle.
 :::
 
 ::: {.driving-question}
 <span class="label">Driving question</span>
 
-<p class="dq-context">"On average" can hide the interesting part: an effect may differ across groups, or bend as scale grows. Interactions and curvature are how a model is allowed to say so.</p>
+<p class="dq-context">An average slope can hide the interesting part. A relationship may differ between groups, or it may bend as a predictor grows. Interactions and curves let a model show this.</p>
 
-Is the downward season trend in equity offers the same for every team
-composition --- and is the trend even a straight line?
+The equity offered (`equity_offered_pct`) in the Shark Tank file falls over
+the seasons. Is this trend the same for every kind of presenting team, and
+is it a straight line at all?
 :::
 
 ::: {.course-phase .phase-before}
@@ -40,6 +58,12 @@ composition --- and is the trend even a straight line?
 
 <span class="time-budget">Total preparation time: about 30 minutes.</span>
 
+**Minimum path:** the video and the R task. **Full path:** everything in this section.
+
+Bring a charged laptop with RStudio and the course project open. The code of
+the lecture is in this chapter, ready to copy, so you can run each step
+yourself during the lecture and get the same numbers and figures.
+
 <div class="video-prep">
 <span class="label">Video preparation (15 minutes)</span><br>
 Watch Stanford Statistical Learning
@@ -47,14 +71,14 @@ Watch Stanford Statistical Learning
 Extensions of the Linear Model</a> and
 <a href="https://www.youtube.com/watch?v=F-D3lZzYn50&list=PLoROMvodv4rOzrYsAxzQyHb8n_RWNuS1e&index=48">7.1
 Polynomials and Step Functions</a>. Focus on why an interaction changes a
-slope and why a polynomial remains a linear regression model in its
-coefficients. All links are also listed in the
+slope, and why a model with a squared term is still a linear regression. All
+links are also listed in the
 <a href="../resources/video-guide.html">External Video Guide</a>.
 </div>
 
 **Derive the two lines (5 minutes).** In the model
-$Y=\beta_0+\beta_1X+\beta_2D+\beta_3XD+\varepsilon$ with $D\in\{0,1\}$,
-write the fitted line for $D=0$ and for $D=1$.
+$Y=\beta_0+\beta_1X+\beta_2D+\beta_3XD+\varepsilon$ with a dummy variable
+$D\in\{0,1\}$, write the line for $D=0$ and the line for $D=1$.
 
 ::: {.callout-note collapse="true"}
 ## Check your preparation
@@ -64,14 +88,16 @@ $E[Y\mid X,D=1]=(\beta_0+\beta_2)+(\beta_1+\beta_3)X$. Setting $D=1$ shifts
 the intercept by $\beta_2$ and the slope by $\beta_3$.
 :::
 
-**Predict (2 minutes).** Answer the one-click Mentimeter question posted on
+**Predict (2 minutes).** Answer the one-click Wooclap question posted on
 Canvas before you come to class: how many separate numbers do you need to
 fully describe a picture of **two straight lines with different slopes**?
-Commit to an answer; the lecture resolves it.
+Choose one answer. You find the answer in the lecture material.
 
-**R warm-up (8 minutes).** Build the analysis variables --- the same
-`known_gender` subset as Lecture 5, plus a `women` indicator and a centred
-season --- fit one equity-on-season line per group, and bring the plot:
+**R warm-up (8 minutes).** Build the variables for the analysis. The code
+uses the same `known_gender` subset as Lecture 5. It adds a dummy `women`
+and a centred season `season_c`, which is the season minus the mean season.
+It then fits one line of equity offered on season for each group and draws
+both lines. Bring the plot:
 
 ```{r}
 #| label: i06-prep-warmup
@@ -94,35 +120,42 @@ abline(lm(equity_offered_pct ~ season,
        col = "#D55E00", lwd = 3)
 ```
 
-If products, powers, or centering are not secure, review
+If you are not sure about products, powers, or centering, review
 [Mathematics Refresher: products, powers, and centering](../resources/math-refresher.html).
 
 :::
 
 ::: {.course-phase .phase-in-class}
 
-## In class
+## Lecture material
 
-The session opens with the usual four-minute entry quiz on the prep videos,
-then turns to the driving question --- with the class's own warm-up two-line
-plots on screen.
+This section has two parts. The first part adds an interaction, which lets
+a slope differ between two groups. The second part adds a squared term,
+which lets a slope change along the predictor itself.
 
 <p class="concept-video"><strong>Stanford explanations (review):</strong>
 <a href="https://www.youtube.com/watch?v=dEBQmiXv9fk">3.5 Extensions of the Linear Model</a> and
 <a href="https://www.youtube.com/watch?v=F-D3lZzYn50">7.1 Polynomials and Step Functions</a>.</p>
 
+### Start with a founder's question
+
+Does advertising work equally well in every week? Does a trend go on in a
+straight line forever? Often the answer is "it depends". The two tools of
+this lecture let you check this in the data. An interaction lets a slope
+differ between groups. A curve lets a slope change along the way.
+
 ### The picture before the formula
 
-Every model so far forced all groups to share one slope. Lecture 5 let the
-*heights* differ by group; today the **slopes** get the same freedom. Start
-with the picture, not the algebra:
+In every model so far, all groups had the same slope. Lecture 5 let the
+height of the line differ between groups. Now the slope may differ as well.
+Start with the picture in @fig-i06-two-lines:
 
 ```{r}
 #| label: fig-i06-two-lines
 #| code-fold: true
 #| code-summary: "See the drawing code (optional, not exam material)"
 #| fig-height: 3.8
-#| fig-cap: "Two groups, two lines, different slopes. Before any formula: how many numbers does it take to describe this picture completely?"
+#| fig-cap: "Two groups, two lines, different slopes (an invented picture). How many numbers do you need to describe this picture completely?"
 old_par <- par(no.readonly = TRUE)
 par(mar = c(4.2, 4.2, 1, 1), las = 1)
 plot(NA, xlim = c(0, 10), ylim = c(0, 10), bty = "n",
@@ -134,82 +167,117 @@ text(8.4, 4.5 + 0.25 * 8.4 - 0.8, "Group D = 1", col = "#D55E00")
 par(old_par)
 ```
 
-This resolves the prediction from your prep: **four numbers** --- an
-intercept and a slope for each line. The interaction model is nothing more
-than a reparameterisation of those four numbers:
+This answers the Wooclap question from before class: four numbers, an
+intercept and a slope for each line. The interaction model writes the same
+four numbers in a different way:
 
 $$
 E[Y\mid X,D]
 =\beta_0+\beta_1X+\beta_2D+\beta_3XD.
 $$
 
-Map each coefficient to a feature of the picture:
+Each coefficient is one feature of the picture:
 
-- $\beta_0$: where the $D=0$ line meets the vertical axis;
-- $\beta_1$: the slope of the $D=0$ line;
-- $\beta_2$: how much *higher* the $D=1$ line starts;
-- $\beta_3$: how much *steeper* the $D=1$ line runs.
+- $\beta_0$: where the $D=0$ line meets the vertical axis
+- $\beta_1$: the slope of the $D=0$ line
+- $\beta_2$: how much higher the $D=1$ line starts
+- $\beta_3$: how much steeper the $D=1$ line is.
 
-Or as the two-row table that your prep derivation produced:
+The same in a table with one row per group, as you derived it before class:
 
 | Group | Intercept | Slope |
 |---|---|---|
 | $D=0$ | $\beta_0$ | $\beta_1$ |
 | $D=1$ | $\beta_0+\beta_2$ | $\beta_1+\beta_3$ |
 
-Four coefficients, four picture features. When $\beta_3=0$ the lines are
-parallel and the model collapses to Lecture 5's common-slope dummy model.
+When $\beta_3=0$ the two lines are parallel, and the model is the dummy
+model of Lecture 5 with one common slope.
 
 ### The interaction coefficient is a difference in slopes
 
+::: {.definition-box}
+<span class="label">Definition</span>
+
+**Interaction.** A term that is the product of two predictors, for example
+$X\times D$. It lets the slope of one predictor depend on the value of the
+other. Its coefficient is a difference in slopes.
+:::
+
 In the additive model the slope of $X$ is the same at every value of the
-other predictor. Adding the product $XD$ lets it depend: the change in the
-conditional mean for a one-unit increase in $X$ is
+other predictor. With the product $XD$ in the model, a one-unit increase in
+$X$ changes the conditional mean by
 
 $$
-\beta_1+\beta_3D,
+\beta_1+\beta_3D.
 $$
 
-so $\beta_3$ is a **difference in slopes**, not a standalone effect. Its
-units combine the variables. If $X$ is measured in seasons and $D$ is a
-group indicator, $\beta_3$ is measured in *outcome units per season,
-between the groups* --- here, equity percentage points per season, group
-minus reference group. (The same algebra works when both variables are
-quantitative: the slope of $X$ becomes $\beta_1+\beta_3Z$, a slope that
-slides with $Z$.)
+So $\beta_3$ is the difference between the slope of the group with $D=1$ and
+the slope of the reference group. It is not an effect on its own. Its unit
+combines the two variables. If $X$ is measured in seasons and $D$ is a
+dummy, $\beta_3$ is in outcome units per season: here, equity percentage
+points per season, one group minus the reference group. The same algebra
+works when the second variable is a number $Z$ and not a dummy. The slope of
+$X$ is then $\beta_1+\beta_3Z$, a slope that changes with $Z$.
 
-**Centering.** Once $XD$ is in the model, $\beta_2$ compares the groups *at
-$X=0$* --- for us, the unobserved Season 0. Replacing season with
+**Centering.** Centering a predictor means subtracting its mean. With $XD$
+in the model, $\beta_2$ compares the two groups at $X=0$. For the Shark Tank
+data this would be Season 0, which does not exist. Replacing season with
 
 $$
 season\_c = season - \overline{season}
 $$
 
 moves that comparison to the average season (about 8.8). Centering changes
-exactly one kind of thing and cannot change another:
+one kind of thing and cannot change another:
 
-- it **changes** the meaning (and value) of lower-order terms --- the
-  intercept and the group coefficient now refer to the average season;
-- it **cannot change** the fitted values, the residuals, $R^2$, or the
-  interaction estimate itself. The lines are the same lines; only the
-  place where we read off their vertical gap has moved.
+- It changes the meaning and the value of the intercept and of the group
+  coefficient. Both now refer to the average season.
+- It cannot change the fitted values, the residuals, $R^2$, or the
+  interaction coefficient. The lines are the same lines. Only the place
+  where we read the vertical gap between them has moved.
 
 ::: {.callout-note collapse="true"}
 ## Check: which printed numbers change when season is centred?
 
-The intercept and the `women` coefficient (lower-order terms) change; the
-interaction coefficient, the `ask_1k` coefficient, all fitted values, and
-$R^2$ do not. The after-class practice has you verify this in R.
+The intercept and the `women` coefficient change. The interaction
+coefficient, the `ask_1k` coefficient, all fitted values, and $R^2$ do not.
+You check this in R in the after-class practice.
+:::
+
+::: {.callout-caution collapse="true"}
+## Try it: two lines from four coefficients
+
+Try this with your neighbour first. In an invented example, a venture models
+weekly orders with advertising spending in euros, a dummy for exam weeks,
+and their interaction:
+fitted orders = 100 + 0.10 × ads + 15 × exam + 0.12 × ads × exam.
+
+*Step 1 (given).* In ordinary weeks (exam = 0) the line is 100 + 0.10 × ads.
+
+*Step 2 (you).* Write the line for exam weeks.
+
+*Step 3 (you).* Compare the fitted orders at 200 euros of advertising in the
+two kinds of weeks, and say what the coefficient 0.12 means.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+Exam weeks: (100 + 15) + (0.10 + 0.12) × ads = 115 + 0.22 × ads. At 200
+euros: 120 orders in an ordinary week and 159 in an exam week. The
+coefficient 0.12 is the difference between the two slopes: each euro of
+advertising goes with 0.12 more orders in an exam week than in an ordinary
+week.
+:::
 :::
 
 ### The Shark Tank interaction model
 
-Now the driving question's first half. For this lecture, `women = 1` means
-the source classifies the presenting team as all-women or mixed;
-`women = 0` means all-men. It is a broader split than Lecture 5's
-three-category factor, it does not measure a share of women or the full
-venture team, and the seven `unknown` records are excluded as before. The
-whole setup is visible --- it is the warm-up code:
+Now take the first half of the driving question. In this lecture,
+`women = 1` means that the presenting team is classified as all-women or
+mixed, and `women = 0` means all-men. This split is broader than the three
+categories of Lecture 5. It does not measure the share of women or the full
+team behind the venture. The seven `unknown` records are left out as before.
+The code first builds the variables, as in the R warm-up:
 
 ```{r}
 #| label: i06-interaction-fit
@@ -228,30 +296,30 @@ interaction_model <- lm(
 summary(interaction_model)
 ```
 
-Read the two group slopes off the two-row table, holding requested amount
-fixed. For all-men teams (`women = 0`), the fitted season slope is about
-$-0.799$ percentage points per season. For teams with women represented, it
-is
+Use the table with one row per group to get the two season slopes, holding
+requested amount fixed. For all-men teams (`women = 0`), the fitted season
+slope is about $-0.799$ percentage points per season. For teams with women
+(`women = 1`), it is
 
 $$
--0.799+(-0.061)=-0.861
+-0.7994+(-0.0615)=-0.861
 \text{ percentage points per season.}
 $$
 
-The interaction estimate is $-0.061$ equity percentage points per season
-(between groups), with p-value about 0.520. Read that carefully, in both
-directions: this model does **not provide evidence that the season trend
-differs** between these two broad source-defined groups. It also does
-**not prove the slopes are identical** --- the estimate is imprecise (SE
-about 0.096), and the data are consistent with anything from a moderately
-steeper to a moderately flatter trend for teams with women represented.
-No evidence of different trends is not proof of equal trends.
+The interaction estimate is $-0.061$ equity percentage points per season,
+with a p-value of about 0.520. The difference is small: about 8% of the
+all-men slope. Read this result in both directions. The model gives no
+evidence that the season trend differs between the two groups. It also does
+not prove that the two slopes are equal. The estimate is imprecise (standard
+error about 0.096), so the data fit a somewhat steeper trend and also a
+somewhat flatter trend for teams with women. No evidence of a difference is
+not proof of no difference.
 
 ```{r}
 #| label: fig-i06-interaction
 #| code-fold: true
 #| code-summary: "See the R code for this figure"
-#| fig-cap: "Fitted initial equity by season for the two source-defined groups, at the same average requested amount. Each line's slope is that group's fitted change per season; the vertical separation is the fitted group difference at a given season."
+#| fig-cap: "Fitted equity offered by season for all-men teams and for teams with women, at the average requested amount. The two lines are almost parallel. The slope of a line is the fitted change per season for that group, and the vertical gap is the fitted difference between the groups in a given season."
 library(ggplot2)
 sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
 sharks$ask_1k <- sharks$ask_amount_usd / 1000
@@ -301,19 +369,19 @@ ggplot(newdat, aes(x = season, y = fit,
   )
 ```
 
-Graph the model whenever an interaction is present: in
-@fig-i06-interaction the two nearly-parallel lines *are* the finding, and
-neither $\beta_1$ nor $\beta_2$ alone is an overall effect once $XD$ is in
-the model.
+Always graph a model that contains an interaction. In @fig-i06-interaction
+the two almost parallel lines are the result. Once $XD$ is in the model,
+neither $\hat\beta_1$ nor $\hat\beta_2$ alone describes all teams.
 
 ### The hierarchy principle and the `*` shorthand
 
-If a model contains $XD$, ordinarily retain both $X$ and $D$, even when a
-lower-order term is not individually significant. The lower-order terms
-define the two lines whose *difference* the interaction describes; dropping
-one forces the lines through an arbitrary common feature and turns the
-interaction coefficient into something unintended. R's formula shorthand
-respects the hierarchy automatically:
+The **hierarchy principle** says: if a model contains $XD$, keep both $X$
+and $D$ in the model, even when one of them is not significant on its own.
+The terms $X$ and $D$ define the two lines, and the interaction describes
+the difference between these lines. Without one of them the two lines are
+restricted for no reason, for example to the same intercept, and this
+restriction distorts the interaction coefficient. The `*` shorthand in an R
+formula follows the principle for you:
 
 ```{r}
 #| label: i06-interaction-formula
@@ -321,35 +389,45 @@ respects the hierarchy automatically:
 lm(y ~ x * z, data = df)  # x * z expands to x + z + x:z
 ```
 
-Before the break, the parallel that organises the whole lecture: block 1
-let the slope differ **by group**; block 2 lets the slope differ **along
-$x$ itself**. Both are the same move --- feeding least squares a new
-constructed column (a product, a square) and reading the fitted
-combination.
+The first part of this lecture let the slope differ by group. The second
+part lets the slope differ along $x$ itself. Both parts do the same thing:
+they give least squares a new column that is built from the data (a product
+or a square), and they read several coefficients together.
 
 ### Curvature: polynomials are still linear regression
 
-Is the season trend even a straight line? A quadratic conditional mean
+Is the season trend a straight line at all? To let it bend, add the square
+of the predictor.
+
+::: {.definition-box}
+<span class="label">Definition</span>
+
+**Quadratic term.** The square of a predictor, $x^2$, added to a model that
+also contains $x$. It lets the fitted line bend, so the slope changes with
+$x$. A model with powers of a predictor is called a polynomial.
+:::
+
+The quadratic conditional mean
 
 $$
 E[Y\mid X=x]=\beta_0+\beta_1x+\beta_2x^2
 $$
 
-is curved in $x$ but **linear in the unknown coefficients**
-$\beta_0,\beta_1,\beta_2$ --- and that is all `lm()` requires. The square
-is just another constructed predictor column.
+is curved in $x$, but it is linear in the unknown coefficients
+$\beta_0,\beta_1,\beta_2$. That is all `lm()` requires. The square is one
+more column of data.
 
-What changes is how to read the output. The slope is no longer one number:
-moving from $x$ to $x+1$ changes the fitted mean by
+What changes is how to read the output. The slope is no longer one number.
+Moving from $x$ to $x+1$ changes the conditional mean by
 
 $$
 (\beta_1(x+1)+\beta_2(x+1)^2) - (\beta_1x+\beta_2x^2)
-=\beta_1+\beta_2(2x+1),
+=\beta_1+\beta_2(2x+1).
 $$
 
-a change that depends on where you start. The standing rule: **never read
-$\beta_1$ alone while $x^2$ is in the model.** Compute fitted changes or
-graph the curve.
+This change depends on where you start. The rule is: **never read $\beta_1$
+alone while $x^2$ is in the model.** Calculate fitted changes or graph the
+curve.
 
 ```{r}
 #| label: i06-polynomial-fit
@@ -359,27 +437,30 @@ poly_season <- lm(equity_offered_pct ~ season + I(season^2) + ask_1k,
 summary(poly_season)$coefficients
 ```
 
-The `I()` wrapper tells R to square arithmetically rather than read `^` as
-formula syntax. The fitted coefficients are $b_1 \approx -1.713$ and
-$b_2 \approx 0.051$: a steep early decline that flattens season by season.
+`I()` tells R to calculate the square. Without it, R would read `^` as
+formula syntax. The fitted coefficients are $\hat\beta_1 \approx -1.713$ for
+`season` and $\hat\beta_2 \approx 0.051$ for `I(season^2)`. Together they
+describe a steep decline in the early seasons that becomes flatter season by
+season.
 
 ::: {#exm-i06-quadratic-change}
 ## Worked example: the fitted change from Season 5 to Season 6
 
 Holding requested amount fixed, the fitted change from season $x$ to season
-$x+1$ is $b_1+b_2(2x+1)$. From Season 5 to Season 6, $x = 5$:
+$x+1$ is $\hat\beta_1+\hat\beta_2(2x+1)$. From Season 5 to Season 6, $x = 5$:
 
 $$
-b_1+b_2(2\times5+1)
+\hat\beta_1+\hat\beta_2(2\times5+1)
 =-1.713+0.051\times11
 =-1.713+0.561
 \approx-1.15
 \text{ percentage points.}
 $$
 
-Reading $b_1=-1.713$ alone would overstate the drop by half a point ---
-that number is the fitted change at the meaningless $x=0$, not a constant
-slope. Verification in R, as a difference of two fitted values:
+Reading $\hat\beta_1=-1.713$ alone would overstate the drop by about 0.56
+points, which is about half of the fitted drop of 1.15 points. The number
+$-1.713$ is not a constant slope. It belongs to $x=0$, a season that does
+not exist. Check the calculation in R with the stored coefficients:
 
 ```{r}
 #| label: i06-quadratic-check
@@ -390,24 +471,25 @@ unname(b["season"] + b["I(season^2)"] * (2 * 5 + 1))
 
 ### Is the curvature worth having? The partial F
 
-The quadratic model and the linear model are nested --- Lecture 5's test
-applies directly to the one added term:
+The quadratic model and the linear model are nested, so the partial F-test
+of Lecture 5 applies to the one added term:
 
 ```{r}
 #| label: i06-partial-f
 anova(linear_season, poly_season)
 ```
 
-The partial F-test for adding `I(season^2)` gives $F \approx 20.1$ with
-p-value below 0.001 in the classical model: the curvature is statistically
-detectable. Detectable is not dramatic --- adjusted $R^2$ moves from about
-0.186 to 0.196 --- so also assess the substantive shape:
+The partial F-test for adding `I(season^2)` gives $F \approx 20.1$ with a
+p-value below 0.001. The data show a curve. The gain in fit is small:
+adjusted $R^2$ rises from about 0.186 to about 0.196, one percentage point
+more of the variation in the equity offered. So also look at the shape of
+the curve in @fig-i06-polynomial:
 
 ```{r}
 #| label: fig-i06-polynomial
 #| code-fold: true
 #| code-summary: "See the R code for this figure"
-#| fig-cap: "Raw season means of initial equity offered (points) and the fitted quadratic at the average requested amount (curve). The curve flattens towards the last observed seasons; beyond Season 16 (shaded) it would turn upward, a region with no data support."
+#| fig-cap: "Season means of the equity offered (points) and the fitted quadratic curve at the average requested amount. The curve becomes flatter towards the last observed seasons. Beyond Season 16 (shaded) it would turn upward, but there are no data in that region."
 library(ggplot2)
 sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
 sharks$ask_1k <- sharks$ask_amount_usd / 1000
@@ -441,45 +523,48 @@ ggplot(season_means, aes(x = season, y = equity_offered_pct)) +
   )
 ```
 
-The points in @fig-i06-polynomial are raw season means; the curve holds
-requested amount at its sample mean. **Do not extrapolate the quadratic
-beyond Seasons 1--16.** The fitted parabola bottoms out just past Season 16
-and would climb steeply afterwards --- an artefact of the functional form,
-not a forecast. Polynomials can turn sharply the moment they leave the
-data.
+The points in @fig-i06-polynomial are the plain means of each season. The
+curve holds the requested amount at its sample mean. To extrapolate means to
+use a fitted model outside the range of the data. **Do not extrapolate the
+quadratic beyond Seasons 1--16.** The fitted curve reaches its lowest point
+just after Season 16 and would rise steeply afterwards. This rise comes from
+the shape of a quadratic, not from any data, so it is not a forecast.
 
 ::: {.caveat-box}
 <span class="label">What flexible terms can and cannot repair</span>
 
-Interactions and polynomials make the conditional mean more flexible ---
-and that is *all* they do. They repair nothing about the design: dependence
-across rows, selection into broadcast, measurement error, unequal error
-variance, and unmeasured confounding all pass through untouched. Nor is
-flexibility free: every added term spends precision and invites overfitting
-if terms are added because they are significant rather than because a
-substantive question asks for them. Choose terms from the question ---
-"could this trend differ by group?", "could this relationship bend?" ---
-inspect the implied predictions, and report combined effects, never single
-coefficients ripped out of a product or a polynomial.
+- Interactions and curves make the model more flexible. They repair nothing
+  about how the data came about.
+- Every added term costs precision. Add a term because a question asks for
+  it, not because it turns out significant.
+- A curve can be trusted only inside the range of the data.
+
+**What you can do with it:** ask whether a relationship could differ between
+groups or bend, add that one term, graph the fitted lines, and report
+combined results.
 :::
 
 ### Answering the driving question
 
-Two halves, two verdicts, both with limits. **Same trend for every
-composition?** The estimated slope difference is $-0.061$ percentage points
-per season (p $\approx$ 0.52): no detectable difference between the
-source-defined groups --- and no proof of equality, since the estimate is
-imprecise. **A straight line?** Not quite: the quadratic term is
-detectable (partial $F \approx 20.1$, p $<$ 0.001), and the fitted decline
-flattens from about $-1.56$ points per season early on to about $-0.64$
-around Season 10 --- a mild, data-supported curvature valid only inside
-Seasons 1--16, in a model that remains observational throughout.
+**The same trend for every kind of team?** The estimated difference in
+slopes is $-0.061$ percentage points per season (p $\approx$ 0.52). The data
+show no difference between all-men teams and teams with women. They also do
+not prove that the trends are equal, because the estimate is imprecise.
 
-**Next:** Tutorial 2 rehearses Lectures 4--6 in exam format and closes with
-the integrated modelling task: one full analysis from research question to a
-150-word conclusion --- outcome, predictors, an extension a real question
-motivates, and the caveat that headlines it. That is a rehearsal of exactly
-what the exam, and later your thesis, will ask of you.
+**A straight line?** Not quite. The quadratic term is significant (partial
+$F \approx 20.1$, p $<$ 0.001). The fitted decline becomes flatter: from
+about $-1.56$ points per season between Seasons 1 and 2 to about $-0.64$
+between Seasons 10 and 11. The curve can be used only inside Seasons 1--16.
+
+::: {.founder-box}
+<span class="label">A founder's decision (invented example)</span>
+
+You suspect that advertising works better in exam weeks. The model with an interaction gives an advertising slope of 0.10 orders per euro in ordinary weeks and 0.10 + 0.12 = 0.22 in exam weeks. After a price increase, each order now brings 6 euros of margin. So 100 euros of advertising goes with 10 more orders and 60 euros of margin in an ordinary week, which is less than the advertising costs. In an exam week it goes with 22 more orders and 132 euros of margin. The decision: advertise in the exam weeks only. One check first: the interaction of 0.12 has its own interval. If that interval includes zero, the difference between the two kinds of weeks is not yet established, and you keep the budget split for one more term before you commit.
+:::
+
+**Next:** Tutorial 2 practises Lectures 4--6 in the format of the exam. It
+ends with one full analysis, from a research question to a conclusion of 150
+words. The exam asks for this kind of analysis, and so will your thesis.
 
 :::
 
@@ -487,39 +572,50 @@ what the exam, and later your thesis, will ask of you.
 
 ## After class
 
-<span class="time-budget">Total practice time: about 65 minutes.</span>
+<span class="time-budget">Total practice time: about 85 minutes.</span>
 
-### Retrieval (10 minutes)
+**Minimum path (about 35 minutes):** read the lecture material, answer the recall questions, then work for 10 minutes on the tasks that follow. **Full path:** all tasks below.
 
-1. What does an interaction coefficient measure, and what are its units in
-   the season-by-group model?
-2. Why centre a predictor before interacting it, and what can centering
-   never change?
+### Read the lecture material (15 minutes)
+
+Read the Lecture material section above from start to end. The lecture
+covered the core of it. The text has every step, every example, and all the
+code, including parts that were not shown in class. Note what is still
+unclear and bring it to the next tutorial, or ask Tilly.
+
+### Recall questions (10 minutes)
+
+1. What does an interaction coefficient measure, and what is its unit in the
+   model with season and the `women` dummy?
+2. Why centre a predictor before you use it in an interaction, and what can
+   centering never change?
 3. State the hierarchy principle.
 4. Why is a quadratic model still a linear regression model?
-5. Why should a polynomial be graphed, and never extrapolated casually?
+5. Why should you graph a quadratic curve, and why should you not
+   extrapolate it?
 
 ::: {.callout-note collapse="true"}
 ## Check your answers
 
-1. How one predictor's slope differs with the other predictor --- here,
-   equity percentage points per season, as a difference between groups.
-2. To make lower-order terms refer to a meaningful value such as the sample
-   mean; it never changes fitted values, residuals, $R^2$, or the
-   interaction estimate.
-3. Retain the component lower-order terms whenever their interaction or
-   higher-order term is in the model.
-4. It is linear in the unknown coefficients; the squared column is just
-   another constructed predictor.
+1. How the slope of one predictor differs with the other predictor. Here its
+   unit is equity percentage points per season, as a difference between the
+   two groups.
+2. So that the intercept and the group coefficient refer to a useful value,
+   such as the sample mean, and not to zero. Centering never changes the
+   fitted values, the residuals, $R^2$, or the interaction coefficient.
+3. Keep $X$ and $D$ in the model whenever their interaction $XD$ is in it,
+   and keep $x$ whenever $x^2$ is in it.
+4. It is linear in the unknown coefficients. The squared column is one more
+   predictor built from the data.
 5. No single coefficient is the slope, so only fitted values or the curve
-   show the model's claim --- and outside the observed range the curve can
-   turn sharply with no data support.
+   show what the model says. Outside the observed range the curve can turn
+   sharply, and no data support that turn.
 :::
 
 ### Centering verification (10 minutes)
 
-Fit the interaction model with and without centering season. Verify that
-the fitted values and the interaction coefficient are unchanged, and report
+Fit the interaction model with and without centering season. Check that the
+fitted values and the interaction coefficient are unchanged, and report
 which coefficients do change.
 
 ::: {.callout-note collapse="true"}
@@ -546,23 +642,23 @@ c(women_uncentered = unname(coef(uncentered)["women"]),
   women_centered = unname(coef(centered)["women"]))
 ```
 
-The fitted values agree and both interaction estimates are about $-0.061$.
-The lower-order `women` coefficient changes from about $1.35$ (a comparison
-at the unobserved Season 0) to about $0.81$ (a comparison at the average
-season, about 8.8); the intercept changes correspondingly. Centering moved
-the reading point, not the lines.
+The fitted values agree, and both interaction estimates are about $-0.061$.
+The `women` coefficient changes from about $1.35$ (a comparison at Season 0,
+which does not exist) to about $0.81$ (a comparison at the average season,
+about 8.8). The intercept changes as well. Centering moved the place where
+the gap is read. It did not move the lines.
 :::
 
-### From worked to faded: a quadratic change (15 minutes)
+### Finish a half-worked example: a quadratic change (15 minutes)
 
-Re-read the worked Season 5 to 6 calculation
-(@exm-i06-quadratic-change). Then compute the fitted change from **Season
+Read the worked calculation for Season 5 to Season 6 again
+(@exm-i06-quadratic-change). Then calculate the fitted change from **Season
 10 to Season 11** in the same model.
 
-*Step 1 (given).* The recipe is $b_1+b_2(2x+1)$ with $x=10$, so the
-multiplier on $b_2$ is $21$.
+*Step 1 (given).* The formula is $\hat\beta_1+\hat\beta_2(2x+1)$ with $x=10$,
+so $\hat\beta_2$ is multiplied by $21$.
 
-*Step 2 (you).* Plug in $b_1\approx-1.713$ and $b_2\approx0.051$.
+*Step 2 (you).* Plug in $\hat\beta_1\approx-1.713$ and $\hat\beta_2\approx0.051$.
 
 *Step 3 (you).* Compare the result with the Season 5 to 6 change and state
 in one sentence what the comparison shows about the trend.
@@ -570,60 +666,64 @@ in one sentence what the comparison shows about the trend.
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-$-1.713+0.051\times21\approx-1.713+1.072\approx-0.64$ percentage points
-(exactly: $b_1+21b_2=-0.642$). The drop per season has shrunk from about
-$-1.15$ (Seasons 5--6) to about $-0.64$ (Seasons 10--11): the decline
-flattens in later seasons, which is precisely what a positive $b_2$ says.
+$-1.713+0.051\times21\approx-1.713+1.071\approx-0.64$ percentage points
+(with the unrounded coefficients: $\hat\beta_1+21\hat\beta_2=-0.642$). The
+drop per season has become smaller, from about $-1.15$ (Seasons 5--6) to
+about $-0.64$ (Seasons 10--11). The decline becomes flatter in later
+seasons. This is what a positive $\hat\beta_2$ means.
 :::
 
-Then unassisted, with new coefficients. A model of monthly revenue
-(€1,000s) on shop age $x$ (years) reports
-$\widehat Y = 40 - 2.00x + 0.060x^2$.
+Now do the next tasks on your own, with new coefficients from an invented
+example. A model of monthly revenue (€1,000s) on the age of a shop $x$
+(years) reports $\widehat Y = 40 - 2.00x + 0.060x^2$.
 
-1. Compute the fitted change from age 3 to age 4 and from age 8 to age 9.
+1. Calculate the fitted change from age 3 to age 4 and from age 8 to age 9.
 2. A colleague reports "revenue falls €2,000 per year of age." Correct the
    sentence.
-3. In $Y=10+2X+3D-0.5XD$, write both group lines and interpret the
-   interaction coefficient.
+3. In $\widehat Y=10+2X+3D-0.5XD$, write the lines of both groups and
+   interpret the interaction coefficient.
 
 ::: {.callout-note collapse="true"}
 ## Check your answers
 
 1. Age 3 to 4: $-2.00+0.060(2\times3+1)=-2.00+0.42=-1.58$, about
    $-€1{,}580$. Age 8 to 9: $-2.00+0.060\times17=-0.98$, about $-€980$.
-2. $-2.00$ is the fitted change at age 0 only. With $x^2$ in the model the
-   change depends on age: about $-1.58$ at age 3, about $-0.98$ at age 8
-   --- the decline weakens as shops age.
+2. $-2.00$ is not the fitted change per year. With $x^2$ in the model the
+   change depends on age: about $-1.58$ from age 3 to 4 and about $-0.98$
+   from age 8 to 9. The decline becomes weaker as shops get older.
 3. For $D=0$: $\widehat Y=10+2X$. For $D=1$: $\widehat Y=13+1.5X$. The
-   interaction $-0.5$ says the $D=1$ slope is 0.5 outcome units per unit of
-   $X$ smaller than the $D=0$ slope.
+   interaction coefficient $-0.5$ says that the slope of the $D=1$ group is
+   0.5 outcome units per unit of $X$ smaller than the slope of the $D=0$
+   group.
 :::
 
 ### Cumulative mini-task (15 minutes)
 
-In Lecture 4 you wrote a paragraph connecting the Lecture 2 diagnostics to
-the three-predictor equity model. Extend that paragraph by one argument:
-propose **either** an interaction **or** a polynomial term for that model,
-state the substantive question that motivates it, and say how you would
-test whether the term earns its place.
+In Lecture 4 you wrote a paragraph that connects the diagnostics of Lecture
+2 to the three-predictor model of the equity offered. Add one argument to
+that paragraph. Propose either an interaction or a quadratic term for that
+model. State the question about the business or the data that motivates the
+term, and say how you would test whether the term belongs in the model.
 
 ::: {.callout-note collapse="true"}
 ## Check a model answer
 
-A defensible extension: "The season decline need not be linear ---
-early-seasons novelty and later-seasons professionalisation suggest a
-flattening trend, so I would add `I(season^2)`. The term is motivated by
-the shape question, not by hunting significance. I would test it with a
-partial F-test against the nested linear model on the same rows (here
-$F\approx20.1$, p $<$ 0.001), check that adjusted $R^2$ improves, graph the
-fitted curve inside Seasons 1--16, and report fitted season-to-season
-changes rather than the raw `season` coefficient." An interaction argument
-(for example season by gender group, testing whether the trend differs;
-$F\approx0.41$, p $\approx$ 0.52, so the term is not retained) is equally
-valid if it names the motivating question and the nested test.
+A good answer: "The decline over the seasons need not be a straight line.
+The show was new in the early seasons and pitches became more professional
+later, so the trend may become flatter. I would add `I(season^2)`. I add the
+term because of this question about the shape, not because I am searching
+for a significant result. I would test it with a partial F-test against the
+nested linear model on the same observations (here $F\approx20.1$,
+p $<$ 0.001), check that adjusted $R^2$ rises, graph the fitted curve inside
+Seasons 1--16, and report fitted changes from season to season in place of
+the `season` coefficient alone." An answer with an interaction is equally
+good if it names the question and the nested test. An example is the
+interaction of season with the `women` dummy, which asks whether the trend
+differs between the groups. Its test gives $F\approx0.41$ and
+p $\approx$ 0.52, so the term is not kept.
 :::
 
-### Spaced review: one partial-F item from Lecture 5 (5 minutes)
+### Review: one partial-F question from Lecture 5 (5 minutes)
 
 Adding the two gender dummies to the season-and-ask model of equity reduced
 the residual sum of squares by 436.25 using 2 degrees of freedom, and the
@@ -635,30 +735,45 @@ F statistic and state the 5% conclusion.
 
 $F=(436.25/2)/(82{,}792/1{,}429)=218.1/57.9\approx3.76$, with
 p $\approx$ 0.023. At 5%, the two category terms are jointly useful in that
-specification --- even though the mixed dummy's own t-test is far from
-significant, which is the standing lesson that joint and individual tests
-answer different questions.
+model, even though the t-test of the mixed dummy alone is far from
+significant. Joint tests and individual tests answer different questions.
 :::
 
 ### Worked exam interpretation (5 minutes)
 
-**Question** (mock exam Question 5 pattern). A model of venture sales
-growth (percentage points) on marketing spending (€10,000s), an
-online-only indicator, and their interaction reports
-`spending 1.20`, `online 2.00`, `spending:online -0.50`. A student writes:
-"Spending raises growth by 1.2 percentage points per €10,000 for all
-ventures." Correct the sentence.
+**Question.** This question is in the style of Question 5 of the mock exam.
+The numbers are invented. A model of the sales growth of ventures
+(percentage points) on marketing spending (€10,000s), a dummy for
+online-only ventures, and their interaction reports `spending 1.20`,
+`online 2.00`, `spending:online -0.50`. A student writes: "Spending raises
+growth by 1.2 percentage points per €10,000 for all ventures." Correct the
+sentence.
 
 ::: {.callout-note collapse="true"}
 ## Check a model answer
 
-Two repairs. First, with the interaction present, 1.20 is the fitted
-spending slope for **offline** ventures only (`online = 0`); for
-online-only ventures the slope is $1.20-0.50=0.70$ percentage points per
-€10,000 --- there is no single all-venture slope. Second, "raises" claims
-causation; these are fitted associations among sampled ventures, holding
-the other included terms fixed, with no design that identifies an effect of
-spending.
+Two corrections. First, with the interaction in the model, 1.20 is the
+fitted spending slope only for ventures that are not online-only
+(`online = 0`). For online-only ventures the slope is $1.20-0.50=0.70$
+percentage points per €10,000. There is no single slope for all ventures.
+Second, "raises" claims causation. These are fitted associations among the
+sampled ventures, holding the other included terms fixed. The data do not
+come from an experiment, so they do not show an effect of spending.
+:::
+
+### Check the AI (5 minutes)
+
+You asked an AI assistant: "The interaction has a coefficient of -0.061 and a p-value of 0.52. What do I conclude?" It answered:
+
+> "The p-value proves that the season trend is identical for both groups. And the season coefficient of -0.80 is the season trend for all teams."
+
+Find what is wrong and write the corrected answer. This is the **Verify**
+step of Attempt → Ask → Verify → Explain, and the exam asks for it.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+Two errors. A large p-value means the data do not show a difference. It does not prove that the trends are the same, because the estimate is imprecise. And with an interaction in the model, -0.80 is the trend for the group coded 0, the all-men teams. For teams with women it is -0.80 - 0.06 = -0.86.
 :::
 
 ### Make it yours (5 minutes)
@@ -666,30 +781,30 @@ spending.
 :::: {.utility-prompt}
 <span class="label">Utility: two sentences</span>
 
-Think of your EiA3 venture --- or any business you know well. Name one
-relationship in its data whose *slope* plausibly depends on something else
-(price sensitivity differing by segment, campaign effect differing by
-channel, growth flattening with scale), and write two sentences: first
-state the interaction or quadratic term you would add and the substantive
-question behind it, then say what a non-significant result would --- and
-would not --- tell you. There is no wrong answer; the point is letting the
-question, not the software, choose the term.
+Think of your EiA3 venture, or any business you know well. Name one
+relationship in its data whose slope could depend on something else. For
+example, the response to price may differ by customer segment, the result of
+a campaign may differ by channel, or growth may become flatter as the
+business gets larger. Then write two sentences. First, state the interaction
+or quadratic term you would add and the question behind it. Second, say what
+a result that is not significant would tell you, and what it would not tell
+you. There is no wrong answer.
 
 ::: {.callout-note collapse="true"}
 ## See an example, then write your own
 
-Take a student-run campus meal-prep box venture. "I would add an ad-spend × exam-week interaction, because the substantive question is whether ads only work when students are actually on campus. A non-significant interaction would mean no evidence the slopes differ --- not proof that exam weeks make no difference."
+Take a student-run venture that sells meal-prep boxes on campus (an invented example). "I would add an interaction of advertising spend with exam week, because my question is whether ads only work when students are on campus. An interaction that is not significant would mean no evidence that the slopes differ. It would not prove that exam weeks make no difference."
 :::
 
-You can discuss this task --- and any other task in this chapter --- with
-**Tilly**, the course AI assistant on Canvas: ask it to read your two
-sentences and check whether you treated "no evidence of a difference" as
-"proof of no difference."
+You can discuss this task, and any other task in this chapter, with
+**Tilly**, the course AI assistant. Ask it to read your two sentences and to
+check whether you treated "no evidence of a difference" as "proof of no
+difference".
 ::::
 
-Continue to Tutorial 2: Multiple regression and extensions.
+[Continue to Tutorial 2: Multiple regression and extensions](t02-exam-prep.qmd).
 
-Formula sheet: Lecture 6 formulas.
+[Code sheet: Lecture 6 commands and formulas](code-sheet.qmd#lecture-6-interactions-and-polynomial-terms).
 
 For a more formal treatment, see James et al., *An Introduction to
 Statistical Learning*, 2nd ed., Section 3.3.2 and Sections 3.6.4--3.6.6,

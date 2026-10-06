@@ -1,4 +1,4 @@
-# Lecture 9: The t distribution, confidence intervals, and the two-sided test {#b09}
+# Lecture 9: The t distribution and confidence intervals {#b09}
 
 ```{r}
 #| label: b09-setup
@@ -13,22 +13,37 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 <span class="label">By the end of Lecture 9, you can</span>
 
 - explain why estimating the population SD leads to a t distribution with
-  $n-1$ degrees of freedom, and use its critical values;
-- construct a t confidence interval for a population mean;
-- express comparison with a benchmark as a parameter equal to zero;
-- state a two-sided null and alternative hypothesis;
-- calculate and interpret a t statistic and a two-sided p-value;
-- connect a 95% confidence interval to a 5% two-sided test;
+  $n-1$ degrees of freedom, and use its critical values
+- construct a t confidence interval for a population mean
+- express comparison with a benchmark as a parameter equal to zero
+- state a two-sided null and alternative hypothesis
+- calculate a t statistic and say what it measures
 - state correctly what "95% confidence" is a property of.
+:::
+
+::: {.must-know}
+<span class="label">Must know</span>
+
+**Be able to do yourself:**
+
+- build a 95% interval by hand from the mean, the standard deviation, the sample size, and a supplied t value
+- write $H_0$ and $H_1$ for a gap from a benchmark
+- calculate a t statistic and say what it measures
+- say what "95%" refers to.
+
+**Enough to recognise:**
+
+- the t curves for different degrees of freedom
+- `qt()`.
 :::
 
 ::: {.driving-question}
 <span class="label">Driving question</span>
 
-<p class="dq-context">A common pitch-deck rule of thumb says founders offer investors about 15 percent equity. Our data can put such a benchmark to the test --- if we account honestly for sampling noise.</p>
+<p class="dq-context">Suppose an advisor tells founders that pitches typically offer investors about 15 percent equity. Our data can check such a benchmark, if we take the variation between samples into account.</p>
 
-Is the typical initial equity ask in the recorded-pitch frame really
-different from 15 percent?
+Is the mean equity offered (`equity_offered_pct`) across all recorded Shark
+Tank pitches really different from 15 percent?
 :::
 
 ::: {.course-phase .phase-before}
@@ -36,6 +51,8 @@ different from 15 percent?
 ## Before class
 
 <span class="time-budget">Total preparation time: about 30 minutes.</span>
+
+**Minimum path:** the video preparation and the prediction. **Full path:** everything in this section.
 
 <div class="video-prep">
 <span class="label">Video preparation (20 minutes)</span><br>
@@ -49,20 +66,20 @@ distribution, and the role of the null value. All links are also listed in
 the <a href="../resources/video-guide.html">External Video Guide</a>.
 </div>
 
-**Reactivate (5 minutes).** Let $X$ be initial equity offered and define the
-**equity gap**
+**Reactivate (5 minutes).** Let $X$ be the equity offered in a pitch
+(`equity_offered_pct`, in percentage points) and define the **equity gap**
 
 $$
-D = X - 15.
+G = X - 15.
 $$
 
-Write two-sided hypotheses for the question: "Does population mean initial
-equity differ from 15 percentage points?"
+Write two-sided hypotheses for the question: "Does the population mean of
+the equity offered differ from 15 percentage points?"
 
 ::: {.callout-note collapse="true"}
 ## Check your preparation
 
-Let $\delta=E[D]=\mu_X-15$. Then
+Let $\delta=E[G]=\mu_X-15$. Then
 
 $$
 H_0:\delta=0
@@ -71,16 +88,15 @@ H_1:\delta\ne0.
 $$
 
 This is equivalent to testing $H_0:\mu_X=15$ against $H_1:\mu_X\ne15$.
-Writing the contrast as $\delta$ makes the central question "is the
-difference zero?" --- the same structure later used for regression
-coefficients.
+Writing the gap as $\delta$ turns the question into "is the difference
+zero?". Regression coefficients are tested in the same way later.
 :::
 
-**Predict (5 minutes).** Answer the one-click Mentimeter question posted on
+**Predict (5 minutes).** Answer the one-click Wooclap question posted on
 Canvas before you come to class: in a real sample, the unknown population SD
 $\sigma$ must be replaced by the sample SD $S$. Should that substitution
 make a 95% interval **wider**, **narrower**, or leave it **unchanged**?
-Commit to an answer; the lecture resolves it.
+Commit to an answer. You find the answer in the lecture material.
 
 If intervals, standardisation, or degrees of freedom feel rusty, review
 [Mathematics Refresher: intervals, standardisation, and degrees of
@@ -90,38 +106,61 @@ freedom](../resources/math-refresher.html).
 
 ::: {.course-phase .phase-in-class}
 
-## In class
+## Lecture material
 
-The session opens with the usual four-minute entry quiz on the prep videos,
-then turns to the driving question. Lecture 8 left us with a sample mean and
-its standard error. This lecture turns those two numbers into a defensible
-claim: a range of plausible values for the parameter, and a yes-or-no
-decision about a benchmark.
+Lecture 8 gave a sample mean and its standard error. This section turns
+those two numbers into a range of plausible values for the parameter, the
+confidence interval. It ends with the t statistic, which measures how far an
+estimate lies from a benchmark. Lecture 10 uses it to reach a decision.
 
 <p class="concept-video"><strong>Video explanations (review):</strong>
 <a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/confidence-intervals/">20.5 Confidence Intervals</a>,
 <a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/confidence-intervals-for-the-mean-when-the-variance-is-unknown/">20.7 Confidence Intervals with Unknown Variance</a>, and
 <a href="https://www.youtube.com/watch?v=ti9NFdjf3sM">Introduction to Hypothesis Testing</a>.</p>
 
+### Start with a founder's question
+
+Suppose an advisor tells you that founders on the show offer about 15% of
+their company. You have looked at 100 pitches, chosen by chance, and their
+average equity offered (`equity_offered_pct`) is 12.76%. Is the advisor
+wrong? Or is 12.76 simply what 100 pitches can give by chance when the true
+average is 15? R answers with one command:
+
+```{r}
+#| label: b09-opening
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+set.seed(123)
+sample_rows <- sample(seq_len(nrow(sharks)), size = 100, replace = FALSE)
+pitch_sample <- sharks[sample_rows, ]
+t.test(pitch_sample$equity_offered_pct, mu = 15)
+```
+
+R prints the mean of the sample, 12.76, a t value of $-2.91$ with 99 degrees
+of freedom, a p-value of 0.0045, and an interval from 11.23 to 14.29. An AI
+assistant would hand you the same output with a confident sentence about it.
+This lecture and the next give you what you need to read the output yourself
+and to check that sentence: where the interval comes from, why it uses a t
+value and 99 degrees of freedom, and what the p-value does and does not say.
+This lecture builds the interval and the t value. Lecture 10 adds the
+p-value.
+
 ### From a benchmark to a zero contrast
 
-The driving question compares a population mean to the benchmark 15. The
-prep exercise already made the key move: subtract the benchmark and study
-the **gap**
+The driving question compares a population mean to the benchmark 15. As in
+the preparation exercise, subtract the benchmark and study the **gap**
 
 $$
-D = X - 15,
+G = X - 15,
 \qquad
-\delta = E[D] = \mu_X - 15.
+\delta = E[G] = \mu_X - 15.
 $$
 
-"Is mean equity different from 15?" becomes "is $\delta$ different from
-**zero**?" This looks like a cosmetic rewrite, but it is the single most
-reusable idea of the next four weeks: every benchmark question can be turned
-into a question about a parameter being zero. Lecture 10 shows that group
-differences, proportion gaps, and regression slopes all wear the same
-zero-contrast uniform. Learn the pattern once here, and every later test is
-a rerun.
+"Is the mean equity offered different from 15?" becomes "is $\delta$
+different from zero?" A difference of this kind is called a **contrast**.
+Every benchmark question can be rewritten as a question about a contrast
+being zero. Lecture 10 tests a gap between proportions and a regression
+slope in this way, and names the difference between two groups as a further
+case.
 
 ### The price of estimating σ: the t distribution
 
@@ -131,12 +170,12 @@ $$
 Z=\frac{\bar X-\mu}{\sigma/\sqrt n},
 $$
 
-which is approximately standard normal by the CLT. But this $Z$ contains the
-*population* SD $\sigma$ --- a number nobody knows in a real study. In
-practice we substitute the sample SD $S$, and $S$ is itself a random
-quantity: it changes from sample to sample, and in a small sample it can
-miss $\sigma$ badly. Standardising with an *estimated* spread therefore
-produces a statistic that is more variable than $Z$. For independent
+which is approximately standard normal by the central limit theorem (CLT).
+But this $Z$ contains the population SD $\sigma$, and in a real study
+nobody knows $\sigma$. In practice we replace it by the sample SD $S$. But
+$S$ is itself random. It changes from sample to sample, and in a small
+sample it can be far from $\sigma$. A mean that is standardised with an
+estimated spread therefore varies more than $Z$. For independent
 observations from a normal population,
 
 $$
@@ -144,26 +183,35 @@ T=\frac{\bar X-\mu}{S/\sqrt n}
 \sim t_{n-1}.
 $$
 
-The **t distribution** is symmetric around zero like the standard normal,
-but it has **heavier tails**: extreme standardised values are more likely,
-precisely because $S$ sometimes underestimates the true spread. Its
-**degrees of freedom** control how much heavier:
+::: {.definition-box}
+<span class="label">Definition</span>
 
-- few degrees of freedom mean $S$ is estimated imprecisely, so the tails
-  are heavier;
-- more degrees of freedom mean more information about spread;
-- as the degrees of freedom increase, the t distribution approaches
-  $N(0,1)$.
+**t distribution and degrees of freedom.** The t distribution describes a
+sample mean that is standardised with the sample SD $S$ in place of
+$\sigma$. It is symmetric around zero and has heavier tails than the
+standard normal. Its shape depends on one number, the **degrees of freedom**
+($df$). For one sample mean, $df=n-1$.
+:::
 
-For a one-sample mean, $df=n-1$ --- the same $n-1$ you met in Lecture 7:
-once the sample mean is estimated, the $n$ deviations must sum to zero, so
-only $n-1$ of them vary freely when spread is estimated.
+Heavier tails mean that values far from zero are more likely than under the
+standard normal. The reason is that $S$ sometimes underestimates the true
+spread. The degrees of freedom say how much heavier the tails are:
+
+- few degrees of freedom mean that $S$ is an imprecise estimate of
+  $\sigma$, so the tails are heavier
+- more degrees of freedom mean more information about spread
+- as the degrees of freedom increase, the t distribution approaches the
+  standard normal $N(0,1)$.
+
+For one sample mean, $df=n-1$. This is the same $n-1$ as in Lecture 7. Once
+the sample mean is estimated, the $n$ deviations must sum to zero, so only
+$n-1$ of them vary freely when spread is estimated.
 
 ```{r}
 #| label: fig-b09-t-curves
 #| code-fold: true
 #| code-summary: "See the R code for this figure"
-#| fig-cap: "The t distribution for 4 and 10 degrees of freedom against the standard normal. All three are symmetric around zero; the t curves put more probability in the tails, most visibly at low degrees of freedom."
+#| fig-cap: "The t distribution for 4 and 10 degrees of freedom against the standard normal. All three are symmetric around zero. The t curves put more probability in the tails, most visibly at low degrees of freedom."
 library(ggplot2)
 
 t_grid <- seq(-4, 4, length.out = 800)
@@ -206,15 +254,13 @@ ggplot(reference_curves, aes(x, density,
   )
 ```
 
-The difference in @fig-b09-t-curves is most visible in the tails. This is
-why a 95% t critical value is larger than the normal 1.96 when $df$ is
-small --- the reference curve must reach further out to enclose 95% of its
-probability.
-
-This resolves the prep prediction: replacing $\sigma$ with $S$ makes the
-interval **wider**, because the heavier-tailed t distribution demands a
-larger critical value. The extra width is the honest price of estimating
-one more quantity from the same data.
+The difference in @fig-b09-t-curves is most visible in the tails. The
+central 95% of the standard normal lies between $-1.96$ and $1.96$
+(Lecture 6). A t curve must reach further out to enclose its central 95%.
+The point where the central 95% ends is the 0.975 quantile of the t
+distribution. It is written $t_{0.975,\,df}$ and computed in R with
+`qt(0.975, df)`. This number is called the 95% **critical value**, or the
+multiplier. For small $df$ it is clearly larger than 1.96.
 
 ::: {.callout-note collapse="true"}
 ## Check: which is larger, $t_{0.975,11}$ or $t_{0.975,99}$?
@@ -223,11 +269,17 @@ $t_{0.975,11}\approx 2.20$ is larger than $t_{0.975,99}\approx 1.98$. With
 only 11 degrees of freedom, $S$ is an imprecise estimate of $\sigma$, so
 the t distribution has heavier tails and its 97.5% quantile sits further
 from zero. At $df=99$ the critical value is already close to the normal
-1.96 --- with a large sample, the t and normal answers nearly coincide.
+1.96. With a large sample, the t and normal answers are almost the same.
 Verify in R: `qt(0.975, df = 11)` and `qt(0.975, df = 99)`.
 :::
 
 ### The interval recipe
+
+A sample can be used in three ways. A point estimate gives one number for
+the parameter, such as the sample mean 12.76. An interval estimate gives a
+range of plausible values. A test answers a yes-or-no question about one
+value of the parameter. Lectures 7 and 8 gave point estimates. This lecture
+builds the interval estimate and prepares the test.
 
 A confidence interval combines the estimate with its uncertainty. The
 general form is
@@ -238,74 +290,135 @@ $$
 \text{critical value}\times\text{standard error}.
 $$
 
-The product after the $\pm$ is the **margin of error**. A confidence
-interval becomes:
+::: {.definition-box}
+<span class="label">Definition</span>
 
-- wider when the confidence level increases (a larger critical value);
-- wider when observations are more variable (a larger SE);
+**Confidence interval.** A range of plausible values for a parameter,
+calculated from the sample as estimate $\pm$ critical value $\times$
+standard error. A 95% confidence interval is built by a method that captures
+the parameter in about 95% of random samples.
+:::
+
+::: {.definition-box}
+<span class="label">Definition</span>
+
+**Margin of error.** The part after the $\pm$ sign: critical value $\times$
+standard error. It is half the width of the confidence interval.
+:::
+
+A confidence interval becomes:
+
+- wider when the confidence level increases (a larger critical value)
+- wider when observations are more variable (a larger SE)
 - narrower when the sample size increases, all else equal.
 
-For an independent sample with unknown population SD,
+For an independent sample from a normal population with unknown SD, or
+approximately for large $n$,
 
 $$
 \bar X\pm t_{1-\alpha/2,\,n-1}\frac{S}{\sqrt n}
 $$
 
-is a $100(1-\alpha)\%$ confidence interval for $\mu$. For a large
-independent sample, the interval is also a reasonable approximation when
-the population is not normal --- the CLT again. The same recipe applied to
-the gap variable $D$ gives an interval for $\delta$.
+is a $100(1-\alpha)\%$ confidence interval for $\mu$. Here $\alpha$ is one
+minus the confidence level. A 95% interval has $\alpha=0.05$, and the
+multiplier $t_{0.975,\,n-1}$ leaves $\alpha/2=0.025$ in each tail. The words
+"approximately for large $n$" refer to the CLT: for a large independent
+sample the interval is a reasonable approximation even when the population
+is not normal. The same recipe applied to the gap variable $G$ gives an
+interval for $\delta$.
+
+The margin of error is the precision of the estimate at the stated
+confidence level. A smaller margin means a more precise estimate.
+
+This also answers the prediction question from the preparation. Replacing
+$\sigma$ with $S$ makes the interval wider on average, because the t
+multiplier is larger than 1.96. The extra width is the price of estimating
+one more quantity from the same data.
+
+In the exam, the multiplier you need is printed in the question or on the
+formula sheet. For a value of the degrees of freedom that is not on the
+sheet, use the closest one listed.
 
 ::: {#exm-b09-hand-interval}
 ## Worked example: a 95% interval by hand
 
-A random sample of $n=64$ ventures reports a mean score of $\bar x = 80$
-with sample SD $s = 16$. The industry benchmark is 75. Construct a 95%
-confidence interval for $\delta=\mu-75$, voicing every arithmetic step.
+This is an invented example. A random sample of $n=64$ ventures reports a
+mean customer satisfaction score of $\bar x = 80$ points, with sample SD
+$s = 16$ points. The industry benchmark is 75 points. Construct a 95%
+confidence interval for $\delta=\mu-75$, step by step.
 
 - **Estimate.** The estimated gap is the sample mean minus the benchmark:
   $\widehat\delta = 80 - 75 = 5$.
-- **Standard error.** $\operatorname{SE}=s/\sqrt n = 16/\sqrt{64}$. The
-  square root of 64 is 8, so $\operatorname{SE}=16/8=2$.
+- **Standard error.** $\widehat{\operatorname{SE}}=s/\sqrt n = 16/\sqrt{64}$. The
+  square root of 64 is 8, so $\widehat{\operatorname{SE}}=16/8=2$.
 - **Degrees of freedom and critical value.** $df=n-1=63$, and
-  $t_{0.975,63}\approx 2.00$ (the exam supplies this value; in R it is
-  `qt(0.975, df = 63)`, about 1.998).
+  $t_{0.975,63}\approx 2.00$. In R it is `qt(0.975, df = 63)`, about 1.998.
+  The closest value on the formula sheet is the one for $df=60$, which is
+  2.000.
 - **Margin of error.** Critical value times SE: $2.00\times 2 = 4$.
 - **Interval.** Estimate plus and minus the margin:
   $5 - 4 = 1$ and $5 + 4 = 9$, so the 95% interval for $\delta$ is
   $(1,\,9)$.
 
-Every plausible value of the gap is positive: the data are consistent with
-a population mean between 1 and 9 points *above* the benchmark. Adding 75
+Every plausible value of the gap is positive. The data are consistent with
+a population mean between 1 and 9 points above the benchmark. Adding 75
 back to both endpoints gives the equivalent interval $(76,\,84)$ for $\mu$
-itself --- the gap form and the mean form are the same statement.
+itself. The gap form and the mean form are the same statement.
 :::
 
 ### Check conditions before calculating
 
-The formula is justified by the sampling design and distributional
-conditions, not by the presence of an R command. Before any interval or
-test, walk this checklist:
+The formula is valid only when conditions on the sampling design and on the
+shape of the data hold. R does not check them for you. Before any interval
+or test, go through this checklist:
 
 1. **Random selection.** Were the rows selected randomly from a defined
-   frame? (Ours will be: the seed-123 sample of 100 from the 1,441-record
-   frame.)
+   frame? In the Shark Tank case below they were: the sample of 100 is drawn
+   at random (seed 123) from the 1,441 recorded pitches.
 2. **The 10% condition.** Sampling without replacement creates weak
    dependence, but $100/1441\approx 0.07 < 0.10$, so the usual
    independent-sample SE is a reasonable approximation.
-3. **Shape and sample size.** Pitch-level equity is right-skewed, but
-   $n=100$ makes the t approximation for the *sample mean* far more
-   credible than it would be for a very small sample. Still check for data
-   errors or observations that dominate the mean.
+3. **Shape and sample size.** The equity offered (`equity_offered_pct`) is
+   right-skewed. With $n=100$ the t approximation for the sample mean is
+   still reasonable. For a very small sample it would not be. Also check for
+   data errors and for single observations that dominate the mean.
 
-These conditions support inference to the recorded-pitch frame. They do not
-make televised pitches representative of all entrepreneurs --- the caveat
-box returns to this.
+These conditions support conclusions about the recorded-pitch frame. They do
+not make televised pitches representative of all entrepreneurs. The caveat
+box at the end of this section returns to this point.
 
-### The Shark Tank case, with nothing hidden
+::: {.callout-caution collapse="true"}
+## Try it: is the average order above break-even?
 
-Now the real question. The recipe runs on the reproducible sample of 100
-from Lecture 7, and every object is constructed on screen:
+Try this with your neighbour first. This is an invented example. A venture
+needs an average order of 20 euros to break even. A random sample of $n=36$
+orders has a mean of 21.50 euros and a standard deviation of 6 euros.
+Supplied value: $t_{0.975,\,35}=2.030$.
+
+*Step 1 (given).* The estimated standard error is
+$\widehat{\operatorname{SE}}=6/\sqrt{36}=1$ euro.
+
+*Step 2 (you).* Calculate the margin of error and the 95% interval.
+
+*Step 3 (you).* Is 20 euros a plausible value for the mean order? What would
+you tell the founder?
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+The margin is $2.030\times1=2.03$ euros, so the interval runs from 19.47 to
+23.53 euros. The break-even value of 20 euros lies inside the interval. The
+sample mean is above break-even, but the data cannot rule out that the true
+mean is below it. Advice: collect more orders before any decision that
+depends on being above break-even. With four times as many orders the margin
+would be about half as wide.
+:::
+:::
+
+### The Shark Tank case, step by step
+
+Now apply the recipe to the Shark Tank data. The code draws the same random
+sample of 100 pitches as in Lecture 7 and builds every object step by step:
 
 ```{r}
 #| label: b09-gap-objects
@@ -333,10 +446,13 @@ c(
 )
 ```
 
-The estimated population mean gap is $-2.24$ percentage points: the sample
-mean equity offer of 12.76 sits 2.24 points below the 15-point benchmark.
-Note that subtracting the constant 15 changes the mean but not the spread:
-`gap_sd` equals the sample SD of equity itself, 7.71.
+The estimated population mean gap is $-2.24$ percentage points. The sample
+mean of the equity offered, 12.76, lies 2.24 points below the benchmark of
+15 points. That is about one seventh of the benchmark. Subtracting the
+constant 15 changes the mean but not the spread, as the shift rule of
+[Lecture 3](b03-discrete-distributions.qmd#b03-shift-rescale) says. So
+`gap_sd` equals the sample SD of the equity offered itself, 7.71 points. The
+standard error is $7.71/\sqrt{100}=0.77$ points.
 
 ```{r}
 #| label: b09-gap-ci
@@ -349,184 +465,23 @@ c(gap_lower = gap_ci[1], gap_upper = gap_ci[2])
 c(mean_lower = mean_ci[1], mean_upper = mean_ci[2])
 ```
 
-The 95% interval for the mean gap is approximately $(-3.77,\,-0.71)$
-percentage points. Adding 15 to both endpoints gives the equivalent
-interval $(11.23,\,14.29)$ for mean initial equity. Same recipe as the
-hand-worked example --- only the numbers changed.
-
-### A hypothesis test starts with a null model
-
-The interval displays every plausible value. A **test** answers one
-question about one value. For a two-sided test,
-
-$$
-H_0:\delta=0
-\qquad\text{versus}\qquad
-H_1:\delta\ne0.
-$$
-
-The null says there is no population mean difference from the benchmark.
-The alternative allows a difference in either direction. Choose the
-two-sided alternative from the research question *before* inspecting the
-sample estimate. (Directional, one-sided alternatives exist; Lecture 10
-treats them and explains when they are --- and are not --- legitimate.)
-
-Standardise the estimated gap using its SE:
-
-$$
-T=
-\frac{\widehat\delta-0}
-{\operatorname{SE}(\widehat\delta)}
-=
-\frac{\bar D}{S_D/\sqrt n}.
-$$
-
-By hand first, from the numbers already on screen: the estimate is
-$-2.24$, its SE is $0.77$, so
-
-$$
-t=\frac{-2.24}{0.77}\approx -2.91.
-$$
-
-The sign records direction --- below the benchmark; the absolute value
-records distance from zero in standard-error units --- almost three SEs.
-Now the same calculation in R, with the p-value:
-
-```{r}
-#| label: b09-gap-test
-t_value <- gap_bar / gap_se
-p_value <- 2 * pt(-abs(t_value), df = df)
-
-c(
-  estimate = gap_bar,
-  standard_error = gap_se,
-  t_statistic = t_value,
-  degrees_of_freedom = df,
-  two_sided_p_value = p_value
-)
-```
-
-### A two-sided p-value uses both tails
-
-The **p-value** is the probability, assuming $H_0$, of obtaining a test
-statistic at least as far from zero as the observed statistic in either
-direction:
-
-$$
-p=P\!\left(|T_{99}|\ge|t_{obs}|\mid H_0\right).
-$$
-
-```{r}
-#| label: fig-b09-two-sided-p
-#| code-fold: true
-#| code-summary: "See the R code for this figure"
-#| fig-cap: "The t distribution with 99 degrees of freedom under the null hypothesis. Dashed lines mark statistics as far from zero as the observed t = −2.91; the two orange tail areas together are the two-sided p-value, about 0.005."
-library(ggplot2)
-
-sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
-set.seed(123)
-sample_rows <- sample(seq_len(nrow(sharks)), size = 100, replace = FALSE)
-pitch_sample <- sharks[sample_rows, ]
-pitch_sample$equity_gap_pp <- pitch_sample$equity_offered_pct - 15
-gap_bar <- mean(pitch_sample$equity_gap_pp)
-gap_se <- sd(pitch_sample$equity_gap_pp) / sqrt(nrow(pitch_sample))
-df <- nrow(pitch_sample) - 1
-t_value <- gap_bar / gap_se
-
-null_curve <- data.frame(x = seq(-4.5, 4.5, length.out = 1200))
-null_curve$density <- dt(null_curve$x, df = df)
-left_tail <- subset(null_curve, x <= -abs(t_value))
-right_tail <- subset(null_curve, x >= abs(t_value))
-
-ggplot(null_curve, aes(x, density)) +
-  geom_area(data = left_tail, fill = "#D55E00", alpha = 0.85) +
-  geom_area(data = right_tail, fill = "#D55E00", alpha = 0.85) +
-  geom_vline(xintercept = c(-abs(t_value), abs(t_value)),
-             linetype = "dashed", colour = "#D55E00", linewidth = 0.6) +
-  geom_line(colour = "#17324D", linewidth = 0.9) +
-  annotate("text", x = -abs(t_value), y = 0.33,
-           label = "t == -2.91", parse = TRUE,
-           colour = "#17324D", size = 3.4, hjust = 1.15) +
-  annotate("text", x = abs(t_value), y = 0.33,
-           label = "t == +2.91", parse = TRUE,
-           colour = "#17324D", size = 3.4, hjust = -0.15) +
-  scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
-  labs(x = "t statistic under the null", y = "Density") +
-  theme_minimal(base_size = 13) +
-  theme(
-    panel.grid.minor = element_blank(),
-    panel.grid.major.x = element_blank(),
-    plot.caption = element_text(colour = "#5B6976"),
-    axis.title = element_text(colour = "#17324D")
-  )
-```
-
-Read @fig-b09-two-sided-p with the five-step sequence. (1) The curve is the
-distribution of the t statistic **if the null were true** --- not data, a
-null model. (2) The horizontal axis is the possible t statistic; the
-vertical axis is density, so probability is area. (3) The dashed lines mark
-$-2.91$ and $+2.91$: statistics as far from zero as the one observed.
-(4) The pattern: the two orange tail areas beyond the dashed lines are tiny
---- together about 0.0045. (5) Takeaway: if the true mean gap were zero, a
-sample as extreme as ours would occur in roughly 5 of every 1,000 samples.
-That is **not** the probability that $H_0$ is true, and not the size of
-the gap.
-
-At $\alpha=0.05$, reject $H_0$ because $p<0.05$. The random sample
-provides evidence that mean initial equity in the recorded-pitch frame
-differs from 15 percentage points; the negative estimate indicates that it
-is lower.
-
-### The confidence interval and test tell the same story
-
-For the same two-sided t procedure:
-
-- reject $H_0:\delta=0$ at level $\alpha$ exactly when the
-  $100(1-\alpha)\%$ confidence interval excludes zero;
-- do not reject when the interval includes zero.
-
-Here the gap interval $(-3.77,\,-0.71)$ excludes zero, matching the
-rejection. The interval adds information the p-value does not: it displays
-the direction, plausible magnitude, and precision of the difference. Course
-policy, from here to the end of Intermediate: **report the estimate and
-interval alongside any test decision.**
-
-::: {.callout-caution collapse="true"}
-## Try it: read the decision straight from an interval
-
-A colleague reports a 95% confidence interval for a mean gap:
-$(-1.4,\,3.8)$ percentage points. No t statistic, no p-value.
-
-*Step 1 (given).* The matched two-sided test rejects $H_0:\delta=0$ at 5%
-exactly when the 95% interval excludes zero.
-
-*Step 2 (you).* Does this interval exclude zero? State the test decision
-without computing anything.
-
-*Step 3 (you).* What may you conclude about the population mean gap ---
-and what may you *not* conclude?
-
-::: {.callout-note collapse="true"}
-## Check your answer
-
-Zero lies inside $(-1.4,\,3.8)$, so the 5% two-sided test does **not**
-reject $H_0:\delta=0$. The data are compatible with a zero gap --- and
-also with gaps as large as 3.8 points in one direction and 1.4 in the
-other. You may *not* conclude that the gap **is** zero: "do not reject" is
-not "accept," a distinction Lecture 10 builds on.
-:::
-:::
+The critical value is $t_{0.975,\,99}=1.984$, so the margin of error is
+$1.984\times0.77=1.53$ percentage points. The 95% interval for the mean gap
+is approximately $(-3.77,\,-0.71)$ percentage points. Adding 15 to both
+endpoints gives the equivalent interval $(11.23,\,14.29)$ for the mean
+equity offered. The recipe is the same as in the worked example. Only the
+numbers differ.
 
 ### Interpret 95% confidence correctly
 
-The parameter is fixed; interval endpoints vary from sample to sample.
+The parameter is fixed. Interval endpoints vary from sample to sample.
 "95%" describes the **procedure**: if the same valid recipe were repeated
 on many random samples, about 95% of the resulting intervals would contain
 the parameter.
 
-The simulation in @fig-b09-coverage repeats the random sample and interval
-calculation 100 times. The fixed target is the mean initial equity among
-all 1,441 recorded pitches.
+The simulation in @fig-b09-coverage repeats the random sample and the
+interval calculation 100 times. The fixed target is the mean equity offered
+(`equity_offered_pct`) among all 1,441 recorded pitches, 13.21 points.
 
 ```{r}
 #| label: fig-b09-coverage
@@ -534,7 +489,7 @@ all 1,441 recorded pitches.
 #| code-summary: "See the R code for this figure"
 #| fig-width: 7
 #| fig-height: 5.2
-#| fig-cap: "One hundred repetitions of the same procedure: draw 100 random pitches, compute a 95% t interval for mean initial equity. Green intervals contain the fixed target mean (gold dashed line); orange intervals miss it. In this run, 96 of 100 intervals cover the target."
+#| fig-cap: "One hundred repetitions of the same procedure: draw 100 random pitches, compute a 95% t interval for the mean equity offered. Green intervals contain the fixed target mean (gold dashed line). Orange intervals miss it. In this run, 96 of 100 intervals cover the target."
 library(ggplot2)
 
 sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
@@ -578,7 +533,7 @@ ggplot(intervals, aes(y = position, colour = covers)) +
   scale_colour_manual(values = c("contains the target mean" = "#009E73",
                                  "misses the target mean" = "#D55E00")) +
   scale_y_continuous(breaks = c(1, 20, 40, 60, 80, 100)) +
-  labs(x = "Mean initial equity offered (%)",
+  labs(x = "Mean equity offered (%)",
        y = "Repeated sample (ordered by estimate)",
        colour = NULL) +
   theme_minimal(base_size = 13) +
@@ -592,57 +547,125 @@ ggplot(intervals, aes(y = position, colour = covers)) +
 ```
 
 Each horizontal segment in @fig-b09-coverage is one 95% confidence
-interval; its dot is that sample's mean. The gold dashed vertical line is
+interval. Its dot is that sample's mean. The gold dashed vertical line is
 the fixed target mean, 13.21. In this run (seed 209), **96 of 100** intervals
 cross the line. A new run need not give exactly 95, but across many
 repetitions the proportion approaches 95% when the procedure's conditions
 hold.
 
-One sentence is now forbidden for the rest of your studies:
+The following sentence may look natural, but it is wrong:
 
 > "There is a 95% probability that the population mean is in my interval."
 
-The realised interval $(11.23, 14.29)$ either contains the fixed parameter
-or it does not --- there is no probability left once the sample is drawn.
-The correct replacement:
+Before the sample is drawn, the endpoints of the interval are random, and
+the 95% applies to them. After the sample is drawn, the interval
+$(11.23, 14.29)$ consists of two fixed numbers. It either contains the fixed
+parameter or it does not, and no probability is left. The correct sentence
+is:
 
 > "This interval was produced by a procedure that captures the fixed
 > population mean in about 95% of repeated valid samples."
 
-::: {.caveat-box}
-<span class="label">What significance can and cannot tell you</span>
+### From interval to test: the hypotheses and the t statistic
 
-Three boundaries around everything in this lecture. First, **significance
-is not importance**: $p\approx 0.005$ says the gap is measured precisely
-enough to distinguish it from zero, not that a 2.24-point gap matters for
-any decision --- magnitude and context decide that. Second, **significance
-is not causation**: the evidence concerns a mean in an observational frame;
-nothing here says *why* equity asks sit below 15 points. Third, **a narrow
-interval repairs nothing about selection**: the interval quantifies random
-sampling error within the recorded-pitch frame. If the frame itself is a
-producer-curated selection of telegenic pitches --- and it is --- then no
-interval width, however impressive, extends the conclusion to entrepreneurs
-in general. An on-air agreement is still not a completed investment.
+The interval shows every plausible value. A **test** answers one question
+about one value: is the gap zero? A test starts from two hypotheses:
+
+$$
+H_0:\delta=0
+\qquad\text{versus}\qquad
+H_1:\delta\ne0.
+$$
+
+::: {.definition-box}
+<span class="label">Definition</span>
+
+**Null hypothesis and alternative hypothesis.** The null hypothesis $H_0$
+states that the parameter equals the benchmark value, here $\delta=0$. The
+alternative hypothesis $H_1$ states that it does not. A two-sided
+alternative, $\delta\ne0$, allows a difference in either direction.
+:::
+
+Here the null hypothesis says that the population mean of the equity offered
+does not differ from the benchmark. State both hypotheses from the research
+question before you look at the sample estimate. Alternatives that allow
+only one direction (one-sided alternatives) also exist. They are optional
+reading in Lecture 10 and are not examined.
+
+The **t statistic** standardises the estimated gap with its SE. Its general
+form is the estimate minus the null value, divided by the standard error:
+
+$$
+T=
+\frac{\widehat\delta-0}
+{\widehat{\operatorname{SE}}(\widehat\delta)}
+=
+\frac{\bar G}{S_G/\sqrt n}.
+$$
+
+First by hand, with the numbers calculated above. The estimate is $-2.24$
+and its SE is $0.77$, so
+
+$$
+t=\frac{-2.24}{0.77}\approx -2.91.
+$$
+
+The sign gives the direction: the estimate is below the benchmark. The
+absolute value gives the distance from zero in standard-error units, here
+almost three SEs. Now the same calculation in R:
+
+```{r}
+#| label: b09-gap-test
+t_value <- gap_bar / gap_se
+
+c(
+  estimate = gap_bar,
+  standard_error = gap_se,
+  t_statistic = t_value,
+  degrees_of_freedom = df
+)
+```
+
+A t statistic of $-2.91$ says that the estimate lies almost three standard
+errors below zero. Lecture 10 measures how surprising such a value would be
+if the null hypothesis were true. That measure is called the p-value.
+
+::: {.caveat-box}
+<span class="label">What an interval can and cannot tell you</span>
+
+- Precision is not importance. An interval that excludes 15 says the gap is
+  measured well, not that 2.24 points matter for a decision.
+- An interval is not a claim about cause. Nothing here says why offers sit
+  below 15 points.
+- A narrow interval repairs nothing about selection. It describes the
+  recorded pitches, not founders in general.
+
+**What you can do with it:** read both ends of the interval as possible
+truths, and ask whether your decision would be the same at each end.
 :::
 
 ### Answering the driving question
 
-Yes --- within the frame. The seed-123 sample gives an estimated gap of
-$-2.24$ percentage points with SE $0.77$; the 95% interval for mean equity
-is $(11.23, 14.29)$, which excludes 15, and the two-sided test rejects
-$H_0:\delta=0$ at 5% ($t=-2.91$, $p\approx 0.005$). The evidence says the
-frame's mean initial equity ask sits *below* 15 percent --- plausibly by
-between 0.7 and 3.8 points. Whether that gap matters commercially, and what
-caused it, are separate questions the test cannot answer.
+For the recorded-pitch frame, the evidence points to yes. The random sample
+of 100 pitches gives an estimated gap of $-2.24$ percentage points with SE
+$0.77$. The 95% interval for the mean equity offered is $(11.23, 14.29)$,
+which excludes 15. The t statistic of $-2.91$ puts the estimate almost three
+standard errors below the benchmark. Lecture 10 turns that distance into a
+p-value and a formal decision. Whether the gap matters commercially, and
+what caused it, are separate questions that no interval can answer.
 
-**Next:** We can now test a benchmark and report the answer as an interval and
-a p-value. But every test decision can be wrong in one of two ways ---
-rejecting a true null, or missing a real effect --- and the two mistakes
-rarely cost the same. Lecture 10 names the two error types, shows the four
-levers that make wrong calls rarer (power), settles when a one-sided
-alternative is legitimate, and then opens the door this whole course has been
-walking toward: the same estimate--SE--t--p--interval row, sitting in a
-regression table.
+::: {.founder-box}
+<span class="label">A founder's decision (invented example)</span>
+
+From 25 orders, the average order value is 9.60 euros with a standard deviation of 2 euros. You need 9 euros per order to break even on a kitchen lease. The 95% interval is 9.60 ± 2.064 × 0.40, from 8.77 to 10.43 euros. The break-even value of 9 euros lies inside the interval. The decision: do not sign yet. With 100 orders the standard error falls to 0.20. If the mean stays at 9.60, the interval then runs from 9.20 to 10.00 and excludes 9. You collect orders for three more weeks and decide then.
+:::
+
+**Next:** We can now report an estimate with an interval, and we have
+measured how far the estimate lies from a benchmark in standard-error units.
+Lecture 10 turns that distance into a p-value and a decision. It names the two
+ways a decision can be wrong and shows what makes wrong decisions rarer. It
+ends with a first look at a regression table, which reports the same five
+items: estimate, SE, t, p-value, and interval.
 
 :::
 
@@ -650,91 +673,102 @@ regression table.
 
 ## After class
 
-<span class="time-budget">Total practice time: about 60 minutes.</span>
+<span class="time-budget">Total practice time: about 70 minutes.</span>
 
-### Retrieval (10 minutes)
+**Minimum path (about 35 minutes):** read the lecture material, answer the recall questions, then work for 10 minutes on the tasks that follow. **Full path:** all tasks below.
+
+### Read the lecture material (15 minutes)
+
+Read the Lecture material section above from start to end. The lecture
+covered the core of it. The text has every step, every example, and all the
+code, including parts that were not shown in class. Note what is still
+unclear and bring it to the next tutorial, or ask Tilly.
+
+### Recall questions (10 minutes)
 
 1. Why does replacing $\sigma$ with the sample SD $S$ require a t rather
    than a normal reference distribution?
 2. Why does a one-sample t procedure use $n-1$ degrees of freedom?
 3. What are the three pieces of a confidence interval?
 4. What do $H_0:\delta=0$ and $H_1:\delta\ne0$ say?
-5. Why does a two-sided p-value use two tails?
-6. What is the exact decision link between a 95% t interval and a 5%
-   two-sided t-test?
+5. What does a t statistic of $-2.91$ tell you?
+6. What is "95%" a property of: the interval you computed or the procedure?
 
 ::: {.callout-note collapse="true"}
 ## Check your answers
 
-1. $S$ is itself estimated and varies from sample to sample; the t
+1. $S$ is itself estimated and varies from sample to sample. The t
    distribution's heavier tails represent that extra uncertainty.
 2. Estimating the sample mean imposes one constraint (deviations sum to
    zero) before spread is estimated, leaving $n-1$ freely varying
    deviations.
 3. Estimate, critical value, and standard error.
-4. The null states that the population contrast is zero; the alternative
-   allows a non-zero contrast in either direction.
-5. Values equally far below and above zero are both evidence against a
-   two-sided null.
-6. The test rejects exactly when the interval excludes zero, provided both
-   use the same model and SE.
+4. The null hypothesis states that the population gap $\delta$ is zero. The
+   alternative allows a non-zero gap in either direction.
+5. The estimate lies 2.91 standard errors below the null value of zero.
+6. The procedure: about 95% of intervals built this way from repeated valid
+   samples contain the fixed parameter.
 :::
 
-### From worked to faded (10 minutes)
+### Finish a half-worked example (10 minutes)
 
 Re-read the hand-worked interval (@exm-b09-hand-interval). Then complete
-the same calculation with new numbers: $n=25$ customers, mean satisfaction
-$\bar x = 42$, sample SD $s = 10$, benchmark 40, so $\delta=\mu-40$.
+the same calculation with new invented numbers: a random sample of $n=25$
+customers, mean satisfaction $\bar x = 42$ points, sample SD $s = 10$
+points, benchmark 40 points, so $\delta=\mu-40$.
 
 *Step 1 (given).* The estimated gap is $42-40=2$, and
-$t_{0.975,24}\approx 2.06$.
+$t_{0.975,24}=2.064$.
 
 *Step 2 (you).* Calculate the SE and the margin of error.
 
-*Step 3 (you).* Write the 95% interval for $\delta$ and state, without any
-further computation, the 5% two-sided test decision.
+*Step 3 (you).* Write the 95% interval for $\delta$ and say whether a gap of zero
+is among the plausible values.
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-$\operatorname{SE}=10/\sqrt{25}=2$; margin of error
-$2.06\times 2=4.13$. The interval is $2\pm 4.13=(-2.13,\,6.13)$. Zero lies
-inside, so the 5% two-sided test does not reject $H_0:\delta=0$: the data
-are compatible with a zero gap --- and with gaps up to about 6 points. (For
-completeness, $t=2/2=1.00$, $p\approx 0.33$.)
+$\widehat{\operatorname{SE}}=10/\sqrt{25}=2$. The margin of error is
+$2.064\times 2=4.13$. The interval is $2\pm 4.13=(-2.13,\,6.13)$. Zero lies
+inside, so a zero gap is among the plausible values, and so are gaps up to
+about 6 points. The t statistic is $2/2=1.00$. The estimate lies one
+standard error from zero.
 :::
 
 ### Practice (10 minutes)
 
-1. A sample has $n=49$, $\bar x=110$, and $s=14$. Define $\delta=\mu-100$.
-   Construct a 95% interval for $\delta$ (use $t_{0.975,48}\approx 2.01$).
-2. Test $H_0:\delta=0$ against $H_1:\delta\ne0$ at 5%. Report the
-   statistic, degrees of freedom, approximate p-value, decision, and a
-   contextual conclusion.
-3. A coefficient-like estimate is 0.42 percentage points per €100,000,
-   with SE 0.18 and $df=120$. Test a two-sided zero null and construct a
-   95% interval (use $t_{0.975,120}\approx 1.98$).
-4. Explain why a statistically significant mean gap need not be
-   practically important or causal.
+The numbers in tasks 1 to 3 are invented.
+
+1. A random sample has $n=49$, $\bar x=110$, and $s=14$. Define
+   $\delta=\mu-100$. Construct a 95% interval for $\delta$ (use
+   $t_{0.975,48}\approx 2.01$).
+2. For the sample of task 1, state $H_0$ and $H_1$ for a two-sided test of
+   a zero gap. Calculate the t statistic and its degrees of freedom.
+3. An estimate is 0.42 percentage points per €100,000, with SE 0.18 and
+   $df=120$. Calculate the t statistic and construct a 95% interval (use
+   $t_{0.975,120}\approx 1.98$).
+4. Explain why an interval that excludes zero does not show that a gap is
+   important in practice, or that it has a particular cause.
 
 ::: {.callout-note collapse="true"}
 ## Check your answers
 
 1. The estimated gap is $110-100=10$, its SE is $14/\sqrt{49}=2$, and the
    interval is $10\pm 2.01(2)=(5.98,\,14.02)$.
-2. $t=10/2=5.00$, $df=48$, two-sided p-value below 0.001. Reject $H_0$:
-   the data provide strong evidence that the population mean exceeds 100
-   --- plausibly by 6 to 14 points.
-3. $t=0.42/0.18\approx 2.33$, two-sided p-value about 0.021. The 95%
-   interval is $0.42\pm1.98(0.18)=(0.064,\,0.776)$ percentage points per
-   €100,000. Reject the zero null at 5%.
-4. Statistical significance concerns precision relative to zero. Practical
-   importance depends on the magnitude and the decision context, and
-   causality requires an appropriate design and assumptions --- neither is
-   delivered by a small p-value.
+2. $H_0:\delta=0$ against $H_1:\delta\ne0$. The t statistic is
+   $t=10/2=5.00$ with $df=48$, so the estimate lies five standard errors
+   above zero. The interval from task 1 lies entirely above zero. Plausible
+   gaps run from about 6 to 14 points.
+3. $t=0.42/0.18\approx 2.33$. The 95% interval is
+   $0.42\pm1.98(0.18)=(0.064,\,0.776)$ percentage points per €100,000,
+   which excludes zero.
+4. An interval that excludes zero says that the estimate is precise enough
+   to tell the gap from zero. Whether the gap is important depends on its
+   size and on the decision. A causal claim needs a suitable study design.
+   A narrow interval gives neither.
 :::
 
-### Rewrite the forbidden sentence (5 minutes)
+### Rewrite the wrong sentence (5 minutes)
 
 Rewrite this claim correctly: "There is a 95% chance that the population
 mean is in my interval $(11.23, 14.29)$."
@@ -744,11 +778,11 @@ mean is in my interval $(11.23, 14.29)$."
 
 "The interval $(11.23, 14.29)$ was produced by a procedure that captures
 the fixed population mean in about 95% of repeated valid samples." The
-parameter is fixed; it is the interval endpoints that vary across samples,
+parameter is fixed. It is the interval endpoints that vary across samples,
 as in @fig-b09-coverage.
 :::
 
-### Spaced review: one item each from Lectures 8 and 4 (10 minutes)
+### Review: one question each from Lectures 8 and 4 (10 minutes)
 
 1. *(Lecture 8.)* A planned survey expects a sample SD around 24 with
    $n=64$. Estimate the SE of the sample mean, and state what happens to
@@ -761,49 +795,27 @@ as in @fig-b09-coverage.
 ::: {.callout-note collapse="true"}
 ## Check your answers
 
-1. $\operatorname{SE}=24/\sqrt{64}=3$. Quadrupling the sample size halves
-   the SE to 1.5 --- the square-root rule.
-2. They condition on different reference classes: the first divides the
-   505 joint records by the 734 late-season records, the second divides
-   the same 505 by the 882 deal records. Changing the event after the bar
-   changes the denominator.
+1. $\widehat{\operatorname{SE}}=24/\sqrt{64}=3$. Four times the sample size
+   halves the SE to 1.5. This is the square-root rule.
+2. They condition on different events. The first divides the 505 joint
+   records by the 734 late-season records. The second divides the same 505
+   by the 882 deal records. Changing the event after the bar changes the
+   denominator.
 :::
 
-### Worked exam interpretation (10 minutes)
+### Check the AI (5 minutes)
 
-**Question (Mock Exam Q4 pattern).** From a frame of 1,000 accelerator
-applicants, a simple random sample of 64 was selected. `prep_hours` is
-hours spent preparing the application; $\mu$ is the frame mean. The sample
-has $\bar x=18.4$ and $s=8.0$. R produced:
+You asked an AI assistant: "What does the 95% interval from 11.23 to 14.29 for the mean equity offered mean?" It answered:
 
-```text
-One Sample t-test
+> "It means that 95% of all pitches offer between 11.23% and 14.29% of the company."
 
-data: prep_hours
-t = 2.400, df = 63, p-value = 0.0193
-alternative hypothesis: true mean is not equal to 16
-95 percent confidence interval:
- 16.40 20.40
-sample estimate:
-mean of x = 18.40
-```
-
-Verify the SE and the t statistic, explain the degrees of freedom,
-interpret the p-value and the interval, and give the 5% decision.
+Find what is wrong and write the corrected answer. This is the **Verify**
+step of Attempt → Ask → Verify → Explain, and the exam asks for it.
 
 ::: {.callout-note collapse="true"}
-## Check a model answer
+## Check your answer
 
-$\operatorname{SE}=8/\sqrt{64}=1$ hour, so
-$t=(18.4-16)/1=2.4$, matching the output. $df=64-1=63$ because the
-deviations from the estimated sample mean must sum to zero, leaving 63
-free. If the frame mean were 16 hours, a sample mean at least 2.4 SEs from
-16 in either direction would occur in about 1.9% of random samples; since
-$0.0193<0.05$, reject $H_0:\mu=16$. The interval $(16.40, 20.40)$ gives
-the plausible range for $\mu$ --- it excludes 16, agreeing with the test
---- and was produced by a procedure with about 95% coverage across
-repeated samples. The claim concerns the 1,000-applicant frame, not
-applicants in general.
+The interval is about the mean, not about single pitches. In the Shark Tank file, the equity offered (`equity_offered_pct`) in single pitches ranges from 1% to 100%. The correct reading: the interval was produced by a procedure that captures the mean equity offered in all recorded pitches in about 95% of samples.
 :::
 
 ### Make it yours (5 minutes)
@@ -811,7 +823,7 @@ applicants in general.
 :::: {.utility-prompt}
 <span class="label">Utility: two sentences</span>
 
-Think of your EiA venture --- or any business you know well. Pick one key
+Think of your EiA venture, or any business you know well. Pick one key
 metric with a published industry benchmark (conversion rate, average order
 value, churn), frame the comparison as a gap $\delta = \mu - \text{benchmark}$,
 and write two sentences: first say what sample you could realistically
@@ -822,18 +834,17 @@ include zero.
 ::: {.callout-note collapse="true"}
 ## See an example, then write your own
 
-Take a student-run campus meal-prep box venture. "The sector churn benchmark is 25% per term; from my roughly 120 subscribers I can estimate $\delta = \mu - 25$, and a 95% interval sitting entirely below zero would let me claim genuinely stickier customers in my pitch. If the interval included zero, I would stop pitching retention as my edge and lead with margin instead."
+Take a student-run campus meal-prep box venture. "The sector churn benchmark is 25% per term. From my roughly 120 subscribers I can estimate $\delta = \mu - 25$, and a 95% interval sitting entirely below zero would let me claim genuinely stickier customers in my pitch. If the interval included zero, I would stop pitching retention as my edge and lead with margin instead."
 :::
 
-You can discuss this task --- and any other task in this chapter --- with
-**Tilly**, the course AI assistant on Canvas: ask it to check whether your
+You can discuss this task, and any other task in this chapter, with
+**Tilly**, the course AI assistant: ask it to check whether your
 gap is defined on a population you can actually sample.
 ::::
 
-Continue to Lecture 10: Testing decisions, errors, power, and the road to
-regression.
+[Continue to Lecture 10: Testing decisions, errors, power, and the road to regression](b10-testing-errors-power.qmd).
 
-Formula sheet: Lecture 9 formulas.
+[Formula sheet: Lecture 9 formulas](formula-sheet.qmd#formula-l9).
 
 For a more formal explanation, consult
 [Nieuwenhuis, *Statistical Methods for Business and Economics*](https://tilburguniversity.on.worldcat.org/oclc/317545871),

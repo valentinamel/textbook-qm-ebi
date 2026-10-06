@@ -18,8 +18,10 @@ Innovation bachelor programme.
 ## Build locally
 
 Install Quarto (https://quarto.org/docs/get-started/) and R with `knitr`,
-`rmarkdown`, `ggplot2`, and `patchwork`
-(`install.packages(c("knitr", "rmarkdown", "ggplot2", "patchwork"))`).
+`rmarkdown`, `ggplot2`, `patchwork`, `lmtest`, and `sandwich`
+(`install.packages(c("knitr", "rmarkdown", "ggplot2", "patchwork",
+"lmtest", "sandwich"))`). The last two are needed for the robust standard
+errors in Intermediate Lecture 3. Render in a UTF-8 locale.
 Then, from this directory:
 
 ```sh
@@ -50,3 +52,7 @@ the repo root as working directory (`execute-dir: project`).
 - One caveat box per lecture, navy/teal; collapsed model answers after every
   substantive question; stated time budgets on Before/After class; numbered
   figures.
+- Chapter parts: Before class, Lecture material, After class. The text is
+  written for the student only: no classroom script, no lecturer's notes.
+- Definition boxes (`.definition-box`) are examinable. Optional boxes
+  (`callout-tip`, collapsed, title starts with "Optional:") are not.
