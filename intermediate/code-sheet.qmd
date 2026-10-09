@@ -37,7 +37,7 @@ The table shows which sections you use in which session.
 | `x`, `x1`, `x2`, `x3`, `z` | numerical predictors |
 | `group` | categorical predictor |
 | `m`, `m_multi`, ... | fitted models |
-| $n$, $k$ | number of observations, number of slopes |
+| $n$, $k$, $G$ | number of observations, slopes, groups |
 
 **Read and inspect the data**
 
@@ -402,6 +402,29 @@ $$
 | `F` | partial $F$ |
 | `Pr(>F)` | p-value of the partial F-test |
 
+**One-way ANOVA: one model, $G$ groups**
+
+```r
+m_anova <- lm(y ~ group, data = analysis)
+anova(m_anova)   # ANOVA table
+```
+
+$$
+H_0:\text{all }G\text{ group means are equal},
+\qquad
+F=\frac{\text{SSR}/(G-1)}{\text{SSE}/(n-G)}.
+$$
+
+**Labels in the output of `anova(m_anova)`**
+
+| Label in the output | Symbol |
+|---|---|
+| `Df` | $G-1$ (group), $n-G$ (`Residuals`) |
+| `Sum Sq` | SSR (group), SSE (`Residuals`) |
+| `Mean Sq` | `Sum Sq` / `Df` |
+| `F value` | $F$ |
+| `Pr(>F)` | p-value of the F-test |
+
 ## Lecture 6: Interactions and curvature {#lecture-6-interactions-and-polynomial-terms}
 
 **Interaction of a numerical predictor $X$ with a dummy $D$**
@@ -468,6 +491,7 @@ anova(m_linear, m_quadratic)
 | Residual degrees of freedom | `df.residual(m)` |
 | Critical value of a 95% interval | `qt(0.975, df.residual(m))` |
 | Partial F-test of nested models | `anova(reduced, complete)` |
+| ANOVA table of one model | `anova(m)` |
 | Reference category of a factor | `relevel(factor(group), ref = "category")` |
 | Interaction | `x * group` |
 | Square in a formula | `I(x^2)` |

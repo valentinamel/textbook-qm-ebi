@@ -459,8 +459,8 @@ in the PDF.
 <td>fitted models</td>
 </tr>
 <tr class="even">
-<td><span class="math inline">\(n\)</span>, <span class="math inline">\(k\)</span></td>
-<td>number of observations, number of slopes</td>
+<td><span class="math inline">\(n\)</span>, <span class="math inline">\(k\)</span>, <span class="math inline">\(G\)</span></td>
+<td>number of observations, slopes, groups</td>
 </tr>
 </tbody>
 </table>
@@ -799,6 +799,45 @@ F=
 </tr>
 </tbody>
 </table>
+<p><strong>One-way ANOVA: one model, <span class="math inline">\(G\)</span> groups</strong></p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>m_anova <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> group, <span class="at">data =</span> analysis)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(m_anova)   <span class="co"># ANOVA table</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><span class="math display">\[
+H_0:\text{all }G\text{ group means are equal},
+\qquad
+F=\frac{\text{SSR}/(G-1)}{\text{SSE}/(n-G)}.
+\]</span></p>
+<p><strong>Labels in the output of <code>anova(m_anova)</code></strong></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Label in the output</th>
+<th>Symbol</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Df</code></td>
+<td><span class="math inline">\(G-1\)</span> (group), <span class="math inline">\(n-G\)</span> (<code>Residuals</code>)</td>
+</tr>
+<tr class="even">
+<td><code>Sum Sq</code></td>
+<td>SSR (group), SSE (<code>Residuals</code>)</td>
+</tr>
+<tr class="odd">
+<td><code>Mean Sq</code></td>
+<td><code>Sum Sq</code> / <code>Df</code></td>
+</tr>
+<tr class="even">
+<td><code>F value</code></td>
+<td><span class="math inline">\(F\)</span></td>
+</tr>
+<tr class="odd">
+<td><code>Pr(&gt;F)</code></td>
+<td>p-value of the F-test</td>
+</tr>
+</tbody>
+</table>
 </section>
 <section id="lecture-6-interactions-and-polynomial-terms" class="level2">
 <h2 class="anchored" data-anchor-id="lecture-6-interactions-and-polynomial-terms">Lecture 6: Interactions and curvature</h2>
@@ -827,13 +866,13 @@ F=
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>m_interaction <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> x <span class="sc">*</span> group <span class="sc">+</span> z, <span class="at">data =</span> analysis)</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co"># x * group expands to x + group + x:group</span></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(m_interaction)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>m_interaction <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> x <span class="sc">*</span> group <span class="sc">+</span> z, <span class="at">data =</span> analysis)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="co"># x * group expands to x + group + x:group</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(m_interaction)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p><strong>Centred predictor</strong></p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># x minus its mean</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>analysis<span class="sc">$</span>x_c <span class="ot">&lt;-</span> analysis<span class="sc">$</span>x <span class="sc">-</span> <span class="fu">mean</span>(analysis<span class="sc">$</span>x)</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>m_centred <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> x_c <span class="sc">*</span> group <span class="sc">+</span> z, <span class="at">data =</span> analysis)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># x minus its mean</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>analysis<span class="sc">$</span>x_c <span class="ot">&lt;-</span> analysis<span class="sc">$</span>x <span class="sc">-</span> <span class="fu">mean</span>(analysis<span class="sc">$</span>x)</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>m_centred <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> x_c <span class="sc">*</span> group <span class="sc">+</span> z, <span class="at">data =</span> analysis)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p><strong>Quadratic model</strong></p>
 <p><span class="math display">\[
 \widehat Y=\hat\beta_0+\hat\beta_1X+\hat\beta_2X^2.
@@ -842,12 +881,12 @@ F=
 \text{Fitted change from }x\text{ to }x+1:\quad
 \hat\beta_1+\hat\beta_2(2x+1).
 \]</span></p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>m_linear <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> x <span class="sc">+</span> z, <span class="at">data =</span> analysis)</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>m_quadratic <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> x <span class="sc">+</span> <span class="fu">I</span>(x<span class="sc">^</span><span class="dv">2</span>) <span class="sc">+</span> z, <span class="at">data =</span> analysis)</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="co"># I(x^2) is the square of x</span></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(m_quadratic)</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(m_linear, m_quadratic)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>m_linear <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> x <span class="sc">+</span> z, <span class="at">data =</span> analysis)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>m_quadratic <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> x <span class="sc">+</span> <span class="fu">I</span>(x<span class="sc">^</span><span class="dv">2</span>) <span class="sc">+</span> z, <span class="at">data =</span> analysis)</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="co"># I(x^2) is the square of x</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(m_quadratic)</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(m_linear, m_quadratic)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="commands-by-purpose" class="level2 sheet-wide">
 <h2 class="anchored" data-anchor-id="commands-by-purpose">Commands by purpose</h2>
@@ -916,22 +955,26 @@ F=
 <td><code>anova(reduced, complete)</code></td>
 </tr>
 <tr class="even">
+<td>ANOVA table of one model</td>
+<td><code>anova(m)</code></td>
+</tr>
+<tr class="odd">
 <td>Reference category of a factor</td>
 <td><code>relevel(factor(group), ref = "category")</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Interaction</td>
 <td><code>x * group</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Square in a formula</td>
 <td><code>I(x^2)</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Robust standard errors</td>
 <td><code>coeftest(m, vcov. = vcovHC(m, type = "HC1"))</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Regression table with several models</td>
 <td><code>modelsummary(list(...))</code></td>
 </tr>

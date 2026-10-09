@@ -14,7 +14,8 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 
 - use dummy variables to put a categorical predictor into a regression
 - interpret dummy coefficients as differences from a named reference group
-- test with a partial F-test whether a group of terms is jointly useful
+- test whether a group of terms is jointly useful, and whether group means
+  differ in a one-way ANOVA
 - tell an adjusted comparison between groups apart from a causal claim
 :::
 
@@ -439,6 +440,156 @@ on its own. The overall F-test in `summary(gender_model)` is about 84.5, with a
 very small p-value. It answers a third question: do all four coefficients
 together improve on a model with only an intercept?
 
+### The same model as a one-way ANOVA
+
+Take away season and requested amount for a moment. Then the only
+predictors are the dummies of one categorical variable. Such a regression
+compares group means, and it has its own name.
+
+::: {.definition-box}
+<span class="label">Definition</span>
+
+**One-way analysis of variance (ANOVA).** A regression of the outcome on the
+dummies of one categorical variable with $G$ groups, and nothing else. It
+compares the $G$ group means. Its F-test has the null hypothesis that all
+group means are equal, against the alternative that at least one differs.
+:::
+
+In this model each fitted value is the mean of the group of the
+observation. Write $\bar y_g$ for the mean of group $g$, $n_g$ for its
+number of observations, and $\bar y$ for the overall mean. The intercept is
+the mean of the reference group. Each dummy coefficient is the difference
+between the mean of its group and the mean of the reference group.
+
+The variation splits as in Lecture 3, $\text{SST}=\text{SSR}+\text{SSE}$.
+Put the group mean $\bar y_g$ in place of the fitted value $\widehat y_i$.
+Then SSR measures the variation between the groups: how far the group means
+lie from the overall mean, weighted by the size of each group. SSE measures
+the variation within the groups: how far each observation lies from the
+mean of its own group.
+
+$$
+\text{SSR}=\sum_{g=1}^{G}n_g(\bar y_g-\bar y)^2,
+\qquad
+\text{SSE}=\sum_{g=1}^{G}\ \sum_{i\text{ in group }g}(y_i-\bar y_g)^2.
+$$
+
+The model has $k=G-1$ slopes, so the residual degrees of freedom are
+$n-k-1=n-G$. The F statistic of the ANOVA is
+
+$$
+F=\frac{\text{SSR}/(G-1)}{\text{SSE}/(n-G)}.
+$$
+
+This is the overall F-test of Lecture 3 for the dummy regression. Its null
+hypothesis $H_0:\mu_1=\mu_2=\cdots=\mu_G$ says that the population means
+of all groups are equal. This is the same as saying that all dummy
+coefficients are zero. A small p-value says that at least one group mean
+differs. It does not say which one.
+
+R prints the numbers of this test in an **ANOVA table**. It has one row for
+the group variable and one row for the residuals. The columns are:
+
+- `Df`: the degrees of freedom, $G-1$ for the groups and $n-G$ for the
+  residuals.
+- `Sum Sq`: the sum of squares, SSR for the groups and SSE for the
+  residuals.
+- `Mean Sq`: the mean square, `Sum Sq` divided by `Df`.
+- `F value`: the F statistic, the mean square of the groups divided by the
+  mean square of the residuals.
+- `Pr(>F)`: the p-value of the F-test.
+
+[Shark Tank data]{.shark-tag} Return to the raw comparison at the start of
+this lecture. Are the three group means of the equity offered
+(`equity_offered_pct`) further apart than chance alone would produce? Fit
+the model with the gender groups only, without season and requested
+amount, and ask R for the ANOVA table:
+
+```{r}
+#| label: i05-one-way-anova
+anova_model <- lm(equity_offered_pct ~ gender, data = known_gender)
+anova(anova_model)
+summary(anova_model)
+```
+
+The coefficients repeat the group means from the start of this lecture. The
+intercept 13.20 is the mean of the all-men teams. The all-women mean is
+$13.20+0.82=14.02$, and the mixed mean is $13.20-1.03=12.17$.
+
+Now check the table by hand. Each mean square is the sum of squares divided
+by its degrees of freedom:
+
+$$
+\frac{551}{2}\approx 275.5,
+\qquad
+\frac{101{,}822}{1{,}431}\approx 71.15,
+\qquad
+F=\frac{275.5}{71.15}\approx 3.87.
+$$
+
+This is the `F-statistic` in the last line of `summary()`: 3.872 on 2 and
+1,431 degrees of freedom, with the same p-value 0.021. The mean square of
+the residuals is $s^2$, and $\sqrt{71.15}\approx 8.435$ is the residual
+standard error. The code below computes SSR from the group means with the
+formula above, and the overall mean and standard deviation for comparison:
+
+```{r}
+#| label: i05-anova-by-hand
+y <- known_gender$equity_offered_pct
+group_means <- tapply(y, known_gender$gender, mean)
+group_sizes <- table(known_gender$gender)
+sum(group_sizes * (group_means - mean(y))^2)   # SSR, between groups
+c(mean = mean(y), sd = sd(y))
+```
+
+At the 5% level, the three groups of teams do not all offer the same mean
+equity (F $\approx$ 3.87, p $\approx$ 0.021). The largest gap, between
+all-women teams (14.02%) and mixed teams (12.17%), is 1.85 percentage
+points. That is about 14% of the overall mean of 13.22% and about 0.22
+standard deviations of the equity offered. The groups explain only about
+0.5% of the variation ($R^2\approx 0.005$), so most of the differences
+between offers lie within the groups.
+
+Once season and requested amount are added, as in the adjusted comparison
+of this lecture, the model is no longer a one-way ANOVA. Its fitted values
+are then no longer the raw group means. ANOVA with more than one
+categorical variable, and its extensions, come in QM Advanced.
+
+::: {#exm-i05-anova-hand}
+## Worked example: a one-way ANOVA by hand
+
+An invented example. A venture sells through three channels: the campus
+stand, the app, and the website. It records the order value in euros of 10
+orders per channel, so $n=30$ and $G=3$. The mean order values are 10 euros
+(campus stand), 14 euros (app), and 12 euros (website). The variation within
+the channels is $\text{SSE}=270$. Two values are given: the critical value
+3.35, from `qf(0.95, 2, 27)`, and the p-value 0.030.
+
+First the overall mean and SSR. All groups have the same size, so the
+overall mean is $(10+14+12)/3=12$ euros. Then
+
+$$
+\text{SSR}=10(10-12)^2+10(14-12)^2+10(12-12)^2=40+40+0=80.
+$$
+
+Now the test in five steps.
+
+1. **Hypotheses.** $H_0:\mu_{\text{stand}}=\mu_{\text{app}}=\mu_{\text{website}}$,
+   the three channels have the same mean order value. $H_1$: at least one
+   mean differs. The significance level is 5%.
+2. **Test statistic.** $F=\dfrac{\text{SSR}/(G-1)}{\text{SSE}/(n-G)}$,
+   with $G-1=2$ and $n-G=27$ degrees of freedom.
+3. **Critical value and rejection region.** The critical value is 3.35.
+   Reject $H_0$ if $F_{obs}\ge 3.35$.
+4. **Observed value.**
+   $F_{obs}=\dfrac{80/2}{270/27}=\dfrac{40}{10}=4.0$.
+5. **Conclusion.** $F_{obs}=4.0$ lies in the rejection region, so reject
+   $H_0$ (p $\approx$ 0.030). At the 5% level, the mean order value differs
+   between at least two of the channels. The test does not say which ones.
+   The largest gap, 4 euros between the app and the campus stand, is a
+   third of the overall mean.
+:::
+
 ### Visualise the adjusted comparison
 
 [Shark Tank data]{.shark-tag} @fig-i05-adjusted shows the fitted equity offered for the three groups of
@@ -577,6 +728,8 @@ assistant.
 5. Why can a joint F-test reject when one individual t-test does not?
 6. How do you analyse an A/B test with a regression, and why can you read
    its coefficient as an effect?
+7. What does the F-test of a one-way ANOVA test, and how is it related to
+   the regression on the dummies of one categorical variable?
 
 ::: {.callout-note collapse="true"}
 ## Check your answers
@@ -598,6 +751,10 @@ assistant.
    coefficient is the difference between the two group means. Chance decided
    who saw which version, so the groups differ in nothing else on average,
    and the difference is the effect of the version.
+7. It tests whether all group means are equal, against the alternative
+   that at least one differs. It is the overall F-test of the regression on
+   the $G-1$ dummies, with nothing else in the model. A rejection says that
+   some group mean differs, not which one.
 :::
 
 ### Finish a half-worked example: a partial F with new numbers
@@ -630,7 +787,7 @@ table, with p $\approx$ 0.004. At 5%, the two category terms are jointly
 useful even in the model that adjusts only for season.
 :::
 
-### Practice: relevelling, hypotheses, and an A/B test
+### Practice: relevelling, hypotheses, an A/B test, and an ANOVA table
 
 1. [Shark Tank data]{.shark-tag} Relevel `gender` so that `mixed` is the reference group, and interpret
    both dummy coefficients. Save the relevelled model as `relevelled_model`.
@@ -645,6 +802,18 @@ useful even in the model that adjusts only for season.
    $t_{0.975,\,198}$ = `qt(0.975, 198)` = 1.972. Why can the coefficient be read as an effect here?
 5. [Shark Tank data]{.shark-tag} Explain why "the all-women coefficient is 1.28%" is ambiguous, then
    rewrite it precisely.
+6. An invented example. A franchise compares the weekly revenue (in
+   thousands of euros) of its shops in four regions. Fill in the three
+   missing numbers A, B, and C of this ANOVA table:
+
+   ```text
+               Df Sum Sq Mean Sq F value  Pr(>F)
+   region       3    240       A       B 0.00053
+   Residuals   96      C    12.5
+   ```
+
+   How many shops are in the data? State the conclusion at 5%. The critical
+   value is `qf(0.95, 3, 96)` = 2.70.
 
 ::: {.callout-note collapse="true"}
 ## Check your answers
@@ -676,6 +845,12 @@ useful even in the model that adjusts only for season.
    comparison group or what is held fixed. A precise version: "At the same
    season and requested amount, all-women presenting teams are fitted to
    offer 1.28 equity percentage points more than all-men presenting teams."
+6. A $=240/3=80$. C $=12.5\times96=1{,}200$. B $=80/12.5=6.4$. With
+   $G=4$ regions and $n-G=96$, there are $n=100$ shops. Because
+   $6.4\ge2.70$ (p $\approx$ 0.0005), reject $H_0$: at the 5% level, the
+   mean weekly revenue differs between at least two regions. The regions
+   explain $240/(240+1{,}200)\approx17\%$ of the variation in weekly
+   revenue.
 :::
 
 ### The 120-word interpretation

@@ -210,6 +210,16 @@ These points supersede earlier entries where they differ.
   full marking guides are kept internally in `Assessment/`. Video boxes say
   that the videos can use another notation and that the lecture material
   comes first.
+- **Model answers contain only the expected student answer** (9 October,
+  Valentina). No alternatives, notes for markers, or explanations of the
+  answer. QM Intermediate: per question **Code** (the code the student
+  copies, with the plots that are part of the answer) and **Answers**. No
+  stand-in figure. Stand-in values for later parts stay in the questions.
+- **One-way ANOVA in Intermediate Lecture 5** (9 October, Valentina). The
+  dummy-variable regression is introduced in the main text as a one-way
+  ANOVA: SSR between groups, SSE within groups, the ANOVA F-test and the
+  ANOVA table from `anova(m)`. The code sheet has `anova(m)` with its labels.
+  ANOVA with several factors is left to QM Advanced.
 - **No promises about the real exams** (9 October, Valentina). The textbook
   does not state the number of questions, does not say that the mock exam has
   the same form as the real exam, and makes no promises about exam content,
