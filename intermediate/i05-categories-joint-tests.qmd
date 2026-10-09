@@ -21,6 +21,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
   R output
 - tell whether a set of terms is jointly useful, and tell this apart from
   the significance of a single term
+- read an A/B test as a regression on one dummy
 - tell an adjusted association apart from a causal claim.
 :::
 
@@ -43,11 +44,11 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 ::: {.driving-question}
 <span class="label">Driving question</span>
 
-<p class="dq-context">Markets come in categories: sales channels, customer segments, kinds of teams. This lecture shows how to put categories into a model and how to judge whether they belong in it.</p>
+<p class="dq-context">Many business variables are categories: sales channels, customer segments, kinds of teams. This lecture shows how to put categories into a model and how to judge whether they belong in it.</p>
 
 At the same season and requested amount, do all-women presenting teams offer
 a different equity (`equity_offered_pct`) than all-men teams in the Shark
-Tank file? And are the category terms worth having in the model at all?
+Tank file? And do the category terms improve the model at all?
 :::
 
 ::: {.course-phase .phase-before}
@@ -57,10 +58,6 @@ Tank file? And are the category terms worth having in the model at all?
 <span class="time-budget">Total preparation time: about 25 minutes.</span>
 
 **Minimum path:** the video and the R task. **Full path:** everything in this section.
-
-Bring a charged laptop with RStudio and the course project open. The code of
-the lecture is in this chapter, ready to copy, so you can run each step
-yourself during the lecture and get the same numbers and figures.
 
 <div class="video-prep">
 <span class="label">Video preparation (10 minutes)</span><br>
@@ -72,19 +69,19 @@ category decides what a coefficient means. All links are also listed in the
 <a href="../resources/video-guide.html">External Video Guide</a>.
 </div>
 
-**Reactivate and predict (5 minutes).** The Shark Tank file sorts the
+**Warm up and predict (5 minutes).** The Shark Tank file sorts the
 presenting teams into three categories: `all_men`, `all_women`, and `mixed`.
 The video explains dummy variables, which take only the values 0 and 1. How
 many dummy variables does a model with an intercept need for three
 categories? Write down a number. Then answer the one-click Wooclap question
 posted on Canvas before you come to class: at the same season and requested
 amount, do you expect all-women teams to offer **more**, **less**, or
-**about the same** equity as all-men teams? You find both answers in the
-lecture material.
+**about the same** equity as all-men teams? You will find both answers in
+the lecture material.
 
-**R warm-up (10 minutes).** The lecture material starts from the subset and
-the factor that you build here. Run the code and bring the contrasts table
-that it prints:
+[Shark Tank data]{.shark-tag} **R warm-up (10 minutes).** The code below builds the subset of pitches and
+the factor that the lecture material uses. Run the code and bring the
+contrasts table that it prints to class:
 
 ```{r}
 #| label: i05-prep-warmup
@@ -98,8 +95,13 @@ levels(known_gender$gender)
 contrasts(known_gender$gender)
 ```
 
+**Code along (bring your laptop).** Bring a charged laptop with RStudio and
+the course project open. All the code of the lecture is in this chapter,
+ready to copy. You can run each step yourself during the lecture and get the
+same numbers and figures.
+
 If indicators and reference categories are unfamiliar, review
-[Mathematics Refresher: indicators and reference categories](../resources/math-refresher.html).
+[Mathematics Refresher: indicators and reference categories](../resources/math-refresher.html#indicators-and-reference-categories).
 
 :::
 
@@ -108,12 +110,12 @@ If indicators and reference categories are unfamiliar, review
 ## Lecture material
 
 This section first compares the groups of teams with plain averages. It then
-shows how a variable made of categories enters a regression, and how to test
+shows how a regression uses a variable made of categories, and how to test
 several coefficients at once.
 
 ### Start with a founder's question
 
-Founders compare groups all the time: customers from the app against
+[Shark Tank data]{.shark-tag} Founders often compare groups: customers from the app against
 customers from the website, one price against another, one kind of team
 against another. Start with the comparison in the driving question. The
 Shark Tank file sorts the presenting teams into all men, all women, and
@@ -131,10 +133,9 @@ table(known$pitcher_gender_group)
 All-men teams offered 13.20% on average, all-women teams 14.02%, and mixed
 teams 12.17%. The gap between all-women and all-men teams is 0.82 percentage
 points, about 6% of the all-men average. Three questions follow. Is this gap
-more than chance? Does it remain when we compare teams from the same season
-that asked for the same amount? And how does a variable made of words, not
-numbers, get into `lm()` at all? The sections below answer them in reverse
-order.
+larger than chance alone would produce? Does it remain when we compare teams from the same season
+that asked for the same amount? And how can `lm()` use a variable that
+contains words, not numbers?
 
 ### Measurement first: what the category records
 
@@ -143,9 +144,9 @@ order.
 
 The categories describe the people who presented on screen: all men, all
 women, or mixed. They do not record the share of women in a team, and they
-do not describe the full team behind the venture. Seven records are
-classified as `unknown`. They are left out of every model in this lecture.
-The section on the `unknown` records further down explains why. Keep these
+do not describe the full team behind the venture. In seven records the
+source classifies the team as `unknown`. We leave these records out of every
+model in this lecture. A later section of this lecture explains why. Keep these
 limits in mind for every result in this chapter.
 
 ### A two-level indicator
@@ -177,10 +178,10 @@ E[Y_i\mid D_i=1]=\beta_0+\beta_1.
 $$
 
 So $\beta_1$ is the expected difference between the group with $D=1$ and
-the reference group with $D=0$. A regression on one dummy is the same thing
+the reference group with $D=0$. A regression on one dummy is the same
 as a comparison of two group means.
 
-This is also how an A/B test is analysed. In an A/B test you show two
+You analyse an A/B test in the same way. In an A/B test you show two
 versions of a page, a price, or an offer to customers, and chance decides who
 sees which version. Code the version as a dummy and read its coefficient.
 Because chance decided who saw which version, nothing else differs between
@@ -190,7 +191,7 @@ coefficient can be read as the effect of the change.
 ::: {#exm-i05-two-ticks}
 ## Worked example: two group means from two coefficients
 
-Restrict to the all-men and all-women teams (1,158 records) and let
+[Shark Tank data]{.shark-tag} Keep only the all-men and all-women teams (1,158 records) and let
 `women_team` equal 1 for all-women teams:
 
 ```{r}
@@ -216,7 +217,7 @@ is the gap between the two marks.
 ```{r}
 #| label: fig-i05-two-ticks
 #| code-fold: true
-#| code-summary: "See the drawing code (optional, not exam material)"
+#| code-summary: "See the R code for this figure"
 #| fig-height: 2.2
 #| fig-cap: "The model with one dummy places the two group means as two marks on the axis of the equity offered. The intercept is the mean of the reference group (all-men teams), and the dummy coefficient is the distance between the marks."
 old_par <- par(no.readonly = TRUE)
@@ -236,10 +237,10 @@ par(old_par)
 
 ### More than two categories
 
-With $G$ categories and an intercept, use $G-1$ dummies. With all $G$
+[Shark Tank data]{.shark-tag} With $G$ categories and an intercept, use $G-1$ dummies. With all $G$
 dummies and an intercept, the dummies sum to 1 in every row. This is the
-exact linear dependence from Lecture 4, and the coefficients cannot be
-estimated. The mistake is called the **dummy-variable trap**.
+exact dependence from Lecture 4, and R cannot estimate all the coefficients.
+This mistake is called the **dummy-variable trap**.
 
 R creates the dummies itself when a predictor is a factor. Choose the
 reference category yourself and check it. This is the code of the R warm-up:
@@ -254,14 +255,15 @@ contrasts(known_gender$gender)
 ```
 
 Each row of the contrasts table is a category. Each column is one dummy. The
-reference category `all_men` is the row with only zeros. Its mean is carried
-by the intercept. This answers the first question from before class: three
+reference category `all_men` is the row with only zeros. The intercept
+belongs to this category. This answers the first question from before class: three
 categories need two dummies.
 
 ::: {.callout-note collapse="true"}
 ## Check: four industries and an intercept, how many dummies?
 
-Three. One industry is the reference group, carried by the intercept. Each
+Three. One industry is the reference group, and the intercept belongs to
+this group. Each
 of the three dummy coefficients compares one of the other industries with
 it. Four dummies and an intercept would be the dummy-variable trap.
 :::
@@ -281,38 +283,38 @@ two dummies. The campus stand has no dummy. Its mean is the intercept.
 channels.
 
 *Step 3 (you).* By how much does the fitted order value in the app differ
-from the website? Neither is the reference group.
+from the fitted order value on the website? Neither is the reference group.
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
 Campus stand: 9.0 euros. App: 9.0 + 6.0 = 15.0 euros. Website: 9.0 + 2.5 =
-11.5 euros. App minus website: 6.0 - 2.5 = 3.5 euros. Two coefficients that
-share a reference group can be subtracted from each other.
+11.5 euros. App minus website: 6.0 - 2.5 = 3.5 euros. You can subtract two
+coefficients that share a reference group from each other. The result
+compares their two categories directly.
 :::
 :::
 
 ### Percent versus percentage points
 
-One point about units comes first. The outcome `equity_offered_pct` is
-measured in percent, so its regression coefficients are in **percentage
-points**. The next section estimates a coefficient of 1.28 for all-women
-teams. The sentence "the all-women coefficient is 1.28%" would be ambiguous.
+[Shark Tank data]{.shark-tag} The outcome `equity_offered_pct` is measured in percent, so its regression
+coefficients are in **percentage points**. The model in the next section
+estimates a coefficient of 1.28 for all-women teams. The sentence "the all-women coefficient is 1.28%" would be ambiguous.
 It could mean:
 
-- a relative change: 1.28% of the all-men level more (13.0% would become
-  about 13.2%)
-- an absolute change of 1.28 percentage points (13.0% would become 14.28%).
+- a relative change: 1.28% of the all-men level more (13.2% would become
+  about 13.4%)
+- an absolute change of 1.28 percentage points (13.2% would become 14.48%).
 
 The two readings differ by a factor of about eight here. A coefficient for
-an outcome in percent is always the absolute kind. The precise sentence is:
+an outcome in percent is always an absolute change in percentage points. The precise sentence is:
 "At the same season and requested amount, all-women presenting teams are
 fitted to offer 1.28 equity percentage points more than all-men presenting
 teams." Always write percentage points for this outcome.
 
 ### The adjusted comparison
 
-Now fit the model of the driving question. It contains both category
+[Shark Tank data]{.shark-tag} Now fit the model of the driving question. It contains both category
 dummies, and it holds season and requested amount (in thousands of dollars,
 `ask_1k`) fixed.
 
@@ -348,7 +350,7 @@ offer.
 
 Changing the reference group changes the names and values of the
 coefficients. It does not change the fitted values or the overall fit. Check
-it:
+this in R:
 
 ```{r}
 #| label: i05-change-reference
@@ -364,7 +366,7 @@ with the opposite sign, and the fitted values are identical.
 
 ### Are the category terms worth having at all?
 
-So far the coefficients were read one at a time. The driving question also
+So far we read the coefficients one at a time. The driving question also
 asks something that no single t-test answers: do the two category terms
 together add information beyond season and requested amount?
 
@@ -374,6 +376,14 @@ together add information beyond season and requested amount?
 **Partial F-test.** A test of whether several coefficients are all zero at
 the same time. It compares a complete model with a reduced model that leaves
 out the tested terms. Both models are fitted on the same observations.
+
+$$
+F=\dfrac{(\text{SSE}_R-\text{SSE}_C)/q}{\text{SSE}_C/(n-k_C-1)},
+$$
+
+with $\text{SSE}_R$ and $\text{SSE}_C$ the sums of squared residuals of the
+reduced and the complete model, $q$ the number of tested coefficients, and
+$k_C$ the number of slopes of the complete model.
 :::
 
 Two such models are called **nested**: the reduced model is the complete
@@ -383,7 +393,7 @@ pair for the two category dummies.
 ```{r}
 #| label: fig-i05-nested
 #| code-fold: true
-#| code-summary: "See the drawing code (optional, not exam material)"
+#| code-summary: "See the R code for this figure"
 #| fig-height: 2.6
 #| fig-cap: "The two nested models of the partial F-test. The reduced model is the complete model with the two category coefficients set to zero, fitted on the same observations."
 old_par <- par(no.readonly = TRUE)
@@ -394,7 +404,7 @@ rect(0.4, 1.1, 4.6, 3.9, col = "#DCEAF3", border = "#17324D", lwd = 2)
 rect(5.4, 1.1, 9.6, 3.9, col = "#FDE5C1", border = "#17324D", lwd = 2)
 text(2.5, 3.35, "Reduced model", font = 2, col = "#17324D")
 text(2.5, 2.55, "season + ask_1k", cex = 0.95)
-text(2.5, 1.85, expression(beta[aw] == 0 ~ "," ~ beta[mx] == 0),
+text(2.5, 1.85, expression(beta["all_women"] == 0 ~ "," ~ beta["mixed"] == 0),
      cex = 0.95, col = "#5B6976")
 text(7.5, 3.35, "Complete model", font = 2, col = "#17324D")
 text(7.5, 2.55, "season + ask_1k", cex = 0.95)
@@ -407,14 +417,14 @@ par(old_par)
 The hypotheses:
 
 $$
-H_0:\beta_{all\_women}=\beta_{mixed}=0
+H_0:\beta_{\text{all\_women}}=\beta_{\text{mixed}}=0
 \quad\text{against at least one non-zero.}
 $$
 
 ::: {#exm-i05-partial-f}
 ## Worked example: the partial F statistic by hand
 
-Fit both models and ask R for the anova table:
+[Shark Tank data]{.shark-tag} Fit both models and ask R for the anova table:
 
 ```{r}
 #| label: i05-partial-f
@@ -424,8 +434,8 @@ anova(reduced_gender, gender_model)
 ```
 
 Now calculate F by hand from the numbers in the table. The residual sum of
-squares (RSS in the R output, SSE in this course) falls by $436.25$ when the
-two category terms are added. This uses $2$ degrees of freedom. The complete
+squares (RSS in the R output, SSE in this course) falls by $436.25$ when you
+add the two category terms. This uses $2$ degrees of freedom. The complete
 model leaves a residual sum of squares of $82{,}792$ on $1{,}429$ degrees of
 freedom:
 
@@ -442,18 +452,18 @@ really zero, the ratio would be close to 1. Here it is about 3.8, and the
 p-value is about 0.023.
 :::
 
-At 5%, the two category terms are **jointly useful** in this model. Compare
+At 5%, the two category terms are jointly useful in this model. Compare
 this with the single results: the p-value of the joint test is $0.023$, and
 the p-value of the mixed dummy alone is $0.823$. Joint usefulness is not the
 same as individual significance. The F-test asks whether the two terms
 together improve the model. It does not ask whether each term is significant
-on its own. The overall F-test in `summary(gender_model)`, about 84.5 with a
-very small p-value, answers a third question: whether all four coefficients
-together improve on a model with only an intercept.
+on its own. The overall F-test in `summary(gender_model)` is about 84.5, with a
+very small p-value. It answers a third question: do all four coefficients
+together improve on a model with only an intercept?
 
 ### Visualise the adjusted comparison
 
-@fig-i05-adjusted shows the fitted equity offered for the three groups of
+[Shark Tank data]{.shark-tag} @fig-i05-adjusted shows the fitted equity offered for the three groups of
 teams at the same season and requested amount.
 
 ```{r}
@@ -521,9 +531,9 @@ Read @fig-i05-adjusted with the
 
 Seven records have the classification `unknown`. This label says that
 information is missing. It is not a kind of team. A fourth category would
-estimate the mean equity of teams that the source could not classify, a
-number with no business meaning. Leaving these records out keeps every
-coefficient interpretable. The cost is that the results describe the 1,434
+estimate the mean equity of teams that the source could not classify. This
+number has no business meaning. If we leave these records out, every
+coefficient has a clear meaning. The cost is that the results describe the 1,434
 classified records only.
 
 ::: {.caveat-box}
@@ -547,22 +557,22 @@ effect.
 At the same season and requested amount, all-women presenting teams are
 fitted to offer about 1.28 equity percentage points more than all-men teams
 (p $\approx$ 0.008). That is about one tenth of the average equity offered by
-all-men teams (13.20%). Mixed teams cannot be distinguished from all-men
-teams. The two category terms are jointly useful (partial F $\approx$ 3.76,
+all-men teams (13.20%). The estimate for mixed teams is not statistically
+different from all-men teams. The two category terms are jointly useful (partial F $\approx$ 3.76,
 p $\approx$ 0.023), so they belong in the model. The result is an adjusted
 association among these recorded pitches, not an effect of gender.
 
 ::: {.founder-box}
 <span class="label">A founder's decision (invented example)</span>
 
-You test two checkout pages. Each new customer sees the old or the new page by chance, 100 customers each. You regress the order value in euros on a dummy for the new page. The coefficient is 1.20 with a standard error of 0.50, so the 95% interval runs from about 0.20 to 2.20 euros. Chance decided who saw which page, so the two groups differ in nothing else on average. Here the coefficient is the effect of the page. The decision: switch to the new page. This is an A/B test, the founder's own way to get from an association to an effect.
+You test two checkout pages. Each new customer sees the old or the new page by chance, 100 customers each. You regress the order value in euros on a dummy for the new page. The coefficient is 1.20 with a standard error of 0.50, so the 95% interval runs from about 0.20 to 2.20 euros. Chance decided who saw which page, so the two groups differ in nothing else on average. Here the coefficient is the effect of the page. The decision: switch to the new page. This is an A/B test. Founders can run one themselves to move from an association to an effect.
 :::
 
 **Next:** You can now compare categories at fixed values of the other
 predictors. So far every group has the same slope, and every trend is a
-straight line. Both are choices of the model, not facts. Lecture 6 relaxes
-them. An interaction lets the season trend differ between groups of teams,
-and a squared term lets the trend bend.
+straight line. Both are choices of the model, not facts. Lecture 6 removes
+these two restrictions. An interaction lets the season trend differ between
+groups of teams, and a squared term lets the trend curve.
 
 :::
 
@@ -577,9 +587,10 @@ and a squared term lets the trend bend.
 ### Read the lecture material (15 minutes)
 
 Read the Lecture material section above from start to end. The lecture
-covered the core of it. The text has every step, every example, and all the
+covered the main ideas. The text has every step, every example, and all the
 code, including parts that were not shown in class. Note what is still
-unclear and bring it to the next tutorial, or ask Tilly.
+unclear and bring it to the next tutorial, or ask Tilly, the course AI
+assistant.
 
 ### Recall questions (10 minutes)
 
@@ -588,17 +599,17 @@ unclear and bring it to the next tutorial, or ask Tilly.
 3. What changes when the reference group changes?
 4. What does a partial F-test evaluate?
 5. Why can a joint F-test reject when one individual t-test does not?
-6. How is an A/B test analysed with a regression, and why can its
-   coefficient be read as an effect?
+6. How do you analyse an A/B test with a regression, and why can you read
+   its coefficient as an effect?
 
 ::: {.callout-note collapse="true"}
 ## Check your answers
 
 1. All $G$ dummies sum to 1 in every row, which is the same as the intercept
-   column. This is an exact linear dependence, so the coefficients could not
-   be estimated.
-2. A category with the named reference category, holding the other included
-   predictors fixed.
+   column. This is an exact dependence, so R could not estimate all the
+   coefficients.
+2. It compares a category with the named reference category, holding the
+   other included predictors fixed.
 3. The names and values of the coefficients change, because they now compare
    with a different category. The fitted values and the overall fit do not
    change.
@@ -613,16 +624,50 @@ unclear and bring it to the next tutorial, or ask Tilly.
    and the difference is the effect of the version.
 :::
 
-### Releveling and verification practice (15 minutes)
+### Finish a half-worked example: a partial F with new numbers (10 minutes)
 
-1. Relevel `gender` so that `mixed` is the reference group, and interpret
+[Shark Tank data]{.shark-tag} Test the two category dummies again, now in a smaller complete model. The
+reduced model contains only `season`:
+
+```{r}
+#| label: i05-faded-anova
+reduced_season <- lm(equity_offered_pct ~ season, data = known_gender)
+full_season    <- lm(equity_offered_pct ~ season + gender,
+                     data = known_gender)
+anova(reduced_season, full_season)
+```
+
+*Step 1 (given).* Adding the two dummies reduces the residual sum of squares
+by $643.43$ using $2$ degrees of freedom. The complete model leaves
+$84{,}003$ on $1{,}430$ degrees of freedom.
+
+*Step 2 (you).* Put these numbers into the F formula of the definition box.
+
+*Step 3 (you).* Compare with the table's F and p-value and state the
+conclusion at 5% in one sentence.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+$F=(643.43/2)/(84{,}003/1{,}430)=321.7/58.7\approx 5.48$, matching the
+table, with p $\approx$ 0.004. At 5%, the two category terms are jointly
+useful even in the model that adjusts only for season.
+:::
+
+### Practice: relevelling, hypotheses, and an A/B test (15 minutes)
+
+1. [Shark Tank data]{.shark-tag} Relevel `gender` so that `mixed` is the reference group, and interpret
    both dummy coefficients. Save the relevelled model as `relevelled_model`.
-2. Check that the fitted values are unchanged after releveling by comparing
+2. [Shark Tank data]{.shark-tag} Check that the fitted values are unchanged after relevelling by comparing
    them with those of `gender_model`.
 3. State the hypotheses for the partial F-test of both gender dummies.
-4. Explain why the seven `unknown` records were left out and not treated as
-   a fourth group.
-5. Explain why "the all-women coefficient is 1.28%" is ambiguous, then
+4. An invented A/B test. 200 new customers see the old or the new checkout
+   page by chance, 100 each. A regression of the order value (euros) on the
+   dummy `new_page` reports an intercept of 18.40 and a coefficient of 1.20
+   with standard error 0.50. Give the mean order value of each group and a
+   95% interval for the difference. The critical value is
+   $t_{0.975,\,198}$ = `qt(0.975, 198)` = 1.972. Why can the coefficient be read as an effect here?
+5. [Shark Tank data]{.shark-tag} Explain why "the all-women coefficient is 1.28%" is ambiguous, then
    rewrite it precisely.
 
 ::: {.callout-note collapse="true"}
@@ -644,49 +689,22 @@ unclear and bring it to the next tutorial, or ask Tilly.
    $1.163$ percentage points. Both compare with mixed teams.
 2. `all.equal(fitted(gender_model), fitted(relevelled_model))` returns
    `TRUE`.
-3. $H_0:\beta_{all\_women}=\beta_{mixed}=0$ against the alternative that at
+3. $H_0:\beta_{\text{all\_women}}=\beta_{\text{mixed}}=0$ against the alternative that at
    least one of the two is not zero, with all-men as the reference group.
-4. The `unknown` records have no known classification. Missing information
-   is not a kind of team.
+4. Old page: 18.40 euros. New page: $18.40+1.20=19.60$ euros. The model has
+   $200-2=198$ residual degrees of freedom. Interval:
+   $1.20\pm1.972\times0.50=1.20\pm0.986$, about 0.2 to 2.2 euros. Chance
+   decided who saw which page, so the two groups differ in nothing else on
+   average, and the coefficient is the effect of the page.
 5. It confuses percent with percentage points, and it does not name the
    comparison group or what is held fixed. A precise version: "At the same
    season and requested amount, all-women presenting teams are fitted to
    offer 1.28 equity percentage points more than all-men presenting teams."
 :::
 
-### Finish a half-worked example: a partial F with new numbers (10 minutes)
-
-Test the two category dummies again, now in a smaller complete model. The
-reduced model contains only `season`:
-
-```{r}
-#| label: i05-faded-anova
-reduced_season <- lm(equity_offered_pct ~ season, data = known_gender)
-full_season    <- lm(equity_offered_pct ~ season + gender,
-                     data = known_gender)
-anova(reduced_season, full_season)
-```
-
-*Step 1 (given).* Adding the two dummies reduces the residual sum of squares
-by $643.43$ using $2$ degrees of freedom. The complete model leaves
-$84{,}003$ on $1{,}430$ degrees of freedom.
-
-*Step 2 (you).* Plug these into the F formula from the worked example.
-
-*Step 3 (you).* Compare with the table's F and p-value and state the
-conclusion at 5% in one sentence.
-
-::: {.callout-note collapse="true"}
-## Check your answer
-
-$F=(643.43/2)/(84{,}003/1{,}430)=321.7/58.7\approx 5.48$, matching the
-table, with p $\approx$ 0.004. At 5%, the two category terms are jointly
-useful even in the model that adjusts only for season.
-:::
-
 ### The 120-word interpretation (10 minutes)
 
-Write an interpretation of the full `gender_model` in about 120 words.
+[Shark Tank data]{.shark-tag} Write an interpretation of the full `gender_model` in about 120 words.
 Include what the team categories do and do not record, and say why the
 result is not causal.
 
@@ -708,8 +726,8 @@ pitches, not causal effects.
 
 ### Review: one question from Lecture 4 (5 minutes)
 
-Using the Lecture 4 three-predictor model, compute the combined fitted
-difference for a pitch three seasons later requesting $200,000 more, at the
+[Shark Tank data]{.shark-tag} Using the Lecture 4 three-predictor model, compute the combined fitted
+difference for a pitch three seasons later requesting \$200,000 more, at the
 same description length.
 
 ::: {.callout-note collapse="true"}
@@ -722,10 +740,10 @@ of `ask_1k`.
 
 ### Worked exam interpretation (5 minutes)
 
-**Question.** This question is in the style of Question 4 of the mock exam.
+**Exam-style question.** An invented example.
 A model of equity offered on season, `ask_1k`, and industry (four
 categories, reference `Food and Beverage`) reports
-`industryTechnology 1.9 (p = 0.04)`. The numbers are invented. A student
+`industryTechnology 1.9 (p = 0.04)`. A student
 writes: "Technology pitches offer 1.9% more equity, so entering tech makes
 founders more generous." Correct the sentence.
 
@@ -736,13 +754,13 @@ Three corrections. Units: the estimate is 1.9 equity percentage points, not
 a relative 1.9%. Comparison and what is held fixed: technology pitches are
 fitted 1.9 points above Food and Beverage pitches at the same season and
 requested amount, among the recorded pitches. Scope: nothing here is causal.
-"Entering tech makes founders more generous" reads a comparison with the
+"Entering tech makes founders more generous" treats a comparison with the
 reference group as an effect of choosing an industry.
 :::
 
 ### Check the AI (5 minutes)
 
-You asked an AI assistant: "The coefficient of the all-women dummy is 1.28. What does that mean?" It answered:
+[Shark Tank data]{.shark-tag} You asked an AI assistant: "The coefficient of the all-women dummy is 1.28. What does that mean?" It answered:
 
 > "All-women teams offer 1.28% more equity than the average team."
 
@@ -752,25 +770,26 @@ step of Attempt → Ask → Verify → Explain, and the exam asks for it.
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-Three errors. The unit is percentage points, not percent. The comparison is with the reference group, all-men teams, not with the average team. And it holds at the same season and requested amount. Correct: at the same season and requested amount, all-women teams are fitted to offer 1.28 percentage points more equity than all-men teams.
+Three errors. The unit is percentage points, not percent. The comparison is with the reference group, all-men teams, not with the average team. And the answer leaves out that the comparison is at the same season and requested amount. Correct: at the same season and requested amount, all-women teams are fitted to offer 1.28 percentage points more equity than all-men teams.
 :::
 
 ### Make it yours (5 minutes)
 
 :::: {.utility-prompt}
-<span class="label">Utility: two sentences</span>
+<span class="label">Two sentences about your own venture</span>
 
 Think of your EiA3 venture, or any business you know well. Name one
 categorical feature of your customers or products (segment, channel, region,
 plan tier). Then write two sentences. Which category would you set as the
-reference group, and why? What would a "jointly useful" result of the F-test
-for the whole set of categories change in how you describe your market?
+reference group, and why? Suppose the F-test for the whole set of categories
+shows that they are jointly useful. How would this change the way you
+describe your market?
 There is no wrong answer.
 
 ::: {.callout-note collapse="true"}
 ## See an example, then write your own
 
-Take a student-run venture that sells meal-prep boxes on campus (an invented example). "My channels are the campus stand, the app, and the website. I would set the campus stand as the reference, because it is the first channel and every decision is compared with it. A jointly useful result of the F-test would justify describing my market by channel at all. Mixed p-values of the single dummies would not settle that."
+Take a student-run venture that sells meal-prep boxes on campus. "My channels are the campus stand, the app, and the website. I would set the campus stand as the reference, because it is the first channel and every decision is compared with it. If the F-test shows that the channel dummies are jointly useful, it makes sense to describe my market by channel. The p-values of the single dummies, some small and some large, could not answer that question."
 :::
 
 You can discuss this task, and any other task in this chapter, with

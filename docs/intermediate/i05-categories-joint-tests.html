@@ -74,7 +74,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-1825cde5eff643560dd74da544ac5848.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-0373dafead96411fe286b8dec0b5ee25.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -186,7 +186,7 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../basic/b01-introduction-data-analysis.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 1: Introduction to Data Analysis</span></a>
+  <a href="../basic/b01-introduction-data-analysis.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 1: Introduction to data analysis</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -236,22 +236,22 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../basic/t03-exam-prep.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Tutorial 3: Normal models, sampling, and standard errors</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="../basic/b09-t-confidence-intervals.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 9: The t distribution and confidence intervals</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../basic/b10-testing-errors-power.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 10: Testing decisions, errors, power, and the road to regression</span></a>
+  <a href="../basic/t03-exam-prep.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Tutorial 3: Normal models, sampling, and confidence intervals</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../basic/t04-exam-prep.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Tutorial 4: Inference and tests against zero</span></a>
+  <a href="../basic/b10-testing-errors-power.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Lecture 10: Testing decisions, errors, power, and a first look at regression</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/t04-exam-prep.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Tutorial 4: Hypothesis tests, errors, and power</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -408,6 +408,7 @@ window.Quarto = {
 <li>avoid the dummy-variable trap</li>
 <li>compute a partial F statistic by hand from an anova table and read the R output</li>
 <li>tell whether a set of terms is jointly useful, and tell this apart from the significance of a single term</li>
+<li>read an A/B test as a regression on one dummy</li>
 <li>tell an adjusted association apart from a causal claim.</li>
 </ul>
 </div>
@@ -429,20 +430,19 @@ window.Quarto = {
 <div class="driving-question">
 <p><span class="label">Driving question</span></p>
 <p class="dq-context">
-Markets come in categories: sales channels, customer segments, kinds of teams. This lecture shows how to put categories into a model and how to judge whether they belong in it.
+Many business variables are categories: sales channels, customer segments, kinds of teams. This lecture shows how to put categories into a model and how to judge whether they belong in it.
 </p>
-<p>At the same season and requested amount, do all-women presenting teams offer a different equity (<code>equity_offered_pct</code>) than all-men teams in the Shark Tank file? And are the category terms worth having in the model at all?</p>
+<p>At the same season and requested amount, do all-women presenting teams offer a different equity (<code>equity_offered_pct</code>) than all-men teams in the Shark Tank file? And do the category terms improve the model at all?</p>
 </div>
 <section id="before-class" class="level2 course-phase phase-before">
 <h2 class="anchored" data-anchor-id="before-class">Before class</h2>
 <p><span class="time-budget">Total preparation time: about 25 minutes.</span></p>
 <p><strong>Minimum path:</strong> the video and the R task. <strong>Full path:</strong> everything in this section.</p>
-<p>Bring a charged laptop with RStudio and the course project open. The code of the lecture is in this chapter, ready to copy, so you can run each step yourself during the lecture and get the same numbers and figures.</p>
 <div class="video-prep">
 <p><span class="label">Video preparation (10 minutes)</span><br> Watch Stanford Statistical Learning <a href="https://www.youtube.com/watch?v=dEBQmiXv9fk&amp;list=PLoROMvodv4rOzrYsAxzQyHb8n_RWNuS1e&amp;index=13">3.5 Extensions of the Linear Model</a>. Focus on predictors that are categories (the video calls them qualitative predictors) and on how the reference category decides what a coefficient means. All links are also listed in the <a href="../resources/video-guide.html">External Video Guide</a>.</p>
 </div>
-<p><strong>Reactivate and predict (5 minutes).</strong> The Shark Tank file sorts the presenting teams into three categories: <code>all_men</code>, <code>all_women</code>, and <code>mixed</code>. The video explains dummy variables, which take only the values 0 and 1. How many dummy variables does a model with an intercept need for three categories? Write down a number. Then answer the one-click Wooclap question posted on Canvas before you come to class: at the same season and requested amount, do you expect all-women teams to offer <strong>more</strong>, <strong>less</strong>, or <strong>about the same</strong> equity as all-men teams? You find both answers in the lecture material.</p>
-<p><strong>R warm-up (10 minutes).</strong> The lecture material starts from the subset and the factor that you build here. Run the code and bring the contrasts table that it prints:</p>
+<p><strong>Warm up and predict (5 minutes).</strong> The Shark Tank file sorts the presenting teams into three categories: <code>all_men</code>, <code>all_women</code>, and <code>mixed</code>. The video explains dummy variables, which take only the values 0 and 1. How many dummy variables does a model with an intercept need for three categories? Write down a number. Then answer the one-click Wooclap question posted on Canvas before you come to class: at the same season and requested amount, do you expect all-women teams to offer <strong>more</strong>, <strong>less</strong>, or <strong>about the same</strong> equity as all-men teams? You will find both answers in the lecture material.</p>
+<p><span class="shark-tag">Shark Tank data</span> <strong>R warm-up (10 minutes).</strong> The code below builds the subset of pitches and the factor that the lecture material uses. Run the code and bring the contrasts table that it prints to class:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>known_gender <span class="ot">&lt;-</span> <span class="fu">subset</span>(sharks, pitcher_gender_group <span class="sc">!=</span> <span class="st">"unknown"</span>)</span>
@@ -452,14 +452,15 @@ Markets come in categories: sales channels, customer segments, kinds of teams. T
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">levels</span>(known_gender<span class="sc">$</span>gender)</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">contrasts</span>(known_gender<span class="sc">$</span>gender)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>If indicators and reference categories are unfamiliar, review <a href="../resources/math-refresher.html">Mathematics Refresher: indicators and reference categories</a>.</p>
+<p><strong>Code along (bring your laptop).</strong> Bring a charged laptop with RStudio and the course project open. All the code of the lecture is in this chapter, ready to copy. You can run each step yourself during the lecture and get the same numbers and figures.</p>
+<p>If indicators and reference categories are unfamiliar, review <a href="../resources/math-refresher.html#indicators-and-reference-categories">Mathematics Refresher: indicators and reference categories</a>.</p>
 </section>
 <section id="lecture-material" class="level2 course-phase phase-in-class">
 <h2 class="anchored" data-anchor-id="lecture-material">Lecture material</h2>
-<p>This section first compares the groups of teams with plain averages. It then shows how a variable made of categories enters a regression, and how to test several coefficients at once.</p>
+<p>This section first compares the groups of teams with plain averages. It then shows how a regression uses a variable made of categories, and how to test several coefficients at once.</p>
 <section id="start-with-a-founders-question" class="level3">
 <h3 class="anchored" data-anchor-id="start-with-a-founders-question">Start with a founder’s question</h3>
-<p>Founders compare groups all the time: customers from the app against customers from the website, one price against another, one kind of team against another. Start with the comparison in the driving question. The Shark Tank file sorts the presenting teams into all men, all women, and mixed (<code>pitcher_gender_group</code>). What equity (<code>equity_offered_pct</code>) did each group offer on average?</p>
+<p><span class="shark-tag">Shark Tank data</span> Founders often compare groups: customers from the app against customers from the website, one price against another, one kind of team against another. Start with the comparison in the driving question. The Shark Tank file sorts the presenting teams into all men, all women, and mixed (<code>pitcher_gender_group</code>). What equity (<code>equity_offered_pct</code>) did each group offer on average?</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>known <span class="ot">&lt;-</span> <span class="fu">subset</span>(sharks, pitcher_gender_group <span class="sc">!=</span> <span class="st">"unknown"</span>)</span>
@@ -475,14 +476,14 @@ Markets come in categories: sales channels, customer segments, kinds of teams. T
       773       385       276 </code></pre>
 </div>
 </div>
-<p>All-men teams offered 13.20% on average, all-women teams 14.02%, and mixed teams 12.17%. The gap between all-women and all-men teams is 0.82 percentage points, about 6% of the all-men average. Three questions follow. Is this gap more than chance? Does it remain when we compare teams from the same season that asked for the same amount? And how does a variable made of words, not numbers, get into <code>lm()</code> at all? The sections below answer them in reverse order.</p>
+<p>All-men teams offered 13.20% on average, all-women teams 14.02%, and mixed teams 12.17%. The gap between all-women and all-men teams is 0.82 percentage points, about 6% of the all-men average. Three questions follow. Is this gap larger than chance alone would produce? Does it remain when we compare teams from the same season that asked for the same amount? And how can <code>lm()</code> use a variable that contains words, not numbers?</p>
 </section>
 <section id="measurement-first-what-the-category-records" class="level3">
 <h3 class="anchored" data-anchor-id="measurement-first-what-the-category-records">Measurement first: what the category records</h3>
 <p class="concept-video">
 <strong>Stanford explanation (review):</strong> <a href="https://www.youtube.com/watch?v=dEBQmiXv9fk">3.5 Extensions of the Linear Model</a>.
 </p>
-<p>The categories describe the people who presented on screen: all men, all women, or mixed. They do not record the share of women in a team, and they do not describe the full team behind the venture. Seven records are classified as <code>unknown</code>. They are left out of every model in this lecture. The section on the <code>unknown</code> records further down explains why. Keep these limits in mind for every result in this chapter.</p>
+<p>The categories describe the people who presented on screen: all men, all women, or mixed. They do not record the share of women in a team, and they do not describe the full team behind the venture. In seven records the source classifies the team as <code>unknown</code>. We leave these records out of every model in this lecture. A later section of this lecture explains why. Keep these limits in mind for every result in this chapter.</p>
 </section>
 <section id="a-two-level-indicator" class="level3">
 <h3 class="anchored" data-anchor-id="a-two-level-indicator">A two-level indicator</h3>
@@ -501,10 +502,10 @@ E[Y_i\mid D_i=0]=\beta_0,
 \qquad
 E[Y_i\mid D_i=1]=\beta_0+\beta_1.
 \]</span></p>
-<p>So <span class="math inline">\(\beta_1\)</span> is the expected difference between the group with <span class="math inline">\(D=1\)</span> and the reference group with <span class="math inline">\(D=0\)</span>. A regression on one dummy is the same thing as a comparison of two group means.</p>
-<p>This is also how an A/B test is analysed. In an A/B test you show two versions of a page, a price, or an offer to customers, and chance decides who sees which version. Code the version as a dummy and read its coefficient. Because chance decided who saw which version, nothing else differs between the two groups on average. In that case, and only in that case, the coefficient can be read as the effect of the change.</p>
+<p>So <span class="math inline">\(\beta_1\)</span> is the expected difference between the group with <span class="math inline">\(D=1\)</span> and the reference group with <span class="math inline">\(D=0\)</span>. A regression on one dummy is the same as a comparison of two group means.</p>
+<p>You analyse an A/B test in the same way. In an A/B test you show two versions of a page, a price, or an offer to customers, and chance decides who sees which version. Code the version as a dummy and read its coefficient. Because chance decided who saw which version, nothing else differs between the two groups on average. In that case, and only in that case, the coefficient can be read as the effect of the change.</p>
 <div id="exm-i05-two-ticks" class="theorem example">
-<p><span class="theorem-title"><strong>Example 22.1 (Worked example: two group means from two coefficients)</strong></span> Restrict to the all-men and all-women teams (1,158 records) and let <code>women_team</code> equal 1 for all-women teams:</p>
+<p><span class="theorem-title"><strong>Example 22.1 (Worked example: two group means from two coefficients)</strong></span> <span class="shark-tag">Shark Tank data</span> Keep only the all-men and all-women teams (1,158 records) and let <code>women_team</code> equal 1 for all-women teams:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>known_gender <span class="ot">&lt;-</span> <span class="fu">subset</span>(sharks, pitcher_gender_group <span class="sc">!=</span> <span class="st">"unknown"</span>)</span>
@@ -528,7 +529,7 @@ E[Y_i\mid D_i=1]=\beta_0+\beta_1.
 </div>
 <div class="cell">
 <details class="code-fold">
-<summary>See the drawing code (optional, not exam material)</summary>
+<summary>See the R code for this figure</summary>
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>old_par <span class="ot">&lt;-</span> <span class="fu">par</span>(<span class="at">no.readonly =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="fl">3.5</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>))</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="cn">NA</span>, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="fl">12.6</span>, <span class="fl">14.6</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">axes =</span> <span class="cn">FALSE</span>,</span>
@@ -559,7 +560,7 @@ Figure&nbsp;22.1: The model with one dummy places the two group means as two mar
 </section>
 <section id="more-than-two-categories" class="level3">
 <h3 class="anchored" data-anchor-id="more-than-two-categories">More than two categories</h3>
-<p>With <span class="math inline">\(G\)</span> categories and an intercept, use <span class="math inline">\(G-1\)</span> dummies. With all <span class="math inline">\(G\)</span> dummies and an intercept, the dummies sum to 1 in every row. This is the exact linear dependence from Lecture 4, and the coefficients cannot be estimated. The mistake is called the <strong>dummy-variable trap</strong>.</p>
+<p><span class="shark-tag">Shark Tank data</span> With <span class="math inline">\(G\)</span> categories and an intercept, use <span class="math inline">\(G-1\)</span> dummies. With all <span class="math inline">\(G\)</span> dummies and an intercept, the dummies sum to 1 in every row. This is the exact dependence from Lecture 4, and R cannot estimate all the coefficients. This mistake is called the <strong>dummy-variable trap</strong>.</p>
 <p>R creates the dummies itself when a predictor is a factor. Choose the reference category yourself and check it. This is the code of the R warm-up:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>known_gender<span class="sc">$</span>gender <span class="ot">&lt;-</span> <span class="fu">relevel</span>(<span class="fu">factor</span>(known_gender<span class="sc">$</span>pitcher_gender_group),</span>
@@ -577,7 +578,7 @@ all_women         1     0
 mixed             0     1</code></pre>
 </div>
 </div>
-<p>Each row of the contrasts table is a category. Each column is one dummy. The reference category <code>all_men</code> is the row with only zeros. Its mean is carried by the intercept. This answers the first question from before class: three categories need two dummies.</p>
+<p>Each row of the contrasts table is a category. Each column is one dummy. The reference category <code>all_men</code> is the row with only zeros. The intercept belongs to this category. This answers the first question from before class: three categories need two dummies.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -590,7 +591,7 @@ Check: four industries and an intercept, how many dummies?
 </div>
 <div id="callout-1" class="callout-1-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>Three. One industry is the reference group, carried by the intercept. Each of the three dummy coefficients compares one of the other industries with it. Four dummies and an intercept would be the dummy-variable trap.</p>
+<p>Three. One industry is the reference group, and the intercept belongs to this group. Each of the three dummy coefficients compares one of the other industries with it. Four dummies and an intercept would be the dummy-variable trap.</p>
 </div>
 </div>
 </div>
@@ -609,7 +610,7 @@ Try it: three sales channels
 <p>Try this with your neighbour first. In an invented example, a venture sells through three channels: the campus stand, the app, and the website. A model of the order value in euros uses the campus stand as the reference and reports <code>channelApp 6.0</code> and <code>channelWebsite 2.5</code>, with an intercept of 9.0.</p>
 <p><em>Step 1 (given).</em> With three categories and an intercept, the model needs two dummies. The campus stand has no dummy. Its mean is the intercept.</p>
 <p><em>Step 2 (you).</em> Give the fitted mean order value for each of the three channels.</p>
-<p><em>Step 3 (you).</em> By how much does the fitted order value in the app differ from the website? Neither is the reference group.</p>
+<p><em>Step 3 (you).</em> By how much does the fitted order value in the app differ from the fitted order value on the website? Neither is the reference group.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -622,7 +623,7 @@ Check your answer
 </div>
 <div id="callout-2" class="callout-2-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>Campus stand: 9.0 euros. App: 9.0 + 6.0 = 15.0 euros. Website: 9.0 + 2.5 = 11.5 euros. App minus website: 6.0 - 2.5 = 3.5 euros. Two coefficients that share a reference group can be subtracted from each other.</p>
+<p>Campus stand: 9.0 euros. App: 9.0 + 6.0 = 15.0 euros. Website: 9.0 + 2.5 = 11.5 euros. App minus website: 6.0 - 2.5 = 3.5 euros. You can subtract two coefficients that share a reference group from each other. The result compares their two categories directly.</p>
 </div>
 </div>
 </div>
@@ -632,16 +633,16 @@ Check your answer
 </section>
 <section id="percent-versus-percentage-points" class="level3">
 <h3 class="anchored" data-anchor-id="percent-versus-percentage-points">Percent versus percentage points</h3>
-<p>One point about units comes first. The outcome <code>equity_offered_pct</code> is measured in percent, so its regression coefficients are in <strong>percentage points</strong>. The next section estimates a coefficient of 1.28 for all-women teams. The sentence “the all-women coefficient is 1.28%” would be ambiguous. It could mean:</p>
+<p><span class="shark-tag">Shark Tank data</span> The outcome <code>equity_offered_pct</code> is measured in percent, so its regression coefficients are in <strong>percentage points</strong>. The model in the next section estimates a coefficient of 1.28 for all-women teams. The sentence “the all-women coefficient is 1.28%” would be ambiguous. It could mean:</p>
 <ul>
-<li>a relative change: 1.28% of the all-men level more (13.0% would become about 13.2%)</li>
-<li>an absolute change of 1.28 percentage points (13.0% would become 14.28%).</li>
+<li>a relative change: 1.28% of the all-men level more (13.2% would become about 13.4%)</li>
+<li>an absolute change of 1.28 percentage points (13.2% would become 14.48%).</li>
 </ul>
-<p>The two readings differ by a factor of about eight here. A coefficient for an outcome in percent is always the absolute kind. The precise sentence is: “At the same season and requested amount, all-women presenting teams are fitted to offer 1.28 equity percentage points more than all-men presenting teams.” Always write percentage points for this outcome.</p>
+<p>The two readings differ by a factor of about eight here. A coefficient for an outcome in percent is always an absolute change in percentage points. The precise sentence is: “At the same season and requested amount, all-women presenting teams are fitted to offer 1.28 equity percentage points more than all-men presenting teams.” Always write percentage points for this outcome.</p>
 </section>
 <section id="the-adjusted-comparison" class="level3">
 <h3 class="anchored" data-anchor-id="the-adjusted-comparison">The adjusted comparison</h3>
-<p>Now fit the model of the driving question. It contains both category dummies, and it holds season and requested amount (in thousands of dollars, <code>ask_1k</code>) fixed.</p>
+<p><span class="shark-tag">Shark Tank data</span> Now fit the model of the driving question. It contains both category dummies, and it holds season and requested amount (in thousands of dollars, <code>ask_1k</code>) fixed.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>gender_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> ask_1k <span class="sc">+</span> gender,</span>
@@ -678,7 +679,7 @@ F-statistic: 84.49 on 4 and 1429 DF,  p-value: &lt; 2.2e-16</code></pre>
 <li><strong>Mixed versus all-men.</strong> Among the same pitches, mixed teams are fitted to offer about 0.12 percentage points more than all-men teams at the same season and requested amount (p <span class="math inline">\(\approx\)</span> 0.823). This estimate is not statistically distinguishable from zero.</li>
 </ul>
 <p>The first sentence answers the Wooclap question from before class: all-women teams offer more. The adjusted gap between all-women and all-men teams (1.28 points) is larger than the raw gap from the worked example (0.82 points). Holding season and requested amount fixed changed the comparison. This is why the sentence must name what is held fixed. Both coefficients are comparisons with the reference group. They do not show that the gender of a team causes the offer.</p>
-<p>Changing the reference group changes the names and values of the coefficients. It does not change the fitted values or the overall fit. Check it:</p>
+<p>Changing the reference group changes the names and values of the coefficients. It does not change the fitted values or the overall fit. Check this in R:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>known_gender<span class="sc">$</span>gender_women_ref <span class="ot">&lt;-</span> <span class="fu">relevel</span>(known_gender<span class="sc">$</span>gender,</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>                                         <span class="at">ref =</span> <span class="st">"all_women"</span>)</span>
@@ -695,15 +696,19 @@ gender_women_refall_men   gender_women_refmixed
 </section>
 <section id="are-the-category-terms-worth-having-at-all" class="level3">
 <h3 class="anchored" data-anchor-id="are-the-category-terms-worth-having-at-all">Are the category terms worth having at all?</h3>
-<p>So far the coefficients were read one at a time. The driving question also asks something that no single t-test answers: do the two category terms together add information beyond season and requested amount?</p>
+<p>So far we read the coefficients one at a time. The driving question also asks something that no single t-test answers: do the two category terms together add information beyond season and requested amount?</p>
 <div class="definition-box">
 <p><span class="label">Definition</span></p>
 <p><strong>Partial F-test.</strong> A test of whether several coefficients are all zero at the same time. It compares a complete model with a reduced model that leaves out the tested terms. Both models are fitted on the same observations.</p>
+<p><span class="math display">\[
+F=\dfrac{(\text{SSE}_R-\text{SSE}_C)/q}{\text{SSE}_C/(n-k_C-1)},
+\]</span></p>
+<p>with <span class="math inline">\(\text{SSE}_R\)</span> and <span class="math inline">\(\text{SSE}_C\)</span> the sums of squared residuals of the reduced and the complete model, <span class="math inline">\(q\)</span> the number of tested coefficients, and <span class="math inline">\(k_C\)</span> the number of slopes of the complete model.</p>
 </div>
 <p>Two such models are called <strong>nested</strong>: the reduced model is the complete model with the tested coefficients set to zero. <a href="#fig-i05-nested" class="quarto-xref">Figure&nbsp;<span>22.2</span></a> shows the pair for the two category dummies.</p>
 <div class="cell">
 <details class="code-fold">
-<summary>See the drawing code (optional, not exam material)</summary>
+<summary>See the R code for this figure</summary>
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>old_par <span class="ot">&lt;-</span> <span class="fu">par</span>(<span class="at">no.readonly =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="fl">0.3</span>, <span class="fl">0.3</span>, <span class="fl">0.3</span>, <span class="fl">0.3</span>))</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="cn">NA</span>, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">10</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">5</span>), <span class="at">axes =</span> <span class="cn">FALSE</span>,</span>
@@ -712,7 +717,7 @@ gender_women_refall_men   gender_women_refmixed
 <span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="fu">rect</span>(<span class="fl">5.4</span>, <span class="fl">1.1</span>, <span class="fl">9.6</span>, <span class="fl">3.9</span>, <span class="at">col =</span> <span class="st">"#FDE5C1"</span>, <span class="at">border =</span> <span class="st">"#17324D"</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span>
 <span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="fl">2.5</span>, <span class="fl">3.35</span>, <span class="st">"Reduced model"</span>, <span class="at">font =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"#17324D"</span>)</span>
 <span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="fl">2.5</span>, <span class="fl">2.55</span>, <span class="st">"season + ask_1k"</span>, <span class="at">cex =</span> <span class="fl">0.95</span>)</span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="fl">2.5</span>, <span class="fl">1.85</span>, <span class="fu">expression</span>(beta[aw] <span class="sc">==</span> <span class="dv">0</span> <span class="sc">~</span> <span class="st">","</span> <span class="sc">~</span> beta[mx] <span class="sc">==</span> <span class="dv">0</span>),</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="fl">2.5</span>, <span class="fl">1.85</span>, <span class="fu">expression</span>(beta[<span class="st">"all_women"</span>] <span class="sc">==</span> <span class="dv">0</span> <span class="sc">~</span> <span class="st">","</span> <span class="sc">~</span> beta[<span class="st">"mixed"</span>] <span class="sc">==</span> <span class="dv">0</span>),</span>
 <span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>     <span class="at">cex =</span> <span class="fl">0.95</span>, <span class="at">col =</span> <span class="st">"#5B6976"</span>)</span>
 <span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="fl">7.5</span>, <span class="fl">3.35</span>, <span class="st">"Complete model"</span>, <span class="at">font =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"#17324D"</span>)</span>
 <span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="fl">7.5</span>, <span class="fl">2.55</span>, <span class="st">"season + ask_1k"</span>, <span class="at">cex =</span> <span class="fl">0.95</span>)</span>
@@ -736,11 +741,11 @@ Figure&nbsp;22.2: The two nested models of the partial F-test. The reduced model
 </div>
 <p>The hypotheses:</p>
 <p><span class="math display">\[
-H_0:\beta_{all\_women}=\beta_{mixed}=0
+H_0:\beta_{\text{all\_women}}=\beta_{\text{mixed}}=0
 \quad\text{against at least one non-zero.}
 \]</span></p>
 <div id="exm-i05-partial-f" class="theorem example">
-<p><span class="theorem-title"><strong>Example 22.2 (Worked example: the partial F statistic by hand)</strong></span> Fit both models and ask R for the anova table:</p>
+<p><span class="theorem-title"><strong>Example 22.2 (Worked example: the partial F statistic by hand)</strong></span> <span class="shark-tag">Shark Tank data</span> Fit both models and ask R for the anova table:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>reduced_gender <span class="ot">&lt;-</span> <span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> ask_1k,</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>                     <span class="at">data =</span> known_gender)</span>
@@ -757,7 +762,7 @@ Model 2: equity_offered_pct ~ season + ask_1k + gender
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 </div>
 </div>
-<p>Now calculate F by hand from the numbers in the table. The residual sum of squares (RSS in the R output, SSE in this course) falls by <span class="math inline">\(436.25\)</span> when the two category terms are added. This uses <span class="math inline">\(2\)</span> degrees of freedom. The complete model leaves a residual sum of squares of <span class="math inline">\(82{,}792\)</span> on <span class="math inline">\(1{,}429\)</span> degrees of freedom:</p>
+<p>Now calculate F by hand from the numbers in the table. The residual sum of squares (RSS in the R output, SSE in this course) falls by <span class="math inline">\(436.25\)</span> when you add the two category terms. This uses <span class="math inline">\(2\)</span> degrees of freedom. The complete model leaves a residual sum of squares of <span class="math inline">\(82{,}792\)</span> on <span class="math inline">\(1{,}429\)</span> degrees of freedom:</p>
 <p><span class="math display">\[
 F=\frac{436.25/2}{82{,}792/1{,}429}
 =\frac{218.13}{57.94}
@@ -765,11 +770,11 @@ F=\frac{436.25/2}{82{,}792/1{,}429}
 \]</span></p>
 <p>Read the ratio. The numerator is the variation that the two terms explain, per tested coefficient. The denominator is the variation that is left unexplained, per residual degree of freedom. If the two coefficients were really zero, the ratio would be close to 1. Here it is about 3.8, and the p-value is about 0.023.</p>
 </div>
-<p>At 5%, the two category terms are <strong>jointly useful</strong> in this model. Compare this with the single results: the p-value of the joint test is <span class="math inline">\(0.023\)</span>, and the p-value of the mixed dummy alone is <span class="math inline">\(0.823\)</span>. Joint usefulness is not the same as individual significance. The F-test asks whether the two terms together improve the model. It does not ask whether each term is significant on its own. The overall F-test in <code>summary(gender_model)</code>, about 84.5 with a very small p-value, answers a third question: whether all four coefficients together improve on a model with only an intercept.</p>
+<p>At 5%, the two category terms are jointly useful in this model. Compare this with the single results: the p-value of the joint test is <span class="math inline">\(0.023\)</span>, and the p-value of the mixed dummy alone is <span class="math inline">\(0.823\)</span>. Joint usefulness is not the same as individual significance. The F-test asks whether the two terms together improve the model. It does not ask whether each term is significant on its own. The overall F-test in <code>summary(gender_model)</code> is about 84.5, with a very small p-value. It answers a third question: do all four coefficients together improve on a model with only an intercept?</p>
 </section>
 <section id="visualise-the-adjusted-comparison" class="level3">
 <h3 class="anchored" data-anchor-id="visualise-the-adjusted-comparison">Visualise the adjusted comparison</h3>
-<p><a href="#fig-i05-adjusted" class="quarto-xref">Figure&nbsp;<span>22.3</span></a> shows the fitted equity offered for the three groups of teams at the same season and requested amount.</p>
+<p><span class="shark-tag">Shark Tank data</span> <a href="#fig-i05-adjusted" class="quarto-xref">Figure&nbsp;<span>22.3</span></a> shows the fitted equity offered for the three groups of teams at the same season and requested amount.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>See the R code for this figure</summary>
@@ -835,7 +840,7 @@ Figure&nbsp;22.3: Fitted equity offered for the three groups of presenting teams
 </section>
 <section id="why-unknown-is-excluded-not-a-fourth-group" class="level3">
 <h3 class="anchored" data-anchor-id="why-unknown-is-excluded-not-a-fourth-group">Why <code>unknown</code> is excluded, not a fourth group</h3>
-<p>Seven records have the classification <code>unknown</code>. This label says that information is missing. It is not a kind of team. A fourth category would estimate the mean equity of teams that the source could not classify, a number with no business meaning. Leaving these records out keeps every coefficient interpretable. The cost is that the results describe the 1,434 classified records only.</p>
+<p>Seven records have the classification <code>unknown</code>. This label says that information is missing. It is not a kind of team. A fourth category would estimate the mean equity of teams that the source could not classify. This number has no business meaning. If we leave these records out, every coefficient has a clear meaning. The cost is that the results describe the 1,434 classified records only.</p>
 <div class="caveat-box">
 <p><span class="label">What these category coefficients can and cannot say</span></p>
 <ul>
@@ -848,12 +853,12 @@ Figure&nbsp;22.3: Fitted equity offered for the three groups of presenting teams
 </section>
 <section id="answering-the-driving-question" class="level3">
 <h3 class="anchored" data-anchor-id="answering-the-driving-question">Answering the driving question</h3>
-<p>At the same season and requested amount, all-women presenting teams are fitted to offer about 1.28 equity percentage points more than all-men teams (p <span class="math inline">\(\approx\)</span> 0.008). That is about one tenth of the average equity offered by all-men teams (13.20%). Mixed teams cannot be distinguished from all-men teams. The two category terms are jointly useful (partial F <span class="math inline">\(\approx\)</span> 3.76, p <span class="math inline">\(\approx\)</span> 0.023), so they belong in the model. The result is an adjusted association among these recorded pitches, not an effect of gender.</p>
+<p>At the same season and requested amount, all-women presenting teams are fitted to offer about 1.28 equity percentage points more than all-men teams (p <span class="math inline">\(\approx\)</span> 0.008). That is about one tenth of the average equity offered by all-men teams (13.20%). The estimate for mixed teams is not statistically different from all-men teams. The two category terms are jointly useful (partial F <span class="math inline">\(\approx\)</span> 3.76, p <span class="math inline">\(\approx\)</span> 0.023), so they belong in the model. The result is an adjusted association among these recorded pitches, not an effect of gender.</p>
 <div class="founder-box">
 <p><span class="label">A founder’s decision (invented example)</span></p>
-<p>You test two checkout pages. Each new customer sees the old or the new page by chance, 100 customers each. You regress the order value in euros on a dummy for the new page. The coefficient is 1.20 with a standard error of 0.50, so the 95% interval runs from about 0.20 to 2.20 euros. Chance decided who saw which page, so the two groups differ in nothing else on average. Here the coefficient is the effect of the page. The decision: switch to the new page. This is an A/B test, the founder’s own way to get from an association to an effect.</p>
+<p>You test two checkout pages. Each new customer sees the old or the new page by chance, 100 customers each. You regress the order value in euros on a dummy for the new page. The coefficient is 1.20 with a standard error of 0.50, so the 95% interval runs from about 0.20 to 2.20 euros. Chance decided who saw which page, so the two groups differ in nothing else on average. Here the coefficient is the effect of the page. The decision: switch to the new page. This is an A/B test. Founders can run one themselves to move from an association to an effect.</p>
 </div>
-<p><strong>Next:</strong> You can now compare categories at fixed values of the other predictors. So far every group has the same slope, and every trend is a straight line. Both are choices of the model, not facts. Lecture 6 relaxes them. An interaction lets the season trend differ between groups of teams, and a squared term lets the trend bend.</p>
+<p><strong>Next:</strong> You can now compare categories at fixed values of the other predictors. So far every group has the same slope, and every trend is a straight line. Both are choices of the model, not facts. Lecture 6 removes these two restrictions. An interaction lets the season trend differ between groups of teams, and a squared term lets the trend curve.</p>
 </section>
 </section>
 <section id="after-class" class="level2 course-phase phase-after">
@@ -862,7 +867,7 @@ Figure&nbsp;22.3: Fitted equity offered for the three groups of presenting teams
 <p><strong>Minimum path (about 35 minutes):</strong> read the lecture material, answer the recall questions, then work for 10 minutes on the tasks that follow. <strong>Full path:</strong> all tasks below.</p>
 <section id="read-the-lecture-material-15-minutes" class="level3">
 <h3 class="anchored" data-anchor-id="read-the-lecture-material-15-minutes">Read the lecture material (15 minutes)</h3>
-<p>Read the Lecture material section above from start to end. The lecture covered the core of it. The text has every step, every example, and all the code, including parts that were not shown in class. Note what is still unclear and bring it to the next tutorial, or ask Tilly.</p>
+<p>Read the Lecture material section above from start to end. The lecture covered the main ideas. The text has every step, every example, and all the code, including parts that were not shown in class. Note what is still unclear and bring it to the next tutorial, or ask Tilly, the course AI assistant.</p>
 </section>
 <section id="recall-questions-10-minutes" class="level3">
 <h3 class="anchored" data-anchor-id="recall-questions-10-minutes">Recall questions (10 minutes)</h3>
@@ -872,7 +877,7 @@ Figure&nbsp;22.3: Fitted equity offered for the three groups of presenting teams
 <li>What changes when the reference group changes?</li>
 <li>What does a partial F-test evaluate?</li>
 <li>Why can a joint F-test reject when one individual t-test does not?</li>
-<li>How is an A/B test analysed with a regression, and why can its coefficient be read as an effect?</li>
+<li>How do you analyse an A/B test with a regression, and why can you read its coefficient as an effect?</li>
 </ol>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
@@ -887,8 +892,8 @@ Check your answers
 <div id="callout-4" class="callout-4-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ol type="1">
-<li>All <span class="math inline">\(G\)</span> dummies sum to 1 in every row, which is the same as the intercept column. This is an exact linear dependence, so the coefficients could not be estimated.</li>
-<li>A category with the named reference category, holding the other included predictors fixed.</li>
+<li>All <span class="math inline">\(G\)</span> dummies sum to 1 in every row, which is the same as the intercept column. This is an exact dependence, so R could not estimate all the coefficients.</li>
+<li>It compares a category with the named reference category, holding the other included predictors fixed.</li>
 <li>The names and values of the coefficients change, because they now compare with a different category. The fitted values and the overall fit do not change.</li>
 <li>Whether several coefficients are all zero at the same time. It compares two nested models on the same observations.</li>
 <li>The F-test evaluates the terms together. Each t-test asks a narrower question about one comparison with the reference group, and it can miss what the terms explain together.</li>
@@ -898,53 +903,14 @@ Check your answers
 </div>
 </div>
 </section>
-<section id="releveling-and-verification-practice-15-minutes" class="level3">
-<h3 class="anchored" data-anchor-id="releveling-and-verification-practice-15-minutes">Releveling and verification practice (15 minutes)</h3>
-<ol type="1">
-<li>Relevel <code>gender</code> so that <code>mixed</code> is the reference group, and interpret both dummy coefficients. Save the relevelled model as <code>relevelled_model</code>.</li>
-<li>Check that the fitted values are unchanged after releveling by comparing them with those of <code>gender_model</code>.</li>
-<li>State the hypotheses for the partial F-test of both gender dummies.</li>
-<li>Explain why the seven <code>unknown</code> records were left out and not treated as a fourth group.</li>
-<li>Explain why “the all-women coefficient is 1.28%” is ambiguous, then rewrite it precisely.</li>
-</ol>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Check your answers
-</div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
-</div>
-<div id="callout-5" class="callout-5-contents callout-collapse collapse">
-<div class="callout-body-container callout-body">
-<ol type="1">
-<li><p>Use:</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>mixed_reference <span class="ot">&lt;-</span> <span class="fu">relevel</span>(known_gender<span class="sc">$</span>gender, <span class="at">ref =</span> <span class="st">"mixed"</span>)</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>relevelled_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> ask_1k <span class="sc">+</span> mixed_reference,</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> known_gender</span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(relevelled_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>At the same season and requested amount, the all-men coefficient is about <span class="math inline">\(-0.121\)</span> percentage points and the all-women coefficient about <span class="math inline">\(1.163\)</span> percentage points. Both compare with mixed teams.</p></li>
-<li><p><code>all.equal(fitted(gender_model), fitted(relevelled_model))</code> returns <code>TRUE</code>.</p></li>
-<li><p><span class="math inline">\(H_0:\beta_{all\_women}=\beta_{mixed}=0\)</span> against the alternative that at least one of the two is not zero, with all-men as the reference group.</p></li>
-<li><p>The <code>unknown</code> records have no known classification. Missing information is not a kind of team.</p></li>
-<li><p>It confuses percent with percentage points, and it does not name the comparison group or what is held fixed. A precise version: “At the same season and requested amount, all-women presenting teams are fitted to offer 1.28 equity percentage points more than all-men presenting teams.”</p></li>
-</ol>
-</div>
-</div>
-</div>
-</section>
 <section id="finish-a-half-worked-example-a-partial-f-with-new-numbers-10-minutes" class="level3">
 <h3 class="anchored" data-anchor-id="finish-a-half-worked-example-a-partial-f-with-new-numbers-10-minutes">Finish a half-worked example: a partial F with new numbers (10 minutes)</h3>
-<p>Test the two category dummies again, now in a smaller complete model. The reduced model contains only <code>season</code>:</p>
+<p><span class="shark-tag">Shark Tank data</span> Test the two category dummies again, now in a smaller complete model. The reduced model contains only <code>season</code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>reduced_season <span class="ot">&lt;-</span> <span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> season, <span class="at">data =</span> known_gender)</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>full_season    <span class="ot">&lt;-</span> <span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> gender,</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">data =</span> known_gender)</span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(reduced_season, full_season)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>reduced_season <span class="ot">&lt;-</span> <span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> season, <span class="at">data =</span> known_gender)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>full_season    <span class="ot">&lt;-</span> <span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> gender,</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">data =</span> known_gender)</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(reduced_season, full_season)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Analysis of Variance Table
 
@@ -958,10 +924,10 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 </div>
 </div>
 <p><em>Step 1 (given).</em> Adding the two dummies reduces the residual sum of squares by <span class="math inline">\(643.43\)</span> using <span class="math inline">\(2\)</span> degrees of freedom. The complete model leaves <span class="math inline">\(84{,}003\)</span> on <span class="math inline">\(1{,}430\)</span> degrees of freedom.</p>
-<p><em>Step 2 (you).</em> Plug these into the F formula from the worked example.</p>
+<p><em>Step 2 (you).</em> Put these numbers into the F formula of the definition box.</p>
 <p><em>Step 3 (you).</em> Compare with the table’s F and p-value and state the conclusion at 5% in one sentence.</p>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -970,16 +936,55 @@ Check your answer
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p><span class="math inline">\(F=(643.43/2)/(84{,}003/1{,}430)=321.7/58.7\approx 5.48\)</span>, matching the table, with p <span class="math inline">\(\approx\)</span> 0.004. At 5%, the two category terms are jointly useful even in the model that adjusts only for season.</p>
 </div>
 </div>
 </div>
 </section>
+<section id="practice-relevelling-hypotheses-and-an-ab-test-15-minutes" class="level3">
+<h3 class="anchored" data-anchor-id="practice-relevelling-hypotheses-and-an-ab-test-15-minutes">Practice: relevelling, hypotheses, and an A/B test (15 minutes)</h3>
+<ol type="1">
+<li><span class="shark-tag">Shark Tank data</span> Relevel <code>gender</code> so that <code>mixed</code> is the reference group, and interpret both dummy coefficients. Save the relevelled model as <code>relevelled_model</code>.</li>
+<li><span class="shark-tag">Shark Tank data</span> Check that the fitted values are unchanged after relevelling by comparing them with those of <code>gender_model</code>.</li>
+<li>State the hypotheses for the partial F-test of both gender dummies.</li>
+<li>An invented A/B test. 200 new customers see the old or the new checkout page by chance, 100 each. A regression of the order value (euros) on the dummy <code>new_page</code> reports an intercept of 18.40 and a coefficient of 1.20 with standard error 0.50. Give the mean order value of each group and a 95% interval for the difference. The critical value is <span class="math inline">\(t_{0.975,\,198}\)</span> = <code>qt(0.975, 198)</code> = 1.972. Why can the coefficient be read as an effect here?</li>
+<li><span class="shark-tag">Shark Tank data</span> Explain why “the all-women coefficient is 1.28%” is ambiguous, then rewrite it precisely.</li>
+</ol>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check your answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li><p>Use:</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>mixed_reference <span class="ot">&lt;-</span> <span class="fu">relevel</span>(known_gender<span class="sc">$</span>gender, <span class="at">ref =</span> <span class="st">"mixed"</span>)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>relevelled_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> ask_1k <span class="sc">+</span> mixed_reference,</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> known_gender</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(relevelled_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>At the same season and requested amount, the all-men coefficient is about <span class="math inline">\(-0.121\)</span> percentage points and the all-women coefficient about <span class="math inline">\(1.163\)</span> percentage points. Both compare with mixed teams.</p></li>
+<li><p><code>all.equal(fitted(gender_model), fitted(relevelled_model))</code> returns <code>TRUE</code>.</p></li>
+<li><p><span class="math inline">\(H_0:\beta_{\text{all\_women}}=\beta_{\text{mixed}}=0\)</span> against the alternative that at least one of the two is not zero, with all-men as the reference group.</p></li>
+<li><p>Old page: 18.40 euros. New page: <span class="math inline">\(18.40+1.20=19.60\)</span> euros. The model has <span class="math inline">\(200-2=198\)</span> residual degrees of freedom. Interval: <span class="math inline">\(1.20\pm1.972\times0.50=1.20\pm0.986\)</span>, about 0.2 to 2.2 euros. Chance decided who saw which page, so the two groups differ in nothing else on average, and the coefficient is the effect of the page.</p></li>
+<li><p>It confuses percent with percentage points, and it does not name the comparison group or what is held fixed. A precise version: “At the same season and requested amount, all-women presenting teams are fitted to offer 1.28 equity percentage points more than all-men presenting teams.”</p></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
 <section id="the-120-word-interpretation-10-minutes" class="level3">
 <h3 class="anchored" data-anchor-id="the-120-word-interpretation-10-minutes">The 120-word interpretation (10 minutes)</h3>
-<p>Write an interpretation of the full <code>gender_model</code> in about 120 words. Include what the team categories do and do not record, and say why the result is not causal.</p>
+<p><span class="shark-tag">Shark Tank data</span> Write an interpretation of the full <code>gender_model</code> in about 120 words. Include what the team categories do and do not record, and say why the result is not causal.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -999,7 +1004,7 @@ Check a model answer
 </section>
 <section id="review-one-question-from-lecture-4-5-minutes" class="level3">
 <h3 class="anchored" data-anchor-id="review-one-question-from-lecture-4-5-minutes">Review: one question from Lecture 4 (5 minutes)</h3>
-<p>Using the Lecture 4 three-predictor model, compute the combined fitted difference for a pitch three seasons later requesting $200,000 more, at the same description length.</p>
+<p><span class="shark-tag">Shark Tank data</span> Using the Lecture 4 three-predictor model, compute the combined fitted difference for a pitch three seasons later requesting $200,000 more, at the same description length.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -1019,7 +1024,7 @@ Check your answer
 </section>
 <section id="worked-exam-interpretation-5-minutes" class="level3">
 <h3 class="anchored" data-anchor-id="worked-exam-interpretation-5-minutes">Worked exam interpretation (5 minutes)</h3>
-<p><strong>Question.</strong> This question is in the style of Question 4 of the mock exam. A model of equity offered on season, <code>ask_1k</code>, and industry (four categories, reference <code>Food and Beverage</code>) reports <code>industryTechnology 1.9 (p = 0.04)</code>. The numbers are invented. A student writes: “Technology pitches offer 1.9% more equity, so entering tech makes founders more generous.” Correct the sentence.</p>
+<p><strong>Exam-style question.</strong> An invented example. A model of equity offered on season, <code>ask_1k</code>, and industry (four categories, reference <code>Food and Beverage</code>) reports <code>industryTechnology 1.9 (p = 0.04)</code>. A student writes: “Technology pitches offer 1.9% more equity, so entering tech makes founders more generous.” Correct the sentence.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -1032,14 +1037,14 @@ Check a model answer
 </div>
 <div id="callout-9" class="callout-9-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>Three corrections. Units: the estimate is 1.9 equity percentage points, not a relative 1.9%. Comparison and what is held fixed: technology pitches are fitted 1.9 points above Food and Beverage pitches at the same season and requested amount, among the recorded pitches. Scope: nothing here is causal. “Entering tech makes founders more generous” reads a comparison with the reference group as an effect of choosing an industry.</p>
+<p>Three corrections. Units: the estimate is 1.9 equity percentage points, not a relative 1.9%. Comparison and what is held fixed: technology pitches are fitted 1.9 points above Food and Beverage pitches at the same season and requested amount, among the recorded pitches. Scope: nothing here is causal. “Entering tech makes founders more generous” treats a comparison with the reference group as an effect of choosing an industry.</p>
 </div>
 </div>
 </div>
 </section>
 <section id="check-the-ai-5-minutes" class="level3">
 <h3 class="anchored" data-anchor-id="check-the-ai-5-minutes">Check the AI (5 minutes)</h3>
-<p>You asked an AI assistant: “The coefficient of the all-women dummy is 1.28. What does that mean?” It answered:</p>
+<p><span class="shark-tag">Shark Tank data</span> You asked an AI assistant: “The coefficient of the all-women dummy is 1.28. What does that mean?” It answered:</p>
 <blockquote class="blockquote">
 <p>“All-women teams offer 1.28% more equity than the average team.”</p>
 </blockquote>
@@ -1056,7 +1061,7 @@ Check your answer
 </div>
 <div id="callout-10" class="callout-10-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>Three errors. The unit is percentage points, not percent. The comparison is with the reference group, all-men teams, not with the average team. And it holds at the same season and requested amount. Correct: at the same season and requested amount, all-women teams are fitted to offer 1.28 percentage points more equity than all-men teams.</p>
+<p>Three errors. The unit is percentage points, not percent. The comparison is with the reference group, all-men teams, not with the average team. And the answer leaves out that the comparison is at the same season and requested amount. Correct: at the same season and requested amount, all-women teams are fitted to offer 1.28 percentage points more equity than all-men teams.</p>
 </div>
 </div>
 </div>
@@ -1064,8 +1069,8 @@ Check your answer
 <section id="make-it-yours-5-minutes" class="level3">
 <h3 class="anchored" data-anchor-id="make-it-yours-5-minutes">Make it yours (5 minutes)</h3>
 <div class="utility-prompt">
-<p><span class="label">Utility: two sentences</span></p>
-<p>Think of your EiA3 venture, or any business you know well. Name one categorical feature of your customers or products (segment, channel, region, plan tier). Then write two sentences. Which category would you set as the reference group, and why? What would a “jointly useful” result of the F-test for the whole set of categories change in how you describe your market? There is no wrong answer.</p>
+<p><span class="label">Two sentences about your own venture</span></p>
+<p>Think of your EiA3 venture, or any business you know well. Name one categorical feature of your customers or products (segment, channel, region, plan tier). Then write two sentences. Which category would you set as the reference group, and why? Suppose the F-test for the whole set of categories shows that they are jointly useful. How would this change the way you describe your market? There is no wrong answer.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -1078,7 +1083,7 @@ See an example, then write your own
 </div>
 <div id="callout-11" class="callout-11-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>Take a student-run venture that sells meal-prep boxes on campus (an invented example). “My channels are the campus stand, the app, and the website. I would set the campus stand as the reference, because it is the first channel and every decision is compared with it. A jointly useful result of the F-test would justify describing my market by channel at all. Mixed p-values of the single dummies would not settle that.”</p>
+<p>Take a student-run venture that sells meal-prep boxes on campus. “My channels are the campus stand, the app, and the website. I would set the campus stand as the reference, because it is the first channel and every decision is compared with it. If the F-test shows that the channel dummies are jointly useful, it makes sense to describe my market by channel. The p-values of the single dummies, some small and some large, could not answer that question.”</p>
 </div>
 </div>
 </div>

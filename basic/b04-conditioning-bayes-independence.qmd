@@ -3,8 +3,6 @@
 ```{r}
 #| label: b04-setup
 #| include: false
-# Chunk options only. Every object used in this chapter is constructed in
-# visible code on this page, so that copying the code always works.
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
                       fig.width = 7, fig.height = 4.5)
 ```
@@ -13,13 +11,13 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 <span class="label">By the end of Lecture 4, you can</span>
 
 - calculate conditional probabilities from a counts table and name the
-  reference class behind each one.
+  reference class of each one
 - use the multiplication rule to move between joint and conditional
-  probabilities.
+  probabilities
 - rebuild an overall probability from the rates of separate groups with the
-  law of total probability.
+  law of total probability
 - update a probability after new evidence with Bayes' rule, first by counting
-  cases on a tree and then with the formula.
+  cases on a tree and then with the formula
 - check whether two events are independent and explain why disjoint is not
   the same as independent.
 :::
@@ -29,9 +27,9 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 
 **Be able to do yourself:**
 
-- calculate a conditional probability from a table and name its reference class.
-- rebuild an overall rate from group rates.
-- answer a Bayes question with a tree of 1,000 cases.
+- calculate a conditional probability from a table and name its reference class
+- rebuild an overall rate from group rates
+- answer a Bayes question with a tree of 1,000 cases
 - check whether two events are independent with the product form.
 
 **Enough to recognise:**
@@ -42,11 +40,11 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 ::: {.driving-question}
 <span class="label">Driving question</span>
 
-<p class="dq-context">An investor who learns a pitch is late-season updates their expectations. A bank seeing a positive fraud flag does the same. Updating chances on new information is a core probability skill in business, and an easy one to reverse by mistake.</p>
+<p class="dq-context">An investor who learns that a pitch is from a late season updates their expectations. A bank that sees a fraud warning on a payment does the same. Updating chances after new information is a core probability skill in business. It is also easy to turn the question around by mistake.</p>
 
-Late-season pitches reach deals more often. What exactly do the two possible
-"68.8% versus 57.3%" sentences claim, and what does a positive flag from an
-AI deal-predictor really tell us?
+Late-season pitches reach deals more often. Two sentences about these pitches
+give the numbers 68.8% and 57.3%. What exactly does each sentence claim, and
+what does a positive flag from an AI tool that predicts deals really tell us?
 :::
 
 ::: {.course-phase .phase-before}
@@ -63,12 +61,12 @@ Watch <a href="https://www.youtube.com/watch?v=MPRKc4UPoJk">Conditional
 Probabilities</a> and
 <a href="https://www.youtube.com/watch?v=kz2tvO_ZAKI">Bayes' Rule</a>. Be
 ready to identify the reference class in a conditional probability and to
-explain why reversing a condition changes the denominator. All links are
+explain why turning a condition around changes the denominator. All links are
 also listed in the <a href="../resources/video-guide.html">External Video
 Guide</a>.
 </div>
 
-**Reactivate (10 minutes).** Lecture 2 built the counts table for deals and
+[Shark Tank data]{.shark-tag} **Warm up (10 minutes).** Lecture 2 built the counts table for deals and
 seasons from the Shark Tank file. Build it again. The events $D$ (on-air
 deal) and $L$ (late season) are defined as in Lecture 2:
 
@@ -90,16 +88,18 @@ Then compare, in words only:
 Both questions use the same cell of your table. Decide before class which
 part of the table each question looks at.
 
-**Predict (5 minutes).** Answer the one-click Wooclap question posted on
-Canvas before you come to class: an AI classifier flags pitches likely to
-get a deal. Only 10% of the pitches it is applied to reach a deal. The
-classifier flags 80% of the actual deals and also 20% of the non-deals. Of
-the flagged pitches, what share are deals: near 80%, near 50%, or near 30%?
-Commit to an answer. You find the answer in the lecture material.
+**Predict (5 minutes).** Before you come to class, answer the Wooclap
+question on Canvas (it takes one click). An AI classifier flags (marks) the
+pitches that are likely to get a deal. Of the pitches that it checks, only
+10% reach a deal. The classifier flags 80% of the actual deals and also 20%
+of the non-deals. Of the flagged pitches, what share are deals: near 80%,
+near 50%, or near 30%? Choose one answer. You find the answer in the lecture material.
 
 If fractions or event notation are unfamiliar, review
-[Mathematics Refresher: fractions, powers, and event
-notation](../resources/math-refresher.html).
+[Mathematics Refresher: sets and event
+notation](../resources/math-refresher.html#sets-and-event-notation) and
+[fractions and rearranging
+equations](../resources/math-refresher.html#fractions-and-rearranging-equations).
 
 :::
 
@@ -113,7 +113,7 @@ and independence of events.
 
 ### Start with a founder's question
 
-A founder hears that most deals on the show come from the later seasons. The
+[Shark Tank data]{.shark-tag} A founder hears that most deals on the show come from the later seasons. The
 founder concludes that a pitch in a later season is likely to end in a deal.
 Is that the same statement? Here are two sentences about the 1,441 pitches in
 the Shark Tank file:
@@ -122,15 +122,15 @@ the Shark Tank file:
 - **Sentence B.** "57.3% of the pitches that reached a deal came from the
   late seasons."
 
-Both sentences are built on the same 505 records: the late-season pitches
-that reached a deal. Yet they answer different questions and give different
+Both sentences use the same 505 records: the late-season pitches that
+reached a deal. But they answer different questions and give different
 numbers. This lecture shows what each sentence claims. It also answers a
 harder question of the same kind: when an AI classifier flags a pitch as a
-likely deal, how much should that flag change your mind?
+likely deal, how much should that flag change what you believe?
 
 ### One table, five probabilities
 
-The starting point is the counts table from Lecture 2. The code builds the
+[Shark Tank data]{.shark-tag} The starting point is the counts table from Lecture 2. The code builds the
 events $D$ (on-air deal, `deal_on_show`) and $L$ (late season, `season` 9 or
 higher) as before. Run it yourself:
 
@@ -150,8 +150,8 @@ Written with row and column totals:
 | **Deal** ($D$)      | 377 | 505 | **882** |
 | **Total**           | **707** | **734** | **1441** |
 
-Each of the five quantities below is a fraction of two counts. Before
-reading on, find in the table the count that goes on top and the count that
+Each of the five quantities below is a fraction of two counts. Before you
+read on, find in the table the count that goes on top and the count that
 goes underneath.
 
 1. $P(D)$, the probability that a pitch reached a deal.
@@ -183,12 +183,12 @@ a conditional probability. The next section defines it.
 <p class="concept-video"><strong>MIT explanation (review):</strong>
 <a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/conditional-probabilities/">02.2 Conditional Probabilities</a>.</p>
 
-Items 4 and 5 above ask the same kind of question: what is the probability
-of one event if you already know that another event happens? Both are
-answered in two steps. First, keep only the pitches in one group. This group
+[Shark Tank data]{.shark-tag} Items 4 and 5 above ask the same kind of question: what is the probability
+of one event if you already know that another event happens? You answer
+both in two steps. First, keep only the pitches in one group. This group
 is called the **reference class**. Second, take the share of them in which
 the event happens. For item 4 the reference class is the 734 late-season
-pitches, and 505 of them reached a deal. Restricting attention to a
+pitches, and 505 of them reached a deal. Looking only at a
 reference class is called **conditioning** on it.
 
 The symbol for this is a vertical bar, read as "given". Item 4 is written
@@ -212,20 +212,32 @@ The formula does the same two steps as the count. For item 4,
 $$P(D\mid L)=\frac{P(D\cap L)}{P(L)}
 =\frac{505/1441}{734/1441}=\frac{505}{734}.$$
 
-The reference class supplies the denominator. Dividing by $P(B)$ rescales
+The reference class gives the denominator. Dividing by $P(B)$ rescales
 the probabilities inside $B$ so that they add up to 1 again.
 
-For a fixed $B$, conditional probabilities follow all three rules from
-Lecture 2. For example, the complement rule holds inside the reference class. Among
-late-season pitches, the share without a deal is
+For a fixed event $B$, conditional probabilities follow all three rules from
+Lecture 2. So every rule that Lecture 2 derived from them also holds inside
+the reference class. The condition is that the event after the bar stays the
+same in the whole calculation. Two examples follow. The first is
+the complement rule, $P(A^c\mid B)=1-P(A\mid B)$. Among late-season pitches,
+the share without a deal is
 
-$$P(D^c\mid L)=1-P(D\mid L)=\frac{229}{734}\approx 0.312.$$
+$$P(D^c\mid L)=1-P(D\mid L)=1-\frac{505}{734}=\frac{229}{734}\approx 0.312.$$
+
+The second is the addition rule. For two events $A$ and $C$ and the same
+reference class $B$,
+
+$$P(A\cup C\mid B)=P(A\mid B)+P(C\mid B)-P(A\cap C\mid B).$$
+
+Some calculations mix different reference classes, for example $P(A\mid B)$
+and $P(A\mid B^c)$. For these you need the law of total probability,
+which a later section explains.
 
 ::: {#exm-b04-conditional}
-## Worked example: the two rival sentences, resolved
+## Worked example: what each of the two sentences means
 
-**Sentence A asks about $P(D\mid L)$.** Conditioning on $L$ means that you
-cover everything except the Late column:
+[Shark Tank data]{.shark-tag} **Sentence A asks about $P(D\mid L)$.** Conditioning on $L$ means that you
+hide everything except the Late column:
 
 |                    | Early | **Late ($L$)** |
 |--------------------|------:|---------------:|
@@ -238,7 +250,7 @@ Within that one column, 505 of 734 records are deals:
 $$P(D\mid L)=\frac{505}{734}\approx 0.688.$$
 
 **Sentence B asks about $P(L\mid D)$.** Conditioning on $D$ means that you
-cover everything except the Deal row:
+hide everything except the Deal row:
 
 |                    | Early | Late | Total |
 |--------------------|------:|-----:|------:|
@@ -261,12 +273,12 @@ Sentence A ("of late-season pitches, ... reached a deal") conditions on the
 season, so it is $P(D\mid L)=505/734\approx 68.8\%$. Sentence B ("of deal
 pitches, ... came from late seasons") conditions on the deal, so it is
 $P(L\mid D)=505/882\approx 57.3\%$. A report that quotes "68.8% of deal
-pitches came from late seasons" has attached the right number to the wrong
+pitches came from late seasons" has put the right number into the wrong
 sentence.
 :::
 
 The same two numbers in R. `D[L]` keeps only the late-season pitches, and
-`L[D]` keeps only the deal pitches. This is the step that restricts to the
+`L[D]` keeps only the deal pitches. This is the step that keeps only the
 reference class:
 
 ```{r}
@@ -284,7 +296,7 @@ c(
 <p class="concept-video"><strong>MIT explanation (review):</strong>
 <a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/the-multiplication-rule/">02.6 The Multiplication Rule</a>.</p>
 
-The probability of an intersection, $P(A\cap B)$, is also called a **joint
+[Shark Tank data]{.shark-tag} The probability of an intersection, $P(A\cap B)$, is also called a **joint
 probability**: both events happen together. Multiply both sides of the
 definition of conditional probability by $P(B)$. The result is the
 **multiplication rule**. It builds a joint probability from a conditional
@@ -304,10 +316,10 @@ different reference class.
 ::: {.callout-caution collapse="true"}
 ## Try it: verify the joint probability two ways
 
-Try this with your neighbour first. Use the counts table to check the
-equation above for $D$ and $L$.
+[Shark Tank data]{.shark-tag} Try this first with the student next to you. Use the counts table to check
+the equation above for $D$ and $L$.
 
-*Step 1 (given).* The direct route: $P(D\cap L)=505/1441\approx 0.350$.
+*Step 1 (given).* The direct way: $P(D\cap L)=505/1441\approx 0.350$.
 
 *Step 2 (given).* The first product:
 $P(D\mid L)\,P(L)=\dfrac{505}{734}\cdot\dfrac{734}{1441}$. The 734
@@ -316,7 +328,7 @@ cancels. Cancel it and confirm that $505/1441$ is left.
 *Step 3 (you).* Write the second product, $P(L\mid D)\,P(D)$, as two
 fractions from the table. Show that it also equals $505/1441$.
 
-*Step 4 (you).* Confirm all three routes in R.
+*Step 4 (you).* Confirm all three ways in R.
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
@@ -342,9 +354,9 @@ c(
 <p class="concept-video"><strong>MIT explanation (review):</strong>
 <a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/total-probability-theorem/">02.7 Total Probability Theorem</a>.</p>
 
-Lecture 2 introduced a partition: events that do not overlap and together
+[Shark Tank data]{.shark-tag} Lecture 2 introduced a partition: events that do not overlap and together
 cover every outcome. The early seasons and the late seasons are a partition
-of the pitches. An overall probability can be rebuilt from the parts of a
+of the pitches. You can rebuild an overall probability from the parts of a
 partition in three steps. Take the conditional probability of $A$ within
 each part. Multiply it by the probability of that part, which gives a joint
 probability. Then add the joint probabilities.
@@ -369,7 +381,7 @@ $$P(A)=P(A\mid B)\,P(B)+P(A\mid B^c)\,P(B^c).$$
 ::: {#exm-b04-total}
 ## Worked example: rebuilding P(D) from the deal rates of the two periods
 
-The early and late events $L^c$ and $L$ form a partition, so
+[Shark Tank data]{.shark-tag} The early and late events $L^c$ and $L$ form a partition, so
 
 $$P(D)=P(D\mid L^c)\,P(L^c)+P(D\mid L)\,P(L)
 =\frac{377}{707}\cdot\frac{707}{1441}
@@ -380,8 +392,8 @@ Two kinds of number appear here. $377/707\approx 0.533$ and
 $505/734\approx 0.688$ are the deal rates within each period.
 $707/1441\approx 0.491$ and $734/1441\approx 0.509$ are the weights: the
 share of all pitches that falls in each period. The overall deal probability
-is a weighted average of the two rates. It must therefore lie between 0.533
-and 0.688, and it is a little closer to the rate of the larger group.
+is a weighted average of the two rates. So it must lie between 0.533 and
+0.688, and it is a little closer to the rate of the larger group.
 :::
 
 ```{r}
@@ -447,11 +459,12 @@ ggplot() +
 <p class="concept-video"><strong>MIT explanation (review):</strong>
 <a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/bayes-rule/">02.8 Bayes' Rule</a>.</p>
 
-Return to the prediction question from before class. An AI classifier reads
-pitch transcripts and flags the pitches it considers likely to reach a deal.
+[Shark Tank data]{.shark-tag} Return to the prediction question from before class. An AI classifier reads
+the transcripts of pitches (the written text of what was said) and flags
+(marks) the pitches that it considers likely to reach a deal.
 Three numbers describe an invented classifier of this kind:
 
-- the **base rate**: 10% of the pitches it is applied to reach a deal.
+- the **base rate**: 10% of the pitches that it checks reach a deal.
 - the **sensitivity**: among actual deals, 80% get flagged,
   $P(\text{flag}\mid\text{deal})=0.80$.
 - the **false-positive rate**: among non-deals, 20% still get flagged,
@@ -471,13 +484,13 @@ other, as in @fig-b04-bayes-tree.
 2. **Flag the deals.** Sensitivity 80%: of the 100 deals, 80 are flagged.
 3. **Flag some non-deals too.** False-positive rate 20%: of the 900
    non-deals, 180 are flagged.
-4. **Collect the flagged.** In total $80+180=260$ pitches carry a flag,
+4. **Collect the flagged pitches.** In total $80+180=260$ pitches have a flag,
    and only 80 of them are deals:
 
 $$P(\text{deal}\mid\text{flag})=\frac{80}{260}\approx 0.31.$$
 
-The classifier catches 80% of deals, yet fewer than a third of its flags are
-deals. The tree shows the reason. The 900 non-deals are a large group, so
+The classifier finds 80% of deals, but fewer than a third of the flagged
+pitches are deals. The tree shows the reason. The 900 non-deals are a large group, so
 even a 20% false-positive rate produces 180 false flags. That is more than
 double the 80 true flags. A flag moves the deal probability from 10% to 31%.
 This is real evidence, but it is far from certainty.
@@ -531,9 +544,9 @@ text(9.55, 6.2, "260\nflagged\nin total", cex = 0.82, col = "#D55E00")
 par(old_par)
 ```
 
-Now the formula. The question turns a condition around. The quality of the
-classifier is stated as $P(\text{flag}\mid\text{deal})$, but the person who
-decides needs $P(\text{deal}\mid\text{flag})$. The multiplication rule gives
+Now the formula. The question turns a condition around. We describe the
+quality of the classifier with $P(\text{flag}\mid\text{deal})$, but the
+person who makes the decision needs $P(\text{deal}\mid\text{flag})$. The multiplication rule gives
 the numerator, and the law of total probability gives the denominator.
 
 ::: {.definition-box}
@@ -545,8 +558,8 @@ probability,
 
 $$P(B\mid A)=\frac{P(A\mid B)\,P(B)}{P(A)}.$$
 
-When $B_1,\ldots,B_k$ form a partition, the denominator $P(A)$ is written out
-with the law of total probability:
+When $B_1,\ldots,B_k$ form a partition, you can write out the denominator
+$P(A)$ with the law of total probability:
 
 $$P(B_i\mid A)=\frac{P(A\mid B_i)\,P(B_i)}
 {\sum_{j=1}^{k} P(A\mid B_j)\,P(B_j)}.$$
@@ -566,8 +579,9 @@ Every term is a branch of the tree, divided by 1,000:
 | $P(\text{flag}\mid\text{no deal})\,P(\text{no deal})$ | $0.18$ | the 180 flagged non-deals |
 | the denominator (total probability of a flag) | $0.26$ | all 260 flagged pitches |
 
-The formula is the tree in compact form. When a Bayes question appears on
-the exam, you may draw the tree with a convenient imaginary total and count.
+The formula is a short way to write the tree. When a Bayes question appears
+on the exam, you may draw the tree and count. Use an imaginary total that is
+easy to calculate with, such as 1,000.
 The tree and the formula always give the same answer.
 
 Bayes' rule also works on the Shark Tank events. Starting from
@@ -595,9 +609,9 @@ c(
 <p class="concept-video"><strong>MIT explanation (review):</strong>
 <a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/independence-of-two-events/">03.3 Independence of Two Events</a>.</p>
 
-Sometimes knowing that one event happened tells you nothing about another
+[Shark Tank data]{.shark-tag} Sometimes knowing that one event happened tells you nothing about another
 event. Lecture 2 mentioned this idea. Conditional probability makes it
-exact.
+precise.
 
 ::: {.definition-box}
 <span class="label">Definition</span>
@@ -650,12 +664,13 @@ $L$. They are disjoint: no pitch is in both periods, so $P(L^c\cap L)=0$.
 But the product $P(L^c)\,P(L)\approx 0.491\times 0.509\approx 0.25$ is not
 zero, so the product check fails. Disjoint events with positive probability
 are always dependent. If you observe one of them, you know that the other
-did not happen. That is a lot of information, not none.
+did not happen. So one event tells you a lot about the other.
 
 ### Second application: deal rates by team composition
 
-The variable `pitcher_gender_group` in the Shark Tank file classifies each
-pitching team as `all_men`, `all_women`, `mixed`, or `unknown`. The deal rate
+[Shark Tank data]{.shark-tag} The variable `pitcher_gender_group` in the Shark Tank file puts each team
+that pitches into one of four groups: `all_men`, `all_women`, `mixed`, or
+`unknown`. The deal rate
 within a category is a conditional probability, $P(D\mid \text{category})$,
 with the category as reference class. The code computes the three rates for
 the pitches with a known category:
@@ -679,7 +694,7 @@ gender_deal_rates
 #| label: fig-b04-team-deal-rates
 #| code-fold: true
 #| code-summary: "See the R code for this figure"
-#| fig-cap: "Share of pitches with an on-air deal by team category (`pitcher_gender_group`), among the 1,434 Shark Tank pitches with a known category. Each bar is a percentage within its own category: P(deal | category). The three rates lie between 58% and 66%."
+#| fig-cap: "Share of pitches with an on-air deal by team category (`pitcher_gender_group`), among the 1,434 Shark Tank pitches with a known category. Each bar is a percentage within its own category: P(deal | category). The three rates lie between 58% and 67%."
 library(ggplot2)
 sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
 known_gender <- sharks$pitcher_gender_group != "unknown"
@@ -730,38 +745,38 @@ within its own group.
 
 - Turning a condition around changes the number. Neither number shows a
   cause. 68.8% of late-season pitches got a deal. That does not mean that late
-  seasons produce deals.
-- The team comparison uses the source's broad categories of presenters, for
-  pitches that producers selected.
+  seasons cause deals.
+- The team comparison uses the broad groups of presenters that the data
+  source defined. It also uses only pitches that the producers selected.
 - The classifier numbers are invented for the example.
 
-**What you can do with it:** before you act on a signal, ask how common the
-thing is that you are looking for. With a low base rate most alarms are
-false, and a cheap second check pays off.
+**What you can do with it:** before you act on a signal, ask how often the
+outcome that you look for happens. With a low base rate, most signals are
+false alarms, so a cheap second check is worth its cost.
 :::
 
 ### Answering the driving question
 
-The two sentences claim different things about the same 505 records.
+The two sentences make different claims about the same 505 records.
 "68.8% of late-season pitches reached a deal" is $P(D\mid L)=505/734$, with
 the late seasons as reference class. "57.3% of deal pitches came from late
 seasons" is $P(L\mid D)=505/882$, with the deals as reference class. Both are
-correct. The typical error is to attach the number of one sentence to the
-other. A positive flag from the AI deal-predictor tells us less than its 80%
+correct. The typical error is to use the number of one sentence in the
+other. A positive flag from the AI classifier tells us less than its 80%
 sensitivity suggests. With a 10% base rate and a 20% false-positive rate,
-only $80/260\approx 31\%$ of flagged pitches are deals. The flag lifts the
-probability of a deal from 10% to 31%, and no further.
+only $80/260\approx 31\%$ of flagged pitches are deals. The flag raises the
+probability of a deal from 10% to 31%, and not more.
 
 ::: {.founder-box}
 <span class="label">A founder's decision (invented example)</span>
 
-You give away trial boxes. One in ten trial customers becomes a subscriber. You notice a signal: 80% of later subscribers open your follow-up email, and 20% of the others open it too. Count with 1,000 trial customers. 100 become subscribers, and 80 of them open the email. Of the other 900, 180 open it. So 80 of 260 openers become subscribers, about 31%. A phone call costs you 2 euros of time, and a subscriber is worth 30 euros. A call to an opener is worth 0.31 × 30 = 9.30 euros on average, so you call the openers. Among the 740 who did not open, only 20 become subscribers, under 3%. A call there is worth about 0.80 euros. The decision: call the openers and nobody else.
+Your venture sells boxes of prepared meals by subscription, and you give away free trial boxes. One in ten trial customers becomes a subscriber. You notice a signal: 80% of later subscribers open your follow-up email, and 20% of the others open it too. Count with 1,000 trial customers. 100 become subscribers, and 80 of them open the email. Of the other 900, 180 open it. So 80 of 260 openers become subscribers, about 31%. A phone call costs you 2 euros of time, and a subscriber is worth 30 euros. A call to an opener is worth 0.31 × 30 = 9.30 euros on average, so you call the openers. Among the 740 who did not open, only 20 become subscribers, under 3%. A call to one of them is worth about 0.80 euros on average. The decision: call the openers and nobody else.
 :::
 
 **Next:** You can now update the probability of one event when another
 event is known. Lecture 5 looks at two random variables at the same time,
 for example the season of a pitch and the equity offered. It introduces two
-numbers that measure how two variables move together, the covariance and the
+numbers that measure how two variables change together, the covariance and the
 correlation. It also shows what a correlation can and cannot tell you.
 
 :::
@@ -777,7 +792,7 @@ correlation. It also shows what a correlation can and cannot tell you.
 ### Read the lecture material (15 minutes)
 
 Read the Lecture material section above from start to end. The lecture
-covered the core of it. The text has every step, every example, and all the
+covered the most important parts. The text has every step, every example, and all the
 code, including parts that were not shown in class. Note what is still
 unclear and bring it to the next tutorial, or ask Tilly.
 
@@ -794,9 +809,10 @@ unclear and bring it to the next tutorial, or ask Tilly.
 ## Check your answers
 
 1. $P(B)$, the probability of the conditioning event.
-2. They condition on different reference classes and therefore have
-   different denominators.
-3. The parts are mutually disjoint and their union is $\Omega$.
+2. They condition on different reference classes, so they have different
+   denominators.
+3. No two parts overlap, and together they make up $\Omega$ (their union is
+   $\Omega$).
 4. The total probability of the observed evidence, added across all parts of
    the partition.
 5. $P(A\mid B)=P(A)$ (learning $B$ does not change the probability of $A$),
@@ -831,22 +847,22 @@ $\dfrac{0.90\times 0.20}{0.90\times 0.20+0.30\times 0.80}
 =\dfrac{0.18}{0.42}\approx 0.429$.
 :::
 
-**On your own.** A stricter classifier is applied to pitches of which 5%
+**On your own.** A stricter classifier checks a group of pitches in which 5%
 reach a deal. Its sensitivity is 90% and its false-positive rate is 10%.
 What share of flagged pitches are deals? Use either the tree or the formula.
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-With 1,000 pitches: 50 deals of which 45 flagged. 950 non-deals of which 95
-flagged. $P(\text{deal}\mid\text{flag})=45/(45+95)=45/140\approx 0.321$.
+With 1,000 pitches: 50 deals, of which 45 are flagged, and 950 non-deals, of
+which 95 are flagged. $P(\text{deal}\mid\text{flag})=45/(45+95)=45/140\approx 0.321$.
 Even with 90% sensitivity and a low false-positive rate, the 5% base rate
 keeps the share of true flags below one third.
 :::
 
 ### Practice (15 minutes)
 
-Use the counts table: 330, 229, 377, 505, with totals 559, 882, 707, 734,
+[Shark Tank data]{.shark-tag} Use the counts table: 330, 229, 377, 505, with totals 559, 882, 707, 734,
 and 1,441.
 
 1. Use the early/late partition to verify
@@ -857,10 +873,10 @@ and 1,441.
    product form.
 4. The events $L^c$ and $L$ are disjoint. Are they independent? Explain in
    one sentence.
-5. Among the 1,434 pitches with a known team-composition classification, 428
-   of 661 pitches with women represented (all-women or mixed) and 449 of 773
-   all-men pitches reached an on-air deal. Calculate both conditional deal
-   proportions and interpret the difference.
+5. Consider the 1,434 pitches with a known classification of the team. Of
+   the 661 pitches with women represented (all-women or mixed), 428 reached
+   an on-air deal. Of the 773 all-men pitches, 449 reached an on-air deal.
+   Calculate both conditional deal proportions and interpret the difference.
 
 ::: {.callout-note collapse="true"}
 ## Check your answers
@@ -869,7 +885,7 @@ and 1,441.
    \approx 0.612$.
 2. $P(L\mid D)=505/882\approx 0.573$: among deal records, 57.3% came from
    Seasons 9--16. It differs from $P(D\mid L)=505/734\approx 0.688$ because
-   the conditioning event, and therefore the denominator, is different.
+   the conditioning event, and so the denominator, is different.
 3. $P(D\cap L)=505/1441\approx 0.350$, while
    $P(D)\,P(L)=(882/1441)(734/1441)\approx 0.312$. The two are not equal, so
    $D$ and $L$ are not independent.
@@ -877,9 +893,9 @@ and 1,441.
    check fails. Disjoint events with positive probability are always
    dependent.
 5. $428/661\approx 0.648$ and $449/773\approx 0.581$, a descriptive
-   difference of about 6.7 percentage points. The comparison uses the
-   source's presenter classification and selected televised pitches. It does
-   not establish a causal effect of team composition.
+   difference of about 6.7 percentage points. The data source defined the
+   groups, and the producers chose the pitches for television. The difference does
+   not show that the kind of team causes the deal.
 :::
 
 ### Review: one question from Lecture 3 (5 minutes)
@@ -892,13 +908,13 @@ $Y$ ever equal it exactly?
 ## Check your answer
 
 $E[Y]=0(0.2)+1(0.5)+2(0.3)=1.1$. It is the probability-weighted average of
-the possible values, the long-run average over many repetitions, and it
-need not be a value the variable can take: here $Y$ is never 1.1.
+the possible values, and the long-run average over many repetitions. It does
+not have to be a value that the variable can take: here $Y$ is never 1.1.
 :::
 
 ### Worked exam interpretation (10 minutes)
 
-**Question.** A student sees $P(D\mid L)=0.688$ and writes, "68.8% of deal
+[Shark Tank data]{.shark-tag} **Question.** A student sees $P(D\mid L)=0.688$ and writes, "68.8% of deal
 pitches came from late seasons." Explain what is wrong and give the correct
 interpretation.
 
@@ -908,13 +924,13 @@ interpretation.
 The calculation conditions on $L$, so the denominator is the 734 pitches in
 Seasons 9--16. The correct interpretation is that 68.8% of late-season
 records reached an on-air deal. The sentence the student wrote describes the
-reverse conditional, $P(L\mid D)=505/882\approx 57.3\%$. Neither quantity
+reversed conditional probability, $P(L\mid D)=505/882\approx 57.3\%$. Neither quantity
 measures completed investment or a causal season effect.
 :::
 
 ### Check the AI (5 minutes)
 
-You asked an AI assistant: "If a pitch got a deal, how likely is it that it came from a late season?" It answered:
+[Shark Tank data]{.shark-tag} You asked an AI assistant: "If a pitch got a deal, how likely is it that it came from a late season?" It answered:
 
 > "68.8% of late-season pitches got a deal. So if a pitch got a deal, there is a 68.8% chance that it came from a late season."
 
@@ -930,26 +946,31 @@ The AI turned the condition around. 68.8% is the share of deals among late-seaso
 ### Make it yours (5 minutes)
 
 :::: {.utility-prompt}
-<span class="label">Utility: two sentences</span>
+<span class="label">Two sentences about your own venture</span>
 
 Think of your EiA venture, or any business you know well. Name one signal
-it receives about customers or partners (a positive review, a signed letter
-of intent, a click on an ad) and write two sentences: first state the
-conditional probability the signal makes you want to know, written with the
-vertical bar and with the reference class named. Then say which base rate
-you would need to know before you trust the signal. There is no wrong
-answer.
+it receives about customers or partners, for example a positive review, a
+signed letter of intent, or a click on an ad. Sentence 1: which conditional
+probability does the signal make you want to know? Write it with the
+vertical bar and name the reference class. Sentence 2: which base rate would
+you need to know before you trust the signal? There is no wrong answer.
 
 ::: {.callout-note collapse="true"}
 ## See an example, then write your own
 
-Take a student-run campus meal-prep box venture. "I want $P(\text{becomes a paying customer} \mid \text{clicked the ad})$, where the reference class is the students who clicked the ad this month. Before trusting a high click count I would need the base rate of buyers among all viewers. With a tiny base rate, most clickers still never buy, as the tree of 1,000 cases shows."
+Take a student-run venture that sells boxes of prepared meals on campus. "I want $P(\text{becomes a paying customer} \mid \text{clicked the ad})$, where the reference class is the students who clicked the ad this month. Before I trust a high number of clicks, I would need the base rate of buyers among all students who saw the ad. With a very low base rate, most students who click still never buy, as the tree of 1,000 cases shows."
 :::
 
 You can discuss this task, and any other task in this chapter, with
 **Tilly**, the course AI assistant: ask it to build the tree of 1,000 cases
 for your signal with numbers you consider realistic.
 ::::
+
+### More practice
+
+For extra exercises on this lecture, with worked solutions, ask **Tilly**,
+the course AI assistant. For example: "Give me an extra exercise for
+Lecture 4. Show the solution only after I send my answer."
 
 [Continue to Lecture 5: Joint random variables, covariance, and correlation](b05-joint-covariance-correlation.qmd).
 

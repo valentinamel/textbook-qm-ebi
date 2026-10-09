@@ -14,15 +14,20 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 
 - distinguish a population distribution, a sampling distribution, and a
   realised estimate
-- derive the mean and variance of a sample mean using the rules for
-  rescaling and for sums
-- calculate and interpret a standard error
-- use the square-root rule to relate sample size to precision, and find the
-  sample size for a target margin of error
-- state the central limit theorem for this course's conditions and apply it
-  to means and proportions
-- explain what the law of large numbers and the CLT each claim, and what
-  neither of them repairs.
+- calculate the mean, the variance, and the standard deviation of a sample
+  mean for given $\mu$, $\sigma$, and $n$, and follow their derivation from
+  the rules for rescaling and for sums
+- say in plain words what unbiased means for the sample mean, and recognise
+  the word consistent
+- tell the difference between the standard deviation of the sample mean and
+  the standard error, and calculate and interpret both
+- use the square-root rule to relate sample size to precision
+- state the central limit theorem for this course's conditions and use the
+  normal model to calculate a probability for a sample mean
+- apply the same results to a sample proportion and check the
+  success-failure condition
+- explain what consistency and the CLT each say, and which problems neither
+  of them solves.
 :::
 
 ::: {.must-know}
@@ -30,17 +35,27 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 
 **Be able to do yourself:**
 
-- calculate the standard error of a mean and of a proportion
-- use the square-root rule: four times the data halves the standard error
-- find the sample size needed for a target margin of error
+- calculate $E[\bar X]$, $\operatorname{Var}(\bar X)$, and
+  $\operatorname{SD}(\bar X)$ for given $\mu$, $\sigma$, and $n$, and name
+  the rule used at each step (rescaling, sum of independent variables)
+- calculate the standard error of a mean, $s/\sqrt n$
+- calculate the standard deviation of a sample proportion for a given $p$,
+  and its standard error from $\hat p$
+- use the square-root rule: four times the data halves the standard
+  deviation of the sample mean, and the standard error
 - check the success-failure condition
-- calculate a probability for a sample mean with the CLT and supplied $Z$ values
-- tell a standard deviation from a standard error.
+- calculate a probability for a sample mean with the normal model
+  (population normal, or $n$ large) and supplied $Z$ values
+- tell apart the standard deviation of the observations, the standard
+  deviation of the sample mean, and the standard error.
 
 **Enough to recognise:**
 
-- the derivation of $\operatorname{Var}(\bar X)=\sigma^2/n$
-- the formal statements of the law of large numbers and the CLT
+- the derivation of $E[\bar X]=\mu$ and
+  $\operatorname{Var}(\bar X)=\sigma^2/n$
+- the formal statement of the CLT
+- the word consistent: with a larger and larger sample, the estimate comes
+  closer and closer to the population value
 - the binomial distribution $\text{Bin}(n,p)$ for a number of successes, with
   mean $np$ and variance $np(1-p)$.
 :::
@@ -67,11 +82,12 @@ average even though the equity offered in single pitches is strongly skewed?
 <span class="label">Video preparation (10 minutes)</span><br>
 Watch <a href="https://www.youtube.com/watch?v=IrKUM3nNXJE">The Central Limit
 Theorem</a>. Focus on which distribution becomes approximately normal as the
-sample size grows. All links are also listed in the
+sample size grows. The video uses $M_n$ for the sample mean, where this
+book uses $\bar X$, and $\hat\Theta$ for an estimator. All links are also listed in the
 <a href="../resources/video-guide.html">External Video Guide</a>.
 </div>
 
-**Reactivate (10 minutes).** Classify each object as a *population
+**Warm up (10 minutes).** Classify each object as a *population
 distribution*, a *sampling distribution*, or a *realised estimate*:
 
 1. the distribution of equity offered across individual pitches
@@ -79,7 +95,7 @@ distribution*, a *sampling distribution*, or a *realised estimate*:
 3. the single mean calculated from one observed sample.
 
 ::: {.callout-note collapse="true"}
-## Check your answers
+## Check your preparation
 
 The first is a population distribution, the second is a sampling
 distribution, and the third is a realised estimate, the number observed in
@@ -89,12 +105,12 @@ This lecture describes it.
 
 **Predict (5 minutes).** Answer the one-click Wooclap question posted on
 Canvas before you come to class: to cut the typical error of a sample mean
-**in half**, do you need $2\times$, $4\times$, or $10\times$ the
-observations? Commit to an answer. You find the answer in the lecture
+in half, do you need $2\times$, $4\times$, or $10\times$ the
+observations? Choose one answer. You find the correct answer in the lecture
 material.
 
-If square roots, sums, degrees of freedom, or standardisation are not secure,
-review [Mathematics Refresher: powers, roots, and
+If you are not sure about square roots, sums, degrees of freedom, or
+standardisation, review [Mathematics Refresher: powers, roots, and
 standardisation](../resources/math-refresher.html).
 
 :::
@@ -109,21 +125,37 @@ same results to proportions.
 
 ### Start with a founder's question
 
-You asked 100 customers and calculated an average. How far can that average
-be from the truth, and how many customers would it take to halve the
-distance? Lecture 7 showed that averages differ from sample to sample. This
-lecture measures by how much. Start from the five dots of Lecture 7. Five
-random samples of 100 pitches gave five different sample means, while the
-population mean stayed fixed. Where would the mean of a sixth sample land?
-The answer lies in the pattern behind those dots.
+An invented example. You sell meal boxes. You asked 100 customers, chosen by
+chance, to rate the box from 1 to 10, and you calculated the average rating.
+How far can that average be from the average rating of all your customers?
+And how many customers would you need to ask to halve this distance?
 
-### The pattern behind the five dots
+These ratings are not in the Shark Tank file. This lecture answers the two
+questions with the Shark Tank file, because for that file the whole
+population is known. Lecture 7 showed that averages differ from sample to
+sample. This lecture measures how much they differ.
 
-Imagine not five samples but every possible random sample of the same size,
-each with its own sample mean. The distribution of those possible values of
-$\bar X$ is the sampling distribution of the mean, which Lecture 7 named. It
-describes the uncertainty of an estimator, not the variation among single
-pitches. Three objects must be kept apart:
+Lecture 7 drew five random samples of 100 pitches from the Shark Tank file
+(@fig-b07-five-means). The five sample means of the equity offered
+(`equity_offered_pct`) differed, while the population mean stayed fixed at
+13.21%. If we drew a sixth sample, where would its mean lie? You cannot say
+exactly. But you can say something about the range in which it would
+probably fall. This lecture makes that statement precise.
+
+### The distribution behind the five dots
+
+[Shark Tank data]{.shark-tag} The sample mean $\bar X$ is a sample statistic: a number calculated from the
+sample. We use it as an estimator of the parameter $\mu$ (Lecture 7). Its
+value depends on which random sample is drawn. So $\bar X$ is random, and it
+has a distribution. The estimate $\bar x$ is different. It is the one number
+that an observed sample gives, such as 12.76.
+
+Each of the five dots is one value of $\bar X$. Imagine not five samples but
+every possible random sample of the same size, each with its own sample
+mean. The distribution of those possible values of $\bar X$ is the sampling
+distribution of the mean, which Lecture 7 named. It describes the
+uncertainty of an estimator, not the variation among single pitches. Keep
+three objects apart:
 
 - The **population distribution** describes how the equity offered varies
   across the 1,441 pitches.
@@ -132,10 +164,11 @@ pitches. Three objects must be kept apart:
 - A **realised estimate**, such as 12.76, is one draw from that sampling
   distribution.
 
-This lecture uses three parameters of the Shark Tank file: the mean and the
-SD of the equity offered (`equity_offered_pct`), and the proportion of
-pitches that ended with a deal (`deal_on_show`). The 1,441 records are the
-whole population, so the SD divides by $N$ and not by $n-1$:
+This lecture uses three population parameters of the Shark Tank file: the
+mean and the standard deviation (SD) of the equity offered
+(`equity_offered_pct`), and the proportion of pitches that ended with a deal
+(`deal_on_show`). The 1,441 records are the whole population, so the SD
+divides by $N$ and not by $n-1$:
 
 ```{r}
 #| label: b08-population-parameters
@@ -150,21 +183,129 @@ So $\mu = 13.21$%, $\sigma = 8.44$ percentage points, and $p = 0.612$. These
 are fixed numbers. What varies is any number computed from a random sample
 of the 1,441 records.
 
+This lecture uses the random sample of 100 pitches from Lecture 7 (seed 123)
+again:
+
+```{r}
+#| label: b08-sample
+set.seed(123)
+sample_rows <- sample(seq_len(nrow(sharks)), size = 100, replace = FALSE)
+pitch_sample <- sharks[sample_rows, ]
+c(x_bar = mean(pitch_sample$equity_offered_pct),
+  s = sd(pitch_sample$equity_offered_pct),
+  p_hat = mean(pitch_sample$deal_on_show))
+```
+
+This sample gives the estimates $\bar x=12.76$%, $s=7.71$ percentage points,
+and $\hat p=0.64$. Another random sample would give other estimates.
+
+We can make the sampling distribution of $\bar X$ visible. The code below
+draws 5,000 random samples of 100 pitches and keeps the mean of each sample.
+It draws with replacement, so that the draws are exactly independent.
+Lecture 7 drew without replacement. With 100 out of 1,441 pitches the
+difference is small (the 10% condition of Lecture 7).
+
+```{r}
+#| label: b08-many-means
+set.seed(708)
+# replace = TRUE: each sample of 100 is drawn with replacement
+many_means <- replicate(5000, mean(sample(sharks$equity_offered_pct, 100,
+                                          replace = TRUE)))
+c(average = mean(many_means), SD = sd(many_means))
+quantile(many_means, c(0.025, 0.975))   # the middle 95% of the sample means
+```
+
+@fig-b08-many-means shows the 5,000 sample means as a histogram.
+
+```{r}
+#| label: fig-b08-many-means
+#| code-fold: true
+#| code-summary: "See the R code for this figure"
+#| fig-cap: "Histogram of 5,000 sample means of the equity offered, each from a random sample of 100 pitches (green). The histogram is centred on the population mean (gold dashed line at 13.21). The five sample means of Lecture 7 (orange dots) are five draws from this distribution."
+library(ggplot2)
+
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+mu_equity <- mean(sharks$equity_offered_pct)
+
+# 5,000 random samples of 100 pitches, drawn with replacement,
+# one mean per sample
+set.seed(708)
+many_means <- replicate(5000, mean(sample(sharks$equity_offered_pct, 100,
+                                          replace = TRUE)))
+
+# the five sample means of Lecture 7 (seeds 101 to 105),
+# drawn without replacement as in Lecture 7
+seeds <- 101:105
+five_means <- numeric(length(seeds))
+for (i in seq_along(seeds)) {
+  set.seed(seeds[i])
+  rows <- sample(seq_len(nrow(sharks)), size = 100, replace = FALSE)
+  five_means[i] <- mean(sharks$equity_offered_pct[rows])
+}
+five_dots <- data.frame(sample_mean = five_means, density = -0.035)
+
+ggplot(data.frame(sample_mean = many_means), aes(sample_mean)) +
+  geom_histogram(aes(y = after_stat(density)),
+                 breaks = seq(10, 17, by = 0.2),
+                 fill = "#009E73", alpha = 0.85, colour = "white") +
+  geom_vline(xintercept = mu_equity, linetype = "dashed",
+             colour = "#C98B2E", linewidth = 0.7) +
+  geom_point(data = five_dots, aes(sample_mean, density),
+             colour = "#D55E00", size = 3) +
+  annotate("text", x = mu_equity + 0.12, y = 0.52,
+           label = "mu == 13.21", parse = TRUE,
+           colour = "#17324D", size = 3.4, hjust = 0) +
+  annotate("text", x = 14.05, y = -0.035,
+           label = "the five sample means of Lecture 7",
+           colour = "#D55E00", size = 3.4, hjust = 0) +
+  annotate("text", x = 14.6, y = 0.33,
+           label = "5,000 sample means,\neach from 100 pitches",
+           colour = "#009E73", size = 3.4, hjust = 0, lineheight = 0.95) +
+  scale_x_continuous(breaks = 10:17) +
+  scale_y_continuous(breaks = seq(0, 0.5, by = 0.1),
+                     expand = expansion(mult = c(0.02, 0.05))) +
+  coord_cartesian(xlim = c(10, 17), ylim = c(-0.05, 0.53)) +
+  labs(x = "Sample mean equity offered (%)", y = "Density") +
+  theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    plot.caption = element_text(colour = "#5B6976"),
+    axis.title = element_text(colour = "#17324D")
+  )
+```
+
+Each bar counts sample means, not pitches. The five orange dots below the
+histogram are the five sample means of Lecture 7. They are five draws from
+this distribution, and the mean of a sixth sample would be one more draw.
+About 95% of the 5,000 sample means lie between 11.6% and 14.9%. A sixth
+sample mean would probably fall in this range. It would rarely fall far
+outside it.
+
 ### Back to the lab
 
-In Lecture 7 you worked with the
+[Shark Tank data]{.shark-tag} In Lecture 7 you worked with the
 [sampling-distribution lab](b07-samples-estimators.qmd#sampling-lab): the
-histogram of sample means sat near 13.2, narrowed as $n$ grew, and turned
-bell-shaped although the population is strongly right-skewed. That pile of
-sample means is the sampling distribution of the mean. The rest of this
-lecture explains what you saw there: where the pile sits, how wide it is,
-and why it becomes bell-shaped.
+histogram of sample means was centred near 13.2, became narrower as $n$ grew,
+and became bell-shaped, although the distribution of the population is strongly
+right-skewed. That histogram, like @fig-b08-many-means, shows the sampling
+distribution of the mean. The next sections explain its centre, its spread,
+and its shape.
 
 ### The mean and variance of a sample mean
 
-Let $X_1,\ldots,X_n$ be a random sample of independent and identically
-distributed (iid) variables, as in Lecture 7, with population mean $\mu$ and
-variance $\sigma^2$. Then
+[Shark Tank data]{.shark-tag} Let $X_1,\ldots,X_n$ be a random sample of independent and identically
+distributed (iid) variables, as in Lecture 7. The sample mean is the
+estimator
+
+$$
+\bar X=\frac{X_1+\cdots+X_n}{n}=\frac{1}{n}\sum_{i=1}^{n}X_i.
+$$
+
+Write $\mu$ for the population mean and $\sigma^2$ for the population
+variance. The $X_i$ are identically distributed (Lecture 7), so all of them
+have the same mean and the same variance: $E[X_i]=\mu$ and
+$\operatorname{Var}(X_i)=\sigma^2$ for every $i$. Then
 
 $$
 E[\bar X]=\mu,
@@ -174,22 +315,21 @@ E[\bar X]=\mu,
 \operatorname{SD}(\bar X)=\frac{\sigma}{\sqrt n}.
 $$
 
-The first equality says that $\bar X$ is unbiased for $\mu$ (Lecture 7): the
-pile of sample means is centred on the parameter, as in the lab. The third
-quantity has its own name.
+The first equality says that $\bar X$ is an unbiased estimator of $\mu$
+([Lecture 7](b07-samples-estimators.qmd#b07-unbiased)). In words: if we draw
+many random samples, the average of their sample means equals the population
+mean. @fig-b08-many-means shows this result. The 5,000 sample means have an average
+of 13.21%, which is the population mean $\mu=13.21$%. A single sample mean
+still misses $\mu$, sometimes from above and sometimes from below.
 
-::: {.definition-box}
-<span class="label">Definition</span>
+The third quantity, $\operatorname{SD}(\bar X)=\sigma/\sqrt n$, is the
+standard deviation of the sample mean. It measures how far a sample mean
+typically lies from $\mu$. For samples of 100 pitches it is
+$8.44/\sqrt{100}=0.844$ percentage points, about 6% of the population mean.
+The 5,000 simulated sample means have a standard deviation of 0.84, as the
+formula says.
 
-**Standard error (SE).** The standard deviation of an estimator across
-repeated random samples. For the sample mean,
-$\operatorname{SE}(\bar X)=\sigma/\sqrt n$.
-:::
-
-An SD describes the variation among observations. An SE describes the
-variation of an estimator.
-
-The three formulas above are not new facts. They follow from the rules for
+The three formulas are not new facts. They follow from the rules for
 rescaling a variable
 in [Lecture 3](b03-discrete-distributions.qmd#b03-shift-rescale) and from the
 rules for sums of variables in
@@ -198,7 +338,7 @@ rules for sums of variables in
 - $E[X+Y]=E[X]+E[Y]$ and $E[aX]=aE[X]$, so
   $E[\bar X]=\frac{1}{n}\sum_i E[X_i]=\frac{1}{n}\,n\mu=\mu$.
 - $\operatorname{Var}(aX)=a^2\operatorname{Var}(X)$ and, for
-  **independent** variables,
+  independent variables,
   $\operatorname{Var}(X+Y)=\operatorname{Var}(X)+\operatorname{Var}(Y)$, so
 
 $$
@@ -209,36 +349,56 @@ $$
 =\frac{\sigma^2}{n}.
 $$
 
-Independent positive and negative deviations partly cancel in an average.
-That is why the right-hand histogram in the lab is so much narrower than the
-population histogram.
+Both lines use the fact that every $X_i$ has the same mean $\mu$ and the same
+variance $\sigma^2$. Independent positive and negative deviations partly
+cancel in an average. That is why the right-hand histogram in the lab is so
+much narrower than the population histogram.
 
-The variance $\sigma^2/n$ shrinks to zero as $n$ grows, so $\bar X$ gets
-close to $\mu$. Estimators with this property are called **consistent**.
+### Standard deviation or standard error? {#b08-standard-error}
 
-The formulas for $E[\bar X]$ and $\operatorname{SD}(\bar X)$ give the centre
-and the spread of the sampling distribution, not its shape. In one case the
-shape is known exactly. If the population
-itself is normal, the sample mean is exactly normal for every $n$:
-$\bar X\sim N(\mu,\sigma^2/n)$. The reason is that a sum of independent
-normal variables is again normal
-([Lecture 6](b06-continuous-normal.qmd#b06-normal-sums)). The central limit
-theorem below deals with populations that are not normal.
+[Shark Tank data]{.shark-tag} The formula $\operatorname{SD}(\bar X)=\sigma/\sqrt n$ needs the population
+standard deviation $\sigma$. In practice $\sigma$ is usually unknown,
+because you have only the sample. Then you replace $\sigma$ by the sample
+standard deviation $S$ (Lecture 7). The result has its own name.
 
-In practice $\sigma$ is usually unknown and is estimated by the sample SD
-$S$. This gives the estimated standard error
-$\widehat{\operatorname{SE}}(\bar X)=S/\sqrt n$. The hat marks an estimate:
-$\widehat{\operatorname{SE}}$ is a standard error calculated from the
-sample, just as $\hat p$ is a proportion calculated from the sample.
-Replacing a parameter by an estimate adds a little extra uncertainty.
-Lecture 9 shows how to allow for it.
+::: {.definition-box}
+<span class="label">Definition</span>
+
+**Standard error (SE).** The estimated standard deviation of an estimator,
+calculated from the sample. For the sample mean, $\sigma$ is replaced by
+$S$: $\operatorname{SE}(\bar X)=S/\sqrt n$. In one observed sample its value
+is $s/\sqrt n$.
+:::
+
+Keep three quantities apart:
+
+- The standard deviation of the observations, $\sigma$ in the population and
+  $s$ in the sample, describes the variation among single observations.
+- The standard deviation of the sample mean, $\sigma/\sqrt n$, describes the
+  variation of $\bar X$ across repeated random samples.
+- The standard error, $s/\sqrt n$, is the estimate of $\sigma/\sqrt n$ that
+  one sample gives.
+
+For the seed-123 sample of 100 pitches:
+
+```{r}
+#| label: b08-se-seed123
+c(SD_of_sample_mean = sigma_equity / sqrt(100),
+  standard_error = sd(pitch_sample$equity_offered_pct) / sqrt(100))
+```
+
+The standard error is $7.71/\sqrt{100}=0.771$ percentage points. Here the
+population is known, so the standard error can be compared with the standard
+deviation of the sample mean, 0.844. The two are close. Replacing a
+parameter by an estimate adds a little extra uncertainty. Lecture 9 shows
+how to take this extra uncertainty into account.
 
 ::: {#exm-b08-se}
-## Worked example: E, Var, and SE for σ = 12, n = 36
+## Worked example: E, Var, and SD of the sample mean for σ = 12, n = 36
 
 A population has mean $\mu$ and SD $\sigma=12$. A random sample of $n=36$
-observations is drawn. Find the mean, variance, and SE of $\bar X$, naming
-the rule used at each step.
+observations is drawn. Find the mean, the variance, and the standard
+deviation of $\bar X$, naming the rule used at each step.
 
 - **Mean.** By the rules for expectations ($E[X+Y]=E[X]+E[Y]$,
   $E[aX]=aE[X]$), $E[\bar X]=\mu$: whatever $\mu$ is, the sample mean is
@@ -246,38 +406,52 @@ the rule used at each step.
 - **Variance.** By $\operatorname{Var}(aX)=a^2\operatorname{Var}(X)$ and the
   sum rule for independent variables,
   $\operatorname{Var}(\bar X)=\sigma^2/n=12^2/36=144/36=4$.
-- **SE.** Take the square root:
+- **Standard deviation.** Take the square root:
   $\operatorname{SD}(\bar X)=\sqrt 4=2$, which is $\sigma/\sqrt n=12/6=2$.
 
-The typical distance between a sample mean and $\mu$ is about 2 units. That
-is one sixth of the typical distance of a single observation from $\mu$.
-All three rules are on the formula sheet.
+A single observation typically lies about $\sigma=12$ units from $\mu$. A
+sample mean of 36 observations typically lies about 2 units from $\mu$.
+Averaging 36 observations divides the typical distance by $\sqrt{36}=6$, and
+$12/6=2$. All three rules are on the formula sheet.
+
+Here $\sigma$ is given, so 2 is the standard deviation of the sample mean.
+If $\sigma$ were unknown and the sample gave $s=11.4$, the standard error
+would be $11.4/6=1.9$.
 :::
 
 ### The square-root rule
 
 Precision grows with $\sqrt n$, not with $n$. This answers the prediction
-question from before class: to cut the SE in half you need four times the
-observations, because
+question from before class: to cut the standard deviation of the sample mean
+in half you need four times the observations, because
 
 $$
 \frac{\sigma}{\sqrt{4n}}=\frac{1}{2}\cdot\frac{\sigma}{\sqrt n}.
 $$
 
-Doubling the sample size does not halve the SE. It only divides the SE by
-$\sqrt 2\approx 1.41$. More precision becomes more and more expensive, which
-is worth knowing before you budget for data collection.
+Doubling the sample size does not halve the standard deviation of the sample
+mean. It only divides it by $\sqrt 2\approx 1.41$. The same rule holds for
+the standard error if $s$ stays about the same, because it has the same
+$\sqrt n$ in its denominator. So each extra step in precision costs more and
+more data. Keep this in mind when you plan the budget for data collection.
+
+The rule also answers the founder's second question. To halve the typical
+distance between the average of 100 ratings and the average rating of all
+customers, 200 customers are not enough. It takes 400.
+[Lecture 9](b09-t-confidence-intervals.qmd#b09-sample-size) turns the rule
+around and gives the sample size for a target precision.
 
 ::: {.callout-caution collapse="true"}
-## Try it: how large must n become to cut an SE from 4 to 1?
+## Try it: cut the standard deviation of a sample mean from 4 to 1
 
 Try this with your neighbour first. Complete the missing steps
 before opening the answer.
 
-*Step 1 (given).* The SE must fall by a factor of $4/1 = 4$.
+*Step 1 (given).* The standard deviation of the sample mean must fall by a
+factor of $4/1 = 4$.
 
-*Step 2 (you).* The SE is proportional to $1/\sqrt n$. By what factor must
-$n$ change to divide the SE by 4?
+*Step 2 (you).* The standard deviation of the sample mean is proportional to
+$1/\sqrt n$. By what factor must $n$ change to divide it by 4?
 
 *Step 3 (you).* If the original sample had $n=50$, how many observations
 does the new design need?
@@ -285,63 +459,132 @@ does the new design need?
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-Dividing the SE by 4 requires multiplying $n$ by $4^2=16$: the square-root
-rule in reverse. From $n=50$ the design needs $16\times 50=800$
-observations. Four times the precision costs sixteen times the data.
+Dividing the standard deviation of the sample mean by 4 requires multiplying
+$n$ by $4^2=16$. This is the square-root rule used the other way round. From $n=50$ the design
+needs $16\times 50=800$ observations. Four times the precision costs sixteen
+times the data.
 :::
 :::
+
+### A larger sample brings the sample mean closer to μ {#b08-consistent}
+
+[Shark Tank data]{.shark-tag} The variance $\sigma^2/n$ shrinks towards zero as $n$ grows. The sampling
+distribution of $\bar X$ becomes narrower and narrower around $\mu$. An
+estimator with this property has a name.
+
+::: {.definition-box}
+<span class="label">Definition</span>
+
+**Consistent estimator.** An estimator is consistent if, with a larger and
+larger sample, the estimate comes closer and closer to the population value.
+The sample mean $\bar X$ is a consistent estimator of $\mu$.
+:::
+
+The code below shows this for the equity offered (`equity_offered_pct`) in
+the Shark Tank file. It draws 1,000 pitches at random, one after another,
+and calculates the sample mean after each new pitch.
+
+```{r}
+#| label: b08-running-mean
+set.seed(196)
+draws <- sample(sharks$equity_offered_pct, 1000, replace = TRUE)
+running_mean <- cumsum(draws) / seq_along(draws)   # mean of the first n draws
+round(running_mean[c(10, 100, 1000)], 2)
+```
+
+After 10 pitches the sample mean is 16.15%. After 100 pitches it is 14.22%,
+and after 1,000 pitches it is 13.27%. The distance from $\mu=13.21$% falls
+from 2.94 points to 1.01 points and then to 0.06 points.
+@fig-b08-running-mean shows the whole path.
+
+```{r}
+#| label: fig-b08-running-mean
+#| code-fold: true
+#| code-summary: "See the R code for this figure"
+#| fig-cap: "The sample mean of the equity offered in a growing random sample from the Shark Tank file (green line), for n from 1 to 1,000. For small n the sample mean jumps up and down. As n grows it settles on the population mean (gold dashed line at 13.21)."
+library(ggplot2)
+
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+mu_equity <- mean(sharks$equity_offered_pct)
+
+set.seed(196)
+draws <- sample(sharks$equity_offered_pct, 1000, replace = TRUE)
+running <- data.frame(n = seq_along(draws),
+                      running_mean = cumsum(draws) / seq_along(draws))
+marked <- running[running$n %in% c(10, 100, 1000), ]
+marked$label <- c("n = 10", "n = 100", "n = 1,000")
+
+ggplot(running, aes(n, running_mean)) +
+  geom_hline(yintercept = mu_equity, linetype = "dashed",
+             colour = "#C98B2E", linewidth = 0.7) +
+  geom_line(colour = "#009E73", linewidth = 0.8) +
+  geom_point(data = marked, colour = "#17324D", size = 2.4) +
+  annotate("text", x = c(28, 112, 1000), y = c(16.15, 13.72, 13.72),
+           label = marked$label, colour = "#17324D", size = 3.4,
+           hjust = c(0, 0, 1)) +
+  annotate("text", x = 1000, y = mu_equity - 0.45, label = "mu == 13.21",
+           parse = TRUE, colour = "#17324D", size = 3.4, hjust = 1) +
+  scale_x_continuous(breaks = seq(0, 1000, by = 200),
+                     labels = c("0", "200", "400", "600", "800", "1,000")) +
+  scale_y_continuous(breaks = seq(10, 18, by = 2)) +
+  coord_cartesian(ylim = c(9.5, 18.5)) +
+  labs(x = "Number of pitches in the sample (n)",
+       y = "Sample mean equity offered (%)") +
+  theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    plot.caption = element_text(colour = "#5B6976"),
+    axis.title = element_text(colour = "#17324D")
+  )
+```
+
+The green line is the sample mean of the first $n$ pitches. For small $n$ it
+jumps up and down, because one pitch with a very high equity offer moves the
+mean a lot. As $n$ grows, the jumps become smaller and the line stays closer
+and closer to the gold dashed line at 13.21. The line does not come closer at
+every step. At $n=350$ it lies further from $\mu$ than at $n=250$.
+Consistency describes what happens when $n$ becomes very large.
 
 ### The central limit theorem
 
 <p class="concept-video"><strong>MIT explanation (review):</strong>
 <a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/the-central-limit-theorem/">19.2 The Central Limit Theorem</a>.</p>
 
-The lab showed one more pattern that the rules for the mean and the variance
-do not explain. The pile of sample means became bell-shaped, although the
-population is strongly skewed. The central limit theorem describes this
-pattern.
+[Shark Tank data]{.shark-tag} The formulas for $E[\bar X]$ and $\operatorname{SD}(\bar X)$ give the centre
+and the spread of the sampling distribution, not its shape. For some
+populations the shape is known exactly. The case that matters in this course
+is the normal population. If the population itself is normal, the random
+sample is drawn from a normal distribution $N(\mu,\sigma^2)$. Then the
+sample mean is exactly normal for every $n$:
+$\bar X\sim N(\mu,\sigma^2/n)$. The reason is that a sum of independent
+normal variables is again normal
+([Lecture 6](b06-continuous-normal.qmd#b06-normal-sums)).
+
+For most populations the exact shape is not known. The equity offered is
+an example: the distribution of the population is strongly skewed. Still,
+the histogram of sample means is bell-shaped, in the lab and in
+@fig-b08-many-means. The central limit theorem describes this pattern.
 
 ::: {.definition-box}
 <span class="label">Definition</span>
 
-**Central limit theorem (CLT).** For a large random sample of iid
-observations with mean $\mu$ and variance $\sigma^2$, the sample mean is
-approximately normal, whatever the shape of the population:
+**Central limit theorem (CLT).** For a large random sample (large $n$) of
+iid observations with mean $\mu$ and variance $\sigma^2$, the sample mean is
+approximately normal, whatever the shape of the population distribution:
 $\bar X\ \dot\sim\ N\!\left(\mu,\frac{\sigma^2}{n}\right)$.
 :::
 
-The dot above $\sim$ marks an approximation, which improves as $n$ grows. The
-same statement can be written with the standardised sample mean
-
-$$
-Z=\frac{\bar X-\mu}{\sigma/\sqrt n},
-$$
-
-which is approximately standard normal for large $n$. The normal model of
-Lecture 6 returns here. It is not a model for the data, where it failed for
-the equity offered. It is a model for the sample mean.
-
-With the CLT you can calculate a probability for a sample mean. Take the
-worked example above (@exm-b08-se), with $\sigma=12$ and $n=36$, so that
-the SE is 2. Suppose that $\mu=50$. By the CLT, $\bar X$ is approximately
-$N(50,2^2)$. The probability of a sample mean above 53 is
-
-$$
-P(\bar X>53)\approx P\!\left(Z>\frac{53-50}{2}\right)=P(Z>1.5)
-=1-0.9332=0.0668,
-$$
-
-with the supplied value $P(Z\le1.5)=0.9332$. A sample mean above 53 occurs
-in about 7% of random samples.
-
-There is no universal rule that $n=30$ is always enough. Thirty is a common
-starting point for roughly symmetric data. Strongly skewed data, such as
-revenues or deal amounts, need more. Extreme outliers and dependence between
-observations can also require much more data.
+The dot above $\sim$ means "approximately". The approximation improves as
+$n$ grows.
+The mean and the variance of this normal curve are the ones found above:
+$E[\bar X]=\mu$ and $\operatorname{Var}(\bar X)=\sigma^2/n$. The CLT adds
+the shape.
 
 @fig-b08-clt shows a simulation: 5,000 sample means of $n=5$ draws and 5,000
 sample means of $n=40$ draws from the equity offered (`equity_offered_pct`).
-The simulation draws with replacement, so its draws are exactly independent.
+As before, the simulation draws with replacement, so its draws are exactly
+independent.
 
 ```{r}
 #| label: fig-b08-clt
@@ -399,68 +642,68 @@ ggplot(sim_means, aes(sample_mean)) +
   )
 ```
 
-Read @fig-b08-clt with the five-step sequence of Lecture 1. (1) *Unit and
+Read @fig-b08-clt with the reading sequence of Lecture 1. (1) *Unit and
 variables:* each bar counts simulated sample means, not pitches. The
 horizontal axis is the sample mean of the equity offered, in percent. (2)
 *Scales:* both panels use the same range and the same density scale, so
 widths can be compared directly. (3) *One element:* the orange curve in each
 panel is the normal approximation for that sample size. (4) *Pattern:* the
-pile for $n=40$ is far narrower and much closer to its normal curve than the
-pile for $n=5$, which still leans right like the population. (5) *Limits:*
-the figure shows random samples from this file. It says nothing about samples
-that were not drawn by chance.
+histogram for $n=40$ is far narrower and much closer to its normal curve
+than the histogram for $n=5$. The histogram for $n=5$ is still skewed to the
+right, like the population.
+(5) *Limits:* the figure shows random samples from this file. It says nothing
+about samples that were not drawn by chance.
 
-### How many customers must I ask? {#b08-sample-size}
+How large must $n$ be? Many people use a sample size of at least 30 as a
+rough guide (a rule of thumb). But no general rule says that $n=30$ is always
+enough.
+Thirty is a common starting point for roughly symmetric data. Strongly
+skewed data, such as revenues or deal amounts, need more. Extreme outliers
+and dependence between observations can also require much more data.
 
-The square-root rule compares two sample sizes. A founder often asks a more
-direct question: how large must the sample be to reach a given precision?
+The normal model of Lecture 6 returns here. It is not a model for the data.
+For the equity offered in single pitches it did not fit (Lecture 6). It is a
+model for the sample mean. You can calculate probabilities for $\bar X$ with
+the normal model in two situations:
 
-The CLT gives the answer. The central 95% of a normal distribution lies
-within 1.96 standard deviations of its mean, because $z_{0.975}=1.96$
-(Lecture 6). So in about 95% of
-random samples, $\bar X$ lies within $1.96\times\sigma/\sqrt n$ of $\mu$. This
-distance is called the margin of error at the 95% level. Lecture 9 uses it to
-build confidence intervals. If the margin of error may be at most $m$, solve
-for $n$:
+1. the population is normal, so that $\bar X$ is exactly normal for every
+   $n$
+2. the sample size $n$ is large, so that $\bar X$ is approximately normal by
+   the CLT.
+
+One of the two is enough. In both situations, standardise the sample mean as
+in Lecture 6:
 
 $$
-1.96\times\frac{\sigma}{\sqrt n}\le m
-\qquad\text{gives}\qquad
-n\ge\left(\frac{1.96\times\sigma}{m}\right)^2.
+Z=\frac{\bar X-\mu}{\sigma/\sqrt n}.
 $$
 
-::: {#exm-b08-sample-size}
-## Worked example: a sample size for a margin of 2 euros
+$Z$ is standard normal in the first situation and approximately standard
+normal in the second.
 
-An invented example. You want to know the average order value of your
-customers to within 2 euros, at the 95% level. How many customers must you
-survey?
+Take the worked example above (@exm-b08-se), with $\sigma=12$ and $n=36$, so
+that the standard deviation of the sample mean is 2. Suppose that $\mu=50$.
+The sample is large, so by the CLT $\bar X$ is approximately $N(50,2^2)$.
+The probability of a sample mean above 53 is
 
-- **Planning value.** The formula needs $\sigma$, which you do not know
-  before the survey. A small pilot survey gave an SD of about 12 euros, so
-  use $\sigma=12$ as a planning value. The target margin of 2 euros is one
-  sixth of that SD.
-- **Sample size.** $n\ge(1.96\times 12/2)^2=11.76^2\approx 138.3$.
-- **Round up.** Survey $n=139$ customers. Always round up: with 138
-  customers the margin would be slightly above 2 euros.
+$$
+P(\bar X>53)\approx P\!\left(Z>\frac{53-50}{2}\right)=P(Z>1.5)
+=1-0.9332=0.0668,
+$$
 
-Halving the margin to 1 euro needs $(1.96\times 12/1)^2=23.52^2\approx 553.2$,
-so 554 customers. Half the margin costs about four times the sample, as the
-square-root rule says.
-
-```{r}
-#| label: b08-sample-size-calc
-sigma_plan <- 12
-n_needed <- c(margin_2_euros = (1.96 * sigma_plan / 2)^2,
-              margin_1_euro  = (1.96 * sigma_plan / 1)^2)
-n_needed
-ceiling(n_needed)   # ceiling() rounds up to the next whole number
-```
-:::
+with the supplied value $P(Z\le1.5)=0.9332$. A sample mean above 53 occurs
+in about 7% of random samples.
 
 ### Sample proportions are sample means
 
-For a Bernoulli variable $X$ with $P(X=1)=p$ (Lecture 3),
+[Shark Tank data]{.shark-tag} Many business questions are about a share and not about an average. An
+example from the Shark Tank file: what share of all pitches ends with a
+deal? The variable `deal_on_show` is a 0/1 variable. It is 1 if the pitch
+ended with a deal and 0 if not. The population proportion $p$ is the share
+of ones among the 1,441 pitches, here $p=0.612$.
+
+A 0/1 variable is a Bernoulli variable $X$ with $P(X=1)=p$ (Lecture 3). Its
+mean and variance are
 
 $$
 E[X]=p,
@@ -468,28 +711,48 @@ E[X]=p,
 \operatorname{Var}(X)=p(1-p).
 $$
 
-A sample proportion is the sample mean of a 0/1 variable (Lecture 7), so
-every result above applies: $\widehat P=\bar X$ satisfies
+The sample proportion $\widehat P$ is the estimator of $p$: the share of
+ones in a random sample. It is the sample mean of a 0/1 variable
+(Lecture 7), $\widehat P=\bar X$. So every result above applies, with
+$\mu=p$ and $\sigma^2=p(1-p)$:
 
 $$
 E[\widehat P]=p,
 \qquad
-\operatorname{SE}(\widehat P)=\sqrt{\frac{p(1-p)}{n}}.
+\operatorname{Var}(\widehat P)=\frac{p(1-p)}{n},
+\qquad
+\operatorname{SD}(\widehat P)=\sqrt{\frac{p(1-p)}{n}}.
 $$
 
-This formula needs the parameter $p$, which is usually unknown. Replacing $p$
-by the estimate $\hat p$ gives the estimated standard error
+The formulas show two properties. $\widehat P$ is unbiased, because
+$E[\widehat P]=p$. And $\widehat P$ is consistent, because its variance
+$p(1-p)/n$ shrinks towards zero as $n$ grows.
+
+The standard deviation of the sample proportion needs the parameter $p$,
+which is usually unknown. Replacing $p$ by the estimate $\hat p$ gives the
+standard error of the sample proportion:
 
 $$
-\widehat{\operatorname{SE}}(\widehat P)=\sqrt{\frac{\hat p(1-\hat p)}{n}}.
+\operatorname{SE}(\widehat P)=\sqrt{\frac{\hat p(1-\hat p)}{n}}.
 $$
 
-Use the version with $p$ when the population proportion is given or assumed.
-Use the estimated version when you only have the sample, as in Tutorial 3.
+Use the standard deviation, with $p$, when the population proportion is
+given or assumed. Use the standard error, with $\hat p$, when you only have
+the sample, as in Tutorial 3. The seed-123 sample has 64 deals in 100
+pitches, so $\hat p=0.64$:
+
+```{r}
+#| label: b08-proportion-standard-error
+p_hat <- mean(pitch_sample$deal_on_show)
+c(p_hat = p_hat, standard_error = sqrt(p_hat * (1 - p_hat) / 100))
+```
+
+The standard error is $\sqrt{0.64\times0.36/100}=0.048$, or 4.8 percentage
+points.
 
 By the CLT, the sampling distribution of $\widehat P$ is approximately normal
-for a large sample. How large is large enough for a proportion? The next
-section answers this with the distribution of a count.
+for a large sample. How large is large enough for a proportion? The answer
+comes from the distribution of a count.
 
 ### Counting successes: the binomial distribution {#b08-binomial}
 
@@ -587,62 +850,53 @@ ggplot(pmf, aes(y, prob)) +
   )
 ```
 
-This course therefore uses the normal approximation for a count or a
-proportion only if $np\ge10$ and $n(1-p)\ge10$. This rule is called the
+So use the normal approximation for a count or a proportion only if
+$np\ge10$ and $n(1-p)\ge10$. This rule is called the
 **success-failure condition**: the expected numbers of successes and of
 failures must both be at least 10. When $p$ is unknown, check the rule with
 the counts in the sample: at least 10 successes and at least 10 failures. In
-a test, use the null value $p_0$ (Lecture 10). Some textbooks use 5 in place
-of 10. Ten is the safer choice. You do not need to calculate binomial
-probabilities in this course.
+a test of a proposed value $p_0$, use $p_0$ (Lecture 10). Some textbooks use 5
+instead of 10. You do not need to calculate binomial probabilities in this
+course.
 
 ::: {#exm-b08-proportion}
-## Worked example: SE of the deal proportion at n = 100
+## Worked example: standard deviation of the deal proportion at n = 100
 
-Suppose we draw a random sample of $n=100$ pitches from the frame, where the
+[Shark Tank data]{.shark-tag} Suppose we draw a random sample of $n=100$ pitches from the Shark Tank file, where the
 deal proportion is $p=0.612$. How far is the sample deal proportion
 typically from 0.612?
 
-- **SE.**
-  $\operatorname{SE}(\widehat P)=\sqrt{0.612\,(1-0.612)/100}
+- **Standard deviation of the sample proportion.** Here $p$ is given, so
+  $\operatorname{SD}(\widehat P)=\sqrt{0.612\,(1-0.612)/100}
   =\sqrt{0.2375/100}\approx 0.0487$, about 4.9 percentage points.
 - **Success-failure check.** $np=100(0.612)=61.2\ge 10$ and
   $n(1-p)=100(0.388)=38.8\ge 10$, so the normal approximation is reasonable.
 
-In R, using `p_deal` as constructed above:
+In R, with `p_deal` as calculated above:
 
 ```{r}
 #| label: b08-proportion-se
 p_deal <- mean(sharks$deal_on_show)
-c(SE_deal_proportion_n_100 = sqrt(p_deal * (1 - p_deal) / 100),
+c(SD_deal_proportion_n_100 = sqrt(p_deal * (1 - p_deal) / 100),
   successes = 100 * p_deal, failures = 100 * (1 - p_deal))
 ```
 :::
 
-### The law of large numbers and the CLT answer different questions
+### Consistency and the CLT answer different questions
 
-<p class="concept-video"><strong>MIT explanation (review):</strong>
-<a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/the-weak-law-of-large-numbers/">18.4 The Weak Law of Large Numbers</a>.</p>
+Consistency and the CLT are both statements about large random samples. They
+answer different questions:
 
-::: {.definition-box}
-<span class="label">Definition</span>
+- Consistency says where the sample mean goes as $n$ grows: towards $\mu$.
+- The CLT says what the distribution of the sample means looks like for a
+  large $n$: its approximate shape and its width.
 
-**Law of large numbers (LLN).** As the sample size $n$ grows, the sample
-mean $\bar X$ of a random sample gets close to the population mean $\mu$.
-:::
-
-This is the consistency of $\bar X$ noted above. The LLN and the CLT answer
-different questions:
-
-- The LLN says where the pile of sample means goes: towards $\mu$.
-- The CLT says what the pile looks like: its approximate shape and width.
-
-The LLN is about a value. The CLT is about a distribution. Both assume that
-the sampling is random. Neither repairs a sample that was selected badly in
-the first place.
+Consistency is about a value. The CLT is about a distribution. Both assume
+that the sampling is random. Neither of them can correct a sample that was
+selected badly from the start.
 
 ::: {.callout-note collapse="true"}
-## Check: match each statement to LLN, CLT, or neither
+## Check: match each statement to consistency, the CLT, or neither
 
 1. "With enough random draws, the sample mean equity will be very close to
    13.21."
@@ -651,67 +905,108 @@ the first place.
 3. "With enough respondents, our LinkedIn poll will represent Dutch
    founders."
 
-Statement 1 is the LLN, statement 2 is the CLT, and statement 3 is
-**neither**. No theorem turns a self-selected sample into a representative
-one (see the box below).
+Statement 1 is consistency, statement 2 is the CLT, and statement 3 is
+neither. The people who answer a LinkedIn poll chose themselves (a
+self-selected sample). No theorem turns a self-selected sample into a
+representative one (see the box below).
 :::
 
 ::: {.caveat-box}
 <span class="label">What a bigger sample can and cannot fix</span>
 
-- More data shrink the random error, at the square-root rate.
+- More data reduce the random error, at the square-root rate.
 - More data do nothing for selection bias. A million televised pitches still
   describe televised pitches.
-- The standard error measures precision inside the list you sampled from. It
-  is silent about who is on the list.
+- The standard error measures precision inside the list you sampled from
+  (the sampling frame). It says nothing about who is on the list.
 
-**What you can do with it:** first fix who you ask, then decide how many.
+**What you can do with it:** first make sure you ask the right people, then
+decide how many people to ask.
 Stop collecting when more data would no longer change your decision.
 :::
 
 ### Answering the driving question
 
 A random sample of 100 pitches from the Shark Tank file had a mean equity
-offered of 12.76%, while the mean of all 1,441 records is 13.21%. How wrong
-could 12.76 have been? Its standard error:
+offered of $\bar x=12.76$%. How wrong could that number be?
+
+Imagine you are an analyst who has only this sample. The population
+mean $\mu$ is unknown. That is why a sample was drawn. The sample gives its
+own standard deviation, $s=7.71$ percentage points (Lecture 7), and from it
+the standard error:
+
+$$
+\operatorname{SE}(\bar X)=\frac{s}{\sqrt n}=\frac{7.71}{\sqrt{100}}\approx 0.77.
+$$
 
 ```{r}
 #| label: b08-driving-question
-sigma_equity <- sqrt(mean((sharks$equity_offered_pct -
-                             mean(sharks$equity_offered_pct))^2))
-c(SE_mean_n_25 = sigma_equity / sqrt(25),
-  SE_mean_n_100 = sigma_equity / sqrt(100))
+x_bar <- mean(pitch_sample$equity_offered_pct)
+s <- sd(pitch_sample$equity_offered_pct)
+c(x_bar = x_bar, s = s, standard_error = s / sqrt(100))
 ```
 
-At $n=100$ the SE is about 0.84 percentage points, which is about 6% of the
-population mean. The mean of a random sample typically lands within about
-0.84 points of 13.21, and rarely more than about two SEs away. The sample
-with 12.76 missed by 0.45 points, about half an SE. At $n=25$ the SE would be
-twice as large, by the square-root rule.
+So the mean of a random sample of this size typically lies within about 0.8
+percentage points of $\mu$. By the CLT it rarely lies more than about two
+standard deviations of the sample mean away from $\mu$. So, without knowing
+$\mu$, the analyst can say this: 12.76 is probably within about one
+percentage point of the population mean. It is very unlikely to differ from
+it by more than two percentage points. A typical error of 0.8 percentage
+points is about 6% of the sample mean.
 
-Why can we trust the average although the equity offered in single pitches
-is strongly skewed? Deviations cancel in an average (the variance rule), and
-the CLT gives the mean a predictable, nearly normal distribution.
+Why can we trust an average this much, although the equity offered in
+single pitches is strongly skewed? Two results explain it. First, positive
+and negative deviations partly cancel in an average. The sampling distribution of $\bar X$ is therefore far
+narrower than the population distribution: a standard error of about 0.8
+points for the sample mean, against a standard deviation of about 8 points
+for single pitches. Second, the central limit theorem gives this narrow
+distribution a known shape. It is approximately normal, although the
+population is not. Together, the two results make the size of the error of
+an average of 100 skewed values predictable.
 
-One detail: our samples are drawn without replacement from 1,441 records.
-That makes the exact standard error slightly smaller than the formula says,
-0.81 instead of 0.84. The 10% rule says that the difference can be ignored.
-The optional box in
-[Lecture 7](b07-samples-estimators.qmd#b07-parameters) gives the exact
+This file is the whole population, so the answer can be checked:
+
+```{r}
+#| label: b08-driving-check
+c(miss = mu_equity - x_bar,
+  miss_in_standard_errors = (mu_equity - x_bar) / (s / sqrt(100)),
+  SD_of_sample_mean = sigma_equity / sqrt(100))
+```
+
+The population mean is $\mu=13.21$%, so this sample missed by 0.45 points.
+That is a little over half a standard error, which is a normal size for such
+a difference. The standard
+deviation of the sample mean, calculated with $\sigma=8.44$, is 0.84. The
+standard error of 0.77, calculated from the sample alone, is close to it.
+
+One detail: our sample is drawn without replacement from 1,441 records. That
+makes the exact standard deviation of the sample mean slightly smaller than
+$\sigma/\sqrt n$:
+
+```{r}
+#| label: b08-without-replacement
+sigma_equity / sqrt(100) * sqrt((1441 - 100) / (1441 - 1))
+```
+
+It is 0.81 and not 0.84. The 10% condition says that we can ignore the
+difference. The optional box in
+[Lecture 7](b07-samples-estimators.qmd#b07-srs) gives the exact
 formula.
 
 ::: {.founder-box}
 <span class="label">A founder's decision (invented example)</span>
 
-You ask customers to rate your boxes from 1 to 10. Ratings have a standard deviation of about 2. With 25 customers the standard error of the mean is 2/5 = 0.4. With 100 customers it is 0.2. Is the larger survey worth four times the effort? Your rule is to change the menu only if the mean rating is below 7. The first 25 customers give a mean of 8.4, which is 3.5 standard errors above 7. The decision: stop surveying and keep the menu. More data would not change what you do.
+You ask customers to rate your meal boxes from 1 to 10. From earlier surveys you expect the ratings to have a standard deviation of about 2. With 25 customers the standard deviation of the sample mean is then 2/5 = 0.4. With 100 customers it is 0.2. Is the larger survey worth four times the effort? Your rule is to change the menu only if the mean rating is below 7. The first 25 customers give a mean of 8.4 and a sample standard deviation of 2. The standard error is 2/5 = 0.4, so 8.4 is 3.5 standard errors above 7. The decision: stop surveying and keep the menu. More data would not change what you do.
 :::
 
 **Next:** We can now say how much a sample mean typically varies: by about
-one standard error. A report needs a sentence such as "the population mean
-plausibly lies between $a$ and $b$". That takes one more step, because in a
-real sample $\sigma$ is unknown and must be estimated too, which adds
-uncertainty. Lecture 9 introduces the t distribution, which allows for this
-extra uncertainty, and builds the confidence interval from it.
+one standard deviation of the sample mean, which the standard error
+estimates. A report needs a sentence such as "the population mean plausibly
+lies between $a$ and $b$". This needs one more step. In a real sample
+$\sigma$ is unknown, so we must estimate it too, and this adds uncertainty.
+Lecture 9 introduces the t distribution, which takes this extra uncertainty
+into account, and builds the confidence interval from it. Lecture 9
+also shows how many customers you must ask to reach a target precision.
 
 :::
 
@@ -726,16 +1021,19 @@ extra uncertainty, and builds the confidence interval from it.
 ### Read the lecture material (15 minutes)
 
 Read the Lecture material section above from start to end. The lecture
-covered the core of it. The text has every step, every example, and all the
+covered the main points. The text has every step, every example, and all the
 code, including parts that were not shown in class. Note what is still
 unclear and bring it to the next tutorial, or ask Tilly.
 
 ### Recall questions (10 minutes)
 
 1. What varies in a sampling distribution?
-2. Why is $E[\bar X]=\mu$ called unbiasedness?
-3. What is the difference between an SD and an SE?
-4. To cut an SE in half, by what factor must the sample size grow, and why?
+2. What do "unbiased" and "consistent" say about the sample mean?
+3. What is the difference between the standard deviation of the
+   observations, the standard deviation of the sample mean, and the standard
+   error?
+4. To cut the standard deviation of a sample mean in half, by what factor
+   must the sample size grow, and why?
 5. What does the CLT say becomes approximately normal?
 6. Why does a larger sample not remove selection bias?
 
@@ -744,12 +1042,18 @@ unclear and bring it to the next tutorial, or ask Tilly.
 
 1. The statistic varies across possible repeated samples. The parameter and
    the population stay fixed.
-2. Its long-run average across repeated samples equals the population
-   parameter.
-3. An SD describes variation among observations. An SE describes variation
-   of an estimator across samples.
-4. By a factor of 4: the SE is proportional to $1/\sqrt n$, so halving it
-   requires $2^2=4$ times the observations.
+2. Unbiased: $E[\bar X]=\mu$. Over many random samples, the average of the
+   sample means equals the population mean. Consistent: with a larger and
+   larger sample, the sample mean comes closer and closer to the population
+   mean.
+3. The standard deviation of the observations ($\sigma$, estimated by $s$)
+   describes variation among single observations. The standard deviation of
+   the sample mean, $\sigma/\sqrt n$, describes variation of $\bar X$ across
+   samples. The standard error, $s/\sqrt n$, is its estimate from one
+   sample.
+4. By a factor of 4: the standard deviation of the sample mean is
+   proportional to $1/\sqrt n$, so halving it requires $2^2=4$ times the
+   observations.
 5. The sample mean. For a large sample its sampling distribution is
    approximately normal. The single observations do not become normal.
 6. Sample size shrinks random error only. It does not change how units
@@ -758,70 +1062,82 @@ unclear and bring it to the next tutorial, or ask Tilly.
 
 ### Finish a half-worked example (5 minutes)
 
-Re-read the worked SE calculation (@exm-b08-se). Then complete the same
-calculation for a proportion: a planned survey expects $p=0.30$ and
-$n=100$.
+Re-read the worked calculation for a sample mean (@exm-b08-se). Then
+complete the same calculation for a proportion. For a planned survey you
+expect $p=0.30$, and you plan to ask $n=100$ people.
 
-*Step 1 (given).* The SE formula for a proportion is
+*Step 1 (given).* The standard deviation of the sample proportion is
 $\sqrt{p(1-p)/n}$.
 
-*Step 2 (you).* Calculate the SE.
+*Step 2 (you).* Calculate it.
 
 *Step 3 (you).* Check the success-failure condition.
+
+*Step 4 (you).* The survey is done: 36 of the 100 respondents say yes.
+Calculate the standard error.
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-$\operatorname{SE}(\widehat P)=\sqrt{0.30(0.70)/100}\approx 0.0458$, about
+$\operatorname{SD}(\widehat P)=\sqrt{0.30(0.70)/100}\approx 0.0458$, about
 4.6 percentage points. The expected counts are $np=30$ successes and
 $n(1-p)=70$ failures, both at least 10, so the normal approximation is
-acceptable.
+acceptable. After the survey, $\hat p=0.36$ and the standard error is
+$\operatorname{SE}(\widehat P)=\sqrt{0.36(0.64)/100}=0.048$, or 4.8
+percentage points. The standard error uses $\hat p$, because $p$ itself is
+unknown.
 :::
 
 ### Practice (15 minutes)
 
 1. If $\sigma=15$ and $n=25$, find $E[\bar X]$,
-   $\operatorname{Var}(\bar X)$, and $\operatorname{SE}(\bar X)$, naming
+   $\operatorname{Var}(\bar X)$, and $\operatorname{SD}(\bar X)$, naming
    the rule used at each step.
-2. How large must $n$ become to reduce an SE from 6 to 1.5?
+2. By what factor must $n$ grow to reduce the standard deviation of a
+   sample mean from 6 to 1.5?
 3. For a sample proportion with $p$ assumed to be 0.50 and $n=64$,
-   calculate the SE and check the success-failure condition.
+   calculate the standard deviation of the sample proportion and check the
+   success-failure condition.
 4. Explain why the normal approximation is more convincing in the
    right-hand panel of @fig-b08-clt.
 5. State one threat to the CLT-based approximation that a large $n$ alone
    does not solve.
-6. An invented example. A founder wants to know the average delivery time of
-   her orders to within 1 minute, at the 95% level. A pilot gave an SD of 5
-   minutes. How many deliveries must she time? How does the answer change
-   for a margin of half a minute?
+6. An invented example. The preparation times of a founder's orders have
+   mean $\mu=30$ minutes and SD $\sigma=5$ minutes. She times a random sample
+   of 100 orders. Find the probability that the sample mean is above 31
+   minutes. Supplied value: $P(Z\le 2)=0.9772$. Her sample then gives
+   $s=4.6$ minutes. What is the standard error of the mean?
 
 ::: {.callout-note collapse="true"}
 ## Check your answers
 
 1. $E[\bar X]=\mu$ (rules for expectations),
    $\operatorname{Var}(\bar X)=\sigma^2/n=225/25=9$ (variance of a rescaled
-   sum of independent variables), $\operatorname{SE}(\bar X)=\sqrt 9=3$.
-2. The SE must fall by a factor of 4, so the sample size must grow by
-   $4^2=16$ times.
-3. $\sqrt{0.50(0.50)/64}=0.0625$. Expected counts are 32 and 32, both at
-   least 10.
+   sum of independent variables), $\operatorname{SD}(\bar X)=\sqrt 9=3$.
+2. The standard deviation of the sample mean must fall by a factor of 4, so
+   the sample size must grow by $4^2=16$ times.
+3. $\operatorname{SD}(\widehat P)=\sqrt{0.50(0.50)/64}=0.0625$. Expected
+   counts are 32 and 32, both at least 10.
 4. Averaging 40 observations cancels more of the skewness and shrinks the
    sampling variation more than averaging 5 observations. The histogram
    follows its normal curve much more closely.
 5. Dependence between observations. A non-representative sample is a
    different problem: the approximation still works, but the mean then
-   estimates the wrong quantity. (Extreme outliers slow the approximation too.)
-6. $n\ge(1.96\times 5/1)^2=9.8^2=96.04$, so she must time 97 deliveries. For
-   half a minute, $n\ge(1.96\times 5/0.5)^2=19.6^2=384.16$, so 385
-   deliveries. Half the margin costs about four times the sample.
+   estimates the wrong quantity. Extreme outliers are a problem too: with
+   them, the approximation needs a much larger sample to work.
+6. The sample is large, so by the CLT $\bar X$ is approximately normal with
+   mean 30 and $\operatorname{SD}(\bar X)=5/\sqrt{100}=0.5$. Standardise:
+   $z=(31-30)/0.5=2$, so $P(\bar X>31)\approx P(Z>2)=1-0.9772=0.0228$, about
+   2%. The standard error is $s/\sqrt n=4.6/10=0.46$ minutes. It estimates
+   the standard deviation of the sample mean, 0.5.
 :::
 
 ### Widget homework (10 minutes)
 
-Open the
+[Shark Tank data]{.shark-tag} Open the
 [sampling-distribution lab](b07-samples-estimators.qmd#sampling-lab) in
-Lecture 7 again and run these three settings. For each, redraw several times
-and write **one sentence** on what the histogram of sample means shows:
+Lecture 7 again and run these three settings. For each setting, draw new
+samples several times and write **one sentence** on what the histogram of sample means shows:
 
 1. $n = 2$
 2. $n = 25$
@@ -834,18 +1150,18 @@ and write **one sentence** on what the histogram of sample means shows:
    right-skewed, like the population.
 2. At $n=25$ the histogram of means is clearly narrower and roughly
    symmetric, centred near 13.2.
-3. At $n=100$ the means form a tight bell around the population mean, with
-   a typical deviation of less than one percentage point. This is the SE of
-   about 0.84 percentage points.
+3. At $n=100$ the means form a narrow bell shape around the population mean, with
+   a typical deviation of less than one percentage point. This is the
+   standard deviation of the sample mean, about 0.84 percentage points.
 :::
 
 ### Review: one question each from Lectures 7 and 6 (10 minutes)
 
 1. *(Lecture 7.)* The sample variance divides by $n-1$, not $n$. In one or
    two sentences, why?
-2. *(Lecture 6.)* Daily revenue is modelled as $X\sim N(10, 2^2)$ (in
-   thousands of euros). Find $P(X>13)$. Supplied value:
-   $P(Z\le 1.5)=0.9332$.
+2. *(Lecture 6.)* An invented example. Daily revenue is modelled as
+   $X\sim N(10, 2^2)$ (in thousands of euros). Find $P(X>13)$. Supplied
+   value: $P(Z\le 1.5)=0.9332$.
 
 ::: {.callout-note collapse="true"}
 ## Check your answers
@@ -857,9 +1173,9 @@ and write **one sentence** on what the histogram of sample means shows:
    $P(X>13)=P(Z>1.5)=1-0.9332\approx 0.067$.
 :::
 
-### Worked exam interpretation (5 minutes)
+### Worked exam interpretation: a probability for a sample mean (5 minutes)
 
-**Question.** The mean equity offered (`equity_offered_pct`) in the Shark
+[Shark Tank data]{.shark-tag} **Exam-style question.** The mean equity offered (`equity_offered_pct`) in the Shark
 Tank file is $\mu=13.21$% with $\sigma=8.44$ percentage points. A random
 sample of $n=100$ pitches is drawn. Using the CLT, find the probability that
 the sample mean exceeds 14.5%. Supplied value: $P(Z\le 1.53)=0.937$.
@@ -868,16 +1184,16 @@ the sample mean exceeds 14.5%. Supplied value: $P(Z\le 1.53)=0.937$.
 ## Check a model answer
 
 By the CLT, $\bar X\ \dot\sim\ N(13.21, 0.844^2)$ since
-$\operatorname{SE}=8.44/\sqrt{100}=0.844$. Standardise:
+$\operatorname{SD}(\bar X)=8.44/\sqrt{100}=0.844$. Standardise:
 $z=(14.5-13.21)/0.844\approx 1.53$, so
 $P(\bar X>14.5)\approx P(Z>1.53)=1-0.937=0.063$. That is about a 6% chance.
-Note that the question is about the mean, not about a single pitch. For a
-single pitch the normal model was rejected in Lecture 6.
+Note that the question is about the mean, not about a single pitch. Lecture
+6 rejected the normal model for a single pitch.
 :::
 
 ### Check the AI (5 minutes)
 
-You asked an AI assistant: "My ratings have a standard deviation of 12 and I asked 36 customers. How precise is the mean, and how do I halve the error?" It answered:
+You asked an AI assistant: "The ratings in my sample have a standard deviation of 12 and I asked 36 customers. How precise is the mean, and how do I halve the error?" It answered:
 
 > "The standard error is 12/36 = 0.33. To halve it you need twice as many customers, 72."
 
@@ -893,7 +1209,7 @@ Both steps are wrong. The standard error divides by the square root of the sampl
 ### Make it yours (5 minutes)
 
 :::: {.utility-prompt}
-<span class="label">Utility: two sentences</span>
+<span class="label">Two sentences about your own venture</span>
 
 Think of your EiA venture, or any business you know well. Name one number
 you would estimate from a sample (customer satisfaction, conversion rate,
@@ -905,13 +1221,20 @@ error for the decision you face.
 ::: {.callout-note collapse="true"}
 ## See an example, then write your own
 
-Take a student-run campus meal-prep box venture. "I would estimate the conversion rate of tasting-stand visitors from a random 100 of them, and a standard error of about 5 percentage points is fine for deciding on a second stand. Collecting four times the data would halve that to about 2.5 points, which is not worth the extra tasting days for this decision."
+Take a student-run venture that sells meal-prep boxes on campus. "I would estimate the conversion rate of visitors to our tasting stand from a random sample of 100 visitors. A standard error of about 5 percentage points is fine for deciding whether to open a second stand. Collecting four times the data would halve the standard error to about 2.5 percentage points, which is not worth the extra tasting days for this decision."
 :::
 
 You can discuss this task, and any other task in this chapter, with
-**Tilly**, the course AI assistant: ask it to help you sketch the
-sample-size trade-off for your own numbers.
+**Tilly**, the course AI assistant: ask it to help you work out the
+trade-off between sample size and precision for your own numbers.
+
 ::::
+
+### More practice
+
+For extra exercises on this lecture, with worked solutions, ask **Tilly**,
+the course AI assistant. For example: "Give me an extra exercise for
+Lecture 8. Show the solution only after I send my answer."
 
 [Continue to Lecture 9: The t distribution and confidence intervals](b09-t-confidence-intervals.qmd).
 

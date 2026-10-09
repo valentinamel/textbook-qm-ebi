@@ -13,16 +13,22 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 <span class="label">By the end of Lecture 6, you can</span>
 
 - distinguish a continuous random variable from a discrete one
-- explain why $P(X=x)=0$ for a continuous random variable and interpret a
-  probability density function as area rather than point probability
+- explain why $P(X=x)=0$ for a continuous random variable, and why zero
+  probability does not mean impossible
+- explain a probability density as the share per unit of width, and read a
+  probability as an area under the density curve
 - use a CDF to calculate interval probabilities
 - calculate uniform probabilities from interval lengths
+- say why a sum of many small independent influences is bell-shaped, and
+  when to doubt the normal model
 - standardise a normal value and compute normal probabilities by hand from
   supplied $Z$ values and with `pnorm()`
-- convert a percentile back to a raw value with $x=\mu+z\sigma$ and verify
-  with `qnorm()`
-- find quantiles of model distributions (the uniform median, normal
-  quartiles)
+- say what the $q$ quantile of a distribution is, and convert a quantile of
+  the standard normal to a raw value with $x=\mu+z\sigma$ and with `qnorm()`
+- find the two values that enclose the central $1-\alpha$ of a normal
+  model, with $z_{1-\alpha/2}$
+- find the median of a uniform or a normal model, and read normal
+  quartiles from `qnorm()`
 - check a proposed normal model against a histogram of data and say when it
   fails.
 :::
@@ -35,21 +41,26 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 - calculate uniform probabilities from interval lengths
 - standardise a value and use the supplied $Z$ values, with the complement
   rule and the symmetry rule where needed
-- go back from a percentile to a value with $x=\mu+z\sigma$
+- say what the $q$ quantile is, $P(X\le x_q)=q$, and go back from a
+  quantile or percentile to a value with $x=\mu+z\sigma$
+- find the central $1-\alpha$ of a normal model: it lies between
+  $-z_{1-\alpha/2}$ and $z_{1-\alpha/2}$ on the $Z$ scale, with
+  $\alpha/2$ in each tail. The values for 90%, 95%, and 99% are 1.645,
+  1.960, and 2.576
+- explain why the height of a density is not a probability
 - say from a histogram whether a normal model fits.
 
 **Enough to recognise:**
 
 - the density notation $f_X(x)$
 - `pnorm()` and `qnorm()`
-- the central 95% of the standard normal distribution, between $-1.96$ and
-  $1.96$.
+- why a sum of many small independent influences is bell-shaped.
 :::
 
 ::: {.driving-question}
 <span class="label">Driving question</span>
 
-<p class="dq-context">Not everything comes in whole numbers: equity shares, waiting times, and revenues can take any value in a range. Insurers, lenders, and operations planners price risk on such quantities every day, and that needs a new kind of probability model.</p>
+<p class="dq-context">Not everything comes in whole numbers: equity shares, waiting times, and revenues can take any value in a range. Insurers, banks, and operations planners calculate risks for such quantities every day. For this they need a new kind of probability model.</p>
 
 You plan to offer the sharks 30% of your company. How unusual is that, and
 can a model with two numbers answer the question without counting every
@@ -77,8 +88,8 @@ also listed in the
 <a href="../resources/video-guide.html">External Video Guide</a>.
 </div>
 
-**Reactivate (5 minutes).** A discrete random variable has separated
-possible values (Lecture 3 attached a PMF and a CDF to such variables). A
+**Warm up (5 minutes).** A discrete random variable has separate
+possible values with gaps between them (Lecture 3 attached a PMF and a CDF to such variables). A
 continuous random variable can take every real value in an interval. Match
 each variable to the better description:
 
@@ -88,7 +99,7 @@ each variable to the better description:
 4. exact amount invested, before rounding to dollars.
 
 ::: {.callout-note collapse="true"}
-## Check your answers
+## Check your preparation
 
 Variables 1 and 3 are discrete. Variables 2 and 4 are continuous in a
 mathematical model, even if a measuring device or database records rounded
@@ -96,9 +107,9 @@ values.
 :::
 
 **Predict (5 minutes).** Answer the one-click Wooclap question posted on
-Canvas before you come to class: for a *continuous* random variable $X$, is
-$P(X = \text{exactly } 10)$ **very small** or **exactly zero**? Commit to an
-answer. You find the answer in the lecture material.
+Canvas before you come to class: for a continuous random variable $X$, is
+$P(X = \text{exactly } 10)$ very small or exactly zero? Choose one answer
+and write it down. The lecture material gives the correct answer.
 
 If fractions or rearranging an equation feel unfamiliar, review
 [Mathematics Refresher: fractions and rearranging equations](../resources/math-refresher.html#fractions-and-rearranging-equations).
@@ -116,7 +127,7 @@ offered in the Shark Tank file.
 
 ### Start with a founder's question
 
-You plan to offer the sharks 30% of your company. Is that unusual? The Shark
+[Shark Tank data]{.shark-tag} You plan to offer the sharks 30% of your company. Is that unusual? The Shark
 Tank file records the equity offered in each pitch (`equity_offered_pct`).
 The code below reads the file and counts the pitches that offered 30% or
 more.
@@ -135,19 +146,17 @@ offers: the mean and the standard deviation.
 
 ```{r}
 #| label: b06-equity-model
+# sd() divides by n - 1. With 1,441 records the difference from dividing
+# by N is in the third decimal.
 c(mean_equity = mean(sharks$equity_offered_pct),
   sd_equity   = sd(sharks$equity_offered_pct))
 ```
 
 The mean is 13.2% and the standard deviation is 8.4 percentage points. Could
-you still say how unusual 30% is? An AI assistant that gets this question
-will often answer with a model called the normal distribution, and it
-reports about 2%. That is less than half of the share in the data.
-
-This lecture shows how such models work for quantities that can take any
-value in a range, how to calculate with them by hand, and how to check
-whether a model fits the data at hand. The check comes near the end, and it
-explains the gap between 2% and 5%.
+you still say how unusual 30% is? If you ask an AI assistant this question,
+it will often use a model called the normal distribution and report about
+2%. That is less than half of the share in the data. The section on checking
+the normal model against data explains the difference.
 
 ### From counting values to measuring intervals
 
@@ -155,13 +164,14 @@ Equity offered is a continuous quantity: an offer $X$ can be any percentage
 in a range, for example 29.87%. What is the probability that an offer is
 exactly 30%?
 
-Take a window around 30. The offer lies between 29.5% and 30.5% with some
-probability $q$. The window from 29.95% to 30.05% is ten times narrower.
+Take a narrow interval, a window, around 30. The offer lies between 29.5% and 30.5% with some
+probability $c$. The window from 29.95% to 30.05% is ten times narrower.
 Over such a short range the probability is spread almost evenly, so this
-window holds about $q/10$. Every further decimal divides the probability by
-about ten. The value "exactly 30%" lies inside every one of these windows,
-so its probability cannot be larger than any of theirs. Only zero is that
-small. For a continuous random variable,
+window holds about $c/10$. Every further decimal divides the probability by
+about ten. The value "exactly 30%" lies inside every one of these windows.
+So its probability is at most $c$, at most $c/10$, at most $c/100$, and so
+on without end. No positive number is below all of these. The probability is
+zero. For a continuous random variable,
 
 $$P(X=x)=0 \quad\text{for every single value } x.$$
 
@@ -169,36 +179,152 @@ This answers the Wooclap question from the preparation: exactly zero, not
 very small. Probability has not disappeared. It belongs to intervals, not to
 single values.
 
+Zero probability does not mean impossible. The next founder certainly offers
+some exact share of the company. Whatever that share turns out to be, it had
+probability zero in advance, and it occurred anyway. A continuous random
+variable always takes a value. The result only says that you cannot name a
+single value in advance that has a positive probability.
+
 ### From probability mass to probability density
 
 <p class="concept-video"><strong>MIT explanation (review):</strong>
 <a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/probability-density-functions/">08.2 Probability Density Functions</a>.</p>
 
-For a discrete random variable, the PMF gives a probability to each single
-value. For a continuous variable that no longer works. Look at the two
-windows again. The probability fell from $q$ to about $q/10$, and the width
-fell from 1 to 0.1 percentage points. Their ratio hardly changed:
+[Shark Tank data]{.shark-tag} For a discrete random variable, the PMF gives a probability to each single
+value. For a continuous variable that no longer helps, because every single
+value has probability zero. We need something else, and the histogram
+already contains the idea.
 
-$$\frac{q}{1}\approx\frac{q/10}{0.1}.$$
+Imagine a histogram of the equity offered, like the one in
+[Lecture 1](b01-introduction-data-analysis.qmd), but for offers that are
+recorded exactly, without rounding. The intervals of a histogram are also
+called bins. The height of each bar is the share of offers in its bin. With
+bins 5 percentage points wide, the bars have a reasonable size. Now make the
+bins 1 point wide. Each new bar holds about a fifth of what the old bar
+held, so all bars shrink. With bins 0.1 wide they
+shrink again, by another factor of ten. The whole histogram sinks towards
+the axis. This is the shrinking window of the previous section, now for all
+bins at once. A histogram with the share in the bin as its height is not
+useful once the bins are narrow.
 
-For narrow windows, the probability divided by the width is approximately
-constant. This ratio is the probability per unit of width near 30%. It is
-called the density at 30%, written $f_X(30)$. The density takes the place of
-the PMF.
+There is a second way to draw the heights. Divide the share in each bin by
+the width of the bin. The height is then the share per percentage point. Now
+the picture does not sink when the bins get narrower. A bar 1 point wide
+that holds 2% of the offers has the height $0.02/1=0.02$ per point. A bar
+0.1 wide that holds 0.2% of the offers has the height $0.002/0.1=0.02$ per
+point as well. With narrower bins, the bars stop shrinking and form a
+smooth curve, as @fig-b06-density-bins shows. This curve is the probability
+density, written $f_X(x)$. Its height at 30 is the share per percentage
+point near 30. The share in a bin is the height of the bar times its width,
+which is the area of the bar. Probability has become area.
+
+The Shark Tank file records rounded percentages, so it cannot show what
+happens in very narrow bins. The figure therefore uses 100,000 invented
+offers. A computer drew them, without rounding, from a smooth model with the
+same mean and standard deviation as the equity offered in the file.
+
+```{r}
+#| label: fig-b06-density-bins
+#| code-fold: true
+#| code-summary: "See the R code for this figure"
+#| fig-height: 3.8
+#| fig-cap: "Narrowing the bins, for 100,000 invented offers that are not rounded. The height of a bar is the share of offers in the bin divided by the bin width. With this height the histogram does not sink. It comes closer and closer to the same navy curve, the density."
+library(ggplot2)
+
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+mean_equity <- mean(sharks$equity_offered_pct)
+# sd() divides by n - 1. With 1,441 records the difference from dividing
+# by N is in the third decimal.
+sd_equity <- sd(sharks$equity_offered_pct)
+
+# 100,000 invented offers that are not rounded. They come from a smooth,
+# right-skewed model (a gamma distribution) with the mean and the standard
+# deviation of the equity offered in the Shark Tank file.
+model_shape <- (mean_equity / sd_equity)^2
+model_rate <- mean_equity / sd_equity^2
+set.seed(206)
+exact_offers <- rgamma(100000, shape = model_shape, rate = model_rate)
+
+panel_names <- c("Bins 5 points wide", "Bins 1 point wide",
+                 "Bins 0.25 points wide")
+offers_wide <- data.frame(
+  panel = factor(panel_names[1], levels = panel_names), x = exact_offers)
+offers_mid <- data.frame(
+  panel = factor(panel_names[2], levels = panel_names), x = exact_offers)
+offers_narrow <- data.frame(
+  panel = factor(panel_names[3], levels = panel_names), x = exact_offers)
+
+# The same smooth curve for all three panels: the density of the model.
+x_grid <- seq(0, 50, length.out = 400)
+smooth_curve <- data.frame(
+  panel = factor(rep(panel_names, each = length(x_grid)),
+                 levels = panel_names),
+  x = rep(x_grid, times = 3),
+  density = rep(dgamma(x_grid, shape = model_shape, rate = model_rate),
+                times = 3)
+)
+
+ggplot() +
+  geom_histogram(data = offers_wide, aes(x, after_stat(density)),
+                 binwidth = 5, boundary = 0,
+                 fill = "#009E73", alpha = 0.85, colour = "white") +
+  geom_histogram(data = offers_mid, aes(x, after_stat(density)),
+                 binwidth = 1, boundary = 0,
+                 fill = "#009E73", alpha = 0.85, colour = "white",
+                 linewidth = 0.2) +
+  geom_histogram(data = offers_narrow, aes(x, after_stat(density)),
+                 binwidth = 0.25, boundary = 0,
+                 fill = "#26AD88", colour = "#26AD88", linewidth = 0.1) +
+  geom_line(data = smooth_curve, aes(x, density), colour = "#17324D",
+            linewidth = 0.9) +
+  facet_wrap(~panel) +
+  coord_cartesian(xlim = c(0, 50)) +
+  scale_x_continuous(breaks = seq(0, 50, by = 10)) +
+  scale_y_continuous(limits = c(0, 0.07),
+                     expand = expansion(mult = c(0, 0.02))) +
+  labs(x = "Equity offered (%), invented offers without rounding",
+       y = "Density (share per point)") +
+  theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    plot.caption = element_text(colour = "#5B6976"),
+    axis.title = element_text(colour = "#17324D"),
+    strip.text = element_text(colour = "#17324D", hjust = 0)
+  )
+```
+
+A metal rod gives the same picture without data. The rod has a weight per
+metre at each point, which is its density, and no single point of the rod
+has any weight. The weight of a piece is its density times its length. A
+probability density is read in the same way: no single value has
+probability, and the probability of an interval is the area under the curve
+over that interval.
 
 ::: {.definition-box}
 <span class="label">Definition</span>
 
 **Probability density function (PDF).** A curve $f_X(x)$ that is never
 negative and has a total area of 1 under it. The probability that $X$ lies
-between $a$ and $b$ is the area under the curve between $a$ and $b$.
+between $a$ and $b$ is the area under the curve between $a$ and $b$. The
+height $f_X(x)$ is the probability per unit of $x$ near the value $x$. It is
+a rate, not a probability.
 :::
 
-Three reading rules follow. The height of the curve is a rate, not a
-probability. The area over an interval is a probability. A rate can be high
-where the probability is packed into a narrow range, so a density can exceed
-1, as long as the total area is 1. A metal rod gives the same picture: it has
-a weight per metre at each point, but no single point has weight.
+For example, in @fig-b06-density-bins the probability of an offer between
+10% and 20% is the area under the navy curve between 10 and 20.
+
+Three rules for reading a density follow. The histogram helps you to
+remember them.
+
+1. The height of the curve is a rate, the share per percentage point. It is
+   not a probability, just as the height of a bar in the figure is not the
+   share in the bin.
+2. The area over an interval is a probability, just as the area of a bar is
+   the share in its bin.
+3. A rate can be high where the probability is packed into a narrow range.
+   So a density can exceed 1, as long as the total area stays 1. A bar 0.2
+   points wide that holds 30% of the data has the height $0.30/0.2=1.5$.
 
 The Shark Tank file records the equity offered in rounded percentages, so
 values repeat.
@@ -208,8 +334,10 @@ values repeat.
 sum(sharks$equity_offered_pct == 30)
 ```
 
-In the file, 33 of the 1,441 pitches show exactly 30. That comes from
-rounding. The model is continuous.
+In the file, 33 of the 1,441 pitches show exactly 30. These repeated values
+come from rounding the percentages in the file, not from the quantity
+itself. The model is
+continuous, and in the model an offer of exactly 30% has probability zero.
 
 You do not need calculus in this course. You read probability as an area,
 and you calculate it with a CDF, with R, or with supplied values.
@@ -230,13 +358,6 @@ $$P(a\le X\le b)=\int_a^b f_X(x)\,dx.$$
 
 The integral is the area under the curve between $a$ and $b$. For $a=b$ the
 area has zero width, which gives $P(X=a)=0$ again.
-
-The normal distribution, which comes later in this lecture, has the density
-
-$$f_X(x)=\frac{1}{\sigma\sqrt{2\pi}}\,
-\exp\!\left(-\frac{(x-\mu)^2}{2\sigma^2}\right).$$
-
-Nobody needs to memorise this formula. R evaluates it with `dnorm()`.
 :::
 
 ::: {.callout-note collapse="true"}
@@ -257,8 +378,8 @@ $$F_X(x)=P(X\le x),$$
 
 exactly as in Lecture 3. In a picture, $F_X(x)$ is the area under the density
 to the left of $x$. For a continuous random variable the CDF rises smoothly,
-without jumps, from 0 to 1. It never falls, because a move to the right can
-only add area. @fig-b06-uniform-cdf in the next section shows an example.
+without jumps (it is continuous), from 0 to 1. It never falls (it is
+non-decreasing), because a move to the right can only add area. @fig-b06-uniform-cdf in the next section shows an example.
 
 The probability of an interval is the difference of two CDF values:
 
@@ -266,8 +387,9 @@ $$P(a<X\le b)=F_X(b)-F_X(a).$$
 
 Because a single point has zero probability, changing $<$ to $\le$ does not
 change a continuous probability: $P(a<X<b)$, $P(a\le X\le b)$, and the two
-mixed versions are all equal. This differs from a discrete variable, where a
-point may carry positive probability and the inequality type matters.
+mixed versions are all equal. For a discrete variable this is different: a
+single value may have positive probability, so it matters whether you write
+$<$ or $\le$.
 
 ### The uniform distribution
 
@@ -283,7 +405,7 @@ is constant on the support,
 
 $$f_X(x)=\frac{1}{b-a},\qquad a\le x\le b,$$
 
-and zero outside it. The height is not a free choice. The whole rectangle
+and zero outside it. You cannot choose the height freely. The whole rectangle
 must have area 1:
 
 $$\text{width}\times\text{height}=(b-a)\times\frac{1}{b-a}=1.$$
@@ -293,7 +415,7 @@ on its length. For $a\le c<d\le b$,
 
 $$P(c<X<d)=\frac{d-c}{b-a}.$$
 
-The mean, the variance, and the standard deviation are stated here without
+Here are the mean, the variance, and the standard deviation, without a
 derivation:
 
 $$E[X]=\frac{a+b}{2},\qquad \operatorname{Var}(X)=\frac{(b-a)^2}{12},
@@ -302,12 +424,12 @@ $$E[X]=\frac{a+b}{2},\qquad \operatorname{Var}(X)=\frac{(b-a)^2}{12},
 ::: {#exm-b06-uniform-session}
 ## Worked example: when does the pitch appear?
 
-This is an invented example. A recording session lasts 90 minutes, and a
-pitch is equally likely to start at any moment of it. Model the start time
+An invented example. A recording session of the TV show lasts 90 minutes,
+and a pitch is equally likely to start at any moment of the session. Model the start time
 as $X\sim U(0,90)$, measured in minutes.
 
 *Step 1: the height.* The density is $1/(90-0)=1/90\approx 0.011$ per
-minute. The total area of 1 fixes this height.
+minute. The total area must be 1, and this sets the height.
 
 *Step 2: the event.* "The pitch starts during the 18-minute window from
 minute 30 to minute 48" is the event $30<X<48$.
@@ -373,9 +495,8 @@ ggplot() +
 Read the horizontal axis as possible start times and the vertical axis as
 density, not probability. The navy density line is at 0 before minute 0,
 jumps to $1/90$ on the support, and drops back to 0 after minute 90. The
-green probability is an area: $18\times(1/90)=0.20$. Compare this with the
-check above: here the height is far below 1, there it was 2. Both densities
-are valid, because only the area is a probability.
+green probability is an area: $18\times(1/90)=0.20$. In the check above,
+the height was 2. Here the height is far below 1. Both densities are valid, because only the area is a probability.
 
 #### The CDF of the session model
 
@@ -451,9 +572,9 @@ $90-63=27$ minutes inside the support.
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-$P(63<X<90)=27/90=0.30$: under the uniform model there is a 30% chance the
-pitch starts in the final 27 minutes, larger than the 0.20 above only
-because the window is longer.
+$P(63<X<90)=27/90=0.30$: under the uniform model there is a 30% chance that
+the pitch starts in the final 27 minutes. This is larger than the 0.20
+above only because the window is longer.
 :::
 :::
 
@@ -462,12 +583,90 @@ because the window is longer.
 <p class="concept-video"><strong>MIT explanation (review):</strong>
 <a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/normal-random-variables/">08.8 Normal Random Variables</a>.</p>
 
-Many quantities are the sum of many small influences: body height,
-measurement errors, the weight of a filled package. Such quantities often
-have a bell-shaped distribution, with most values near the middle and few
-values far away on either side. The normal distribution is the model for
-this shape. It is a model, not a law. Many business variables, such as
-revenues, are strongly skewed and do not follow it.
+[Shark Tank data]{.shark-tag} Many quantities have a bell-shaped distribution, with most values near the
+middle and few values far away on either side. Why is this shape so common?
+Take the adult height of a person. Think of it as a starting value plus a
+long list of small pushes. One gene pushes the height up a little, another
+pushes it down. Good food in childhood adds a bit, and an illness takes a
+bit away. There are hundreds of such influences. Each one is small, and each
+is roughly independent of the others. The final height is the sum of all the
+pushes.
+
+How does a person become very tall? Nearly all the pushes must go up, and
+that almost never happens. In the same way, a coin almost never lands heads
+ten times in a row. A height near the average can arise in very many
+ways: in every mixture where the ups and downs roughly cancel each other. With ten coin
+tosses there is one way to get ten heads, but there are 252 ways to get five
+heads. So most people end up near the middle, and few end up far away. A
+very short height is as rare as a very tall one, so the two sides of the
+bell fall off at the same rate. That is the bell shape.
+
+@fig-b06-pushes shows this with a computer simulation. One repetition adds up 10
+pushes. Each push is $+1$ or $-1$ with equal probability, like heads and
+tails of a coin. The figure counts the totals of 10,000 repetitions.
+
+```{r}
+#| label: fig-b06-pushes
+#| code-fold: true
+#| code-summary: "See the R code for this figure"
+#| fig-cap: "Ten small pushes, added up, in 10,000 repetitions. Totals near zero can arise in many ways, so they are common. A total of 10 or of -10 can arise in only one way, so it is rare. The bars form a bell around 0."
+library(ggplot2)
+
+# One repetition: 10 pushes, each +1 or -1 with equal probability, added up.
+set.seed(206)
+pushes <- matrix(sample(c(-1, 1), size = 10 * 10000, replace = TRUE),
+                 ncol = 10)
+total <- rowSums(pushes)
+total_counts <- as.data.frame(
+  table(total = factor(total, levels = seq(-10, 10, by = 2))))
+total_counts$total <- as.numeric(as.character(total_counts$total))
+
+# Number of ways to reach a total. Five ups and five downs give 0: 252 ways.
+# Ten ups give 10: 1 way.
+ways_zero <- choose(10, 5)
+ways_ten <- choose(10, 10)
+top <- max(total_counts$Freq)
+
+ggplot(total_counts, aes(total, Freq)) +
+  geom_col(fill = "#009E73", alpha = 0.85, width = 1.6) +
+  annotate("text", x = 0, y = top + 200,
+           label = paste(ways_zero, "ways to reach 0"),
+           colour = "#17324D", size = 3.4) +
+  annotate("text", x = c(-10, 10), y = 520,
+           label = paste0(ways_ten, " way to\nreach ", c(-10, 10)),
+           colour = "#17324D", size = 3.4, lineheight = 0.95) +
+  annotate("segment", x = c(-10, 10), xend = c(-10, 10), y = 330, yend = 60,
+           colour = "#17324D",
+           arrow = arrow(length = unit(0.08, "inches"))) +
+  scale_x_continuous(breaks = seq(-10, 10, by = 2)) +
+  scale_y_continuous(limits = c(0, top + 350),
+                     expand = expansion(mult = c(0, 0.02))) +
+  labs(x = "Total of the 10 pushes",
+       y = "Number of repetitions (of 10,000)") +
+  theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    plot.caption = element_text(colour = "#5B6976"),
+    axis.title = element_text(colour = "#17324D")
+  )
+```
+
+The same explanation fits many quantities. The weight of a filled package
+is the sum of the weights of everything in it. An exam score adds up many
+small successes and small mistakes. Suppose a quantity is the sum of many
+small, independent influences, and no single influence is much larger than
+the others. Then its distribution tends to be bell-shaped. The normal distribution is the mathematical model for this
+shape.
+
+The normal distribution is a model, not a law. The explanation above also
+tells you when to doubt it. If one influence is much larger than the others,
+for example an upper limit, a cut-off, or one large cause, the bell shape is
+lost. If the influences multiply and do not add, as with growth
+rates, the distribution is skewed and not symmetric. Many business variables
+are like this. Revenues, firm sizes, and the equity offered in the Shark
+Tank file are strongly skewed, and the normal model does not fit them. The
+section on checking the normal model against data comes back to this.
 
 A normal model needs two numbers. The first is its mean $\mu$. The second is
 its standard deviation $\sigma$. Lecture 3 introduced both symbols.
@@ -487,7 +686,19 @@ has $\sigma=\sqrt{100}=10$. In symbols,
 $$E[X]=\mu,\qquad \operatorname{Var}(X)=\sigma^2,
 \qquad \operatorname{SD}(X)=\sigma.$$
 
-The two parameters do different jobs, as @fig-b06-normal-parameters shows.
+::: {.callout-tip collapse="true"}
+## Optional: the formula of the normal density
+
+The density of $N(\mu,\sigma^2)$ is
+
+$$f_X(x)=\frac{1}{\sigma\sqrt{2\pi}}\,
+\exp\!\left(-\frac{(x-\mu)^2}{2\sigma^2}\right).$$
+
+You do not have to know this formula by heart. R evaluates it with
+`dnorm()`.
+:::
+
+The two parameters have different roles, as @fig-b06-normal-parameters shows.
 A change in $\mu$ shifts the whole curve to the left or to the right, and
 the shape stays the same. A change in $\sigma$ makes the curve wider or
 narrower. A wider curve is also lower, because the total area stays 1.
@@ -586,13 +797,13 @@ ggplot(normal_curve, aes(z, density)) +
   )
 ```
 
-The horizontal axis locates possible values relative to $\mu$ and $\sigma$.
+The horizontal axis shows possible values in terms of $\mu$ and $\sigma$.
 The vertical axis is density, and probability is again area. In the normal
 model, about 68% of the distribution lies within one standard deviation of
-the mean and about 95% within 1.96 standard deviations. The value 1.96 is
-explained later in this lecture. These are facts about the mathematical
-model. The caveat box below explains why they are not automatic facts about
-every dataset.
+the mean and about 95% within 1.96 standard deviations. The section on the
+central part of the standard normal explains the value 1.96. These are facts
+about the mathematical model. The box "What a normal label can and cannot
+say" below explains why they are not automatically true for every dataset.
 
 #### The opening question as an area
 
@@ -611,6 +822,8 @@ library(ggplot2)
 
 sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
 mean_equity <- mean(sharks$equity_offered_pct)
+# sd() divides by n - 1. With 1,441 records the difference from dividing
+# by N is in the third decimal.
 sd_equity <- sd(sharks$equity_offered_pct)
 
 model_curve <- data.frame(x = seq(-15, 45, length.out = 601))
@@ -647,8 +860,8 @@ ggplot(model_curve, aes(x, density)) +
 
 The figure shows the answer of the model, not the answer of the data. The
 curve also gives some area to values below 0%, which no offer can have. The
-check of the model later in this lecture returns to both points. To turn the
-orange area into a number, you need one more tool: standardising.
+section on checking the normal model against data returns to both points. To
+turn the orange area into a number, you need one more tool: standardising.
 
 #### Standardising: every normal question becomes a Z question
 
@@ -666,18 +879,42 @@ with mean 0 and standard deviation 1:
 
 $$Z=\frac{X-\mu}{\sigma}\sim N(0,1).$$
 
-The distribution $N(0,1)$ is called the **standard normal distribution**.
 The mean 0 and the standard deviation 1 follow from the rules for shifting
 and rescaling in
-[Lecture 3](b03-discrete-distributions.qmd#b03-shift-rescale).
+[Lecture 3](b03-discrete-distributions.qmd#b03-shift-rescale). Write
+$Z=\frac{1}{\sigma}X-\frac{\mu}{\sigma}$, so that $a=1/\sigma$ and
+$b=-\mu/\sigma$:
 
-Standardising helps because one set of standard-normal values then serves
-every normal model. Whatever $\mu$ and $\sigma$ are, the question "what is
-$P(X\le x)$?" becomes the question "what is $P(Z\le z)$?", with
-$z=(x-\mu)/\sigma$.
+$$E[Z]=\frac{1}{\sigma}\,E[X]-\frac{\mu}{\sigma}
+=\frac{\mu}{\sigma}-\frac{\mu}{\sigma}=0,
+\qquad
+\operatorname{SD}(Z)=\frac{1}{\sigma}\,\operatorname{SD}(X)
+=\frac{\sigma}{\sigma}=1.$$
 
-Two general rules turn one value $P(Z\le z)$ into further probabilities.
-Both hold for every $z$.
+The shape does not change. @fig-b06-normal-parameters showed that $\mu$ and
+$\sigma$ do only two things to a normal curve: $\mu$ moves it along the
+axis, and $\sigma$ stretches it. Every normal curve is the same bell, moved
+and stretched. Standardising undoes the move and the stretch. What is left
+is the one bell with mean 0 and standard deviation 1. The distribution
+$N(0,1)$ is called the **standard normal distribution**.
+
+This is why a z-score is useful. It gives the position of a value in its own
+distribution, in standard deviations from the mean and without units. For a
+probability, only this position matters. A value 1.5 standard deviations
+above the mean is at the same place on every bell. The probability of a
+value above it is therefore the same for a height in centimetres, a weight
+in grams, or a processing time in minutes. So one set of standard-normal
+values works for every normal model.
+
+The questions "what is $P(X\le x)$?" and "what is $P(Z\le z)$?", with
+$z=(x-\mu)/\sigma$, are the same question. Subtract $\mu$ and divide by
+$\sigma$ on both sides of $X\le x$. This gives $Z\le z$, and exactly the
+same outcomes satisfy both inequalities. The two probabilities are equal:
+
+$$P(X\le x)=P\!\left(Z\le\frac{x-\mu}{\sigma}\right).$$
+
+With two general rules you can find more probabilities from one value
+$P(Z\le z)$. Both rules hold for every $z$.
 
 - Complement rule. The total area under the curve is 1, so
   $P(Z>z)=1-P(Z\le z)$.
@@ -687,7 +924,8 @@ Both hold for every $z$.
 ::: {#exm-b06-supplied-z}
 ## Worked example: normal probabilities from supplied Z values
 
-This is an invented example. Processing time $Y$ (in minutes) is modelled as
+An invented example. The processing time $Y$ of an order (in minutes) is
+modelled as
 $Y\sim N(50,100)$. The variance is 100, so $\sigma=\sqrt{100}=10$. In the
 exam, the standard-normal values that you need are printed in the question,
 as here:
@@ -719,7 +957,8 @@ $$P(40<Y<60)=P(Z\le 1.0)-P(Z\le -1.0)=0.8413-0.1587=0.6826.$$
 That is the 68% rule seen in @fig-b06-normal-shape: the interval runs from
 one standard deviation below the mean to one above.
 
-**(c) $P(Y>60)$ and $P(Y\le 35)$.** These two need the rules. The z-score of
+**(c) $P(Y>60)$ and $P(Y\le 35)$.** These two need the complement rule and
+the symmetry rule. The z-score of
 60 is 1.0, and the complement rule gives
 
 $$P(Y>60)=P(Z>1.0)=1-P(Z\le 1.0)=1-0.8413=0.1587.$$
@@ -777,31 +1016,89 @@ difference.
 #### The reverse direction: from a probability to a value
 
 `pnorm()` starts from a value and returns the probability at or below it.
-The reverse question starts from the probability: which value has 90% of
-the probability at or below it? Such a value is called a quantile.
+The reverse question starts from a probability $q$: which value has the
+probability $q$ at or below it? This value is called the $q$ quantile.
 
 ::: {.definition-box}
 <span class="label">Definition</span>
 
-**Quantile and percentile.** The 0.90 quantile of a distribution is the
-value with 90% of the probability at or below it. It is also called the
-90th percentile. In the same way, the 0.25 quantile is the 25th percentile.
-For the standard normal we write $z_{0.90}$, and R gives it with
-`qnorm(0.90)`.
+**Quantile.** Take a probability $q$ between 0 and 1. The $q$ quantile of a
+distribution is the value $x_q$ that has the probability $q$ at or below it:
+$P(X\le x_q)=q$. A **percentile** is the same value with $q$ written in
+percent: the 0.90 quantile is the 90th percentile.
 :::
 
-For the standard normal, $z_{0.90}=1.2816$: 90% of the area lies at or below
-1.2816. For any other normal model, solve $z=(x-\mu)/\sigma$ for $x$:
+The definition is cumulative: $q$ is always the area to the left of $x_q$,
+as @fig-b06-quantile shows. The area to the right of $x_q$ is $1-q$. In
+terms of the CDF, $F_X(x_q)=q$, so finding a quantile is the reverse of
+reading the CDF.
+
+```{r}
+#| label: fig-b06-quantile
+#| code-fold: true
+#| code-summary: "See the R code for this figure"
+#| fig-height: 3.4
+#| fig-cap: "The q quantile of a distribution, marked on the axis as x with the subscript q. The green area to the left of this value is the probability q. The area to the right of it is 1 - q."
+library(ggplot2)
+
+# The picture is drawn for q = 0.80. The labels hold for every q.
+q_shown <- 0.80
+x_q <- qnorm(q_shown)
+q_curve <- data.frame(x = seq(-3.6, 3.6, length.out = 800))
+q_curve$density <- dnorm(q_curve$x)
+
+ggplot(q_curve, aes(x, density)) +
+  geom_area(data = subset(q_curve, x <= x_q),
+            fill = "#009E73", alpha = 0.25) +
+  annotate("segment", x = x_q, xend = x_q, y = 0, yend = dnorm(x_q),
+           linetype = "dashed", colour = "#C98B2E", linewidth = 0.7) +
+  geom_line(colour = "#17324D", linewidth = 1.2) +
+  annotate("text", x = -0.2, y = 0.15,
+           label = "area == P(X <= x[q])", parse = TRUE,
+           colour = "#17324D", size = 3.4) +
+  annotate("text", x = -0.2, y = 0.105, label = "area == q", parse = TRUE,
+           colour = "#17324D", size = 3.4) +
+  annotate("text", x = 2.3, y = 0.15, label = "area == 1 - q", parse = TRUE,
+           colour = "#17324D", size = 3.4) +
+  annotate("segment", x = 2.2, xend = 1.5, y = 0.125, yend = 0.05,
+           colour = "#17324D",
+           arrow = arrow(length = unit(0.08, "inches"))) +
+  scale_x_continuous(breaks = x_q, labels = expression(x[q])) +
+  scale_y_continuous(limits = c(0, 0.43),
+                     expand = expansion(mult = c(0, 0.02))) +
+  labs(x = "Value of X", y = "Density") +
+  theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    plot.caption = element_text(colour = "#5B6976"),
+    axis.title = element_text(colour = "#17324D"),
+    axis.text.x = element_text(colour = "#17324D", size = 12)
+  )
+```
+
+For the standard normal, the $q$ quantile is written $z_q$, and R gives it
+with `qnorm(q)`. Now take a number for $q$. The 90th percentile of the
+standard normal is the 0.90 quantile:
+
+```{r}
+#| label: b06-qnorm-090
+qnorm(0.90)
+```
+
+So $z_{0.90}=1.2816$: 90% of the area lies at or below 1.2816. For any other
+normal model, solve $z=(x-\mu)/\sigma$ for $x$:
 
 $$x=\mu+z\sigma,$$
 
-where $z$ is the standard-normal quantile for the chosen proportion.
+where $z$ is the standard-normal quantile for the chosen probability. With
+$z=z_q$, this $x$ is the $q$ quantile $x_q$ of the model.
 
 ::: {#exm-b06-reverse}
 ## Worked example: the 90th percentile of processing time
 
 Take the invented processing-time model $Y\sim N(50,100)$ again. Which
-processing time is exceeded by only 10% of cases? This is the 90th
+processing time do only 10% of orders exceed? This is the 90th
 percentile of $Y$. The supplied standard-normal quantile is
 $z_{0.90}=1.2816$.
 
@@ -823,23 +1120,102 @@ About 62.8 minutes: 90% of processing times fall at or below it, 10%
 above.
 :::
 
-#### The central 95% of the standard normal
+#### The central part of the standard normal {#b06-central}
 
-One pair of quantiles is used again and again in later lectures. Which two
-values enclose the central 95% of the standard normal? If 95% of the
-probability lies in the middle, 5% is left for the two tails. By symmetry,
-each tail holds 2.5%. The upper boundary therefore has 97.5% of the
-probability at or below it. It is the 0.975 quantile. The lower boundary is
-the 0.025 quantile.
+One pair of quantiles is used again and again in later lectures: the two
+values that enclose the central part of the standard normal. Start with the
+probability that is left outside the central part, and call it $\alpha$
+(the Greek letter alpha). The central part then holds the probability
+$1-\alpha$. For example, $\alpha=0.05$ gives a central part of 0.95.
+
+The probability $\alpha$ lies in two tails, one on the left and one on the
+right. The standard normal is symmetric around 0, so the two tails are
+equally large. Each tail holds $\alpha/2$, as @fig-b06-central-general
+shows.
+
+Now find the two boundaries. To the left of the upper boundary lie the
+central part and the lower tail. The probability at or below it is therefore
+$(1-\alpha)+\alpha/2=1-\alpha/2$. The upper boundary is the $1-\alpha/2$
+quantile, $z_{1-\alpha/2}$. The lower boundary needs no new number. By
+symmetry it lies as far below 0 as the upper boundary lies above 0, so it is
+$-z_{1-\alpha/2}$. Together:
+
+$$P\!\left(-z_{1-\alpha/2}\le Z\le z_{1-\alpha/2}\right)=1-\alpha.$$
+
+```{r}
+#| label: fig-b06-central-general
+#| code-fold: true
+#| code-summary: "See the R code for this figure"
+#| fig-cap: "The central part of the standard normal. The green central area holds the probability 1 - α. The rest, α, is split equally over the two orange tails, α/2 in each. The two boundaries lie at the same distance from 0."
+library(ggplot2)
+
+# The picture is drawn for alpha = 0.10. The labels hold for every alpha.
+z_upper <- qnorm(1 - 0.10 / 2)
+g_curve <- data.frame(z = seq(-3.6, 3.6, length.out = 800))
+g_curve$density <- dnorm(g_curve$z)
+
+ggplot(g_curve, aes(z, density)) +
+  geom_area(data = subset(g_curve, z >= -z_upper & z <= z_upper),
+            fill = "#009E73", alpha = 0.25) +
+  geom_area(data = subset(g_curve, z <= -z_upper),
+            fill = "#D55E00", alpha = 0.55) +
+  geom_area(data = subset(g_curve, z >= z_upper),
+            fill = "#D55E00", alpha = 0.55) +
+  geom_line(colour = "#17324D", linewidth = 1.2) +
+  annotate("text", x = 0, y = 0.17, label = "central area",
+           colour = "#17324D", size = 3.4) +
+  annotate("text", x = 0, y = 0.13, label = "1 - alpha", parse = TRUE,
+           colour = "#17324D", size = 4) +
+  annotate("segment", x = c(-2.9, 2.9), xend = c(-2.1, 2.1),
+           y = 0.105, yend = 0.03, colour = "#17324D",
+           arrow = arrow(length = unit(0.08, "inches"))) +
+  annotate("text", x = c(-2.9, 2.9), y = 0.125, label = "alpha / 2",
+           parse = TRUE, colour = "#17324D", size = 4) +
+  annotate("text", x = c(-2.9, 2.9), y = 0.16,
+           label = c("lower tail", "upper tail"),
+           colour = "#17324D", size = 3.4) +
+  scale_x_continuous(breaks = c(-z_upper, 0, z_upper),
+                     labels = expression(-z[1 - alpha / 2], 0,
+                                         z[1 - alpha / 2])) +
+  scale_y_continuous(limits = c(0, 0.43),
+                     expand = expansion(mult = c(0, 0.02))) +
+  labs(x = "Value of Z", y = "Density") +
+  theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    plot.caption = element_text(colour = "#5B6976"),
+    axis.title = element_text(colour = "#17324D"),
+    axis.text.x = element_text(colour = "#17324D", size = 12)
+  )
+```
+
+Three central parts are used most often: 90%, 95%, and 99%. They belong to
+$\alpha=0.10$, $\alpha=0.05$, and $\alpha=0.01$. The quantiles
+$z_{1-\alpha/2}$ are then $z_{0.95}$, $z_{0.975}$, and $z_{0.995}$:
+
+```{r}
+#| label: b06-qnorm-three
+qnorm(c(0.95, 0.975, 0.995))
+```
+
+| Central part $1-\alpha$ | $\alpha$ | In each tail, $\alpha/2$ | Quantile $z_{1-\alpha/2}$ | The central part lies between |
+|---|---|---|---|---|
+| 90% | 0.10 | 0.05 | $z_{0.95}=1.645$ | $-1.645$ and $1.645$ |
+| 95% | 0.05 | 0.025 | $z_{0.975}=1.960$ | $-1.960$ and $1.960$ |
+| 99% | 0.01 | 0.005 | $z_{0.995}=2.576$ | $-2.576$ and $2.576$ |
+
+A larger central part needs boundaries that lie further out. The 95% case is
+the one used most. R confirms the symmetry for it:
 
 ```{r}
 #| label: b06-qnorm-central
 qnorm(c(0.025, 0.975))
 ```
 
-So $z_{0.025}=-1.96$ and $z_{0.975}=1.96$. In the standard normal, 95% of the
-probability lies between $-1.96$ and $1.96$, with 2.5% in each tail, as
-@fig-b06-central-95 shows.
+The 0.025 quantile is $-1.96$ and the 0.975 quantile is $1.96$. In the
+standard normal, 95% of the probability lies between $-1.96$ and $1.96$,
+with 2.5% in each tail, as @fig-b06-central-95 shows.
 
 ```{r}
 #| label: fig-b06-central-95
@@ -884,11 +1260,11 @@ ggplot(z_curve, aes(z, density)) +
   )
 ```
 
-With $x=\mu+z\sigma$ the same holds for every normal model: 95% of the
-probability lies between $\mu-1.96\sigma$ and $\mu+1.96\sigma$. Lectures 9
-and 10 build on this. Lecture 10 uses the value 1.96 in confidence intervals
-for proportions. Lecture 9 uses slightly larger values from the t
-distribution in its place.
+With $x=\mu+z\sigma$ the same holds for every normal model. The central
+$1-\alpha$ of the probability lies between $\mu-z_{1-\alpha/2}\,\sigma$ and
+$\mu+z_{1-\alpha/2}\,\sigma$. For 95%, these are $\mu-1.96\sigma$ and
+$\mu+1.96\sigma$. Lectures 9 and 10 build on the three values 1.645, 1.960,
+and 2.576.
 
 #### Sums of normal variables {#b06-normal-sums}
 
@@ -899,12 +1275,11 @@ this fact for the sample mean.
 
 ### Checking the normal model against data
 
-The normal distribution is a model, not a label that every quantitative
-variable automatically deserves. Skewness, bounds, extreme outliers, or a
-few heavily repeated values can make it a poor description. The check is
-visual: draw the histogram of the data, overlay the normal curve with the
-same mean and standard deviation, and see whether the curve reproduces the
-bars. @fig-b06-equity-normal-check does this for the equity offered
+[Shark Tank data]{.shark-tag} The normal distribution is a model. It does not automatically fit every
+quantitative variable. Skewness, bounds, extreme outliers, or a few values
+that repeat very often can make it a poor fit. The check is visual: draw the
+histogram of the data, draw the normal curve with the same mean and standard
+deviation on top of it, and see whether the curve follows the bars. @fig-b06-equity-normal-check does this for the equity offered
 (`equity_offered_pct`) in the Shark Tank file, with the mean of 13.2% and
 the standard deviation of 8.4 percentage points from the start of this
 lecture.
@@ -918,6 +1293,8 @@ library(ggplot2)
 
 sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
 mean_equity <- mean(sharks$equity_offered_pct)
+# sd() divides by n - 1. With 1,441 records the difference from dividing
+# by N is in the third decimal.
 sd_equity <- sd(sharks$equity_offered_pct)
 
 ggplot(sharks, aes(equity_offered_pct)) +
@@ -943,34 +1320,35 @@ ggplot(sharks, aes(equity_offered_pct)) +
   )
 ```
 
-Read @fig-b06-equity-normal-check with the five-step sequence from
+Read @fig-b06-equity-normal-check with the reading sequence from
 Lecture 1. *Unit and variables:* one observation is one pitch. The horizontal
-axis is the equity offered, in percentage points. *Scales:* the vertical axis
+axis is the equity offered, in percent. *Scales:* the vertical axis
 is density, so the areas of the bars, not their heights alone, represent
 proportions of pitches. *One element:* the green bars are the 1,441 observed
 offers. The orange curve is $N(13.2,\,8.4^2)$, the normal model with the same
-mean and SD. *Pattern:* the bars pile up between 5% and 20% and stretch out
-a long right tail. The data are bounded between 0% and 100%, strongly
-right-skewed, and spiked at round values such as 10% and 20%. The symmetric
+mean and SD. *Pattern:* most bars are between 0% and 20%, and a long tail
+stretches to the right. The data are bounded between 0% and 100%, strongly
+right-skewed, and have spikes at round values such as 10% and 20%. The symmetric
 curve misses all three features. *Limits:* the figure rejects the normal
 model for single equity offers. It says nothing yet about averages of
-offers. A model is a choice, and this check rejects the choice.
+offers. A model is a choice, and this check shows that the normal model is
+the wrong choice here.
 
 The opening question shows what happens without the check. The normal model
 gave $P(X\ge 30)=0.0228$, about 2%. The data give 76 of 1,441, about 5%. The
 model misses the long right tail, and the offers of 30% or more lie in that
 tail.
 
-The normal model stays useful all the same. From Lecture 8 onwards it
+Still, the normal model remains useful. From Lecture 8 onwards it
 describes the sampling distribution of an average, that is, how an average
 varies from sample to sample. Lectures 7 and 8 explain this idea. The normal
-model fits those distributions well, even when the underlying variable is as
+model fits those distributions well, even when the variable itself is as
 skewed as this one. That result is the central limit theorem. It is the main
 reason why the normal model is used so much in statistics.
 
 ### Quantiles of a model distribution
 
-Lecture 1 located quantiles of data: the median, the quartiles $Q_1$ and
+Lecture 1 found quantiles of data: the median, the quartiles $Q_1$ and
 $Q_3$, and the interquartile range of the equity offered (see
 [Lecture 1](b01-introduction-data-analysis.qmd#b01-quartiles)). A model
 distribution has the same quantiles. The median is the 0.50 quantile, and
@@ -994,7 +1372,7 @@ minutes. The width of this range is the interquartile range of the model.
 ::: {.caveat-box}
 <span class="label">What a normal label can and cannot say</span>
 
-- "Normally distributed" is a model, not a fact. It has to be checked against
+- "Normally distributed" is a model, not a fact. You have to check it against
   a histogram.
 - The 68% and 95% rules hold for the model. For skewed or bounded data they
   give wrong numbers, as with the 30% offers.
@@ -1002,13 +1380,14 @@ minutes. The width of this range is the interquartile range of the model.
   shape.
 
 **What you can do with it:** use the normal model for quick answers when the
-histogram looks roughly bell-shaped, and count in the data when it does not.
+histogram looks roughly bell-shaped. When it does not, count the values in
+the data.
 From Lecture 8 on, the normal model describes averages, where it works well.
 :::
 
 ### Answering the driving question
 
-An offer of 30% or more is unusual: about 1 pitch in 20 makes one. In the
+An offer of 30% or more is unusual: about 1 pitch in 20 makes such an offer. In the
 Shark Tank file, 76 of the 1,441 pitches did, about 5%. The normal model
 with the same mean and standard deviation says about 2%, because it ignores
 the long right tail of the offers. So a model with two numbers can answer such a question
@@ -1017,22 +1396,26 @@ check tells you whether it does.
 
 The tools behind this answer are general. For a continuous variable, no
 single value has positive probability, $P(X=x)=0$. Probabilities belong to
-intervals, and they are areas under a density. For a uniform model, only the
-length of the interval matters: the 18-minute window in the session model
-has probability $18/90=0.20$. For a normal model, you standardise and use
-the supplied $Z$ values. In the processing-time model $N(50,100)$ this gave
-$P(Y\le 65)=0.9332$ and $P(40<Y<60)=0.6826$, and `pnorm()` confirmed both. A
-density is a modelling choice, so check the model before you trust its
-areas.
+intervals, and they are areas under a density. The density is the share per
+unit of width: the curve that a histogram comes close to when its bins get
+narrow. For a uniform model, only the length of the interval matters: the
+18-minute window in the session model has probability $18/90=0.20$. For a
+normal model, you standardise and use the supplied $Z$ values. In the
+processing-time model $N(50,100)$ this gave $P(Y\le 65)=0.9332$ and
+$P(40<Y<60)=0.6826$, and `pnorm()` confirmed both. A quantile goes the other
+way, from a probability to a value: the 90th percentile of the processing
+time is $50+1.2816\times 10=62.8$ minutes, and the central 95% of every
+normal model lies between $\mu-1.96\sigma$ and $\mu+1.96\sigma$. A density
+is a modelling choice, so check the model before you trust its areas.
 
 ::: {.founder-box}
 <span class="label">A founder's decision (invented example)</span>
 
-Your delivery times look roughly normal, with a mean of 28 minutes and a standard deviation of 6 minutes. You want to promise a delivery time that 90% of orders meet. The 90th percentile is 28 + 1.2816 × 6 = 35.7 minutes. The decision: promise 36 minutes on the website. First check the histogram of your delivery times. If a few deliveries go very wrong, the normal model is too optimistic, and you promise the 90th percentile of the actual times instead.
+Your delivery times look roughly normal, with a mean of 28 minutes and a standard deviation of 6 minutes. You want to promise a delivery time that 90% of orders meet. The 90th percentile is 28 + 1.2816 × 6 = 35.7 minutes. The decision: promise 36 minutes on the website. First check the histogram of your delivery times. If a few deliveries take much too long, the normal model is too optimistic. Then you promise the 90th percentile of the actual delivery times instead.
 :::
 
-**Next:** So far the 1,441 pitches were treated as the whole world. In
-practice a firm rarely sees the whole world. It sees a sample: 100 audited
+**Next:** So far the lectures treated the 1,441 pitches as all the data
+that exist. In practice a firm rarely sees all the data. It sees a sample: 100 audited
 transactions, 500 surveyed customers. Lecture 7 moves from one pitch to a
 sample of pitches. It covers populations, random sampling, and the
 difference between a parameter, an estimator, and an estimate.
@@ -1043,14 +1426,14 @@ difference between a parameter, an estimator, and an estimate.
 
 ## After class
 
-<span class="time-budget">Total practice time: about 75 minutes.</span>
+<span class="time-budget">Total practice time: about 80 minutes.</span>
 
 **Minimum path (about 35 minutes):** read the lecture material, answer the recall questions, then work for 10 minutes on the tasks that follow. **Full path:** all tasks below.
 
 ### Read the lecture material (15 minutes)
 
 Read the Lecture material section above from start to end. The lecture
-covered the core of it. The text has every step, every example, and all the
+covered the main points. The text has every step, every example, and all the
 code, including parts that were not shown in class. Note what is still
 unclear and bring it to the next tutorial, or ask Tilly.
 
@@ -1062,6 +1445,15 @@ unclear and bring it to the next tutorial, or ask Tilly.
 4. What do $\mu$ and $\sigma$ control in a normal model?
 5. A density curve reaches a height of 2. Why is that not a contradiction?
 6. What does a z-score of $-1.5$ mean?
+7. In a continuous model, an offer of exactly 30% has probability zero. Does
+   that mean that such an offer cannot happen?
+8. A histogram has the share in each bin as the height of its bars. What
+   happens to it when the bins get narrower, and which height avoids this?
+9. Why does a sum of many small independent pushes give a bell shape?
+10. Which quantile of the standard normal is the upper boundary of the
+    central 90%, and why?
+11. What is the median of the session model $U(0,90)$, and what is the
+    median of the processing-time model $N(50,100)$?
 
 ::: {.callout-note collapse="true"}
 ## Check your answers
@@ -1074,6 +1466,21 @@ unclear and bring it to the next tutorial, or ask Tilly.
 5. Density is probability per unit, not probability. A height above 1 is
    fine as long as the total area under the curve is 1.
 6. The value lies 1.5 standard deviations below the mean.
+7. No. Every offer has some exact value, and that value had probability zero
+   in advance. Zero probability only says that no single value can be named
+   in advance with a positive probability.
+8. All bars shrink, and the histogram sinks towards the axis. Divide the
+   share in each bin by the bin width. With this height, the share per unit
+   of width, the histogram comes close to a curve, the density.
+9. A total near the middle can arise in very many ways, because ups and
+   downs cancel. A total far from the middle needs nearly all pushes in the
+   same direction, and that is rare. Both sides are equally hard to reach,
+   so the shape is symmetric.
+10. The 0.95 quantile, $z_{0.95}=1.645$. The central 90% leaves
+    $\alpha=0.10$ for the two tails, 0.05 in each. To the left of the upper
+    boundary lie $0.90+0.05=0.95$ of the probability.
+11. 45 minutes and 50 minutes. Both distributions are symmetric, so the
+    median is the midpoint, which is also the mean.
 :::
 
 ### Finish a half-worked example (5 minutes)
@@ -1092,36 +1499,43 @@ $[10,30]$ and zero outside it.
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-$P(14<X<20)=(20-14)/(30-10)=6/20=0.30$ and $E[X]=(10+30)/2=20$: the wait
-averages 20 minutes, and under the uniform model there is a 30% chance it
-lands between 14 and 20 minutes.
+$P(14<X<20)=(20-14)/(30-10)=6/20=0.30$ and $E[X]=(10+30)/2=20$: the average
+wait is 20 minutes. Under the uniform model there is a 30% chance that the
+wait is between 14 and 20 minutes.
 :::
 
-### Practice (15 minutes)
+### Practice (20 minutes)
 
-For items 3 and 4, use only these supplied values, then verify in R:
+Items 2 to 6 are invented examples. For items 3, 4, and 5, use only these
+supplied values, then verify in R:
 
 ```
 P(Z <=  1.5) = 0.9332
 P(Z <=  1.0) = 0.8413
 P(Z <= -1.0) = 0.1587
-z(0.90)      = 1.2816
+0.90 quantile of Z: z(0.90) = 1.2816
+0.95 quantile of Z: z(0.95) = 1.645
 ```
 
 1. For $X\sim U(10,30)$: find $\operatorname{SD}(X)$ and $P(X>25)$.
 2. A supplier delivers at a moment uniformly distributed between 09:00 and
-   13:00. Your goods lift is reserved for other tenants except during
-   12:00--13:00. What is the probability the delivery arrives while the
-   lift is available, and what is the density height per minute?
+   13:00. Other companies in your building use the goods lift (the lift for
+   deliveries) all morning. You can use it only from 12:00 to 13:00. What
+   is the probability that the delivery arrives while you can use the lift,
+   and what is the density height per minute?
 3. Monthly demand for a product is modelled as $Y\sim N(200,400)$.
    Calculate $P(Y\le 230)$, $P(180<Y<220)$, $P(Y>230)$, and $P(Y\le 170)$
    by hand.
 4. Weekly revenue is modelled as $N(100,15^2)$ (in hundreds of euros).
-   Which revenue level is exceeded in only 10% of weeks? Compute by hand
-   with $x=\mu+z\sigma$, then verify with `qnorm()`.
-5. Explain in two sentences why the normal curve in
-   @fig-b06-equity-normal-check is not a convincing model for offered
-   equity.
+   Which revenue level is exceeded in only 10% of weeks? Say which quantile
+   of the model this is. Compute it by hand with $x=\mu+z\sigma$, then
+   verify with `qnorm()`.
+5. Take the weekly revenue model of item 4 again. Between which two revenue
+   levels do the central 90% of weeks lie? State $\alpha$, the probability
+   in each tail, and the quantile $z_{1-\alpha/2}$ that you use.
+6. A histogram of 200 delivery times has bars of 10 minutes, from 10 to 90
+   minutes, with the counts 20, 70, 60, 25, 12, 8, 3, 2. Sketch it. Does a
+   normal model fit these times? Give two reasons.
 
 ::: {.callout-note collapse="true"}
 ## Check your answers
@@ -1138,13 +1552,22 @@ z(0.90)      = 1.2816
    $P(180<Y<220)=0.8413-0.1587=0.6826$. The complement rule gives
    $P(Y>230)=1-0.9332=0.0668$. For 170: $z=(170-200)/20=-1.5$, and the
    symmetry rule gives $P(Y\le 170)=P(Z\le -1.5)=P(Z>1.5)=0.0668$.
-4. $x=100+1.2816\times 15=119.2$, so about 119 hundred euros, that is about
+4. A level that 10% of weeks exceed has 90% of the weeks at or below it. It
+   is the 0.90 quantile, the 90th percentile.
+   $x=100+1.2816\times 15=119.2$, so about 119 hundred euros, that is about
    11,900 euros. Only 10% of weeks exceed it.
-5. The observed distribution is bounded between 0% and 100%, strongly
-   right-skewed, and concentrated at a few round percentages. The symmetric
-   normal curve reproduces none of those features.
+5. The central 90% leaves $\alpha=0.10$ for the two tails, 0.05 in each.
+   The quantile is $z_{1-\alpha/2}=z_{0.95}=1.645$. The boundaries are
+   $100-1.645\times 15=75.3$ and $100+1.645\times 15=124.7$. In 90% of
+   weeks, the revenue lies between about 7,500 and 12,500 euros. In 5% of
+   weeks it is lower, and in 5% it is higher.
+6. No. First, the counts rise fast and fall slowly, so the histogram has a
+   long tail to the right. A normal curve is symmetric. Second, the highest
+   bars are at the left end and not in the middle: 150 of the 200 times
+   (75%) lie in the first three of the eight bars. A normal curve has its
+   peak in the middle and falls off equally on both sides.
 
-Verification in R for items 3 and 4:
+Verification in R for items 3, 4, and 5:
 
 ```{r}
 #| label: b06-practice-check
@@ -1153,28 +1576,30 @@ pnorm(220, mean = 200, sd = 20) - pnorm(180, mean = 200, sd = 20)
 1 - pnorm(230, mean = 200, sd = 20)
 pnorm(170, mean = 200, sd = 20)
 qnorm(0.90, mean = 100, sd = 15)
+qnorm(c(0.05, 0.95), mean = 100, sd = 15)
 ```
 :::
 
 ### Review: one question from Lecture 3 (5 minutes)
 
-The number of sharks who join an on-air deal, $X$, has PMF $p(1)=0.6$,
-$p(2)=0.3$, $p(3)=0.1$. Find $F(2)=P(X\le 2)$ and $P(X<2)$. Why do the two
-answers differ here, when for a continuous variable they would not?
+An invented example. A student venture sells boxes of prepared meals. The
+number of meal boxes in one customer order, $X$, has PMF $p(1)=0.6$, $p(2)=0.3$, $p(3)=0.1$. Find
+$F(2)=P(X\le 2)$ and $P(X<2)$. Why do the two answers differ here, when for
+a continuous variable they would not?
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
 $F(2)=0.6+0.3=0.9$, while $P(X<2)=P(X=1)=0.6$. They differ because the
-single point $X=2$ carries positive probability, $p(2)=0.3$. For a
+single point $X=2$ has positive probability, $p(2)=0.3$. For a
 continuous variable every single point has probability zero, so $<$ and
 $\le$ give the same answer.
 :::
 
 ### Changing units (5 minutes)
 
-The session-timing variable $X\sim U(0,90)$ is recorded in minutes and then
-converted to seconds. Explain what changes about the PDF and what remains
+The pitch start time $X\sim U(0,90)$ from the session model is recorded in
+minutes and then converted to seconds. Explain what changes about the PDF and what remains
 unchanged.
 
 ::: {.callout-note collapse="true"}
@@ -1182,50 +1607,65 @@ unchanged.
 
 The support stretches from $[0,90]$ minutes to $[0,5400]$ seconds, and the
 density height drops from $1/90$ per minute to $1/5400$ per second: the
-numerical size of a density depends on the units. Probabilities of
-corresponding time intervals are unchanged, because they are areas: the
+numerical size of a density depends on the units. Probabilities of the
+same time intervals do not change, because they are areas: the
 18-minute window becomes a 1,080-second window, and
 $1080/5400=18/90=0.20$.
 :::
 
-### Exam-style item (10 minutes)
+### Worked exam interpretation: uniform and normal probabilities (10 minutes)
 
-This item follows the pattern of Mock Exam Question 3. Let
-$X\sim U(20,60)$ be a waiting time in minutes and, separately,
-$Y\sim N(80,25)$ a processing time in minutes. Supplied:
+**Exam-style question.** An invented example. A web shop models the weight
+of a parcel as $X\sim U(2,10)$, in kilograms. Separately, it models the
+value of one order as $Y\sim N(80,400)$, in euros. Supplied:
 
 ```
 P(Z <=  1.5) = 0.9332
 P(Z <=  1.0) = 0.8413
-P(Z <= -1.0) = 0.1587
+0.975 quantile of Z: z(0.975) = 1.960
 ```
 
 1. State the PDF height of $X$, including its value outside the support.
-2. Calculate $P(30<X<40)$, $E[X]$, and $\operatorname{Var}(X)$.
-3. Standardise 87.5 minutes under the model for $Y$, then calculate
-   $P(Y\le 87.5)$.
-4. Calculate $P(75<Y<85)$.
-5. Explain why a PDF height is not itself a probability.
+2. Calculate $P(4<X<7)$, $E[X]$, and $\operatorname{Var}(X)$.
+3. Standardise 100 euros under the model for $Y$, then calculate
+   $P(Y\le 100)$.
+4. Calculate $P(50<Y<100)$.
+5. Between which two values do the central 95% of the order values lie?
+6. Explain why a PDF height is not itself a probability.
 
 ::: {.callout-note collapse="true"}
 ## Check a model answer
 
-1. $f_X(x)=1/(60-20)=0.025$ for $20\le x\le 60$, and $f_X(x)=0$ outside
-   that interval.
-2. $P(30<X<40)=(40-30)/40=0.25$, $E[X]=(20+60)/2=40$, and
-   $\operatorname{Var}(X)=(60-20)^2/12\approx 133.33$ square minutes.
-3. The variance is 25, so $\sigma=5$ and $z=(87.5-80)/5=1.5$. Hence
-   $P(Y\le 87.5)=0.9332$.
-4. $P(75<Y<85)=P(-1<Z<1)=0.8413-0.1587=0.6826$.
-5. Probability is area over an interval: approximately density times a
-   small interval width. A single point has zero width and hence zero
-   probability. A density value only becomes a probability once multiplied
-   by a width.
+1. $f_X(x)=1/(10-2)=0.125$ for $2\le x\le 10$, and $f_X(x)=0$ outside that
+   interval.
+2. $P(4<X<7)=(7-4)/8=0.375$, $E[X]=(2+10)/2=6$ kilograms, and
+   $\operatorname{Var}(X)=(10-2)^2/12\approx 5.33$ square kilograms.
+3. The variance is 400, so $\sigma=20$ and $z=(100-80)/20=1.0$. So
+   $P(Y\le 100)=0.8413$.
+4. The z-score of 50 is $(50-80)/20=-1.5$. No value for $-1.5$ is supplied,
+   so use the symmetry rule and the complement rule:
+   $P(Z\le -1.5)=P(Z>1.5)=1-0.9332=0.0668$. Then
+   $P(50<Y<100)=0.8413-0.0668=0.7745$.
+5. The central 95% leaves $\alpha=0.05$ for the two tails, 0.025 in each,
+   so the quantile is $z_{0.975}=1.960$. The boundaries are
+   $80-1.960\times 20=40.8$ and $80+1.960\times 20=119.2$. In this model,
+   95% of the orders have a value between 40.80 and 119.20 euros.
+6. Probability is area over an interval: approximately density times a
+   small interval width. A single point has zero width and so zero
+   probability. A density value becomes a probability only after you
+   multiply it by a width.
+
+Verification in R for part 5:
+
+```{r}
+#| label: b06-exam-check
+qnorm(c(0.025, 0.975), mean = 80, sd = 20)
+```
 :::
 
 ### Check the AI (5 minutes)
 
-You asked an AI assistant: "Equity offers have a mean of 13.2% and a standard deviation of 8.4%. How many pitches offer 30% or more?" It answered:
+[Shark Tank data]{.shark-tag} You asked an AI assistant: "Equity offers have a mean of 13.2% and a standard deviation of 8.4%. How many pitches offer 30% or more?" It answered:
 
 > "With the normal distribution, 30% is 2.0 standard deviations above the mean, so about 2.3% of pitches offer 30% or more."
 
@@ -1235,32 +1675,38 @@ step of Attempt → Ask → Verify → Explain, and the exam asks for it.
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-The calculation is correct for a normal model, but the model does not fit. Equity offers are strongly right-skewed and pile up at round numbers. In the data, 76 of 1,441 pitches offer 30% or more, about 5.3%, more than twice the answer of the AI. Check the histogram before you accept an answer that rests on a normal model.
+The calculation is correct for a normal model, but the model does not fit. Equity offers are strongly right-skewed and have many values at round numbers. In the data, 76 of 1,441 pitches offer 30% or more, about 5.3%, more than twice the answer of the AI. Check the histogram before you accept an answer that depends on a normal model.
 :::
 
 ### Make it yours (5 minutes)
 
 :::: {.utility-prompt}
-<span class="label">Utility: two sentences</span>
+<span class="label">Two sentences about your own venture</span>
 
 Think of your EiA venture, or any business you know well. Pick one
-continuous quantity that matters for it (a delivery time, weekly revenue,
-time on site) and write two sentences: first name the interval of values
-that would trigger a real decision, then say whether a uniform or a normal
-model seems defensible for that quantity, and which feature of its
-histogram you would check first. There is no wrong answer.
+continuous quantity that matters for it, for example a delivery time, the
+weekly revenue, or the time a visitor spends on your website. Sentence 1:
+which interval of values would make you take a real decision? Sentence 2:
+does a uniform or a normal model seem reasonable for that quantity, and which feature of its histogram would
+you check first? There is no wrong answer.
 
 ::: {.callout-note collapse="true"}
 ## See an example, then write your own
 
-Take a student-run campus meal-prep box venture. "Delivery time is my quantity: anything over 40 minutes triggers a refund, so $P(T > 40)$ is the number that matters. A normal model is doubtful because times cannot be negative and a few deliveries go very wrong: right skew is the first thing I would check on the histogram."
+Take a student-run campus venture that sells boxes of prepared meals. "Delivery time is my quantity: for any delivery over 40 minutes the customer gets a refund, so $P(T > 40)$ is the number that matters. A normal model is doubtful because times cannot be negative and a few deliveries take very long. Right skew is the first thing I would check on the histogram."
 :::
 
 You can discuss this task, and any other task in this chapter, with
-**Tilly**, the course AI assistant: ask it to propose a
-distribution for your quantity and then challenge whether the normal
-model's assumptions actually hold for it.
+**Tilly**, the course AI assistant: ask it to suggest a
+distribution for your quantity. Then question whether the assumptions of
+the normal model really hold for it.
 ::::
+
+### More practice
+
+For extra exercises on this lecture, with worked solutions, ask **Tilly**,
+the course AI assistant. For example: "Give me an extra exercise for
+Lecture 6. Show the solution only after I send my answer."
 
 [Continue to Lecture 7: Samples, parameters, and estimators](b07-samples-estimators.qmd).
 

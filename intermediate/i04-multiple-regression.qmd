@@ -29,24 +29,25 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 - interpret a coefficient while holding the other included predictors fixed
 - scale a coefficient to a step that matters, and add up several contributions
 - explain why a coefficient changes when a predictor is added
-- say what controls can and cannot do.
+- say what controls can and cannot do
+- read a regression table with several models: the estimates, the standard
+  errors in parentheses, and the stars (you practise this again in
+  Tutorial 2).
 
 **Enough to recognise:**
 
 - the model written with $k$ predictors
-- the word collinearity
-- the layout of a regression table with several models (you practise reading
-  one in Tutorial 2).
+- the word collinearity.
 :::
 
 ::: {.driving-question}
 <span class="label">Driving question</span>
 
-<p class="dq-context">Two stories can produce the same pattern. Perhaps the equity offered (<code>equity_offered_pct</code>) in the Shark Tank file really fell over the seasons. Or perhaps later pitches simply ask for different amounts. Multiple regression separates such overlapping explanations.</p>
+<p class="dq-context">Two different explanations can produce the same pattern. Perhaps the equity offered (<code>equity_offered_pct</code>) in the Shark Tank file really fell over the seasons. Or perhaps later pitches simply ask for different amounts of money. Multiple regression separates two explanations like these.</p>
 
-Later seasons show smaller equity offers. Is that a time story, or is it
-really a money story in disguise, since later pitches also ask for different
-amounts?
+Later seasons show smaller equity offers. Is the season the reason? Or is
+the requested amount the real reason, because later pitches also ask for
+different amounts?
 :::
 
 ::: {.course-phase .phase-before}
@@ -56,10 +57,6 @@ amounts?
 <span class="time-budget">Total preparation time: about 30 minutes.</span>
 
 **Minimum path:** the video and the R task. **Full path:** everything in this section.
-
-Bring a charged laptop with RStudio and the course project open. The code of
-the lecture is in this chapter, ready to copy, so you can run each step
-yourself during the lecture and get the same numbers and figures.
 
 <div class="video-prep">
 <span class="label">Video preparation (15 minutes)</span><br>
@@ -72,7 +69,15 @@ All links are also listed in the
 <a href="../resources/video-guide.html">External Video Guide</a>.
 </div>
 
-**Reactivate (10 minutes).** Make the prediction below first, then run this
+**Predict (5 minutes).** Answer the one-click Wooclap question posted on
+Canvas before you come to class: once the requested amount is added, will the
+season coefficient move **towards zero**, **away from zero**, or **barely
+move**? Think about why the slope might change at all. If the requested
+amount is related to both the season and the equity offered, the simple slope
+mixes the two relationships. Choose one answer. You will find the answer in
+the lecture material.
+
+[Shark Tank data]{.shark-tag} **R warm-up (10 minutes).** Make the prediction above first, then run this
 code. In Lecture 3 you fitted the simple model of the equity offered
 (`equity_offered_pct`) on season and tested its slope. Fit it again. Then fit
 the model with two predictors, which adds the requested amount in thousands
@@ -88,16 +93,14 @@ coef(lm(equity_offered_pct ~ season, data = sharks))
 coef(lm(equity_offered_pct ~ season + ask_1k, data = sharks))
 ```
 
-**Predict (5 minutes).** Answer the one-click Wooclap question posted on
-Canvas before you come to class: once the requested amount is added, will the
-season coefficient move **towards zero**, **away from zero**, or **barely
-move**? Think about why the slope might change at all. If the requested
-amount is related to both the season and the equity offered, the simple slope
-mixes the two relationships. Choose one answer. You find the answer in the
-lecture material.
+**Code along (bring your laptop).** Bring a charged laptop with RStudio and
+the course project open. All the code of the lecture is in this chapter,
+ready to copy. You can run each step yourself during the lecture and get the
+same numbers and figures.
 
-If subscripts or multivariable equations feel rusty, review
-[Mathematics Refresher: subscripts and multivariable equations](../resources/math-refresher.html).
+If you are unsure how subscripts or equations with several variables work,
+review
+[Mathematics Refresher: subscripts and indices](../resources/math-refresher.html#subscripts-and-indices).
 
 :::
 
@@ -113,11 +116,13 @@ why they hardly differ here.
 ### Start with a founder's question
 
 Your sales rose after you cut the price. But it was also December. Was it
-the price or the season? Founders meet this problem all the time: two things
-changed together, and a simple comparison cannot separate them. The Shark
+the lower price or the time of year? Founders often face this problem: two
+factors changed at the same time, and a simple comparison cannot separate
+them. The Shark
 Tank file has the same problem. The equity offered (`equity_offered_pct`)
 fell over the seasons, and the requested amounts also changed over the
-seasons. Multiple regression compares pitches that asked for the same amount.
+seasons. Multiple regression solves this problem by comparing pitches that asked for
+the same amount.
 
 ### More than one predictor
 
@@ -152,15 +157,15 @@ $X_j$.
 Write the phrase "holding the other included predictors fixed" in every
 interpretation of a slope from a multiple regression.
 
-The comparison is made by the model. The data do not need to contain two
+The model makes this comparison. The data do not need to contain two
 real pitches that are the same in every other respect. The model compares
 conditional means at fixed values of the included predictors.
 
 ### Why coefficients change: an invented example
 
 Start with an invented example. We build the data ourselves, so we know the
-truth. Imagine 200 small firms. One background variable, the size of the
-firm (`size`), drives both advertising spend (`adspend`) and revenue
+true relationships. Imagine 200 small firms. One background variable, the size of the
+firm (`size`), influences both advertising spend (`adspend`) and revenue
 (`revenue`). Advertising itself adds nothing to revenue: the line of code
 that builds `revenue` contains `size` but not `adspend`.
 
@@ -179,7 +184,8 @@ coef(lm(revenue ~ adspend + size, data = demo))
 The simple slope of `adspend` is about $1.39$, clearly positive. Yet we know
 that advertising does nothing in these data. Once `size` is in the model, the
 slope of `adspend` falls to about $0.10$, close to the zero that we built in.
-The simple slope gave `adspend` the credit for differences in size. As a
+The simple slope counted the effect of differences in size as an effect of
+`adspend`. As a
 description the simple slope is correct: firms that advertise more do have
 higher revenue on average. As an answer to the question of what advertising
 does, it is wrong.
@@ -198,10 +204,10 @@ omitted-variable bias. In the invented example, `size` is the confounder of
 :::
 
 @fig-i04-ovb-scatter shows why. Larger firms (orange) are high on both axes.
-Smaller firms (blue) are low on both. Moving along the whole cloud from left
-to right, you move from small firms to large firms, so the simple slope
-compares different kinds of firms. Within each colour the cloud is nearly
-flat: at a given size, more advertising does not go with more revenue.
+Smaller firms (blue) are low on both. If you move from left to right through
+the whole cloud of points, you move from small firms to large firms. So the
+simple slope compares different kinds of firms. Within each colour the points
+form a nearly flat cloud: at a given size, more advertising does not go with more revenue.
 
 ```{r}
 #| label: fig-i04-ovb-scatter
@@ -252,14 +258,14 @@ ggplot(demo, aes(x = adspend, y = revenue,
   )
 ```
 
-A coefficient changes when the added predictor accounts for differences that
+A coefficient changes when the added predictor explains differences that
 the simple slope had picked up. This is why the phrase "holding the other
 included predictors fixed" matters: it says which comparison the estimate
 makes.
 
 ### The real-data contrast: the season slope barely moves
 
-Now make the same comparison on the Shark Tank data. From here on, money is
+[Shark Tank data]{.shark-tag} Now make the same comparison on the Shark Tank data. From here on, money is
 measured in thousands of dollars: `ask_1k` is the requested amount divided by
 1,000. One unit is \$1,000 and 100 units are \$100,000. Lecture 1 showed how
 a coefficient changes when the unit changes.
@@ -281,18 +287,19 @@ change of 0.01 percentage points per season, about 1% of the slope. This
 answers the Wooclap question from before class: the coefficient barely moves.
 In the invented example, adding `size` removed almost the whole simple slope.
 Here, adding the requested amount leaves the season trend almost unchanged.
-In these data the time story is not a money story in disguise.
+In these data, the season trend does not come from differences in the
+requested amount.
 
 The stable slope tells you something useful: the requested amount does not
 explain the season trend. It does not rule out every other explanation. A
 variable that is not in the file, such as the maturity of the venture or the
 experience of the founder, could still play the role that `size` played in
-the invented data. A slope that is stable when you add the variables you
-have says nothing about the variables you do not have.
+the invented data. A stable slope tells you about the variables you added.
+It tells you nothing about variables that are not in the file.
 
 ### A three-predictor Shark Tank model
 
-Now add a third predictor. The outcome is the equity that the founders
+[Shark Tank data]{.shark-tag} Now add a third predictor. The outcome is the equity that the founders
 offered at the start of the pitch (`equity_offered_pct`), in percent. The
 predictors are:
 
@@ -313,9 +320,9 @@ summary(equity_model)
 The fitted equation is approximately
 
 $$
-\widehat{equity}
-=22.025-0.836\,season-0.0029\,ask_{1k}
--0.128\,description\_words.
+\widehat{\text{equity}}
+=22.025-0.836\,\text{season}-0.0029\,\text{ask\_1k}
+-0.128\,\text{description\_words}.
 $$
 
 #### The coefficient-interpretation protocol
@@ -353,7 +360,7 @@ the 1,441 recorded pitches:
   points less equity offered. This estimate is not statistically
   distinguishable from zero at 5% (p $\approx$ 0.26). Report the estimate
   anyway. "Not significant" does not mean "exactly zero". It means that the
-  data fit a range of values that includes zero.
+  data are consistent with a range of values that includes zero.
 
 ::: {.callout-note collapse="true"}
 ## Check: the season slope was −0.814 with two predictors and −0.836 with three. Contradiction?
@@ -366,13 +373,13 @@ Here the change is small, as it was when `ask_1k` was added.
 
 ### Three models in one table {#i04-spec-table}
 
-This lecture has now fitted three models of the equity offered
+[Shark Tank data]{.shark-tag} This lecture has now fitted three models of the equity offered
 (`equity_offered_pct`): season alone (`m_simple`), season and requested
 amount (`m_adjusted`), and the three-predictor model (`equity_model`).
 Research papers show such models side by side in one table, with one column
 per model. The table needs the standard error of every coefficient and the
-fit of every model. `summary()` prints them for the first two models. The
-output for the third model is above.
+fit of every model. `summary()` prints these numbers for the first two models
+below. The output for the third model is in the previous section.
 
 ```{r}
 #| label: i04-spec-summaries
@@ -380,7 +387,7 @@ summary(m_simple)
 summary(m_adjusted)
 ```
 
-The table below collects the three outputs.
+The table below collects the numbers of the three outputs above.
 
 ::: {.reg-table}
 | | (1) | (2) | (3) |
@@ -444,22 +451,22 @@ modelsummary(
 )
 ```
 
-The package must be installed once with `install.packages("modelsummary")`.
-The table in this chapter was not made with this code. It was typed by hand
-from the `summary()` outputs above. `modelsummary` rounds to three decimals,
-so in its table the coefficient of the requested amount appears as −0.003.
+You need to install the package once with
+`install.packages("modelsummary")`.
+It rounds to three decimals, so in its table the coefficient of the
+requested amount appears as −0.003.
 
 ### Scaling to comparisons readers care about
 
 A reader rarely cares about one season or one thousand dollars. Scale the
-coefficient to a step that matters to the reader: **fitted change =
-coefficient × number of unit steps**, holding the other included predictors
+coefficient to a step that matters to the reader: fitted change =
+coefficient × number of unit steps, holding the other included predictors
 fixed.
 
 ::: {#exm-i04-scaling}
 ## Worked example: five seasons, half a million dollars, ten words
 
-Holding the other included predictors fixed in `equity_model`:
+[Shark Tank data]{.shark-tag} Holding the other included predictors fixed in `equity_model`:
 
 - **Five later seasons:** $5\times(-0.836)=-4.18$ fitted equity percentage
   points.
@@ -472,14 +479,14 @@ Holding the other included predictors fixed in `equity_model`:
 Changing the unit of a predictor changes the coefficient and its standard
 error by the same factor. It does not change the fitted values, the t
 statistic, or the relationship itself. A coefficient "per dollar" of
-$-0.0000029$ would be correct and unreadable. Per \$1,000 is readable. Per
+$-0.0000029$ would be correct but hard to read. Per \$1,000 is readable. Per
 \$100,000 is often the best unit for a sentence.
 :::
 
 ::: {.callout-caution collapse="true"}
 ## Try it: three seasons later and $200,000 more
 
-Try this with your neighbour first. Two pitches are identical in description
+[Shark Tank data]{.shark-tag} Try this with your neighbour first. Two pitches have the same description
 length. One is three seasons later and requests $200,000 more. Complete the
 steps before opening the answer.
 
@@ -490,8 +497,9 @@ percentage points.
 `ask_1k` coefficient.
 
 *Step 3 (you).* Add the two contributions. This is allowed because the model
-is additive. State the combined fitted difference in one sentence that
-passes the five checks.
+is additive: each predictor has its own term, and the terms are added up.
+State the combined fitted difference in one sentence that passes the five
+checks.
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
@@ -501,7 +509,7 @@ $200\times(-0.0029)\approx-0.58$. Combined:
 $3(-0.836)+200(-0.0029)\approx-2.51-0.58=-3.09$ percentage points. Sentence:
 among the recorded pitches, a pitch three seasons later that requests
 \$200,000 more is fitted to offer about 3.1 percentage points less equity,
-holding description length fixed. This is an association, not an effect.
+holding description length fixed.
 
 ```{r}
 #| label: i04-faded-check
@@ -513,16 +521,18 @@ b <- coef(equity_model)
 
 ### What controls can and cannot do
 
-Including a control **can**:
+Including a control can:
 
 - make a comparison fairer, because the compared cases are alike on the
   measured variables
 - reduce the residual variation, which makes confidence intervals narrower
 - show that a simple association partly came from comparing different kinds
-  of cases
-- make a coefficient less precise when the predictors overlap strongly.
+  of cases.
 
-Including a control **cannot**:
+A control also has a cost: it makes a coefficient less precise when the
+predictors are strongly correlated.
+
+Including a control cannot:
 
 - adjust for variables that were not measured
 - fix reverse causality, where the outcome influences the predictor
@@ -532,12 +542,13 @@ Including a control **cannot**:
 
 A control variable is simply a predictor that is included in the model. The
 word "control" does not make any coefficient causal. Only the way the data
-were produced can do that, for example an experiment.
+were produced can make a coefficient causal, for example when the data come
+from an experiment.
 
 ::: {.callout-note collapse="true"}
 ## Check: which of these four problems does adding `ask_1k` address?
 
-(a) Later pitches request different amounts. (b) The experience of the
+&#40;a) Later pitches request different amounts. (b) The experience of the
 founder is not recorded. (c) The equity offered may influence how much is
 asked. (d) Only pitches that were broadcast are in the file.
 
@@ -556,7 +567,8 @@ set of included predictors:
 2. For a causal reading only: nothing outside the model drives both an
    included predictor and the outcome (no confounding).
 3. The observations are independent.
-4. No predictor is an exact linear combination of the others.
+4. No predictor can be calculated exactly from the others, for example as
+   the sum of two of them.
 5. The usual standard errors require a constant conditional error
    variance.
 6. In small samples, exact t and F inference also requires normally
@@ -565,13 +577,14 @@ set of included predictors:
 A high correlation among the predictors is called **collinearity**. It does
 not bias the coefficients. It makes the single coefficients imprecise and
 unstable, because the data contain little information to separate predictors
-that move together. An exact linear dependence is worse: the coefficients
-then cannot be estimated at all (they are "not identified"), and R drops a
-term. Collinearity costs precision. Exact dependence leaves no answer.
+that move together. It is worse when one predictor can be calculated exactly
+from the others. R then cannot estimate all coefficients and leaves one term
+out. Collinearity makes the estimates less precise. With exact dependence, one
+coefficient cannot be estimated at all.
 
 ### A coefficient plot keeps units visible
 
-@fig-i04-coefplot shows the three slope estimates of `equity_model` with
+[Shark Tank data]{.shark-tag} @fig-i04-coefplot shows the three slope estimates of `equity_model` with
 their 95% confidence intervals.
 
 ```{r}
@@ -629,8 +642,7 @@ Read @fig-i04-coefplot with the
    statistic is about $-5$. The distance from zero in this plot depends on
    the unit. It does not show how strong the evidence is.
 5. **Limits:** the intervals show sampling uncertainty under the model,
-   among these recorded pitches. They say nothing about causation or about
-   variables that were not measured.
+   among these recorded pitches.
 
 ::: {.caveat-box}
 <span class="label">What an adjusted coefficient can and cannot say</span>
@@ -638,30 +650,29 @@ Read @fig-i04-coefplot with the
 - "Holding fixed" covers only the predictors in the model. The maturity of
   the venture, its revenue, and the experience of the founder are not held
   fixed.
-- A coefficient that stays stable across models is good news about the
-  measured controls. It proves nothing about variables that were not
+- If a coefficient stays stable across models, the measured controls do
+  not explain it. This proves nothing about variables that were not
   measured.
 - The equity offered is the opening offer in the pitch, not a completed
   investment.
 
 **What you can do with it:** add the controls that a critic would name first.
-If your coefficient survives them, act on it for cheap decisions and test it
-for expensive ones.
+If your coefficient stays about the same after you add them, you can act on it
+for cheap decisions. For expensive decisions, test it first.
 :::
 
 ### Answering the driving question
 
 At the same requested amount and description length, the season trend
 remains: about $-0.836$ equity percentage points per season, against $-0.824$
-without the two controls. The money story does not replace the time story.
+without the two controls. The requested amount does not explain the season trend.
 Later pitches offer less equity even when they are compared at the same
-requested amount. Neither story is causal. A variable that is not in the file
-could still lie behind both, as firm size did in the invented example.
+requested amount.
 
 ::: {.founder-box}
 <span class="label">A founder's decision (invented example)</span>
 
-Weeks with lower prices show more orders: the simple slope is 12 more orders per euro of price cut. But you lowered prices mainly in exam weeks, when demand is high anyway. With exam week in the model, the slope is 5 orders per euro. You sell about 150 boxes a week at 4 euros of margin. A price cut of 1 euro costs 150 euros of margin on the boxes you sell anyway, and it brings about 5 more orders at 3 euros each, 15 euros. The decision: keep the price. The simple slope would have overstated what a price cut brings by more than double.
+Suppose you run a campus venture that sells meal boxes. In weeks with lower prices you get more orders: the simple slope is 60 more orders per euro of price cut. But you lowered prices mainly in exam weeks, when demand is high anyway. With exam weeks included in the model as a control, the slope is 25 orders per euro. You sell about 150 meal boxes a week at a margin of 4 euros per box. A price cut of 1 euro costs 150 euros of margin on the boxes that you would sell anyway. After the cut, each extra order earns a margin of 3 euros. With the simple slope, the cut would bring 60 more orders at 3 euros each, so 180 euros, and the cut would be profitable. With the adjusted slope, the cut brings 25 orders, so 75 euros, which is less than the 150 euros that the cut costs. The decision: keep the price. The control changed the decision.
 :::
 
 **Next:** You can now hold other predictors fixed, as long as they are
@@ -682,9 +693,10 @@ regression and how to test a whole set of category terms at once.
 ### Read the lecture material (15 minutes)
 
 Read the Lecture material section above from start to end. The lecture
-covered the core of it. The text has every step, every example, and all the
+covered the main ideas. The text has every step, every example, and all the
 code, including parts that were not shown in class. Note what is still
-unclear and bring it to the next tutorial, or ask Tilly.
+unclear and bring it to the next tutorial, or ask Tilly, the course AI
+assistant.
 
 ### Recall questions (10 minutes)
 
@@ -693,7 +705,7 @@ unclear and bring it to the next tutorial, or ask Tilly.
 2. Why can a coefficient change after another predictor is added?
 3. What does the no-confounding condition say, and when is it needed?
 4. Why does adding controls not make a coefficient causal?
-5. What problem can strongly overlapping predictors create?
+5. What problem can strongly correlated predictors create?
 6. Which five elements belong in the interpretation of a slope?
 
 ::: {.callout-note collapse="true"}
@@ -709,77 +721,91 @@ unclear and bring it to the next tutorial, or ask Tilly.
 4. Unmeasured confounders, selection, reverse causality, and measurement
    error can all remain after a control is added.
 5. Imprecise and unstable estimates of the single coefficients. With an exact
-   dependence the coefficients cannot be estimated at all.
+   dependence R cannot estimate all coefficients and leaves one term out.
 6. Estimate and direction, predictor step and unit, outcome unit, the
    predictors that are held fixed, and the scope (which records, association
    or effect).
 :::
 
-### Practice (30 minutes)
+### Finish a half-worked example: interpret the three slopes (10 minutes)
 
-Items 1 to 5 practise the core skills. Items 6 to 8 repeat the calculations
-of @exm-i04-scaling in your own words. Item 9 is the Try it task, now done
-from start to finish.
+[Shark Tank data]{.shark-tag} Interpret the three slopes of `equity_model` with units and with the
+predictors that are held fixed.
 
-1. Interpret all three slopes from `equity_model` with units and with the
-   predictors that are held fixed.
-2. Calculate 95% confidence intervals with `confint(equity_model)`.
-3. Test each coefficient against zero. Explain how these three single tests
+Step 1 (given). Season: holding the requested amount and the description
+length fixed, among the recorded pitches, one later season is associated
+with about 0.836 percentage points less equity offered.
+
+Step 2 (you). Write the same kind of sentence for `ask_1k` and for
+`description_words`.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+Holding the season and the description length fixed, an additional \$1,000
+requested is associated with about 0.0029 percentage points less equity
+offered (0.29 per \$100,000). Holding the season and the requested amount
+fixed, one additional description word is associated with about 0.128
+percentage points less.
+:::
+
+### Practice (20 minutes)
+
+[Shark Tank data]{.shark-tag} Items 5 to 7 use the calculations of @exm-i04-scaling. Item 8 is the Try it
+task, now done from start to finish.
+
+1. Calculate 95% confidence intervals with `confint(equity_model)`.
+2. Test each coefficient against zero. Explain how these three single tests
    differ from the one overall F-test of the model.
-4. Remove `description_words`. Compare the coefficients of season and
+3. Remove `description_words`. Compare the coefficients of season and
    requested amount with those of the full model.
-5. Name one plausible omitted variable and explain which reading of the
-   coefficients it would put in doubt.
-6. Interpret a difference of five seasons with the fitted season
+4. Name one plausible omitted variable and explain which interpretation of
+   the coefficients it would make questionable.
+5. Interpret a difference of five seasons with the fitted season
    coefficient.
-7. Interpret a difference of \$500,000 in the requested amount.
-8. Interpret a difference of ten words in description length and use the 95%
+6. Interpret a difference of \$500,000 in the requested amount.
+7. Interpret a difference of ten words in description length and use the 95%
    interval to judge $H_0:\beta=0$.
-9. Compare two fitted pitches that are the same except that one is three
+8. Compare two fitted pitches that are the same except that one is three
    seasons later and requests \$200,000 more. Calculate the combined fitted
    difference.
 
 ::: {.callout-note collapse="true"}
 ## Check your answers
 
-1. Holding the other two predictors fixed, among the recorded pitches: one
-   later season is associated with about 0.836 percentage points less
-   equity offered, an additional \$1,000 requested with about 0.0029
-   percentage points less (0.29 per \$100,000), and one additional
-   description word with about 0.128 percentage points less.
-2. The season interval is approximately $(-0.936, -0.736)$, the `ask_1k`
+1. The season interval is approximately $(-0.936, -0.736)$, the `ask_1k`
    interval $(-0.0040, -0.0018)$, and the description interval
    $(-0.351, 0.095)$.
-3. Each t-test evaluates one $\beta_j=0$ at a time. The overall F-test
+2. Each t-test evaluates one $\beta_j=0$ at a time. The overall F-test
    (F $\approx$ 110.6 on 3 and 1437 df) evaluates all three slope
    coefficients together.
-4. Without `description_words`, the season coefficient is about $-0.814$ and
-   the `ask_1k` coefficient about $-0.0029$. These are columns (2) and (3) of
-   the table in the lecture material. The coefficients change only slightly.
-   That does not prove that there is no omitted-variable bias.
-5. Examples are the maturity of the venture, its revenue, the experience of
+3. Without `description_words`, the season coefficient is about $-0.814$ and
+   the `ask_1k` coefficient about $-0.0029$. These are the numbers in column (2)
+   of the table in the lecture material. Compare them with column (3).
+   The coefficients change only slightly.
+4. Examples are the maturity of the venture, its revenue, the experience of
    the founder, or decisions of the producers about what is broadcast. If
    such a variable is related to both an included predictor and the equity
    offered, it is a confounder. The coefficient is then still a correct
    description, but it is not the effect of the predictor.
-6. Holding requested amount and description length fixed, a pitch five
+5. Holding requested amount and description length fixed, a pitch five
    seasons later is fitted to offer about $5(-0.836)=-4.18$ equity
    percentage points less.
-7. \$500,000 equals 500 units of `ask_1k`. Holding season and description
+6. \$500,000 equals 500 units of `ask_1k`. Holding season and description
    length fixed, the fitted difference is $500\times(-0.0029)\approx-1.45$
    percentage points.
-8. Ten words go with about $-1.28$ fitted percentage points, holding season
+7. Ten words go with about $-1.28$ fitted percentage points, holding season
    and requested amount fixed. Multiplying the interval by 10 gives
    approximately $(-3.51, 0.95)$. The interval contains zero, so the
    two-sided 5% test does not reject a zero coefficient.
-9. The fitted difference is $3(-0.836)+200(-0.0029)\approx-3.09$ percentage
+8. The fitted difference is $3(-0.836)+200(-0.0029)\approx-3.09$ percentage
    points, holding description length fixed. The two contributions add
    because the model is additive.
 :::
 
-### Cumulative mini-task (10 minutes)
+### Practice: all steps together (10 minutes)
 
-Write one paragraph that connects the diagnostics of Lecture 2 to
+[Shark Tank data]{.shark-tag} Write one paragraph that connects the diagnostics of Lecture 2 to
 `equity_model`. Which residual checks would you run on this three-predictor
 model? What would each check look for? What would you do about a highly
 influential pitch if you found one?
@@ -789,19 +815,19 @@ influential pitch if you found one?
 
 A plot of residuals against fitted values checks that the conditional mean
 is roughly linear in the included terms and that the spread is roughly
-constant. A curve would put assumption 1 in doubt. A funnel shape would put
-the usual standard errors in doubt. Standardised residuals (`rstandard`)
+constant. A curve would suggest that assumption 1 fails. A funnel shape
+would suggest that the usual standard errors are wrong. Standardised residuals (`rstandard`)
 flag pitches that the model fits unusually badly. Cook's distance flags
-pitches that move the coefficients on their own. A flagged pitch, for
-example one with an extreme requested amount, is investigated, not deleted:
-check the recorded values, fit the model with and without it, and report
+pitches that move the coefficients on their own. Investigate a flagged
+pitch, for example one with an extreme requested amount, but do not delete
+it. Check the recorded values, fit the model with and without it, and report
 both fits if they disagree. Never delete an observation without reporting
 it.
 :::
 
 ### Review: one question from Lecture 3 (5 minutes)
 
-For the simple model `equity_offered_pct ~ season`, the slope's t statistic
+[Shark Tank data]{.shark-tag} For the simple model `equity_offered_pct ~ season`, the slope's t statistic
 is about $-17.34$. What is the overall F statistic of this one-predictor
 model, and why?
 
@@ -810,24 +836,23 @@ model, and why?
 
 $F = t^2 \approx 300.7$. With a single slope, the overall F-test and the
 two-sided t-test of that slope test the same hypothesis, and F is exactly the
-square of t. With several predictors this is no longer true. Lecture 5
-therefore introduces a test of several coefficients at once.
+square of t. With several predictors this is no longer true. So Lecture 5
+introduces a test of several coefficients at once.
 :::
 
 ### Worked exam interpretation (5 minutes)
 
-**Question.** A summary table reports, for the three-predictor model,
+[Shark Tank data]{.shark-tag} **Exam-style question.** A summary table reports, for the three-predictor model,
 `season  -0.836  (SE 0.051)` and `description_words  -0.128  (SE 0.114)`. A
 student writes: "Season matters and word count does not, so descriptions have
-no effect on equity." Give two corrections, in the style of Question 4 of the
-mock exam.
+no effect on equity." Give two corrections.
 
 ::: {.callout-note collapse="true"}
 ## Check a model answer
 
-First, "no effect" misreads a result that is not significant. The interval
-$(-0.351, 0.095)$ contains zero and also values near $-0.35$. The data fit
-no association and they also fit a small negative one. Not significant does
+First, "no effect" is a wrong reading of a result that is not significant. The interval
+$(-0.351, 0.095)$ contains zero and also values near $-0.35$. The data are
+consistent with no association and also with a small negative one. Not significant does
 not mean zero. Second, "effect" claims causation. Both estimates are
 associations among the recorded pitches, holding the other included
 predictors fixed. The data do not come from an experiment, so they do not
@@ -836,7 +861,7 @@ show a causal effect.
 
 ### Check the AI (5 minutes)
 
-You asked an AI assistant: "I added the requested amount as a control. Is the season coefficient of -0.81 now the effect of time?" It answered:
+[Shark Tank data]{.shark-tag} You asked an AI assistant: "I added the requested amount as a control. Is the season coefficient of -0.81 now the effect of time?" It answered:
 
 > "Yes. Because you controlled for the requested amount, one later season now causes 0.81 percentage points less equity."
 
@@ -852,19 +877,19 @@ A control only holds fixed what was measured and included. Venture maturity, fou
 ### Make it yours (5 minutes)
 
 :::: {.utility-prompt}
-<span class="label">Utility: two sentences</span>
+<span class="label">Two sentences about your own venture</span>
 
 Think of your EiA3 venture, or any business you know well. Name one
-outcome you care about and two of its drivers that are correlated with each
-other (for example price and quality tier, or marketing spend and firm age).
-Then write two sentences. Which comparison would a regression of the outcome
-on only one driver mix together? What would "holding the other fixed" let
-you see? There is no wrong answer.
+outcome you care about and two factors that influence it and are correlated
+with each other (for example price and quality tier, or marketing spend and
+firm age). Then write two sentences. What would a regression of the outcome
+on only one of the two factors mix together? What would "holding the other
+factor fixed" let you see? There is no wrong answer.
 
 ::: {.callout-note collapse="true"}
 ## See an example, then write your own
 
-Take a student-run venture that sells meal-prep boxes on campus (an invented example). "Outcome: weekly orders. Drivers: price and quality tier, which move together because premium boxes cost more. A regression of orders on price alone would mix cheaper boxes with lower-tier boxes. Holding the tier fixed shows what a price cut does within a tier, and that is the number I can act on."
+Take a student-run venture that sells meal-prep boxes on campus. "Outcome: weekly orders. Factors: price and quality tier, which move together because premium boxes cost more. A regression of orders on price alone would mix cheaper boxes with lower-tier boxes. Holding the tier fixed shows what a price cut does within a tier, and that is the number I can act on."
 :::
 
 You can discuss this task, and any other task in this chapter, with

@@ -99,6 +99,152 @@ These points supersede earlier entries where they differ.
   fixed "n = 30" rule, inference with known sigma, reading quartiles from a
   CDF by the midpoint rule, the full set-algebra list in the main text.
 
+## 2026-10-07 — Exam sheets and internal information
+
+- **Exam sheets are dry.** The formula sheet and the code sheet contain
+  notation, formulas with their conditions, R commands with a short comment,
+  and labels of R output. No interpretation, no advice, no workflow, so that
+  the exam can test understanding. The introduction above the sheet body is
+  for the web page only.
+- **One source for web page and exam PDF.** `scripts/build_exam_sheets.py`
+  builds `assets/downloads/qm-basic-formula-sheet.pdf` (two pages) and
+  `assets/downloads/qm-intermediate-code-sheet.pdf` from the sheet body.
+  Rebuild after every change to a sheet.
+- **No internal information on student pages.** Nothing about how the
+  course, the book, a lecture, an example, a dataset, or the exam was
+  planned or built, and no reasons for design choices. Students see what
+  they need to understand the material or to act.
+- **Simulated practice data.** Students never simulate. Simulation code is
+  shown in a closed optional box for transparency only.
+- **Mock exam pointers.** Chapters do not name mock exam question numbers.
+
+## 2026-10-08 — Exams and mock exams
+
+- **Open questions only.** All parts of all exams and of both mock exams are
+  open questions, in the style of the exams of earlier years: a short case,
+  parts with their points, and a complete solution. No multiple choice, no
+  output with blanks, no list of statements to mark.
+- **New content in open form.** Students interpret supplied R output and
+  assess an answer of an AI assistant. The AI answer is a short text, and
+  each part asks about one of its sentences.
+- **Blueprint.** Each course has a specification table (course learning
+  goals from OSIRIS by cognitive level). The mock exam, the exam, and the
+  resit follow it. The table and the scoring instructions are in the
+  assessment dossier of each course, outside this repository.
+- **QM Intermediate needs R.** Learning goal 3 names R, so parts that start
+  with "In R:" stay in the exam. Stand-in values keep later parts
+  answerable.
+- **Mock exams are unseen.** Cases and numbers of a mock exam do not repeat
+  a worked example or practice task of a chapter.
+- **Parts labelled (a), (b).** At the start of a list line the opening
+  bracket is written as `&#40;`, so that the page does not turn the label
+  into a nested list.
+
+## 2026-10-08 — Gabriela's second review (Lectures 6 to 10, tutorials, exam format)
+
+- **Lectures 9 and 10 follow Gabriela's structure.** Her order and examples
+  are kept, rewritten in the plain style of the book. Figures are rebuilt in
+  R. Longer derivations sit in collapsed optional boxes.
+- **D1 Strict wording for SD and SE.** $\sigma/\sqrt n$ is the standard
+  deviation of the sample mean, $\sqrt{p(1-p)/n}$ the standard deviation of
+  $\widehat P$. "Standard error" is used only for the estimated versions
+  $S/\sqrt n$ and $\sqrt{\hat p(1-\hat p)/n}$. Under $H_0$ the book writes
+  $\operatorname{SD}_0(\widehat P)$, "the standard deviation of $\widehat P$
+  under $H_0$". No hat on SE, no "estimated standard error".
+- **D2 Sigma known is a first step only.** Lecture 9 shows the interval with
+  known $\sigma$ once, as a starting point. Exams ask for t intervals and t
+  tests for a mean, and z intervals and z tests for a proportion.
+  Probabilities for $\bar X$ with a given $\sigma$ and sample size with a
+  planning value of $\sigma$ stay examinable.
+- **D3 One procedure.** The gap parameter, "zero contrast", "universal
+  benchmark", and the seven-step workflow are retired. A test has five
+  steps. The critical value comes first, the p-value second.
+- **D4 Cumulative notation.** $z_{1-\alpha/2}$, $t_{1-\alpha/2,\,n-1}$,
+  $z_{obs}$, $t_{obs}$. Reject if $|t_{obs}|$ is at least the critical
+  value. The formula sheet lists $z$ and $t$ values for $1-\alpha$ = 0.90,
+  0.95, 0.99 and df 5 to 120. A df that is not listed uses the closest
+  listed value.
+- **D5 One running example.** The Shark Tank sample of 100 (seed 123) is
+  used for all worked intervals and tests in Lectures 8 to 10.
+- **D6 Exam-procedure boxes.** Four boxes (`.exam-procedure`): interval for
+  a mean in five parts, interval for a proportion in five parts (Lecture
+  9), test in five steps, and a test question answered with an interval
+  (Lecture 10). Worked examples, tutorials, mock exam, and marking guides
+  use the same numbering, as in the exam of December 2025.
+- **Scope of tutorials.** Tutorial 3 covers Lectures 6 to 9, Tutorial 4
+  covers Lecture 10. Every tutorial has more calculation practice with times
+  per task and a verification chunk per task.
+- **Moved and dropped.** Sample size moved from Lecture 8 to Lecture 9. The
+  law of large numbers is dropped from Lecture 8. Lecture 7 has new sections
+  on simple random samples (iid, 10% condition) and the shortcut variance.
+- **Book exercises stay on Canvas.** The exercises of the textbook by
+  Nieuwenhuis that Gabriela compiled are set as homework on Canvas, not in
+  this repository (copyright).
+- **Sigma known on Canvas.** The Canvas homework may contain intervals and
+  tests for a mean with known $\sigma$, marked as a first step (as in
+  Lectures 9 and 10). They are not examined.
+
+## 2026-10-09 — Fourth review round (seven reviewers, coordinator decisions)
+
+- **Format names, book-wide.** The before-class check in lectures is
+  "Check your preparation". The worked exam item after class is "Worked exam
+  interpretation: <topic>" (replaces "Exam-style item", "Exam-style:",
+  "Exam practice:"). Invented examples start with "An invented example.",
+  exam-style lead-ins with "**Exam-style question.** An invented example."
+  Every page ends with "[Continue to <next item in `_quarto.yml`>: <its
+  title>](<file>)".
+- **Tutorial format.** All tasks at heading level 3, each with its minutes.
+  Tasks outside the core carry "(N minutes, extra practice for home)". One
+  total for the core tasks under "In the tutorial", and time-budget lines for
+  Before class and After class as in the lectures.
+- **Extra practice through Tilly** (9 October, Valentina). The homework
+  exercises with solutions (compiled from Nieuwenhuis) go to the Tilly bot,
+  not into the public book. Every Basic lecture and tutorial ends its after
+  class part with "More practice": ask Tilly for an extra exercise, with the
+  solution shown only after the student's answer.
+- **Margin of error.** One symbol, $m$, as on the formula sheet. The symbol
+  $h$ is retired.
+- **Critical values in QM Intermediate.** With R the critical value is
+  `qt(0.975, df)`, written $t_{0.975,\,df}$. Intermediate Lecture 3 gets one
+  exam-procedure box ("Exam procedure: a test and an interval for a
+  coefficient").
+- **Sample standard deviation in Lecture 3.** Calculating $s$ (divide by
+  $n-1$) from a small data set is a "Be able to do yourself" item of
+  Lecture 3, so Tutorial 1 and the homework may ask it.
+- **Lecture 1 and 5 additions.** The quartile definition (at least a quarter
+  at or below $Q_1$ and at least three quarters at or above it, and the
+  mirror for $Q_3$) is used in Lecture 1, the tutorials, and the formula
+  sheet. A guide to correlation strength goes into Lecture 5. The subsection
+  "How the course works" stays in Lecture 1.
+- **One-sided tests** leave the main text of Lecture 9. They remain optional
+  reading in Lecture 10 and are not examined.
+- **Videos.** No swap before the discussion of 10 October. Clear mapping
+  errors are fixed, and the prep boxes of Lectures 7 to 9 warn that the
+  video writes $M_n$ for $\bar X$ and $\hat\Theta$ for an estimator.
+- **Formula sheet.** Section titles equal the lecture titles. The
+  percentage-change block is removed (no Basic lecture teaches it). New: the
+  row $\operatorname{SD}_0(\widehat P)$, the proportion test written with
+  it, $P(\text{Type I error})\le\alpha$, and a df label in the
+  critical-value table. Still two pages.
+- **QM Intermediate exam.** 120 minutes in TestVision, as the past exams.
+  Aids: RStudio, Excel, the TestVision calculator, a simple pocket
+  calculator, scrap paper, and the code sheet. The mock exam is resized with
+  the plan of review R7, including the `predict()` fix in old part 1.5. 100
+  points.
+- **Grade and pass rule, both exams** (R&R TiSEM 2026-2027, articles 6.2 to
+  6.4, and the Osiris change of 2026-2027: only component grades are
+  registered, Osiris calculates and rounds the final grade). The test score
+  is points / 10 with two decimals on a scale of 1.00 to 10.00 (minimum
+  1.00). It is entered in Osiris as the component grade of the 100% exam.
+  Osiris rounds it to a whole or half grade, and 5.50 to 5.74 becomes 6.0,
+  5.25 to 5.49 becomes 5.0. Pass with 6.0 or higher, that is with 55
+  points or more.
+- **QM Basic mock exam.** The changes of review R6 are adopted: a new sample
+  for the R output of Question 5, the five-step proportion test in Question
+  6 (paid for by R6's cuts), a correlation calculation in 3.7, one summary
+  calculation for CLG3 in Question 1, and the marking-rule fixes. Seven
+  questions, 100 points, suggested minutes adding to at most 170.
+
 ## Prototype editorial log (carried forward for history)
 
 The full prototype log lives in

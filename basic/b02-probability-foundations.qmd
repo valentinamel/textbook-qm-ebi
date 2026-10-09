@@ -3,8 +3,6 @@
 ```{r}
 #| label: b02-setup
 #| include: false
-# Chunk options only. Every object used in this chapter is constructed in
-# visible code on this page, so that copying the code always works.
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
                       fig.width = 7, fig.height = 4.5)
 ```
@@ -40,10 +38,10 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 ::: {.driving-question}
 <span class="label">Driving question</span>
 
-<p class="dq-context">Investors think in chances: how likely is a deal, how likely is a pitch from the show's later, bigger years, how likely are both at once. Before we can compute any such chance, we need a precise language for "how likely". This lecture introduces that language.</p>
+<p class="dq-context">Investors think in chances: how likely is a deal, how likely is a pitch from the show's later years, how likely are both at once. Before we can compute any such chance, we need a precise language for "how likely". This lecture introduces that language.</p>
 
-Pick one recorded pitch at random. What is the chance it reached a deal, came
-from a late season, or both, and what do those numbers mean beyond this
+Pick one recorded pitch at random. What is the chance that it reached a deal,
+came from a late season, or both, and what do those numbers mean beyond this
 file?
 :::
 
@@ -66,9 +64,9 @@ random variable. All links are also listed in the
 <a href="../resources/video-guide.html">External Video Guide</a>.
 </div>
 
-**Reactivate (5 minutes).** In Lecture 1 you built frequency tables for the
-Shark Tank data. Rebuild the season frequency table: one line of R once the
-data are loaded:
+[Shark Tank data]{.shark-tag} **Warm up (5 minutes).** In Lecture 1 you built frequency tables for the
+Shark Tank data. Build the season frequency table again. Once the data are
+loaded, you need one line of R:
 
 ```{r}
 #| label: b02-prep-table
@@ -77,15 +75,15 @@ sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
 table(sharks$season)
 ```
 
-**Predict (5 minutes).** Answer the one-click Wooclap question posted on
-Canvas before you come to class. Pick one recorded pitch at random. Is the
-probability that the pitch is a deal or from a late season **larger** or
+[Shark Tank data]{.shark-tag} **Predict (5 minutes).** Before you come to class, answer the Wooclap
+question on Canvas (it takes one click). Pick one recorded pitch at random.
+Is the probability that the pitch reached a deal or comes from a late season **larger** or
 **smaller** than the probability of a deal plus the probability of a late
 season? Late means Seasons 9 to 16. Choose one answer. You find the answer in
 the lecture material.
 
 If set notation, complements, unions, or intersections are unfamiliar, review
-[Mathematics Refresher: sets and events](../resources/math-refresher.html).
+[Mathematics Refresher: sets and event notation](../resources/math-refresher.html#sets-and-event-notation).
 
 :::
 
@@ -93,15 +91,12 @@ If set notation, complements, unions, or intersections are unfamiliar, review
 
 ## Lecture material
 
-This section starts with one table and plain counting. The names and symbols
-of probability come afterwards.
-
 ### Start with a founder's question
 
-You are preparing a pitch. Before you walk in, you would like to know three
-things. How likely is a deal at all? Was it easier in the later seasons, when
-the show was better known? And how many pitches had both, a late season and a
-deal? All three answers are in one small table. The code builds it from the
+[Shark Tank data]{.shark-tag} You are preparing a pitch. Before you walk in, you would like answers to three
+questions. How likely is a deal at all? Was a deal easier to get in the later
+seasons, when the show was better known? How many pitches had both a late
+season and a deal? All three answers are in one small table. The code builds it from the
 Shark Tank file. "Late" means Seasons 9 to 16.
 
 The code first stores two yes-or-no answers for every pitch. `D` is `TRUE`
@@ -136,26 +131,26 @@ The same counts with row and column totals:
   your preparation: the share is smaller than the sum of the two shares.
 - **No deal.** 1,441 - 882 = 559 pitches, 38.8%.
 
-One more comparison a founder would want: among the late-season pitches, 505
+One more comparison that a founder would want to see: among the late-season pitches, 505
 of 734 got a deal (68.8%). Among the early ones, 377 of 707 did (53.3%).
 Lecture 4 is about comparisons of this kind.
 
 You have just used every idea of this lecture. The rest of the lecture gives
-these ideas names and symbols, so that you can use them on any table and
-recognise them in any textbook: outcomes and events, "and", "or", and "not",
-and the rules that say when shares may be added.
+these ideas names and symbols: outcomes and events, "and", "or", and "not",
+and the rules that say when you may add shares. With these names and symbols,
+you can use the ideas on any table and recognise them in any textbook.
 
 ### Why data analysis needs probability
 
 The shares above describe one fixed file. Most business questions are about
-a larger group, a population, of which we see only a sample. A sample is one
+a larger group, a population, but we see only a sample of it. A sample is one
 draw from the population, and another draw would give other numbers.
 Probability is the language for this uncertainty.
 
 [Lecture 7](b07-samples-estimators.qmd) shows this with the equity initially
-offered (`equity_offered_pct`) in the Shark Tank file. One random sample of
-100 records gives a mean of 12.76%. There the 1,441 records play the role of
-the population. Their mean is 13.21%. Lectures 2 to 6 build the language of
+offered (`equity_offered_pct`) in the Shark Tank file. There the 1,441
+records play the role of the population. One random sample of 100 records
+gives a mean that differs from the mean of all 1,441 records. Lectures 2 to 6 build the language of
 probability. Lectures 7 to 10 use it to go from a sample to a population.
 
 ### A probability model begins with possible outcomes
@@ -163,13 +158,13 @@ probability. Lectures 7 to 10 use it to go from a sample to a population.
 <p class="concept-video"><strong>MIT explanation (review):</strong>
 <a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/sample-space/">01.2 Sample Space</a>.</p>
 
-Probability starts by specifying exactly what may happen. A probability model
+[Shark Tank data]{.shark-tag} Probability starts by describing exactly what may happen. A probability model
 needs a process, a list of complete possible results, and events that describe
 which results matter for the question.
 
 A **random experiment** is a process whose outcome is not known in advance.
-The word *random* does not mean "unstructured." It means the model does not
-specify in advance which possible outcome will occur.
+The word *random* does not mean "without any order or rule." It means that
+the model does not say in advance which possible outcome will occur.
 
 ::: {.definition-box}
 <span class="label">Definition</span>
@@ -195,7 +190,7 @@ For a single roll of a fair six-sided die,
 $$\Omega=\{1,2,3,4,5,6\}.$$
 
 The event $E=\{2,4,6\}$ means "an even result." The outcome $\omega=4$
-belongs to $E$, so $E$ occurs when 4 is rolled. The number 4 is an outcome.
+belongs to $E$, so $E$ occurs when you roll a 4. The number 4 is an outcome.
 The set $\{4\}$, which contains only this one outcome, is an event.
 
 ::: {.callout-note collapse="true"}
@@ -203,9 +198,9 @@ The set $\{4\}$, which contains only this one outcome, is an event.
 
 The record itself is one complete possible result of the selection, so it is
 an **outcome**. The description "the selected pitch is the record with
-pitch_id 7" picks out the set that contains only that record, and a set of
-outcomes is an **event**. This is the same distinction as 4 versus $\{4\}$ on
-the die.
+pitch_id 7" describes the set that contains only that record, and a set of
+outcomes is an **event**. This is the same difference as the one between 4
+and $\{4\}$ for the die.
 :::
 
 #### An empirical selection experiment
@@ -221,13 +216,13 @@ These are the events behind the R objects `D` and `L` from the start of this
 lecture. Making the selection uniform means that every record has the same
 probability, $1/1441$. The probability of an event then equals its share of
 the records in this fixed dataset, so $D$ has probability $882/1441$. This
-does not imply the same probabilities for future entrepreneurs. The box "What
+does not mean that future entrepreneurs have the same probabilities. The box "What
 these numbers can and cannot say" below returns to this point.
 
 ### Combining events
 
-Events are sets of outcomes. Set notation therefore gives us a precise way to
-describe how events are combined.
+[Shark Tank data]{.shark-tag} Events are sets of outcomes. So set notation gives us a precise way to
+describe how we combine events.
 
 | Notation | Name | Meaning |
 |---|---|---|
@@ -238,7 +233,7 @@ describe how events are combined.
 | $\varnothing$ | empty event | the event that contains no outcome, so it never occurs |
 | $A\cap B=\varnothing$ | disjoint | $A$ and $B$ cannot occur together |
 
-To make the notation concrete, suppose one number is selected at random from
+As an example, suppose that we select one number at random from
 
 $$\Omega=\{1,2,\ldots,12\}.$$
 
@@ -297,16 +292,16 @@ for (i in seq_along(event_sets)) {
 par(old_par)
 ```
 
-Thus $A^c=\{4,7,8,10,11,12\}$, $A\cap B=\{1,2,3\}$, and
-$A\cup B=\{1,2,3,4,5,6,9\}$. Notice that **or** includes outcomes that are
+So $A^c=\{4,7,8,10,11,12\}$, $A\cap B=\{1,2,3\}$, and
+$A\cup B=\{1,2,3,4,5,6,9\}$. Notice that "or" includes outcomes that are
 in both events: $1,2,3$ belong to the union as well as the intersection.
 
-The same grammar works for business events. In the selection experiment, let
+The same notation works for business events. In the selection experiment, let
 $F$ be "the selected pitch is from the Food and Beverage industry" and $T$
 "from the Technology/Software industry." Each record lists exactly one industry, so
 $F$ and $T$ are disjoint: $F\cap T=\varnothing$. The union $F\cup T$ is "a
-food or technology pitch," and $F^c$ collects every pitch from any other
-industry. Nothing new is needed, only the sets have changed.
+food or technology pitch," and $F^c$ contains every pitch from any other
+industry. Nothing new is needed. Only the sets have changed.
 
 Disjoint does **not** mean independent. If two disjoint events both have
 positive probability, observing one makes the other impossible. Independence,
@@ -316,7 +311,7 @@ probability of the other.
 #### The counts table again, with event names
 
 This is the table from the start of the lecture. The row and column labels now
-carry the event names $D$ and $L$:
+show the event names $D$ and $L$:
 
 |                    | Early ($L^c$, S1--8) | Late ($L$, S9--16) | Total |
 |--------------------|---------------------:|-------------------:|------:|
@@ -327,14 +322,14 @@ carry the event names $D$ and $L$:
 ::: {#exm-b02-events}
 ## Worked example: three events in words and symbols
 
-From the table, describe each event in words and give its count.
+[Shark Tank data]{.shark-tag} From the table, describe each event in words and give its count.
 
 - $D^c$, "no on-air deal": the top row, $330 + 229 = 559$ records.
 - $D\cap L$, "deal **and** late season": the single bottom-right cell,
   505 records.
 - $D\cup L$, "deal, late season, **or both**": every record except the
-  top-left cell, $1441 - 330 = 1111$ records. The deal row (882) plus the
-  late column (734) minus the 505 records counted in both.
+  top-left cell, $1441 - 330 = 1111$ records. This is the deal row (882) plus
+  the late column (734) minus the 505 records counted in both.
 :::
 
 ::: {.callout-tip collapse="true"}
@@ -368,26 +363,26 @@ to 1, the more likely the event. An impossible event has probability 0, and a
 certain event has probability 1.
 :::
 
-A model assigns a probability $P(A)$ to each event $A$. These numbers must
-satisfy three rules:
+[Shark Tank data]{.shark-tag} A model gives a probability $P(A)$ to each event $A$. These numbers must
+follow three rules:
 
 1. **Non-negativity:** $P(A)\ge 0$ for every event $A$.
 2. **Normalisation:** $P(\Omega)=1$.
 3. **Additivity:** if $A$ and $B$ are disjoint, then
    $$P(A\cup B)=P(A)+P(B),$$
-   and the same holds for any finite number of events of which no two can
-   occur together.
+   The same holds for any finite number of events, as long as no two of them
+   can occur together.
 
 The first two rules set the probability scale: probability cannot be negative,
-and something in the sample space must occur. The third says that the
-probabilities of disjoint events can be added, because no outcome is counted
+and something in the sample space must occur. The third says that you
+can add the probabilities of disjoint events, because no outcome is counted
 twice.
 
 ::: {.callout-tip collapse="true"}
 ## Optional: countable additivity
 
-In the formal theory the third rule is stated for infinite sequences of
-events of which no two can occur together, $P\!\left(\bigcup_{i=1}^{\infty} A_i\right)
+In the formal theory the third rule also holds for infinite sequences of
+events, as long as no two of them can occur together, $P\!\left(\bigcup_{i=1}^{\infty} A_i\right)
 =\sum_{i=1}^{\infty} P(A_i)$. This matters for sample spaces with infinitely
 many outcomes. Every sample space in Lectures 2 to 5 is finite, so the finite
 version above is all you need there.
@@ -399,9 +394,8 @@ space with equally likely outcomes,
 $$P(A)=\frac{|A|}{|\Omega|}.$$
 
 For example, $|D|=882$ and $|\Omega|=1441$, so $P(D)=882/1441\approx 0.612$.
-That ratio is a special case, not a universal definition. It applies because
-equal likelihood has been built into the model: here, because the selection
-was made uniform.
+This ratio works only when all outcomes are equally likely. Here they are,
+because every record has the same chance of being drawn.
 
 #### Rules derived from the three above
 
@@ -416,13 +410,13 @@ When $A$ and $B$ may overlap,
 
 $$P(A\cup B)=P(A)+P(B)-P(A\cap B).$$
 
-This is the addition rule. The intersection is subtracted once because it was
+This is the addition rule. We subtract the intersection once, because it is
 counted in both $P(A)$ and $P(B)$.
 
 ::: {#exm-b02-union}
 ## Worked example: P(deal or late season), by hand
 
-Every number comes from the counts table above. Find each one in the table as
+[Shark Tank data]{.shark-tag} Every number comes from the counts table above. Find each one in the table as
 you read.
 
 $$
@@ -433,13 +427,13 @@ P(D\cup L)
 $$
 
 The 882 is the deal row total, the 734 is the late column total, and the 505
-is the deal-and-late cell that both totals contain. It is subtracted once so
-that no record is counted twice.
+is the deal-and-late cell that both totals contain. We subtract it once, so
+that no record counts twice.
 
 This is the count from the start of the lecture, written as a rule:
-$P(D\cup L)$ is **smaller** than
-$P(D)+P(L)$ whenever the two events overlap, because the overlap
-$P(D\cap L) > 0$ is subtracted.
+$P(D\cup L)$ is smaller than
+$P(D)+P(L)$ whenever the two events overlap, because the rule subtracts the
+overlap $P(D\cap L) > 0$.
 :::
 
 Verification in R, with $D$ and $L$ built exactly as before:
@@ -456,7 +450,7 @@ c(
 )
 ```
 
-Three more properties follow from the three rules. Each one can be read off
+Three more properties follow from the three rules. You can see each one in
 the counts table.
 
 - The empty event has probability zero: $P(\varnothing)=0$. No record is
@@ -473,13 +467,13 @@ the counts table.
 ::: {.callout-caution collapse="true"}
 ## Try it: P(no deal and early season)
 
-Try this with your neighbour first. Complete the two missing steps before
-opening the answer.
+[Shark Tank data]{.shark-tag} Try this first with the student next to you. Complete the two missing steps
+before you open the answer.
 
 *Step 1 (given).* "No deal **and** early season" is the event $D^c\cap L^c$:
 the top-left cell of the counts table.
 
-*Step 2 (you).* Read off the count for that cell.
+*Step 2 (you).* Read the count for that cell from the table.
 
 *Step 3 (you).* Divide by the number of records and interpret the result in
 one sentence.
@@ -490,8 +484,7 @@ one sentence.
 $P(D^c\cap L^c) = 330/1441 \approx 0.229$: about 23% of the recorded pitches
 are early-season pitches that did not reach an on-air deal.
 
-Verification in R (the construction of `D` and `L` is repeated so the block
-runs on its own):
+Verification in R. The first two lines build `D` and `L` again:
 
 ```{r}
 #| label: b02-faded-check
@@ -504,7 +497,7 @@ mean(!D & !L)
 
 ### Partitions
 
-A **partition** divides $\Omega$ into events that do not overlap and together
+[Shark Tank data]{.shark-tag} A **partition** divides $\Omega$ into events that do not overlap and together
 include every possible outcome. Each outcome belongs to exactly one part. For
 example, Seasons 1--8 and Seasons 9--16 partition the recorded pitches into an
 early-period event $L^c$ and a late-period event $L$ (@fig-b02-partition).
@@ -549,7 +542,7 @@ records out (the 330 early no-deal records).
 <p class="concept-video"><strong>MIT explanation (review):</strong>
 <a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/definition-of-random-variables/">05.2 Definition of Random Variables</a>.</p>
 
-An outcome is a complete result, but an analysis usually focuses on one
+[Shark Tank data]{.shark-tag} An outcome is a complete result, but an analysis usually focuses on one
 number that describes that result.
 
 ::: {.definition-box}
@@ -562,17 +555,17 @@ experiment. A fixed rule turns each outcome into a number.
 Random variables are written with capital letters, such as $X$. Their values
 are written with lower-case letters, such as $x$.
 
-Three random variables on our selection experiment:
+Here are three random variables for our selection experiment:
 
 - the **deal indicator** $X$: equal to 1 when the selected pitch reached an
   on-air deal and 0 otherwise
 - the **season** $S$: the season number of the selected pitch
 - the **word count** $W$: the number of words in its written description.
 
-The rule is fixed before an outcome is selected. The value is unknown until
-then. That is the only sense in which the variable is "random." After
-selection, the number produced, written in lower case, $x$, $s$, or $w$,
-is its **realised value**.
+We fix the rule before we select an outcome. The value is unknown until
+then. That is the only sense in which the variable is "random." After the
+selection, the rule produces a number. This number, written in lower case as
+$x$, $s$, or $w$, is the **realised value** of the variable.
 
 A random variable is **discrete** when its possible values can be listed. A
 random variable is **continuous** when it can take every value in an
@@ -581,7 +574,7 @@ random variables.
 
 The **support** of a discrete random variable is the set of values it can
 take with positive probability. The support of the deal indicator is
-$\{0,1\}$. The support of season is $\{1,2,\ldots,16\}$. Lecture 3 attaches a
+$\{0,1\}$. The support of season is $\{1,2,\ldots,16\}$. Lecture 3 gives a
 probability to every value in the support.
 
 ::: {.callout-tip collapse="true"}
@@ -608,9 +601,9 @@ $D=\{\omega : X(\omega)=1\}$. The table lists the symbols:
 - $P(D)=882/1441\approx 0.612$ is exact for one question only: the chance of
   a deal when one record is drawn at random from this file. It is an
   **empirical proportion**.
-- It becomes a forecast for a future pitch under four assumptions: the future
-  pitch belongs to the same kind of pitches, the producers select in the same
-  way, the process stays stable over time, and "deal" keeps its meaning.
+- It becomes a forecast for a future pitch only under four assumptions. The
+  future pitch is like these pitches, producers select in the same way, the
+  process does not change over time, and "deal" keeps its meaning.
 - It says nothing about completed investments, which the file does not
   record.
 
@@ -620,9 +613,9 @@ show, and adjust it when you know more about the pitch. Lecture 4 shows how.
 
 ### Answering the driving question
 
-For one uniformly selected record: the chance it reached a deal is
-$P(D)\approx 0.612$, the chance it came from a late season is
-$P(L)\approx 0.509$, the chance of both is $P(D\cap L)\approx 0.350$, and the
+Select one record uniformly at random. The chance that it reached a deal is
+$P(D)\approx 0.612$. The chance that it came from a late season is
+$P(L)\approx 0.509$. The chance of both is $P(D\cap L)\approx 0.350$, and the
 chance of at least one is $P(D\cup L)\approx 0.771$. Beyond this file, those
 numbers describe future pitches only under the four assumptions in the box
 "What these numbers can and cannot say".
@@ -630,11 +623,11 @@ numbers describe future pitches only under the four assumptions in the box
 ::: {.founder-box}
 <span class="label">A founder's decision (invented example)</span>
 
-Your order records show three shares among your customers: 12% had a late delivery, 8% gave a low rating, and 3% had both. You want to send a personal message to every customer with at least one of these problems. The addition rule gives the share: 12% + 8% - 3% = 17%. With 400 customers that is 68 messages, not the 80 you would budget by adding the two shares. The decision: 68 messages fit into one evening, so you send them this week.
+Your order records show three shares among your customers: 12% had a late delivery, 8% gave a low rating, and 3% had both. You want to send a personal message to every customer with at least one of these problems. The addition rule gives the share: 12% + 8% - 3% = 17%. With 400 customers that is 68 messages, not the 80 that you would plan for if you simply added the two shares. The decision: 68 messages fit into one evening, so you send them this week.
 :::
 
-**Next:** We can now attach a probability to a single event, deal or no
-deal, late or early. Most business quantities have many possible values:
+**Next:** We can now give a probability to a single event, such as deal or
+no deal, late or early. Most business quantities have many possible values:
 which season, how many words, how many units sold. Lecture 3 moves from
 single events to the whole distribution of a random variable, which is a
 probability for every possible value. It also introduces two numbers that
@@ -653,7 +646,7 @@ summarise a distribution: the expected value and the variance.
 ### Read the lecture material (15 minutes)
 
 Read the Lecture material section above from start to end. The lecture
-covered the core of it. The text has every step, every example, and all the
+covered the most important parts. The text has every step, every example, and all the
 code, including parts that were not shown in class. Note what is still
 unclear and bring it to the next tutorial, or ask Tilly.
 
@@ -662,27 +655,28 @@ unclear and bring it to the next tutorial, or ask Tilly.
 1. What is the difference between an outcome and an event?
 2. What is the difference between a random variable and a realised value?
 3. State the three probability rules.
-4. Why is the equally-likely ratio a special case?
+4. Why is the ratio $|A|/|\Omega|$ for equally likely outcomes a special case?
 5. What extra assumptions turn an empirical proportion into a forecast?
 
 ::: {.callout-note collapse="true"}
 ## Check your answers
 
-1. An outcome is one possible complete result. An event is a specified set of
-   outcomes.
+1. An outcome is one possible complete result. An event is a set of outcomes
+   that we define.
 2. A random variable is a fixed measurement rule that turns outcomes into
    numbers. A realised value is the number produced for the observed outcome.
 3. Probabilities are non-negative, $P(\Omega)=1$, and probabilities add
    across disjoint events.
 4. The ratio $|A|/|\Omega|$ requires a finite sample space whose outcomes are
    equally likely.
-5. A forecast requires a defined target population and assumptions about
-   selection, process stability, and a stable outcome definition.
+5. A forecast needs a clearly defined target population. It also needs
+   assumptions: the selection works in the same way, the process stays
+   stable, and the definition of the outcome does not change.
 :::
 
 ### Finish a half-worked example (10 minutes)
 
-Re-read the worked union calculation (@exm-b02-union). Then complete the same
+[Shark Tank data]{.shark-tag} Re-read the worked union calculation (@exm-b02-union). Then complete the same
 calculation with new numbers: let $E=L^c$ be the early-period event
 (Seasons 1--8).
 
@@ -702,7 +696,7 @@ recorded pitches reached an on-air deal, came from Seasons 1--8, or both.
 
 ### Practice (15 minutes)
 
-In the uniform selection experiment, use
+[Shark Tank data]{.shark-tag} In the uniform selection experiment, use
 $P(D)=882/1441$, $P(L)=734/1441$, and
 $P(D\cap L)=505/1441$.
 
@@ -719,14 +713,14 @@ $P(D\cap L)=505/1441$.
 ## Check your answers
 
 1. $P(D^c)=1-882/1441=559/1441\approx0.388$: 38.8% of the records did not
-   reach an on-air agreement.
-2. The event leaves out only the records that are both deals and late season,
+   reach an on-air deal.
+2. The event leaves out only the records that are both deals and from a late season,
    so $P(D^c\cup L^c)=1-P(D\cap L)=1-505/1441=936/1441\approx0.650$: 65.0% of
    the records did not reach an on-air deal, came from Seasons 1--8, or both.
    The addition rule gives the same result:
    $(559+707-330)/1441=936/1441$.
-3. They are disjoint because a record cannot simultaneously have and not have
-   an on-air deal.
+3. They are disjoint because a record cannot have and not have an on-air deal
+   at the same time.
 4. $S$ records the season number of the selected pitch record. Its support is
    $\{1,2,\ldots,16\}$.
 5. $X$ equals 1 when the selected pitch is in $D$ and 0 otherwise. $D$ is a
@@ -739,35 +733,35 @@ $P(D\cap L)=505/1441$.
 A student concludes: "Our class survey had 180 responses, so its average risk
 score describes Dutch first-year students well. With that many responses,
 chance variation is small." Which problem does the size of the sample *not*
-fix?
+solve?
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-Selection bias. A larger sample shrinks sampling variability, but the class
-is a convenience sample of one programme, not a random sample of Dutch
-first-year students. More responses from the same selected group do not make
-it more representative.
+Selection bias. A larger sample reduces sampling variability. But the class
+is a group from one programme that was easy to reach, not a random sample of
+Dutch first-year students. More responses from the same selected group do
+not make it more representative.
 :::
 
 ### Worked exam interpretation (10 minutes)
 
-**Question.** R reports `mean(sharks$deal_on_show) = 0.612`. Is this an
+[Shark Tank data]{.shark-tag} **Question.** R reports `mean(sharks$deal_on_show) = 0.612`. Is this an
 empirical proportion or a universal probability?
 
 ::: {.callout-note collapse="true"}
 ## Check a model answer
 
 It is first an empirical proportion: 882 of the 1,441 recorded
-pitches reached an on-air agreement. It is also the event probability in a
-model that selects one of those 1,441 records uniformly. Applying it to a
-future entrepreneur requires additional population, selection, stability, and
-outcome assumptions.
+pitches reached an on-air deal. It is also the probability of the event in a
+model that selects one of those 1,441 records uniformly. To use it for a
+future founder, you must assume that the future pitch is like these pitches,
+that it is selected in the same way, and that a deal means the same thing.
 :::
 
 ### Check the AI (5 minutes)
 
-You asked an AI assistant: "How likely is it that a pitch got a deal or came from a late season?" It answered:
+[Shark Tank data]{.shark-tag} You asked an AI assistant: "How likely is it that a pitch got a deal or came from a late season?" It answered:
 
 > "P(deal or late) = 882/1441 + 734/1441 = 1616/1441 = 1.12. So the chance is about 112%."
 
@@ -777,30 +771,36 @@ step of Attempt → Ask → Verify → Explain, and the exam asks for it.
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-A probability can never be above 1, so the answer must be wrong. The AI added the two shares and counted the 505 late-season deals twice. Subtract them once: (882 + 734 - 505)/1441 = 1111/1441, about 77%. A fast check for any probability: it must lie between 0 and 1.
+A probability can never be above 1, so the answer must be wrong. The AI added the two shares and counted the 505 late-season deals twice. Subtract them once: (882 + 734 - 505)/1441 = 1111/1441, about 77%. A quick check for any probability: it must lie between 0 and 1.
 :::
 
 ### Make it yours (5 minutes)
 
 :::: {.utility-prompt}
-<span class="label">Utility: two sentences</span>
+<span class="label">Two sentences about your own venture</span>
 
 Think of your EiA venture, or any business you know well. Name one
-uncertain event that matters for it, and write two sentences: first define
-the event precisely (which outcomes count as "yes"?), then say what knowing
-its probability would change about a real decision. There is no wrong
+uncertain event that matters for it. Then write two sentences. First, define
+the event precisely (which outcomes count as "yes"?). Second, say how knowing
+its probability would change a real decision. There is no wrong
 answer.
 
 ::: {.callout-note collapse="true"}
 ## See an example, then write your own
 
-Take a student-run campus meal-prep box venture. "Let $R$ be the event that a first-time customer places a second order within 30 days: each order record either shows a repeat order in that window (yes) or does not. If $P(R)$ were known to be above 0.4, I would spend my small budget on loyalty rewards rather than new-customer ads."
+Take a student-run venture that sells boxes of prepared meals on campus. "Let $R$ be the event that a first-time customer places a second order within 30 days: each order record either shows a repeat order in that window (yes) or does not. If I knew that $P(R)$ is above 0.4, I would spend my small budget on loyalty rewards rather than new-customer ads."
 :::
 
 You can discuss this task, and any other task in this chapter, with
 **Tilly**, the course AI assistant: ask it to challenge your event
 definition or to suggest what else you would need to know.
 ::::
+
+### More practice
+
+For extra exercises on this lecture, with worked solutions, ask **Tilly**,
+the course AI assistant. For example: "Give me an extra exercise for
+Lecture 2. Show the solution only after I send my answer."
 
 [Continue to Lecture 3: Discrete distributions, expectation, and variance](b03-discrete-distributions.qmd).
 

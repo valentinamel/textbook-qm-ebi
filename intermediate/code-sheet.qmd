@@ -1,65 +1,75 @@
 # QM Intermediate Code Sheet {#intermediate-code-sheet}
 
-This sheet collects the R commands and formulas of QM Intermediate, ordered
-by lecture. The names `y`, `x`, `group`, and `df` are placeholders. Replace
-them by the variables and the dataset of the exam question.
+<!--
+One source of truth: the exam PDF is built from the sheet body below (the
+block that starts with `::: {.formula-sheet}` and ends with the matching
+`:::`). Build both exam PDFs with `python3 scripts/build_exam_sheets.py`.
+The introduction above the block is not part of the PDF. Keep the body dry:
+formulas, R commands with a short comment, and plain labels only. Keep code
+lines at 58 characters or fewer, so that they fit the PDF column (the build
+script checks this). A `::: {.sheet-wide}` block spans the full page width
+in the PDF.
+-->
 
-The code sheet is provided at the exam. The table shows which sections you
-need when.
+This is the code sheet of QM Intermediate. It lists the R commands and the
+formulas of the course by lecture, without explanations. You receive exactly
+this sheet at the exam:
+[download the QM Intermediate Code Sheet (PDF)](../assets/downloads/qm-intermediate-code-sheet.pdf).
+
+The table shows which sections you use in which session.
 
 | When | Sections to use |
 |---|---|
-| Tutorial 1 | Workflow and Lectures 1--3 |
+| Tutorial 1 | Data checks and Lectures 1--3 |
 | Tutorial 2 | Complete sheet, Lectures 1--6 |
 | Final exam (in TestVision) | Complete sheet, Lectures 1--6 |
 
-The sheet helps with R syntax and with calculations. You must still define
-the sample, check the assumptions, interpret units and reference categories,
-and tell association from causation.
-
 ::: {.formula-sheet}
 
-## Workflow and data checks
+## Names, data checks, and new variables {#workflow-and-data-checks}
+
+**Placeholder names**
+
+| Name | Stands for |
+|---|---|
+| `dat`, `analysis` | data frames |
+| `y` | outcome |
+| `x`, `x1`, `x2`, `x3`, `z` | numerical predictors |
+| `group` | categorical predictor |
+| `m`, `m_multi`, ... | fitted models |
+| $n$, $k$ | number of observations, number of slopes |
+
+**Read and inspect the data**
 
 ```r
-df <- read.csv("data.csv")
+dat <- read.csv("data.csv")
 
-dim(df)
-names(df)
-head(df)
-str(df)
-summary(df)
-colSums(is.na(df))
-table(df$group, useNA = "ifany")
+dim(dat)            # number of rows and columns
+nrow(dat)           # number of rows
+names(dat)          # variable names
+head(dat)           # first six rows
+summary(dat)        # summary of each variable
+table(dat$group)    # count per category
+mean(dat$y)         # mean
+sd(dat$y)           # standard deviation
+cor(dat$x, dat$y)   # correlation
+tapply(dat$y, dat$group, mean)   # mean of y per category
 ```
 
-Create new variables in visible code. Put money in readable units (this
-course uses millions or thousands of dollars). When you compare models, fit them all on the same
-observations:
+**New variables and the analysis sample**
 
 ```r
-df$x_1k <- df$x_euros / 1000
-df$group <- factor(df$group)
-df$group <- relevel(df$group, ref = "reference")
+dat$x_1k <- dat$x_euros / 1000       # in 1,000 euros
+dat$group <- factor(dat$group)       # categorical
+dat$d <- as.integer(dat$group == "A")  # 1 if A, else 0
 
-needed <- c("y", "x1", "x2", "group")
-analysis <- df[complete.cases(df[needed]), ]
+# rows that meet the conditions
+analysis <- subset(dat, x > 0 & group == "A")
 ```
 
-For every exam analysis:
+## Lecture 1: Simple linear regression {#lecture-1-simple-linear-regression}
 
-1. Say what one row is, and name the outcome, the predictors, their units,
-   and the sample.
-2. Inspect the values and check for missing values.
-3. Make a graph that fits the variables.
-4. Fit the model and check its diagnostics.
-5. Report the estimates, their uncertainty, the fit, and the relevant test.
-6. Interpret the results in context, and state the limits that come from
-   the sample and the reasons why a result is or is not causal.
-
-## Lecture 1: Simple linear regression
-
-The population model and fitted line are
+**Population model and fitted line**
 
 $$
 Y_i=\beta_0+\beta_1X_i+\varepsilon_i,
@@ -67,7 +77,7 @@ Y_i=\beta_0+\beta_1X_i+\varepsilon_i,
 \widehat Y_i=\hat\beta_0+\hat\beta_1X_i.
 $$
 
-For simple OLS,
+**OLS estimates in simple regression**
 
 $$
 \hat\beta_1=
@@ -79,7 +89,7 @@ $$
 \hat\beta_0=\bar y-\hat\beta_1\bar x.
 $$
 
-The residual and least-squares criterion are
+**Residual and sum of squared residuals**
 
 $$
 e_i=Y_i-\widehat Y_i,
@@ -87,55 +97,45 @@ e_i=Y_i-\widehat Y_i,
 \operatorname{SSE}=\sum_{i=1}^{n}e_i^2.
 $$
 
-Fit and inspect a simple regression:
+**Change of units by a factor $c$**
+
+| Multiplied by $c$ | New intercept | New slope |
+|---|---|---|
+| outcome only | $c\,\hat\beta_0$ | $c\,\hat\beta_1$ |
+| predictor only | $\hat\beta_0$ | $\hat\beta_1/c$ |
+| outcome and predictor | $c\,\hat\beta_0$ | $\hat\beta_1$ |
+
+**Fit a simple regression**
 
 ```r
-m <- lm(y ~ x, data = df)
-coef(m)
-summary(m)
-
-fitted(m)
-residuals(m)
+m <- lm(y ~ x, data = dat)
+coef(m)          # estimates
+summary(m)       # coefficient table and fit
+fitted(m)        # fitted values
+residuals(m)     # residuals
 ```
 
-Plot the observations and fitted line:
+**Scatter plot with the fitted line**
 
 ```r
-plot(y ~ x, data = df,
+plot(y ~ x, data = dat,
      xlab = "Predictor (unit)", ylab = "Outcome (unit)")
 abline(m, col = "blue", lwd = 2)
 ```
 
-Calculate a fitted value or ask R for fitted conditional means:
+**Fitted values for chosen values `x_A` and `x_B` of the predictor**
 
 ```r
 b <- coef(m)
-b[1] + b[2] * x0
+b[1] + b[2] * x_A                  # fitted value by hand
 
-new_cases <- data.frame(x = c(x0, x1))
-predict(m, newdata = new_cases)
-predict(m, newdata = new_cases, interval = "confidence")
+new_cases <- data.frame(x = c(x_A, x_B))
+predict(m, newdata = new_cases)    # fitted values
 ```
 
-Interpret $\hat\beta_1$ as the fitted change in the outcome for a one-unit
-increase in the predictor. State both units, and write "associated with"
-unless the data come from an experiment. Rescaling both variables by the
-same factor changes the intercept and leaves the slope unchanged.
-Multiplying only the outcome by a factor multiplies the slope by it.
-Multiplying only the predictor by a factor divides the slope by it (see the
-worked example on units in Lecture 1).
+## Lecture 2: What the model assumes and how residuals reveal it {#lecture-2-assumptions-residual-diagnostics-and-influence}
 
-## Lecture 2: Assumptions, residual diagnostics, and influence
-
-The diagnostic plots check the assumptions in the table of Lecture 2. A
-curve in the residual plot puts the linear conditional mean in doubt. A fan
-shape puts the constant conditional variance in doubt. Large standardised
-residuals or large Cook's distances flag observations that you must
-investigate. Plots cannot show independence, the absence of confounding,
-the quality of the measurement, or causality. These depend on how the data
-were collected.
-
-Make the two main diagnostic plots:
+**Residual plot and normal Q--Q plot**
 
 ```r
 plot(fitted(m), residuals(m),
@@ -146,59 +146,85 @@ qqnorm(rstandard(m))
 qqline(rstandard(m))
 ```
 
-Find unusual and influential observations. Lecture 2 explains the first five
-commands (`nobs(m)` is the number of observations $n$). The three
-`plot(m, which = ...)` lines are shortcuts that draw the residual plot, the
-Q--Q plot, and a plot of Cook's distance:
+**Standardised residuals and Cook's distance**
 
 ```r
-summary(residuals(m))         # summary of the residuals, a first check
-rstandard(m)                  # standardised residuals, beyond about ±3 is large
-cooks.distance(m)             # influence, a common threshold is 4/n
-sum(abs(rstandard(m)) > 3)
-sum(cooks.distance(m) > 4 / nobs(m))
-
-plot(m, which = 1)  # residuals versus fitted
-plot(m, which = 2)  # normal Q--Q
-plot(m, which = 4)  # Cook's distance
+summary(residuals(m))    # summary of the residuals
+rstandard(m)             # standardised residuals
+cooks.distance(m)        # Cook's distances
+nobs(m)                  # number of observations n
 ```
 
-For a flagged observation: investigate it and report it. Never delete it
-without reporting.
+**Flagged observations**
 
-## Lecture 3: Coefficient inference, fit, and the F-test
+$$
+|\text{standardised residual}|>3,
+\qquad
+\text{Cook's distance}>\frac{4}{n}.
+$$
 
-For a two-sided test against zero,
+```r
+sum(abs(rstandard(m)) > 3)            # how many beyond ±3
+sum(cooks.distance(m) > 4 / nobs(m))  # how many above 4/n
+```
+
+## Lecture 3: Coefficient inference, fit, and the F-test {#lecture-3-coefficient-inference-fit-and-the-f-test}
+
+**Two-sided test of one coefficient**
 
 $$
 H_0:\beta_j=0,
 \qquad
 H_1:\beta_j\ne0,
 \qquad
-t=\frac{\hat\beta_j}{\widehat{\operatorname{SE}}(\hat\beta_j)}.
+t=\frac{\hat\beta_j}{\operatorname{SE}(\hat\beta_j)}.
 $$
 
-With $k$ slopes and an intercept, the residual degrees of freedom and the
-95% confidence interval are
+$$
+\text{Reject }H_0\text{ at the 5\% level if }|t_{obs}|\ge t_{0.975,\,df}.
+$$
+
+**Degrees of freedom and 95% confidence interval, model with $k$ slopes and an intercept**
 
 $$
 df=n-k-1,
 \qquad
-\hat\beta_j\pm t_{0.975,\,df}\,\widehat{\operatorname{SE}}(\hat\beta_j).
+\hat\beta_j\pm t_{0.975,\,df}\,\operatorname{SE}(\hat\beta_j),
+\qquad
+\text{simple regression: }k=1,\ df=n-2.
 $$
 
-In simple regression, $k=1$ and $df=n-2$. The multiplier $t_{0.975,\,df}$
-is `qt(0.975, df)` in R.
-
 ```r
-summary(m)                 # estimates, SEs, t tests, p-values, fit
-confint(m, level = 0.95)   # coefficient confidence intervals
-df.residual(m)
-nobs(m)
-qt(0.975, df.residual(m))  # multiplier for a 95% interval
+summary(m)                  # coefficient table and fit
+confint(m, level = 0.95)    # 95% confidence intervals
+df.residual(m)              # residual degrees of freedom
+qt(0.975, df.residual(m))   # critical value, 95% interval
 ```
 
-To verify R's two-sided test against zero:
+**Labels in the output of `summary(m)`**
+
++---------------------------+--------------------------------------------+
+| Label in the output       | Symbol                                     |
++===========================+============================================+
+| `Estimate`                | $\hat\beta_j$                              |
++---------------------------+--------------------------------------------+
+| `Std. Error`              | $\operatorname{SE}(\hat\beta_j)$           |
++---------------------------+--------------------------------------------+
+| `t value`                 | $t$                                        |
++---------------------------+--------------------------------------------+
+| `Pr(>|t|)`                | two-sided p-value for $H_0:\beta_j=0$      |
++---------------------------+--------------------------------------------+
+| `Residual standard error` | $s$, with $df=n-k-1$                       |
++---------------------------+--------------------------------------------+
+| `Multiple R-squared`      | $R^2$                                      |
++---------------------------+--------------------------------------------+
+| `Adjusted R-squared`      | $R^2_{\text{adjusted}}$                    |
++---------------------------+--------------------------------------------+
+| `F-statistic`             | overall $F$, with $k$ and $n-k-1$          |
+|                           | degrees of freedom                         |
++---------------------------+--------------------------------------------+
+
+**The t statistic and the two-sided p-value step by step**
 
 ```r
 tab <- summary(m)$coefficients
@@ -206,7 +232,7 @@ t_value <- tab["x", "Estimate"] / tab["x", "Std. Error"]
 p_value <- 2 * pt(-abs(t_value), df = df.residual(m))
 ```
 
-The decomposition of variation:
+**Sums of squares and $R^2$**
 
 $$
 \text{SST}=\sum_i(y_i-\bar y)^2,\qquad
@@ -221,11 +247,9 @@ R^2=1-\frac{\text{SSE}}{\text{SST}}
 =\frac{\text{SSR}}{\text{SST}}.
 $$
 
-Calculate the components:
-
 ```r
-y <- model.response(model.frame(m))
-yhat <- fitted(m)
+y <- dat$y            # outcome values
+yhat <- fitted(m)    # fitted values
 
 SST <- sum((y - mean(y))^2)
 SSE <- sum(residuals(m)^2)
@@ -233,16 +257,7 @@ SSR <- SST - SSE
 R2 <- 1 - SSE / SST
 ```
 
-Extract fit statistics:
-
-```r
-summary(m)$r.squared
-summary(m)$adj.r.squared
-summary(m)$fstatistic
-sigma(m)                    # residual standard error
-```
-
-The residual standard error and adjusted $R^2$ are
+**Residual standard error and adjusted $R^2$**
 
 $$
 s=\sqrt{\frac{\text{SSE}}{n-k-1}},
@@ -251,41 +266,40 @@ R^2_{\text{adjusted}}
 =1-(1-R^2)\frac{n-1}{n-k-1}.
 $$
 
-For $k$ slopes,
+```r
+summary(m)$r.squared        # R squared
+summary(m)$fstatistic       # overall F, k, and n - k - 1
+```
+
+**Overall F-test, model with $k$ slopes**
 
 $$
-F=\frac{\text{SSR}/k}{\text{SSE}/(n-k-1)}
+H_0:\beta_1=\cdots=\beta_k=0,
+\qquad
+H_1:\text{at least one of }\beta_1,\ldots,\beta_k\text{ is not }0,
 $$
 
-tests
-
 $$
-H_0:\beta_1=\cdots=\beta_k=0
+F=\frac{\text{SSR}/k}{\text{SSE}/(n-k-1)},
+\qquad
+\text{simple regression: }F=t^2.
 $$
 
-against the alternative that at least one slope is not zero. Read F as the
-explained variation per predictor, divided by the residual variation per
-residual degree of freedom. In simple regression, the overall $F$ statistic
-equals the square of the t statistic of the slope. $R^2$ is the share of
-the variation in this sample that the model explains. It is not evidence of
-causation, and it does not show how well the model predicts new data.
-
-Robust standard errors and robust 95% confidence intervals
-([Lecture 3](i03-inference-fit-ftest.qmd#i03-robust)):
+**Robust standard errors (HC1)**
 
 ```r
 library(lmtest)
 library(sandwich)
 
+# robust standard errors, t statistics, and p-values
 coeftest(m, vcov. = vcovHC(m, type = "HC1"))
+# robust 95% confidence intervals
 coefci(m, vcov. = vcovHC(m, type = "HC1"))
 ```
 
-Robust standard errors remain valid when the error variance is not
-constant. They do not repair a wrong shape of the model, they do not remove
-confounding, and they do not make a coefficient causal.
+## Lecture 4: Multiple regression and what controls do {#lecture-4-multiple-linear-regression}
 
-## Lecture 4: Multiple linear regression
+**Model with $k$ predictors**
 
 $$
 Y_i=\beta_0+\beta_1X_{i1}+\cdots+\beta_kX_{ik}+\varepsilon_i.
@@ -293,28 +307,17 @@ $$
 
 ```r
 m_multi <- lm(y ~ x1 + x2 + x3, data = analysis)
-summary(m_multi)
-confint(m_multi)
+summary(m_multi)     # coefficient table and fit
+confint(m_multi)     # 95% confidence intervals
 ```
 
-Interpret $\hat\beta_j$ as the fitted change in the outcome for a one-unit
-increase in $X_j$, holding the other included predictors fixed. Include:
-
-- the estimate and its direction
-- the predictor step and its unit
-- the unit of the outcome
-- the predictors that are held fixed
-- the analysed sample, and "associated with" unless the data come from an
-  experiment.
-
-For changes $\Delta x_1,\ldots,\Delta x_k$, the additive fitted difference
-is
+**Fitted difference for changes $\Delta x_1,\ldots,\Delta x_k$ of the predictors**
 
 $$
 \Delta\widehat Y=\hat\beta_1\Delta x_1+\cdots+\hat\beta_k\Delta x_k.
 $$
 
-Use `predict()` to combine terms without manual arithmetic:
+**Fitted difference between two cases A and B**
 
 ```r
 cases <- data.frame(
@@ -322,16 +325,14 @@ cases <- data.frame(
   x2 = c(x2_A, x2_B),
   x3 = c(x3_A, x3_B)
 )
-fits <- predict(m_multi, newdata = cases)
-fits[2] - fits[1]
+fits <- predict(m_multi, newdata = cases)  # fitted values
+fits[2] - fits[1]                          # B minus A
 ```
 
-A regression table with one column per model, as in a research paper. You
-need this for your thesis, not at the exam. Install the package once with
-`install.packages("modelsummary")`. All models must use the same
-observations:
+**Regression table with one column per model**
 
 ```r
+# install once: install.packages("modelsummary")
 library(modelsummary)
 m_a <- lm(y ~ x1, data = analysis)
 m_b <- lm(y ~ x1 + x2, data = analysis)
@@ -342,14 +343,16 @@ modelsummary(
 )
 ```
 
-`modelsummary` rounds to three decimals.
+## Lecture 5: Categories as predictors and joint tests {#lecture-5-factors-reference-categories-and-partial-f-tests}
 
-## Lecture 5: Factors, reference categories, and partial F-tests
-
-Set a reference category before fitting:
+**Reference category and model with a categorical predictor**
 
 ```r
-analysis$group <- relevel(factor(analysis$group), ref = "reference")
+analysis$group <- factor(analysis$group)
+# categories: the first one is the reference
+levels(analysis$group)
+analysis$group <- relevel(analysis$group,
+                          ref = "reference")
 
 m_group <- lm(y ~ x1 + x2 + group, data = analysis)
 summary(m_group)
@@ -357,17 +360,17 @@ coef(m_group)
 confint(m_group)
 ```
 
-Each printed group coefficient compares that category with the reference
-category, holding the other included predictors fixed. Releveling changes
-which comparisons are reported. It does not change the fitted values:
+**The same model with another reference category**
 
 ```r
-analysis$group_alt <- relevel(analysis$group, ref = "other")
+analysis$group_alt <- relevel(analysis$group,
+                              ref = "other")
 m_alt <- lm(y ~ x1 + x2 + group_alt, data = analysis)
+# TRUE if the fitted values of the two models are equal
 all.equal(fitted(m_group), fitted(m_alt))
 ```
 
-Compare nested models fitted to the same observations:
+**Partial F-test of nested models**
 
 ```r
 reduced <- lm(y ~ x1 + x2, data = analysis)
@@ -375,13 +378,12 @@ complete <- lm(y ~ x1 + x2 + group, data = analysis)
 anova(reduced, complete)
 ```
 
-The partial F-test asks whether the coefficients of all terms that are left
-out of the reduced model are zero at the same time. The reduced model must
-be the complete model without some of its terms, and both models must use
-the same outcome and the same observations.
+Complete model: $k_C$ slopes. Reduced model: the complete model without $q$
+of its terms, with the same outcome and the same observations.
 
-If the complete model has $k_C$ slopes and the reduced model leaves out $q$
-of these terms,
+$$
+H_0:\text{the }q\text{ coefficients left out of the reduced model are all }0,
+$$
 
 $$
 F=
@@ -389,20 +391,29 @@ F=
 {\text{SSE}_{C}/(n-k_C-1)}.
 $$
 
-## Lecture 6: Interactions and polynomial terms
+**Labels in the output of `anova(reduced, complete)`**
 
-For an interaction between a numerical predictor $X$ and a dummy $D$,
+| Label in the output | Symbol |
+|---|---|
+| `Res.Df` | $n-k-1$ of each model |
+| `RSS` | $\text{SSE}_R$ in row 1, $\text{SSE}_C$ in row 2 |
+| `Df` | $q$ |
+| `Sum of Sq` | $\text{SSE}_R-\text{SSE}_C$ |
+| `F` | partial $F$ |
+| `Pr(>F)` | p-value of the partial F-test |
+
+## Lecture 6: Interactions and curvature {#lecture-6-interactions-and-polynomial-terms}
+
+**Interaction of a numerical predictor $X$ with a dummy $D$**
 
 $$
 \widehat Y=\hat\beta_0+\hat\beta_1X+\hat\beta_2D+\hat\beta_3XD.
 $$
 
-- $D=0$: intercept $\hat\beta_0$, slope $\hat\beta_1$
-- $D=1$: intercept $\hat\beta_0+\hat\beta_2$, slope $\hat\beta_1+\hat\beta_3$
-- $\hat\beta_3$: difference in slopes.
-
-Use `*` to include $X$, $D$, and their interaction (the hierarchy
-principle):
+| Group | Intercept | Slope |
+|---|---|---|
+| $D=0$ | $\hat\beta_0$ | $\hat\beta_1$ |
+| $D=1$ | $\hat\beta_0+\hat\beta_2$ | $\hat\beta_1+\hat\beta_3$ |
 
 ```r
 m_interaction <- lm(y ~ x * group + z, data = analysis)
@@ -410,81 +421,66 @@ m_interaction <- lm(y ~ x * group + z, data = analysis)
 summary(m_interaction)
 ```
 
-Centering (subtracting the mean) changes the meaning of the intercept and
-of the group coefficient. It does not change the fitted values or the
-interaction estimate:
+**Centred predictor**
 
 ```r
+# x minus its mean
 analysis$x_c <- analysis$x - mean(analysis$x)
-m_centered <- lm(y ~ x_c * group + z, data = analysis)
+m_centred <- lm(y ~ x_c * group + z, data = analysis)
 ```
 
-For a quadratic model,
+**Quadratic model**
 
 $$
-\widehat Y=\hat\beta_0+\hat\beta_1X+\hat\beta_2X^2,
+\widehat Y=\hat\beta_0+\hat\beta_1X+\hat\beta_2X^2.
 $$
 
-the change from $x$ to $x+1$ is $\hat\beta_1+\hat\beta_2(2x+1)$, and more generally the
-fitted change from $x_A$ to $x_B$ is
-
 $$
-\Delta\widehat Y
-=\hat\beta_1(x_B-x_A)+\hat\beta_2(x_B^2-x_A^2).
+\text{Fitted change from }x\text{ to }x+1:\quad
+\hat\beta_1+\hat\beta_2(2x+1).
 $$
 
 ```r
 m_linear <- lm(y ~ x + z, data = analysis)
 m_quadratic <- lm(y ~ x + I(x^2) + z, data = analysis)
+# I(x^2) is the square of x
 
 summary(m_quadratic)
 anova(m_linear, m_quadratic)
 ```
 
-`I(x^2)` tells R to calculate the square. Keep the term $x$ in the model,
-never interpret $\hat\beta_1$ alone while $x^2$ is in the model, and do not
-use the curve beyond the observed range of $x$.
+::: {.sheet-wide}
 
-Create fitted values for a graph:
-
-```r
-grid <- expand.grid(
-  x = seq(min(analysis$x), max(analysis$x), length.out = 100),
-  group = levels(analysis$group),
-  z = mean(analysis$z)
-)
-
-pred <- predict(m_interaction, newdata = grid, interval = "confidence")
-plot_data <- cbind(grid, pred)
-```
-
-## Commands by purpose
+## Commands by purpose {#commands-by-purpose}
 
 | Purpose | R command |
 |---|---|
-| Fit a model | `lm(y ~ predictors, data = df)` |
+| Fit a model | `lm(y ~ predictors, data = dat)` |
 | Full model output | `summary(m)` |
 | Coefficients only | `coef(m)` |
 | 95% coefficient intervals | `confint(m)` |
 | Fitted values and residuals | `fitted(m)`, `residuals(m)` |
 | Summary of the residuals | `summary(residuals(m))` |
 | Standardised residuals | `rstandard(m)` |
-| Influence | `cooks.distance(m)` |
-| Fitted values for new cases | `predict(m, newdata = ..., interval = "confidence")` |
+| Cook's distance | `cooks.distance(m)` |
+| Fitted values for new cases | `predict(m, newdata = ...)` |
 | $R^2$, adjusted $R^2$, overall F | `summary(m)` |
 | Residual degrees of freedom | `df.residual(m)` |
-| Multiplier for a 95% interval | `qt(0.975, df.residual(m))` |
+| Critical value of a 95% interval | `qt(0.975, df.residual(m))` |
 | Partial F-test of nested models | `anova(reduced, complete)` |
-| Set the reference category of a factor | `relevel(factor(x), ref = "category")` |
-| Interaction | `x * z` |
+| Reference category of a factor | `relevel(factor(group), ref = "category")` |
+| Interaction | `x * group` |
 | Square in a formula | `I(x^2)` |
-| Regression table with several models (thesis) | `modelsummary(list(...))` |
+| Robust standard errors | `coeftest(m, vcov. = vcovHC(m, type = "HC1"))` |
+| Regression table with several models | `modelsummary(list(...))` |
+
+:::
 
 :::
 
 For a more formal explanation of regression, inference, extensions, and
-violations of the assumptions, consult
+violations of the assumptions, see
 [Nieuwenhuis, *Statistical Methods for Business and Economics*](https://tilburguniversity.on.worldcat.org/oclc/317545871),
 Chapters 19--22.
 
-Continue to the [QM Intermediate Mock Exam](#intermediate-mock-exam).
+[Continue to Mock Exam: QM Intermediate](mock-exam.qmd).

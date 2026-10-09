@@ -1259,3 +1259,129 @@ How to succeed, same day: the calendar now gives dates and start times from
 the programme timetable (TimeEdit export of 6 October), including the one
 Basic lecture at 10:45 on Monday 26 October and the two tutorial slots per
 group.
+
+## 2026-10-07 — Second check of the published book
+
+- Exam sheets: the QM Basic Formula Sheet and the QM Intermediate Code
+  Sheet hold reference material only (notation, formulas with their
+  conditions, R commands with a short comment, labels of R output). All
+  interpretation, advice, and workflow lists are removed. Both sheets can be
+  downloaded as PDF in the layout of the exam attachment (two and three
+  pages), built from the same source by `scripts/build_exam_sheets.py`.
+- Intermediate mock exam: says that students download the data and do the
+  tasks, and that nobody has to simulate data. The simulation code sits in a
+  closed optional box. Growth levels are in percent, differences and
+  coefficients in percentage points.
+- Audit of all 16 lectures against the agreed parts and ideas. Fixed: three
+  "be able to do yourself" skills without a practice task (sampling
+  variability versus selection bias, normal fit from a histogram, A/B test),
+  five skills added to must-know boxes that the chapters taught and tested
+  already, three opening questions that were never answered (Basic 1 and 10,
+  Intermediate 6), a pair task for Intermediate 1, the no-confounding
+  condition in Intermediate 1, the founder's decision of Intermediate 4,
+  seven terms used before they were explained, twenty hard sentences,
+  labels for invented examples.
+- Mock exams stay unseen: Intermediate Lecture 1 no longer prints Question 1
+  of the Intermediate mock exam with its numbers. Exam-style items in Basic
+  1, 6, 10 and Intermediate 1 to 3 have their own stories. Pointers to mock
+  exam question numbers are removed.
+- Plain labels: "Warm up" for the preparation task, "Two sentences about
+  your own venture", "Check the AI" in every lecture, "Practice: all steps
+  together".
+- Internal and lecturer-type information removed from all pages (status
+  notes, reasons for design choices, remarks on how the book or a section is
+  built). The QM Advanced card on the welcome page only says "Work in
+  progress".
+- How to succeed: hours and checklist for the two Intermediate tutorial
+  weeks recomputed (about 3.5 hours).
+- Not yet in the book: the revised mock exams proposed in
+  `Review round Oct 6/mock-exam-review/`. They wait for a decision.
+
+## 2026-10-08 — Mock exams with open questions only, aligned with the course learning goals
+
+- `basic/mock-exam.qmd`: rewritten. Seven questions, 100 points, 180
+  minutes, open questions only. Question 5 shows complete R output of a
+  mean test to interpret. Question 7 shows an answer of an AI assistant
+  about a regression row to assess. New cases for the Bayes and decision
+  parts (e-scooter rentals) and for the sampling part (QR code survey).
+  First page states form, aids, pass mark, verbs, and marking rules.
+- `intermediate/mock-exam.qmd`: rewritten. Six questions, 100 points,
+  practice limit 180 minutes, open questions only. 22 points in parts that
+  start with "In R:". Question 3 shows R output of a colleague, Question 4 a
+  regression table in paper layout, Question 6 an answer of an AI assistant
+  and a budget decision. The box with the simulation code moved to the end
+  of the page. The data file is unchanged.
+- `intermediate/i04-multiple-regression.qmd`: must-know box, reading a
+  regression table moved to "be able to do yourself".
+- `intermediate/i06-interactions-curvature.qmd`: the exam-style example has
+  a new case (market stalls), so that the mock exam stays unseen.
+- `basic/t04-exam-prep.qmd`: Task 4 has one more step (which error is
+  possible after the decision).
+- `resources/how-to-succeed.qmd`: exam and resit dates from OSIRIS.
+- `index.qmd`, `basic/overview.qmd`, `intermediate/overview.qmd`: the
+  description of the exams matches the new mock exams.
+- Two independent reviews of each mock exam (all numbers recalculated, the
+  university checklist for flaws in open questions, alignment with the
+  chapters) and all findings applied.
+
+## 2026-10-08 — Gabriela's second review
+
+- `basic/b06`: density through narrowing bins (figure with invented smooth
+  data), general quantile $z_q$, central part of the standard normal.
+- `basic/b07`: overview figure, simple random sample with iid and the 10%
+  condition, shortcut variance, variance of a 0/1 variable.
+- `basic/b08`: definition box for SD and SE of the sample mean, consistency
+  with a running-mean figure. Sample size moved to b09, law of large numbers
+  removed.
+- `basic/b09`: rebuilt in Gabriela's order. t distribution, interval with
+  known $\sigma$ as a first step, margin of error, Exam-procedure Boxes 1
+  and 2, sample size, interval for a proportion, from interval to test.
+  Now placed before Tutorial 3 in `_quarto.yml`.
+- `basic/b10`: rebuilt in Gabriela's order. Rejection region, critical
+  value, five steps (Box 3), test answered with an interval (Box 4), errors,
+  power, power curve, one-sided tests optional.
+- `basic/b01`, `b03`, `b04`, `b05`: small additions (conditional rules,
+  joint PMF conditions, $E[h(X,Y)]$).
+- `basic/t01` to `t04`: new block "More calculation practice", minutes per
+  task, verification chunks. Tutorial 3 now "Normal models, sampling, and
+  confidence intervals" (Lectures 6 to 9), Tutorial 4 "Hypothesis tests,
+  errors, and power" (Lecture 10).
+- `basic/formula-sheet.qmd`: SD and SE rows, cumulative quantile notation,
+  critical-value table, interval in five parts, test in five steps. PDF stays
+  two pages.
+- `basic/mock-exam.qmd`: Question 5 is a t test in five steps with R
+  output, Question 6 an interval for a proportion in five parts. Question 4
+  uses "standard deviation of the sample mean".
+- `assets/styles.scss`: style `.exam-procedure`.
+- `intermediate/i03`, `intermediate/code-sheet.qmd`: no hat on SE.
+- Overview pages, video guide, and maths refresher follow the new order and
+  titles.
+
+## 2026-10-09 — Full review round (seven reviewers) and fixes
+
+- Gabriela's feedback of 8 October checked point by point. All agreed
+  points are in. Open: the video choice (to be discussed).
+- Shark Tank tag: every example and task that uses the Shark Tank file
+  starts with a teal "Shark Tank data" tag (`.shark-tag` in
+  `assets/styles.scss`).
+- QM Basic Lectures 1 to 10 and Tutorials 1 to 4: correctness and wording
+  fixes, quartile definition, correlation strength guide, $s$ as a skill of
+  Lecture 3, one-sided tests out of the main text of Lecture 9, margin of
+  error written $m$ throughout, new tutorial tasks (variables and samples,
+  Check the AI), time budgets, minutes per task, Canvas homework sentence,
+  uniform names ("Check your preparation", "Worked exam interpretation").
+- QM Intermediate: decisions with the critical value `qt(0.975, df)`, one
+  exam-procedure box in Lecture 3, code sheet cleaned (only taught
+  commands), British spelling, tutorial minutes and budgets.
+- QM Basic mock exam: new R output for Question 5 (no giveaway), a five-step
+  proportion test in Question 6, a correlation calculation, a summary
+  calculation for CLG3, marking rules, grade and pass rule (R&R 6.2 to
+  6.4).
+- QM Intermediate mock exam: resized to the 120-minute TestVision exam (26
+  parts, 100 points, 110 suggested minutes), `predict()` part, data file
+  unchanged.
+- Formula sheet: SD_0 row, Type I error at most alpha, quartile line,
+  percentage-change block removed (not taught), titles equal to the
+  lectures. Maths refresher: stable section anchors, D1 slip fixed.
+- Overview pages, How to succeed, video guide, index, README: wording,
+  links, exam length and aids.

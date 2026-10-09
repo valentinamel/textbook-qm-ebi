@@ -3,8 +3,6 @@
 ```{r}
 #| label: b05-setup
 #| include: false
-# Chunk options only. Every object used in this chapter is constructed in
-# visible code on this page, so that copying the code always works.
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
                       fig.width = 7, fig.height = 4.5)
 ```
@@ -12,15 +10,16 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 ::: {.outcomes}
 <span class="label">By the end of Lecture 5, you can</span>
 
-- define a pair of random variables on one sample space.
-- read a joint PMF and recover marginal and conditional distributions.
-- check independence of two random variables with the product form in every
-  cell of the joint table.
-- build covariance from signed products of deviations and compute it two
-  ways.
-- find the mean and the variance of a sum of two random variables.
-- explain how correlation standardises covariance.
-- separate linear association from independence, causality, and importance.
+- define a pair of random variables on one sample space
+- read a joint PMF and recover marginal and conditional distributions
+- check whether two random variables are independent: the joint probability
+  must equal the product of the two marginal probabilities in every cell of
+  the joint table
+- calculate covariance from the products of deviations, with their signs, and
+  calculate it in two ways
+- find the mean and the variance of a sum of two random variables
+- explain how correlation standardises covariance
+- explain how linear association differs from independence, causality, and importance.
 :::
 
 ::: {.must-know}
@@ -28,25 +27,26 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 
 **Be able to do yourself:**
 
-- read a joint table: the marginal probabilities, one conditional probability, one conditional mean.
-- calculate a covariance from a small table with $E[XY]-E[X]E[Y]$.
-- calculate the mean and the variance of a sum $X+Y$ from the two means, the two variances, and the covariance.
-- interpret a correlation: sign, strength, no units, linear only.
+- read a joint table: the marginal probabilities, one conditional probability, one conditional mean
+- check whether two variables in a joint table are independent
+- calculate a covariance from a small table with $E[XY]-E[X]E[Y]$
+- calculate the mean and the variance of a sum $X+Y$ from the two means, the two variances, and the covariance
+- interpret a correlation: sign, strength, no units, linear only
 - name a third variable that could produce a correlation.
 
 **Enough to recognise:**
 
-- the notation $p_{X,Y}(x,y)$ and $p_{X\mid Y}(x\mid y)$.
+- the notation $p_{X,Y}(x,y)$ and $p_{X\mid Y}(x\mid y)$
 - the sample formulas with $n-1$.
 :::
 
 ::: {.driving-question}
 <span class="label">Driving question</span>
 
-<p class="dq-context">Business questions are rarely about one variable alone: marketing and sales, price and demand, timing and success. The first analytical step is measuring whether two quantities move together at all, and how strongly.</p>
+<p class="dq-context">Business questions are rarely about one variable alone: marketing and sales, price and demand, timing and success. The first step of an analysis is to measure whether two quantities move together at all, and how strongly.</p>
 
-Deals and late seasons, equity offers and deals, seasons and equity offers.
-Which pairs move together, how strongly, and what does a correlation allow
+Take three pairs of Shark Tank variables: deals and late seasons, equity
+offers and deals, seasons and equity offers. Which pairs move together, how strongly, and what does a correlation allow
 us to say?
 :::
 
@@ -71,29 +71,29 @@ listed in the <a href="../resources/video-guide.html">External Video
 Guide</a>.
 </div>
 
-**Reactivate (5 minutes).** From earlier lectures you know the deal
+[Shark Tank data]{.shark-tag} **Warm up (5 minutes).** From earlier lectures you know the deal
 indicator $X$ (1 for an on-air deal, 0 otherwise) and the late-period
-indicator $Y$ (1 for Seasons 9--16, 0 for Seasons 1--8). One selected pitch
-record now produces two numbers at once: the ordered pair $(X,Y)$. Write
+indicator $Y$ (1 for Seasons 9 to 16, 0 for Seasons 1 to 8). When one pitch
+record is selected, it now gives two numbers at once: the ordered pair $(X,Y)$. Write
 down all possible values of the pair.
 
 ::: {.callout-note collapse="true"}
-## Check your answer
+## Check your preparation
 
 Four ordered pairs: $(0,0)$, $(0,1)$, $(1,0)$, $(1,1)$. In words: early
 no-deal, late no-deal, early deal, late deal. Order matters: $(1,0)$ and
 $(0,1)$ describe different pitches.
 :::
 
-**Predict (5 minutes).** Answer the one-click Wooclap question posted on
+[Shark Tank data]{.shark-tag} **Predict (5 minutes).** Answer the one-click Wooclap question posted on
 Canvas before you come to class: over the 16 seasons, did the equity
 percentage that entrepreneurs initially offer go up, stay about the same, or
 go down? In the words of the videos: is the correlation between season and
-equity offered positive, near zero, or negative? Commit to an answer. You
-find the answer in the lecture material.
+equity offered positive, near zero, or negative? Choose one answer and write
+it down. The lecture material gives the correct answer.
 
 If ordered pairs, products, or standardisation are unfamiliar, review
-[Mathematics Refresher: products and indices](../resources/math-refresher.html).
+[Mathematics Refresher: subscripts and indices](../resources/math-refresher.html#subscripts-and-indices).
 
 :::
 
@@ -109,12 +109,12 @@ distribution. Now two variables are studied together.
 
 ### Start with a founder's question
 
-A founder who decides how much equity to offer would like to know two
+[Shark Tank data]{.shark-tag} A founder who decides how much equity to offer would like to know two
 things. Have offers changed over the years? And do pitches that offer less
 equity get a deal more often? A single number, the correlation, is often
-used to answer such questions. It is a number between $-1$ and $1$ that this
-lecture explains step by step. The correlation summarises a whole cloud of
-points in one number, so look at the plot before you trust the number.
+used to answer such questions. It lies between $-1$ and $1$. The correlation
+summarises many points in one number, so look at the plot before
+you trust the number.
 @fig-b05-season-equity shows the season (`season`) and the equity initially
 offered (`equity_offered_pct`) for every pitch in the Shark Tank file.
 
@@ -163,22 +163,23 @@ c(
 ```
 
 Season and equity offered have a correlation of about $-0.42$. The sign is
-negative: entrepreneurs in later seasons tend to offer smaller ownership
-stakes. The size, 0.42 on a scale from 0 to 1, is moderate. Equity offered
+negative: entrepreneurs in later seasons tend to offer a smaller share of
+their company. The size, 0.42 on a scale from 0 to 1, is moderate. Equity offered
 and the deal indicator have a correlation of about $-0.11$. This is also
-negative, but weak.
+negative, but weak. As a rough guide, a correlation below about 0.3 in size
+is weak, between about 0.3 and 0.7 moderate, and above about 0.7 strong.
+Whether a correlation of a given size is important depends on the context.
 
 What does such a number measure, and what can it not tell a founder? The
-next sections build the correlation step by step. They start with the
-simplest case, two yes-or-no variables, and return to these two numbers at
-the end.
+sections below start with the simplest case, two yes-or-no variables. The
+section "Back to the opening numbers" returns to these two numbers.
 
 ### The joint probability mass function
 
 <p class="concept-video"><strong>MIT explanation (review):</strong>
 <a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/joint-pmfs-and-the-expected-value-rule/">06.7 Joint PMFs and the Expected Value Rule</a>.</p>
 
-Lecture 3 described one random variable by its PMF. For two variables, the
+[Shark Tank data]{.shark-tag} Lecture 3 described one random variable by its PMF. For two variables, the
 two separate PMFs are not enough, because they cannot say how the values are
 paired. They give the share of deals and the share of late-season pitches,
 but not the share of late-season pitches with a deal. The joint PMF adds
@@ -198,7 +199,14 @@ The comma means "and": $X$ takes the value $x$ and $Y$ takes the value $y$.
 
 Like any PMF, a joint PMF satisfies two conditions. Every entry is at least
 0, and all entries together sum to 1, because each outcome falls in exactly
-one cell.
+one cell. In symbols, as for the PMF of one variable in Lecture 3:
+
+$$p_{X,Y}(x,y)\ge 0\quad\text{for every pair }(x,y),
+\qquad
+\sum_x\sum_y p_{X,Y}(x,y)=1.$$
+
+The double sum adds the entries over all values of $x$ and all values of
+$y$, that is, over all cells of the table.
 
 The code builds the joint PMF of two variables from the Shark Tank file:
 the deal indicator $X$ (`deal_on_show`) and the late-period indicator $Y$
@@ -258,8 +266,8 @@ rowSums(joint_pmf)   # marginal PMF of X
 colSums(joint_pmf)   # marginal PMF of Y
 ```
 
-The joint table determines the marginal PMFs, but not the other way round:
-many different joint tables have the same margins. What the joint table adds
+The joint table gives the marginal PMFs, but the marginal PMFs do not give
+the joint table: many different joint tables have the same margins. What the joint table adds
 is the pairing of the values.
 
 #### Conditional PMFs are rescaled columns
@@ -267,7 +275,7 @@ is the pairing of the values.
 <p class="concept-video"><strong>MIT explanation (review):</strong>
 <a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/conditional-pmfs/">07.2 Conditional PMFs</a>.</p>
 
-Conditioning from Lecture 4 works cell by cell. The **conditional PMF** of
+Conditioning from Lecture 4 also works on a joint table. The **conditional PMF** of
 $X$ given $Y=y$ gives the probabilities of the values of $X$ among the
 outcomes with $Y=y$. For $p_Y(y)>0$,
 
@@ -276,7 +284,7 @@ $$p_{X\mid Y}(x\mid y)=\frac{p_{X,Y}(x,y)}{p_Y(y)}.$$
 ::: {#exm-b05-conditional}
 ## Worked example: one conditional entry, by hand
 
-What is $p_{X\mid Y}(1\mid 1)$, the deal probability given a late-season
+[Shark Tank data]{.shark-tag} What is $p_{X\mid Y}(1\mid 1)$, the deal probability given a late-season
 pitch? Cover everything except the $Y=1$ column and divide its entries by
 the column sum:
 
@@ -289,8 +297,8 @@ the column sum:
 $$p_{X\mid Y}(1\mid 1)=\frac{0.350}{0.509}
 =\frac{505/1441}{734/1441}=\frac{505}{734}\approx 0.688.$$
 
-This is $P(D\mid L)$ from Lecture 4, the calculation 505 over 734, now read
-from a joint PMF. Dividing the whole column by 0.509 makes its entries sum
+This is $P(D\mid L)$ from Lecture 4, the calculation 505 divided by 734.
+Here you read it from a joint PMF. Dividing the whole column by 0.509 makes its entries sum
 to 1. The rescaled column is the complete conditional PMF of $X$ given
 $Y=1$.
 :::
@@ -327,9 +335,9 @@ of one variable across the values of another variable.
 <p class="concept-video"><strong>MIT explanation (review):</strong>
 <a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/independence-of-random-variables/">07.4 Independence of Random Variables</a>.</p>
 
-Lecture 4 defined independence for two events: $P(A\cap B)=P(A)\,P(B)$. A
-random variable produces many events, one for every value it can take.
-Independence of two random variables therefore asks for more: the product
+[Shark Tank data]{.shark-tag} Lecture 4 defined independence for two events: $P(A\cap B)=P(A)\,P(B)$. A
+random variable defines many events, one for every value it can take.
+So independence of two random variables requires more: the product
 form must hold for every pair of values.
 
 ::: {.definition-box}
@@ -389,13 +397,22 @@ cell must be checked.
 <p class="concept-video"><strong>MIT explanation (review):</strong>
 <a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/covariance/">12.5 Covariance</a>.</p>
 
-Independent or dependent is a yes-or-no answer. The next tool says more: in
+[Shark Tank data]{.shark-tag} Independent or dependent is a yes-or-no answer. The next tool says more: in
 which direction do the two variables move together? Lecture 3 measured the
 spread of one variable as an expected squared deviation,
 $\operatorname{Var}(X)=E[(X-\mu_X)^2]$. The covariance applies the same idea
 to a pair of variables. It multiplies the deviation of $X$ from its mean by
 the deviation of $Y$ from its mean, and takes the expectation of this
 product.
+
+Such a product is a function of two random variables. A function $h(X,Y)$
+of two discrete random variables is itself a random variable. Its expected
+value is a sum over all pairs of values:
+
+$$E[h(X,Y)]=\sum_x\sum_y h(x,y)\,p_{X,Y}(x,y).$$
+
+This is the two-variable version of the rule for $E[g(X)]$ from Lecture 3.
+The covariance uses this rule.
 
 ::: {.definition-box}
 <span class="label">Definition</span>
@@ -406,8 +423,8 @@ $\mu_Y=E[Y]$,
 $$\operatorname{Cov}(X,Y)=E[(X-\mu_X)(Y-\mu_Y)].$$
 
 A positive covariance says that above-average values of $X$ tend to occur
-with above-average values of $Y$. A negative covariance says that they tend
-to occur with below-average values of $Y$.
+with above-average values of $Y$. A negative covariance says that
+above-average values of $X$ tend to occur with below-average values of $Y$.
 :::
 
 The product of the two deviations has a sign:
@@ -448,7 +465,7 @@ four contributions:
 
 $$\operatorname{Cov}(X,Y)=0.090-0.040-0.030+0.080=0.10.$$
 
-Most of the probability sits in the two corners where the variables agree,
+Most of the probability lies in the two corners where the variables agree,
 $(0,0)$ and $(1,1)$. The positive contributions are therefore larger, and
 the covariance is positive: the two variables move together.
 
@@ -462,11 +479,11 @@ $E[XY]=1\times 1\times 0.40=0.40$, and
 
 $$\operatorname{Cov}(X,Y)=0.40-(0.5)(0.6)=0.40-0.30=0.10.$$
 
-Both routes give the same answer. The definition explains the sign. The
+Both methods give the same answer. The definition explains the sign. The
 computational form is quicker in an exam.
 :::
 
-The same two routes for the pair from the Shark Tank file, the deal
+Here are the same two methods for the pair from the Shark Tank file, the deal
 indicator $X$ and the late-period indicator $Y$:
 
 ```{r}
@@ -486,7 +503,7 @@ c(
 )
 ```
 
-Both routes give a covariance of about 0.039. The sign is positive: deals
+Both methods give a covariance of about 0.039. The sign is positive: deals
 and late seasons go together. The size of this number is hard to judge on
 its own. The correlation, introduced below, solves this problem.
 
@@ -516,21 +533,21 @@ Most of the probability is in $(0,0)$ and $(1,1)$, the two corners where the
 variables agree, so the covariance should be positive.
 $E[XY]=0.30$ and $E[X]E[Y]=0.40\times0.50=0.20$, so
 $\operatorname{Cov}(X,Y)=0.10$. Customers with a discount reorder more often.
-Whether the discount is the reason is a different question.
+Whether the discount is the reason for the reorders is a different question.
 :::
 :::
 
 The units of a covariance are the units of $X$ times the units of $Y$. If
 $X$ is measured in dollars and $Y$ in years, $\operatorname{Cov}(X,Y)$ is in
-dollar-years. The sign of a covariance can be interpreted. Its size changes
-whenever a unit of measurement changes, so two covariances are hard to
-compare.
+dollar-years. You can interpret the sign of a covariance. Its size changes
+whenever the unit of $X$ or $Y$ changes, so it is hard to compare two
+covariances.
 
 #### Independence implies zero covariance
 
 If $X$ and $Y$ are independent, then $E[XY]=E[X]\,E[Y]$, so
-$\operatorname{Cov}(X,Y)=0$. The reverse does not hold in general. A
-covariance of zero says only that there is no straight-line pattern. Other
+$\operatorname{Cov}(X,Y)=0$. The opposite is not always true: zero
+covariance does not imply independence. A covariance of zero says only that there is no straight-line pattern. Other
 forms of dependence are still possible, and @fig-b05-linear-curved below
 shows one.
 
@@ -559,7 +576,7 @@ $400+200=600$ euros and variance $900+400+2\times300=1900$, a standard
 deviation of about 43.6 euros. Without the covariance term the variance
 would be 1300, a standard deviation of about 36.1 euros. Because the
 products sell together, the standard deviation of the total is about 21%
-larger than the two variances alone suggest.
+larger than the 36.1 euros from the two variances alone.
 
 Lecture 8 uses the independent case to find the spread of a sample mean.
 
@@ -584,7 +601,7 @@ case $b=1$, $c=-1$. The covariance term then has a minus sign.
 <a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/the-correlation-coefficient/">12.8 The Correlation Coefficient</a> and
 <a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/interpreting-the-correlation-coefficient/">12.10 Interpreting the Correlation Coefficient</a>.</p>
 
-The size of a covariance depends on the units of measurement. The solution
+[Shark Tank data]{.shark-tag} The size of a covariance depends on the units of measurement. The solution
 is to divide the covariance by the two standard deviations.
 
 ::: {.definition-box}
@@ -605,8 +622,10 @@ has no units.
 
 The symbol $\rho$ is the Greek letter rho. It stands for the correlation of
 two random variables, also written $\operatorname{Corr}(X,Y)$. A correlation
-computed from data is written $r$. The numbers $-0.42$ and $-0.11$ at the
-start of this lecture are values of $r$.
+computed from data is written $r$. In the record-selection experiment, each
+record has probability $1/n$. Then $\rho$ and $r$ give the same number,
+because the factors $n$ and $n-1$ cancel in the ratio. The numbers
+$-0.42$, $-0.11$, and $0.16$ in this lecture are values of $r$.
 
 Check the units. The numerator is in dollar-years. The denominator is
 dollars times years, also dollar-years. The units cancel, so the correlation
@@ -624,10 +643,10 @@ c(from_definition = rho_xy,
   from_R = cor(X, Y))
 ```
 
-Both routes give about 0.16 for the deal indicator and the late-period
+Both methods give about 0.16 for the deal indicator and the late-period
 indicator: a weak positive linear association.
 
-The word linear matters. A correlation measures only how closely the points
+The word "linear" is important. A correlation measures only how closely the points
 follow a straight line. @fig-b05-linear-curved shows two invented patterns
 with 61 points each.
 
@@ -688,8 +707,8 @@ imply independence.
 ::: {.callout-note collapse="true"}
 ## Check: which panel has correlation near zero, and why is that not "no relationship"?
 
-Pattern B. Its correlation is near zero because the rise on the right
-cancels the fall on the left in the products of deviations. There is no
+Pattern B. Its correlation is near zero because, in the products of deviations, the
+rise on the right cancels the fall on the left. There is no
 linear trend. The relationship itself is strong: if you know $x$, you know
 $y$ almost exactly. A correlation near zero means only "no linear
 association". It never means "no relationship".
@@ -708,7 +727,7 @@ $$r_{XY}=\frac{s_{XY}}{s_X s_Y}.$$
 
 Here $s_X$ and $s_Y$ are the sample standard deviations from Lecture 3. The
 sample correlation is written $r$ for short, and the R function `cor()`
-computes it. $s_{XY}$ is the two-variable version of the sample variance
+calculates it. $s_{XY}$ is the two-variable version of the sample variance
 $s^2$. Both $s_{XY}$ and $r_{XY}$ describe the data, and they are used to
 estimate $\operatorname{Cov}(X,Y)$ and $\rho_{XY}$.
 
@@ -724,7 +743,7 @@ computes it in the same way.
 
 ### Back to the opening numbers
 
-You can now read the two numbers from the start of the lecture. Season and
+[Shark Tank data]{.shark-tag} You can now read the two numbers from the start of the lecture. Season and
 equity offered have a correlation of $r\approx-0.42$: a moderate negative
 linear association, without units. Equity offered and the deal indicator
 have a correlation of $r\approx-0.11$: a weak negative one. Both numbers
@@ -735,18 +754,18 @@ them.
 ::: {.caveat-box}
 <span class="label">What a correlation can and cannot say</span>
 
-- A correlation shows that two things went together. It does not show that
-  one makes the other happen. A third variable can produce a correlation
+- A correlation shows that two variables went together. It does not show
+  that one makes the other happen. A third variable can produce a correlation
   between two others. Here the season is such a third variable: later seasons
   have both lower equity offers and more deals. Holding season fixed is what
   multiple regression does in QM Intermediate.
 - A correlation measures straight-line patterns only. A strong curved pattern
   can have a correlation near zero.
-- A correlation has no units and says nothing about how much is at stake.
+- A correlation has no units. It says nothing about how important the
+  relationship is for a business decision.
 
 **What you can do with it:** treat a correlation as a first hint, not as
-proof. If acting on it
-is cheap and easy to undo, act and watch what happens. If it is expensive,
+proof. If acting on the correlation is cheap and easy to undo, act and watch what happens. If it is expensive,
 test first.
 :::
 
@@ -757,16 +776,15 @@ the 0.312 expected under independence, and the correlation is weak and
 positive, $r\approx 0.16$. Season and equity offered move in opposite
 directions, with moderate strength: $r\approx -0.42$. Equity offered and
 the deal indicator also move in opposite directions, but only weakly,
-$r\approx -0.11$, and the box above explains why this number should not be
-read as advice. A correlation
-describes the direction and the strength of the linear association in these
+$r\approx -0.11$. The box above explains why a founder should not read this
+number as advice. A correlation describes the direction and the strength of the linear association in these
 records. It says nothing about cause, and nothing about curved
 relationships.
 
 ::: {.founder-box}
 <span class="label">A founder's decision (invented example)</span>
 
-Over 30 weeks, your flyer spending and your new sign-ups have a correlation of 0.6. Exam weeks could explain it: you hand out more flyers then, and students order more prepared food then. Should you double the flyer budget? Use a simple rule. If acting is cheap and easy to undo, act on the correlation and watch what happens. If acting is expensive or hard to undo, test first. Flyers are cheap, so you act. You also test: for the next four ordinary weeks you alternate weeks with and without flyers and compare the sign-ups.
+Over 30 weeks, your weekly flyer spending and your weekly new sign-ups have a correlation of 0.6. Exam weeks could explain the correlation: you hand out more flyers then, and students order more prepared food then. Should you double the flyer budget? Use a simple rule. If acting is cheap and easy to undo, act on the correlation and watch what happens. If acting is expensive or hard to undo, test first. Flyers are cheap, so you act. You also test: for the next four ordinary weeks you alternate weeks with and without flyers and compare the sign-ups.
 :::
 
 **Next:** Tutorial 2 practises Lectures 4 and 5 in exam format: conditional
@@ -788,7 +806,7 @@ variables: quantities that can take any value in a range.
 ### Read the lecture material (15 minutes)
 
 Read the Lecture material section above from start to end. The lecture
-covered the core of it. The text has every step, every example, and all the
+covered the main points. The text has every step, every example, and all the
 code, including parts that were not shown in class. Note what is still
 unclear and bring it to the next tutorial, or ask Tilly.
 
@@ -868,7 +886,7 @@ the variables disagree: $X=1$ tends to come with $Y=0$.
 
 1. $P(X=0)=0.50$, $P(X=1)=0.50$. $P(Y=0)=0.40$, $P(Y=1)=0.60$.
 2. No. $P(X=1,Y=1)=0.35$, whereas $P(X=1)P(Y=1)=0.50\times 0.60=0.30$. One
-   mismatching cell proves dependence.
+   cell that does not match proves dependence.
 3. $E[X]=0.50$, $E[Y]=0.60$, $E[XY]=0.35$, so
    $\operatorname{Cov}(X,Y)=0.35-0.30=0.05$. Positive: the pair $(1,1)$
    occurs with greater probability than independence would give.
@@ -898,14 +916,15 @@ of object is the record itself?
 ## Check your answer
 
 The record itself is an outcome: one complete possible result. The
-description picks out the set that contains only that record, and a set of
-outcomes is an event. It is the same distinction as 4 versus $\{4\}$ for a
-die.
+description defines the set that contains only that record, and a set of
+outcomes is an event. It is the same difference as between 4 and $\{4\}$
+for a die roll.
 :::
 
-**From Lecture 4.** A classifier flags likely deals in a population with a
-10% deal base rate. Sensitivity is 70% and the false-positive rate is 20%.
-Using a 1,000-pitch tree, what share of flagged pitches are deals?
+**From Lecture 4.** An invented classifier marks ("flags") pitches that are
+likely to get a deal. In the population, the deal base rate is 10%. The
+sensitivity is 70% and the false-positive rate is 20%. Use a tree for 1,000
+pitches. What share of flagged pitches are deals?
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
@@ -916,7 +935,7 @@ $P(\text{deal}\mid\text{flag})=70/(70+180)=70/250=0.28$.
 
 ### Worked exam interpretation (10 minutes)
 
-The Shark Tank file contains 1,441 televised pitches from Seasons 1--16. The
+[Shark Tank data]{.shark-tag} The Shark Tank file contains 1,441 televised pitches from Seasons 1 to 16. The
 variable `season` records the season number, and `equity_offered_pct`
 records the percentage of the business initially offered to the sharks.
 
@@ -934,12 +953,26 @@ result in context. State:
 
 Among the 1,441 records, season and equity initially offered have a moderate
 negative linear association. Later-season pitches tend to offer a smaller
-ownership percentage, although this is not true of every individual pitch.
+ownership percentage. This is not true of every individual pitch.
 The correlation has no units. It summarises only the linear association and
 does not show that the passage of time caused offers to change.
 :::
 
-### Exam-style: independence and covariance sign (5 minutes)
+**A second short question.** An invented example. A delivery start-up
+compares 50 city districts. The number of flyers it handed out in a district
+and the number of orders from that district have a correlation of 0.5. Name
+one third variable that could produce this correlation, and say how.
+
+::: {.callout-note collapse="true"}
+## Check a model answer
+
+The number of residents of the district. A large district gets more flyers,
+and it also places more orders, because more people live there. Flyers and
+orders then go together even if no flyer leads to an order. A fair
+comparison would look at districts of similar size.
+:::
+
+### Worked exam interpretation: independence and covariance sign (5 minutes)
 
 For the joint PMF
 
@@ -967,7 +1000,7 @@ three.
 
 ### Check the AI (5 minutes)
 
-You asked an AI assistant: "What does the correlation of -0.11 between offered equity and getting a deal tell me?" It answered:
+[Shark Tank data]{.shark-tag} You asked an AI assistant: "What does the correlation of -0.11 between offered equity and getting a deal tell me?" It answered:
 
 > "It proves that offering less equity makes the sharks say yes. And because -0.11 is so close to zero, the two variables are independent."
 
@@ -977,32 +1010,38 @@ step of Attempt → Ask → Verify → Explain, and the exam asks for it.
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-Two errors. A correlation shows that two things went together in these records, not that one makes the other happen. Later seasons have both lower offers and more deals, which can produce the number on its own. And a correlation that is not zero rules independence out. It is weak, but it is not nothing.
+There are two errors. First, a correlation shows that two variables went together in these records, not that one makes the other happen. Later seasons have both lower offers and more deals, and this alone can produce the correlation. Second, a correlation that is not zero rules out independence. The correlation is weak, but it is not zero.
 :::
 
 ### Make it yours (5 minutes)
 
 :::: {.utility-prompt}
-<span class="label">Utility: two sentences</span>
+<span class="label">Two sentences about your own venture</span>
 
 Think of your EiA venture, or any business you know well. Name two
-quantities it could measure per customer, per week, or per order (marketing
-spend and sign-ups, price and basket size, delivery time and repeat
-purchases) and write two sentences: first predict the sign of their
-correlation and why. Then name one third variable that could produce that
-correlation without either quantity driving the other. There is no wrong
+quantities it could measure per customer, per week, or per order. Examples
+are marketing spend and sign-ups, price and basket size, or delivery time
+and repeat purchases. Sentence 1: predict the sign of their correlation and
+say why. Sentence 2: name one third variable that could produce that
+correlation without one quantity causing the other. There is no wrong
 answer.
 
 ::: {.callout-note collapse="true"}
 ## See an example, then write your own
 
-Take a student-run campus meal-prep box venture. "Weekly flyer spend and weekly sign-ups should correlate positively, since flyers reach students who have never heard of us. But exam weeks could produce that correlation on their own: I hand out more flyers in exam weeks, and students order more prepared food in exactly those weeks."
+Take a student-run campus venture that sells boxes of prepared meals. "Weekly flyer spend and weekly sign-ups should correlate positively, since flyers reach students who have never heard of us. But exam weeks could produce that correlation on their own: I hand out more flyers in exam weeks, and students order more prepared food in exactly those weeks."
 :::
 
 You can discuss this task, and any other task in this chapter, with
 **Tilly**, the course AI assistant: ask it to propose third variables for
-your pair, and pick the most plausible one.
+your pair, and choose the most likely one.
 ::::
+
+### More practice
+
+For extra exercises on this lecture, with worked solutions, ask **Tilly**,
+the course AI assistant. For example: "Give me an extra exercise for
+Lecture 5. Show the solution only after I send my answer."
 
 [Continue to Tutorial 2: Conditioning and relationships](t02-exam-prep.qmd).
 

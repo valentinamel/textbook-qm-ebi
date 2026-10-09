@@ -1,11 +1,9 @@
 # R Refresher {#r-refresher}
 
-These resources remain available throughout all three courses.
-
 You first learned R in
-[Programming for E&BI](https://walshc.github.io/ebi-prog/). This page is a
-routing map: open the topic you need, try the reminder, and return to the
-current quantitative-methods task.
+[Programming for E&BI](https://walshc.github.io/ebi-prog/). This page points
+you to the right place: open the topic you need, try the short reminder, and
+return to your current QM task.
 
 ## If R or RStudio is not ready
 
@@ -28,7 +26,7 @@ current quantitative-methods task.
 - [R Packages](https://walshc.github.io/ebi-prog/packages.html)
 - [Dataframes: Indexing](https://walshc.github.io/ebi-prog/dataframes-indexing.html)
 
-Minimal diagnostic:
+A minimal check:
 
 ```r
 getwd()
@@ -47,7 +45,8 @@ names(sharks)
 
 ## If regression commands are unfamiliar
 
-Use the same object-first workflow throughout Intermediate:
+Use the same workflow throughout QM Intermediate. First store the fitted
+model as an object, then inspect it:
 
 ```r
 model <- lm(y ~ x1 + x2, data = my_data)
@@ -58,23 +57,25 @@ residuals(model)
 plot(model)
 ```
 
-- `lm()` fits the model specified to the right of `~` and uses the outcome on
-  the left.
-- `summary()` reports coefficients, their classical tests, model fit, and the
-  overall F-test.
-- `confint()` reports coefficient confidence intervals.
-- `fitted()` and `residuals()` return one value for each analysis row.
+- `lm()` fits the model. The predictors are to the right of `~`, and the
+  outcome is on the left.
+- `summary()` reports the coefficients, their usual t-tests, the model fit,
+  and the overall F-test.
+- `confint()` reports confidence intervals for the coefficients.
+- `fitted()` and `residuals()` return one value for each row of the analysis
+  sample.
 - `plot(model)` opens the standard diagnostic plots.
 
-Write the fitted object to a meaningful name and inspect the analysis sample
-before interpreting output. R silently omits rows containing missing values in
-variables used by `lm()` unless instructed otherwise. The
-[Intermediate code sheet](../intermediate/code-sheet.qmd) collects the full
-course workflow in one place.
+Give the fitted object a meaningful name. Inspect the analysis sample before
+you interpret the output. If a variable in the model has a missing value in a
+row, `lm()` leaves out that row without a warning, unless you tell it to do
+something else. The
+[Intermediate code sheet](../intermediate/code-sheet.qmd) lists the R
+commands of the course in one place.
 
 ## A five-minute return-to-R check
 
-Run this without copying the displayed answer:
+Run this code yourself, without copying the answers from someone else:
 
 ```r
 sharks <- read.csv("data/shark_tank_teaching.csv")
@@ -84,51 +85,53 @@ median(sharks$description_words)
 table(sharks$season)
 ```
 
-Then explain each output in words. If the code runs but you cannot explain the
-quantity, the remaining problem is statistical rather than programming.
+Then explain each output in words. If the code runs but you cannot explain a
+number, your problem is with the statistics, not with the programming.
 
 ::: {.callout-important}
 ## Assessment reminder
 
-Basic and Advanced end with written exams. In Basic you may be asked to verify,
-interpret, or describe supplied R code and output. Intermediate uses TestVision
-with live data work in R, so this refresher matters most for that course.
+QM Basic ends with a written exam. In that exam you may have to check,
+interpret, or describe R code and output that the exam gives you. The QM
+Intermediate exam is in TestVision, and you analyse data in R during the
+exam. QM Advanced also ends with a written exam. So this refresher matters
+most for QM Intermediate.
 :::
 
-## How the figures in this book are made
+## Making figures in R
 
-Every data figure in this textbook carries its own R code: click
-"See the R code for this figure" above any graph to unfold it. Each code
-block is self-contained: copy it into a fresh R session in your course
-project and it reproduces the figure exactly. The exam never asks you to write `ggplot2` code. The base R commands on the
-code sheet are enough there. Install the plotting packages once:
+Every data figure in this textbook comes with its R code. Click
+"See the R code for this figure" above a graph to open the code. You can copy the
+code into a fresh R session in your course project, and it draws the same
+figure. The exam never asks you to write `ggplot2` code. For the exam, the
+base R commands on the code sheet are enough. Install the plotting packages once:
 
 ```r
 install.packages(c("ggplot2", "patchwork"))
 ```
 
-The figures follow a small set of principles worth stealing for your own
-tutorials, reports, and thesis:
+Some rules for the graphs in your own tutorials, reports, and thesis:
 
-- **One message per graph.** The caption states it. Everything that does not
-  serve it is removed (no boxes, no minor gridlines, no decoration).
-- **Counts start at zero, and there is only ever one vertical axis.**
-- **Colour is spent, not sprinkled.** One colour carries the data
-  (`#009E73`), a second marks contrast or a fitted line (`#D55E00`), grey
-  holds context. Reference values (means, benchmarks, zero lines) are gold
-  dashed lines with the value written next to them. The palette is
-  colourblind-safe by construction.
-- **Label directly where possible** instead of forcing the reader through a
-  legend, and always name axes with their units.
-- **PMFs are drawn as stick-and-dot (lollipop) charts**, histograms with
-  stated bin widths, model curves as smooth lines with shaded probability
-  areas.
+- **One message per graph.** State it in the caption. Remove everything that
+  does not support this message (boxes, minor gridlines, decoration).
+- **Counts start at zero, and a graph has only one vertical axis.**
+- **Use few colours.** Take one colour for the data (`#009E73`), a second
+  for a contrast or a fitted line (`#D55E00`), and grey for context. Draw
+  reference values (means, benchmarks, zero lines) as dashed lines and write
+  the value next to them. Colour-blind readers can tell these two data colours
+  apart.
+- **Put labels directly on the graph where possible** in place of a legend,
+  and always name the axes with their units.
+- **Choose the form that fits.** Draw a PMF as sticks with dots, a histogram
+  with a stated bin width, and a model curve as a smooth line.
 
-If you want to go further, and for your thesis you will, three free
-references are the course's recommended path: Wickham, Çetinkaya-Rundel &
-Grolemund, [*R for Data Science*, Chapter 1](https://r4ds.hadley.nz/data-visualize)
-for ggplot2 itself, Healy,
-[*Data Visualization: A Practical Introduction*](https://socviz.co/) for
-building good graphs in R end to end, and Wilke,
-[*Fundamentals of Data Visualization*](https://clauswilke.com/dataviz/) for
-the design principles behind every choice above.
+Three free references go further, and they are useful for your thesis.
+Wickham, Çetinkaya-Rundel & Grolemund,
+[*R for Data Science*, Chapter 1](https://r4ds.hadley.nz/data-visualize),
+explains ggplot2 itself. Healy,
+[*Data Visualization: A Practical Introduction*](https://socviz.co/), shows
+how to build good graphs in R from start to end. Wilke,
+[*Fundamentals of Data Visualization*](https://clauswilke.com/dataviz/),
+explains the design principles.
+
+[Continue to the Mathematics Refresher](math-refresher.qmd).

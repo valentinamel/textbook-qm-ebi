@@ -43,7 +43,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 ::: {.driving-question}
 <span class="label">Driving question</span>
 
-<p class="dq-context">A slope is an estimate, not a fact. Before a number goes into a pitch deck or a report, we need to know how precise it is and whether the model behind it is of any use.</p>
+<p class="dq-context">A slope is an estimate, not a fact. Before you put a number into a pitch deck or a report, you need to know how precise it is. You also need to know whether the model behind it is of any use.</p>
 
 The valuation slope is about 0.65. How precisely do we know that number, how
 much of the outcome does the line explain, and is the model useful at all?
@@ -68,9 +68,9 @@ are also listed in the
 <a href="../resources/video-guide.html">External Video Guide</a>.
 </div>
 
-**Reactivate the recipes (5 minutes).** Write from memory the general recipe
+**Warm up: the two recipes (5 minutes).** Write from memory the general recipe
 for a 95% confidence interval and the two-sided test of a benchmark value.
-Then compare with the blocks for Lectures 9 and 10 of the
+Then compare your recipes with the sections for Lectures 9 and 10 of the
 [QM Basic formula sheet](../basic/formula-sheet.qmd#formula-l9).
 [Basic Lecture 9: The t distribution and confidence intervals](../basic/b09-t-confidence-intervals.qmd)
 explains the interval, and
@@ -81,29 +81,34 @@ regression slope.
 ::: {.callout-note collapse="true"}
 ## Check your preparation
 
-Interval: $\text{estimate} \pm (\text{multiplier}) \times
-\text{standard error}$, with the multiplier close to 1.96 for large samples.
-Test: $t = (\text{estimate} - \text{benchmark})/\text{standard error}$,
-compared with a t distribution. Small p-values are evidence against the
-benchmark.
+Interval: $\text{estimate} \pm (\text{critical value}) \times
+\text{standard error}$, with the critical value $t_{0.975,\,df}$ close to
+1.96 for large samples.
+Test: $t_{obs}=(\text{estimate}-\text{benchmark})/\text{standard error}$.
+Reject the benchmark if $|t_{obs}|$ is at least the critical value
+$t_{0.975,\,df}$. The p-value gives the same decision.
 :::
 
-**Classify (5 minutes).** Three quantities measure how well a line fits. SSE
+**Classify (5 minutes).** Answer the one-click Wooclap question posted on
+Canvas before you come to class. Three quantities measure how well a line
+fits. SSE
 is the sum of squared residuals from Lecture 1. SSR is the part of the
 variation in the outcome that the line explains. $R^2$ is the share of the
 variation that the line explains. For a useful model, decide whether each of
-the three should be relatively small or relatively large. Commit to your
-three answers. The lecture material defines all three quantities precisely.
+the three should be relatively small or relatively large. Choose your
+three answers before class. The lecture material defines all three
+quantities precisely and gives the correct answers.
 
 ::: {.callout-note collapse="true"}
 ## Check your preparation
 
 For a useful model, SSE should be relatively small, SSR relatively large,
-and $R^2$ relatively large. These are comparisons to total outcome
-variation, not universal cut-offs.
+and $R^2$ relatively large. Small and large here mean small or large
+compared with the total variation in the outcome. There are no fixed cut-off
+values.
 :::
 
-**R warm-up (10 minutes).** Rebuild the Lecture 1 model and print its
+[Shark Tank data]{.shark-tag} **R warm-up (10 minutes).** Rebuild the Lecture 1 model and print its
 coefficient table. Bring the table to class:
 
 ```{r}
@@ -123,7 +128,8 @@ yourself during the lecture and get the same numbers and figures.
 
 If you are not sure about squared terms, ratios, or the interval recipe,
 review
-[Mathematics Refresher: squares, proportions, and standardisation](../resources/math-refresher.html).
+[Mathematics Refresher: powers, roots, and squared deviations](../resources/math-refresher.html#powers-roots-and-squared-deviations)
+and [degrees of freedom and t critical values](../resources/math-refresher.html#degrees-of-freedom-and-t-critical-values).
 
 :::
 
@@ -141,15 +147,15 @@ the model is useful at all, with the F-test.
 
 ### Start with a founder's question
 
-The slope says 65 cents per claimed dollar. Would another set of deals say
+[Shark Tank data]{.shark-tag} The slope says 65 cents per claimed dollar. Would another set of deals give
 50 cents, or 80? A founder who negotiates with this number wants to know how
-far it can be off. R and every AI assistant answer with a table of standard
+far the number can be from the true value. R and every AI assistant answer with a table of standard
 errors, t values, and p-values. This lecture shows how to read that table
-and how to check what is said about it.
+and how to check what R or an AI assistant says about it.
 
 ### How precisely do we know the slope?
 
-The code below is the warm-up code. It rebuilds the data and the model of
+[Shark Tank data]{.shark-tag} The code below is the warm-up code. It rebuilds the data and the model of
 Lecture 1: the valuation agreed on air (`agreed_m`) regressed on the
 valuation claimed by the founder (`claimed_m`), both in \$ millions, for the
 874 Shark Tank deals for a share of the company. It then prints the
@@ -166,78 +172,79 @@ summary(val_model)$coefficients
 ```
 
 Lecture 1 read only the first column, the estimates. The other three
-columns, and the interval that R calculates from them, complete the pentad:
-the five quantities from QM Basic that Lecture 1 reviewed. They work here as
-in QM Basic. Only the quantity that is estimated is new, a slope:
+columns, and the interval that R calculates from them, complete the five
+quantities from QM Basic that Lecture 1 reviewed. These quantities work here in the
+same way as in QM Basic. The only new element is the quantity that is
+estimated: a slope.
 
-| Pentad ingredient | Where it sits | For the valuation slope |
+| Quantity | Where you find it | For the valuation slope |
 |---|---|---:|
 | estimate | `Estimate` column | $\hat\beta_1 = 0.649$ |
-| standard error | `Std. Error` column | $\widehat{\operatorname{SE}}(\hat\beta_1) = 0.0111$ |
+| standard error | `Std. Error` column | $\operatorname{SE}(\hat\beta_1) = 0.0111$ |
 | t value | `t value` column | $t = 58.6$ |
 | p-value | `Pr(>|t|)` column | $< 0.001$ |
 | confidence interval | `confint()` | computed below |
 
-The 874 deals are all the deals for a share of the company in the file, so
-nothing was sampled from it. We treat them as one outcome of a process that
-could have produced a different set of deals. A different set of deals would
-give a slightly different line. The standard error says how much the
-estimated slope $\hat\beta_1$ would vary from one such set to the next.
+The file contains all 874 deals for a share of the company. So these deals
+are not a sample drawn from the file. We treat them as one possible result of the show.
+Other pitches would have given a slightly different line. The standard error
+says how much the estimated slope $\hat\beta_1$ would vary from one such set
+of deals to the next.
 
 ::: {.definition-box}
 <span class="label">Definition</span>
 
 **Standard error of a coefficient**,
-$\widehat{\operatorname{SE}}(\hat\beta_1)$. An estimate of how much the
+$\operatorname{SE}(\hat\beta_1)$. An estimate of how much the
 estimated coefficient would vary from sample to sample. It has the units of
 the coefficient.
 :::
 
 Here the standard error is 0.0111, in the units of the slope: \$ million
 agreed per \$ million claimed. It is small compared with the slope, about 2%
-of 0.649. This number holds under the model assumptions of Lecture 2.
+of 0.649. This standard error is correct only under the model assumptions of Lecture 2.
 
-**Degrees of freedom.** The interval multiplier comes from a t distribution
-with $n - 2 = 874 - 2 = 872$ degrees of freedom. Two is subtracted because
-two coefficients, the intercept and the slope, are estimated before the
-spread of the residuals can be estimated. With $k$ slopes and an intercept,
-the residual degrees of freedom are $n - k - 1$. This general form is needed
-from Lecture 4 onwards. The multiplier for a 95% interval is written
-$t_{0.975,\,872}$. Basic Lecture 9 calls this number the critical value. It
-is the value that a t distribution with 872 degrees of
-freedom stays below with probability 0.975, so 2.5% lies above it and 2.5%
-lies below its negative. In R it is `qt(0.975, df)`:
+**Degrees of freedom.** The critical value (multiplier) of the interval
+comes from a t distribution
+with $n - 2 = 874 - 2 = 872$ degrees of freedom. We subtract 2 because we
+must estimate two coefficients, the intercept and the slope, before we can
+estimate the spread of the residuals. With $k$ slopes and an intercept,
+the residual degrees of freedom are $n - k - 1$. You need this general form
+from Lecture 4 onwards. We write the critical value for a 95% interval as
+$t_{0.975,\,872}$. 97.5% of a t distribution with 872 degrees of freedom lies below this value,
+and 2.5% lies above it. In R you calculate it with `qt(0.975, df)`:
 
 ```{r}
 #| label: i03-multiplier
 qt(0.975, df = df.residual(val_model))
 ```
 
-With 872 degrees of freedom the multiplier is 1.963, almost the same as the
+With 872 degrees of freedom the critical value is 1.963, almost the same as
+the
 1.96 of the normal distribution.
 
 ::: {.definition-box}
 <span class="label">Definition</span>
 
 **95% confidence interval for a slope.**
-$\hat\beta_1 \pm t_{0.975,\,n-2}\,\widehat{\operatorname{SE}}(\hat\beta_1)$.
+$\hat\beta_1 \pm t_{0.975,\,n-2}\,\operatorname{SE}(\hat\beta_1)$.
 It is the range of values of the population slope $\beta_1$ that the data
 are consistent with, under the model assumptions. In large samples the
-multiplier is close to 1.96.
+critical value is close to 1.96.
 :::
 
 ::: {#exm-i03-interval}
 ## Worked example: the slope interval by hand
 
-Everything comes from the coefficient table. Take the estimate and the
+[Shark Tank data]{.shark-tag} All numbers come from the coefficient table. Take the estimate and the
 standard error with one digit more than in the table above, so that rounding
 does not change the result: $\hat\beta_1 = 0.6487$ and
-$\widehat{\operatorname{SE}}(\hat\beta_1) = 0.01107$. The multiplier is about
-1.96.
+$\operatorname{SE}(\hat\beta_1) = 0.01107$. The critical value is
+`qt(0.975, 872)` = 1.963.
 
 $$
-\hat\beta_1 \pm t_{0.975,\,872}\,\widehat{\operatorname{SE}}(\hat\beta_1)
-= 0.6487 \pm 1.96 \times 0.01107
+\hat\beta_1 \pm t_{0.975,\,872}\,\operatorname{SE}(\hat\beta_1)
+= 0.6487 \pm 1.963 \times 0.01107
 = 0.6487 \pm 0.0217
 = (0.627,\; 0.670).
 $$
@@ -247,7 +254,7 @@ population slope between about 63 and 67 cents of agreed valuation per dollar
 of claimed valuation. A slope of 1, which would mean that the sharks accept
 the claimed valuation, is far outside this range. The endpoints of the
 interval have the units of the slope. The estimate, its standard error, and
-the interval share these units. The t value and the p-value have no units.
+the interval have the same units. The t value and the p-value have no units.
 
 R agrees:
 
@@ -258,14 +265,14 @@ confint(val_model)
 :::
 
 The interval describes only the variation from sample to sample, under the
-model assumptions. It does not cover other sources of doubt: that only
-televised pitches are recorded, that only pitches with a deal are analysed,
-or how the valuations are measured. No formula makes an interval wider for a
-weak design.
+model assumptions. It does not include other sources of doubt. For
+example, the data contain only televised pitches, we analyse only pitches
+with a deal, and the way the valuations are measured may matter. No formula
+makes an interval wider when the study design is weak.
 
 ### The t-test against zero
 
-The standard test asks whether the data are consistent with no linear
+[Shark Tank data]{.shark-tag} The standard test asks whether the data are consistent with no linear
 association between $X$ and $Y$, that is, with a population slope of zero.
 The test is two-sided:
 
@@ -274,14 +281,17 @@ H_0:\beta_1=0
 \qquad\text{versus}\qquad
 H_1:\beta_1\ne0,
 \qquad
-t=\frac{\hat\beta_1-0}{\widehat{\operatorname{SE}}(\hat\beta_1)}.
+t=\frac{\hat\beta_1-0}{\operatorname{SE}(\hat\beta_1)}.
 $$
 
-By hand: $t = 0.6487 / 0.01107 \approx 58.6$. The estimate lies about 59
-standard errors away from zero. For comparison, a t value beyond about 2 in
-either direction is already rare when the population slope is zero. The
-p-value is the probability, if the population slope is zero, of a t value at
-least this far from zero in either direction. The code below calculates it
+By hand: $t_{obs} = 0.6487 / 0.01107 \approx 58.6$. The estimate lies about
+59 standard errors away from zero.
+
+Decision with the critical value: reject $H_0$ if
+$|t_{obs}|\ge t_{0.975,\,872}=1.963$. Here $58.6\ge1.963$, so we reject
+$H_0$ at the 5% level. The p-value below gives the same decision in a
+second way. The p-value is the probability of a t value at least this far
+from zero in either direction, if the population slope is zero. The code below calculates it
 as in QM Basic:
 
 ```{r}
@@ -302,7 +312,7 @@ never occur. This is strong evidence against a zero slope among these deals.
 What it does not say:
 
 - It does not say that the model is correct. The fan and the influential
-  deals of Lecture 2 remain a limit on everything in this table.
+  deals of Lecture 2 limit how much you can trust every number in this table.
 - It does not say that the association is large or important. With 874
   observations, even a very small slope can have a tiny p-value.
 - It does not say that claiming more causes a higher agreed valuation. No
@@ -311,21 +321,70 @@ What it does not say:
 ::: {.callout-note collapse="true"}
 ## Check: the p-value is 1×10^-304^. Is this slope therefore trustworthy?
 
-No. The p-value measures the distance from zero in standard errors, and the
-standard error was calculated under the model assumptions, among them
-constant error variance and independent rows. Lecture 2 showed the fan in
-the residuals and the few deals that steer the fit, so this standard error
-is doubtful. "Significant" means that the data are not consistent with a
+No. The p-value measures the distance from zero in standard errors. R
+calculated the standard error under the model assumptions. Two of these
+assumptions are constant error variance and independent rows. Lecture 2
+showed the fan in the residuals and the few deals that strongly affect the
+fit, so this standard error is doubtful. "Significant" means that the data are not consistent with a
 zero slope. It does not mean that 0.0111 is the right standard error.
+:::
+
+The box below collects the interval and the test for one coefficient in
+the order that the exam asks for them.
+
+::: {.exam-procedure #i03-exam-procedure}
+<span class="label">Exam procedure: a test and an interval for a coefficient</span>
+
+The interval for $\beta_j$, in five parts.
+
+1. **Formula.**
+   $\hat\beta_j\pm t_{0.975,\,df}\,\operatorname{SE}(\hat\beta_j)$, with
+   $df=n-k-1$ for a model with $k$ slopes ($df=n-2$ in simple regression).
+2. **Given values.** $\hat\beta_j$ and $\operatorname{SE}(\hat\beta_j)$
+   from the coefficient table, $df$, and the critical value
+   $t_{0.975,\,df}$ from `qt(0.975, df)` or from the question.
+3. **Calculations.** The margin of error: critical value $\times$ standard
+   error.
+4. **Interval.** $(\hat\beta_j-\text{margin},\ \hat\beta_j+\text{margin})$,
+   with the unit of the coefficient.
+5. **Conclusion.** One sentence in the words of the question. If 0 lies
+   outside the interval, you can conclude at the 5% level that $\beta_j$
+   differs from 0, and the interval shows on which side. If 0 lies inside,
+   you cannot conclude that $\beta_j$ differs from 0.
+
+The test of $H_0:\beta_j=0$, in five steps.
+
+1. **Hypotheses.** $H_0:\beta_j=0$ versus $H_1:\beta_j\ne0$. Say in words
+   what $\beta_j$ is. State the significance level, here 5%.
+2. **Test statistic.** $T=\hat\beta_j/\operatorname{SE}(\hat\beta_j)$,
+   which has the $t$ distribution with $df=n-k-1$ if $H_0$ is true and the
+   model assumptions hold.
+3. **Critical value and rejection region.** $t_{0.975,\,df}$ from
+   `qt(0.975, df)` or from the question. Reject $H_0$ if
+   $|t_{obs}|\ge t_{0.975,\,df}$.
+4. **Observed value.**
+   $t_{obs}=\hat\beta_j/\operatorname{SE}(\hat\beta_j)$, the `t value`
+   column of the output.
+5. **Conclusion.** Say whether $t_{obs}$ lies in the rejection region.
+   Write "reject $H_0$" or "do not reject $H_0$", never "accept $H_0$". Then write one sentence in the words of the question. If you
+   reject, add the direction from the sign of $\hat\beta_j$.
+
+The p-value, when the question asks for it, comes after step 5. It is the
+`Pr(>|t|)` column. It gives the same decision: $p\le0.05$ exactly when
+$|t_{obs}|\ge t_{0.975,\,df}$.
+
+<p class="exam-note">In the exam, write the formula before the numbers, and
+give the parts of the interval and the steps of the test in this order.</p>
 :::
 
 ### Decomposing variation
 
-The second part of the driving question asks how much the line explains.
-This needs a point of comparison. Without a predictor, the best single
+[Shark Tank data]{.shark-tag} The second part of the driving question asks how much the line explains.
+To answer it, we need a point of comparison. Without a predictor, the best single
 prediction for every deal is the mean agreed valuation $\bar y$. A
-regression is useful to the extent that its fitted values $\widehat y_i$
-come closer to the observed values than this one mean does.
+regression is useful when its fitted values $\widehat y_i$ come closer to
+the observed values than this one mean does. The closer they come, the more
+useful the regression is.
 
 For each observation, the distance from the mean $\bar y$ to the observed
 value $y_i$ is its total deviation. It splits exactly into two parts. The
@@ -459,7 +518,7 @@ c(SST = SST, SSR = SSR, SSE = SSE, check = SSR + SSE)
 
 The units are squared millions of dollars, so the raw numbers (SST is about
 12,000) mean little on their own. The sums of squares matter only relative
-to each other. The next section compares them.
+to each other.
 
 ::: {#exm-i03-sst-sse}
 ## Worked example: from SST and SSE to SSR and R²
@@ -476,11 +535,11 @@ R^2 = \frac{\text{SSR}}{\text{SST}} = \frac{375}{500} = 0.75
 R^2 = 1 - \frac{\text{SSE}}{\text{SST}} = 1 - \frac{125}{500} = 0.75.
 $$
 
-The fitted values account for 75% of the variation of the outcome in the
+The fitted values explain 75% of the variation of the outcome in the
 sample. The other 25% remains as residual variation around the line.
 :::
 
-### R²: what 0.798 means, and four things it is not
+### R²: what 0.798 means, and four wrong readings
 
 ::: {.definition-box}
 <span class="label">Definition</span>
@@ -496,7 +555,7 @@ $$
 It lies between 0 and 1.
 :::
 
-For the valuation model:
+[Shark Tank data]{.shark-tag} For the valuation model:
 
 ```{r}
 #| label: i03-r-squared
@@ -507,20 +566,20 @@ c(
 )
 ```
 
-Here $R^2 \approx 0.798$. Among these deals, about 80% of the variation in
-the agreed valuations is explained by the linear association with the
-claimed valuation. The third number in the output shows a fact that holds
+Here $R^2 \approx 0.798$. Among these deals, the linear association with the
+claimed valuation explains about 80% of the variation in the agreed
+valuations. The third number in the output shows a fact that holds
 in simple regression: $R^2$ is the squared correlation of $X$ and $Y$,
 $R^2 = r_{XY}^2$. Squaring removes the sign, so look at the slope or the
 correlation for the direction of the association.
 
-$R^2$ is often misread. Below are four things that it is not, each with a
-wrong sentence and its correction. The first two are worked out here. The
+People often read $R^2$ wrongly. Below are four wrong readings of $R^2$,
+each with a wrong sentence and its correction. The first two are worked out here. The
 last two are in the Try it task.
 
 **Not the percentage of correct predictions.**
 *Wrong:* "The model predicts 80% of agreed valuations correctly."
-*Corrected:* the model explains 80% of the *variation* in agreed valuations.
+*Corrected:* the model explains 80% of the variation in agreed valuations.
 Single predictions can still miss by millions of dollars. The standard
 deviation of the residuals is about \$1.66 million, as the output of
 `summary()` shows later in this section.
@@ -529,12 +588,12 @@ deviation of the residuals is about \$1.66 million, as the output of
 *Wrong:* "With $R^2$ this high, the model is clearly correct."
 *Corrected:* $R^2$ measures fit. It does not check the assumptions. Lecture 2
 found a fan in the residuals and influential deals in this same model, and
-the value 0.798 says nothing about either.
+the value 0.798 says nothing about either problem.
 
 ::: {.callout-caution collapse="true"}
 ## Try it: correct the last two wrong sentences
 
-Try this with your neighbour first. Correct each sentence in one line, as
+[Shark Tank data]{.shark-tag} Try this with your neighbour first. Correct each sentence in one line, as
 above.
 
 *Sentence 3 (you).* "The claim explains 80% of the valuation, so claiming
@@ -548,20 +607,20 @@ valuations in next year's pitches too."
 
 *Sentence 3* claims causation. $R^2$ describes an association among
 observed deals. Claims were not randomly assigned, and no measure of fit
-says what would happen if a founder *changed* the claim.
+says what would happen if a founder changed the claim.
 *Sentence 4* claims that the fit holds for new data. $R^2$ is calculated on
 this sample. A new season, a different selection of pitches, or a change in
-how the sharks negotiate can all lower it. The fit is evidence about these
+how the sharks negotiate can all lower $R^2$. The fit is evidence about these
 874 deals, not a guarantee for the next 874.
 :::
 :::
 
 ### The overall F-test
 
-The last part of the driving question asks whether the model is useful at
+[Shark Tank data]{.shark-tag} The last part of the driving question asks whether the model is useful at
 all, compared with predicting the mean $\bar y$ for every deal. The overall
-F-test answers it. It is stated here for a regression with $k$ predictors,
-because Lecture 4 adds more predictors. In this lecture $k=1$.
+F-test answers this question. We state the test here for a regression with
+$k$ predictors, because Lecture 4 adds more predictors. In this lecture $k=1$.
 
 ::: {.definition-box}
 <span class="label">Definition</span>
@@ -580,8 +639,9 @@ the mean alone.
 
 Read the ratio part by part. The numerator is the explained variation per
 predictor. The denominator is the residual variation per residual degree of
-freedom. If no slope differs from zero, the two are of similar size and F is
-near 1. A large F is evidence that the predictors together matter.
+freedom. If no slope differs from zero, the numerator and the denominator are of
+similar size and F is near 1. A large F is evidence that the predictors
+together help to explain the outcome.
 
 All numbers of this lecture appear together in the output of `summary()`.
 Read it from top to bottom in this order: (1) the formula and the data, (2)
@@ -597,15 +657,16 @@ summary(val_model)
 
 Two lines of this output are new. The **residual standard error**, 1.664, is
 the standard deviation of the residuals in the units of the outcome:
-$s=\sqrt{\text{SSE}/(n-2)}$, here about \$1.66 million. A few very large
-misses drive this number: Lecture 2 showed that half of the residuals lie
-between $-0.40$ and $0.17$. Still, it is large next to the mean agreed
-valuation of \$2.22 million, so single deals can lie far from the line even
-though $R^2$ is high. **Adjusted $R^2$** is $R^2$ with a small
+$s=\sqrt{\text{SSE}/(n-2)}$, here about \$1.66 million. This number is large
+mainly because of a few very large misses: Lecture 2 showed that half of the
+residuals lie between $-0.40$ and $0.17$. Still, it is large compared with
+the mean agreed valuation of \$2.22 million. So single deals can lie far from
+the line even though $R^2$ is high. **Adjusted $R^2$** is $R^2$ with a small
 penalty for every predictor in the model, $1-(1-R^2)(n-1)/(n-k-1)$. It is
-always a little below $R^2$. Unlike $R^2$, it can fall when a predictor that
-adds almost nothing is included. That makes it the fairer number for
-comparing models with different numbers of predictors. With one predictor
+below $R^2$, and it can even be negative when the predictors add almost
+nothing. Unlike $R^2$, it can fall when you include a
+predictor that explains almost nothing. This property makes it the fairer
+number for comparing models with different numbers of predictors. With one predictor
 and 874 observations the two hardly differ (0.7975 and 0.7973).
 
 The last line reports $F \approx 3435$ on 1 and 872 degrees of freedom. The
@@ -635,34 +696,35 @@ once.
 
 ### Usefulness has more than one meaning
 
-The question "Is the model useful?" has at least four different meanings,
-and a model can pass one and fail another. The four examples below are
+The question "Is the model useful?" has at least four different meanings.
+A model can be useful in one meaning and useless in another. The four examples below are
 invented:
 
 - **Slope clearly different from zero, low $R^2$.** A loyalty-programme
   analysis on 400,000 customers finds a positive association between
-  mailings and spending. It is precisely estimated, and it explains 1% of
-  the variation in spending. This is useful for a decision about all
-  customers, and useless for predicting the spending of one customer.
+  mailings and spending. The association is precisely estimated, but it explains only
+  1% of the variation in spending. If the company sent the mailings at
+  random, this result is useful for a decision about all customers. It is
+  useless for predicting the spending of one customer.
 - **High $R^2$, no causal reading.** Store revenue regressed on the number
-  of staff fits very well, because both follow the size of the store.
+  of staff fits very well, because both depend on the size of the store.
   Hiring more staff at a small store will not produce the revenue of a big
   store.
 - **Good fit on the data used, poor prediction for new data.** A
   travel-demand model fitted on data for 2015--2019 explained bookings very
-  well and failed in 2020. The $R^2$ of the fitted data never promised that
-  the pattern would continue.
+  well and failed in 2020. The $R^2$ on the data used for fitting never
+  promised that the pattern would continue.
 - **Accurate predictions, no explanation.** A complex prediction model may
   forecast weekly orders very well while its coefficients do not explain
-  *why* orders change. That is fine for stocking decisions, and useless for
-  planning a price change.
+  why orders change. Such a model is fine for decisions about how much stock
+  to order, and useless for planning a price change.
 
-Always judge a model by the goal: explanation, prediction, or support for a
+Always judge a model by its goal: explanation, prediction, or support for a
 decision.
 
 ### Robust standard errors: what they fix {#i03-robust}
 
-Heteroskedasticity-consistent standard errors, called **robust** standard
+[Shark Tank data]{.shark-tag} Heteroskedasticity-consistent standard errors, called **robust** standard
 errors for short, do not need the constant-variance assumption. The fitted
 coefficients stay the ordinary least-squares values. Only the standard
 errors change, and with them the t values, p-values, and intervals. Lecture 2
@@ -680,15 +742,18 @@ coefci(val_model, vcov. = vcovHC(val_model, type = "HC1"))
 
 The function `coeftest()` prints the coefficient table with robust standard
 errors, and `coefci()` prints the robust 95% confidence intervals. The
-robust standard error of the slope is 0.034, about three times the usual
-0.0111. The robust 95% interval runs from about 0.58 to 0.72. It is three
-times as wide as the usual interval and still lies far below 1.
+option `type = "HC1"` selects one common version of the robust formula. You
+do not need the other versions in this course. The robust standard error of
+the slope is 0.034, about three times the usual 0.0111. The robust 95%
+interval runs from about 0.58 to 0.72. It is three times as wide as the
+usual interval and still lies far below 1.
 
 Robust standard errors fix exactly one problem: an error variance that is
 not constant. They
 do not repair a curved relationship, confounding, dependence between rows,
-influential data errors, or a selected sample. A robust standard error on a
-biased slope measures the precision of the wrong number. You do not have to
+influential data errors, or a selected sample. If the slope itself is
+biased, a robust standard error only says how precisely the wrong number is
+estimated. You do not have to
 calculate robust standard errors by hand. You should know what they are for.
 
 ::: {.caveat-box}
@@ -696,20 +761,20 @@ calculate robust standard errors by hand. You should know what they are for.
 
 - Every number of this lecture is calculated under the assumptions of
   Lecture 2. The fan makes the usual standard error doubtful, and a few
-  deals shape the fit.
+  deals strongly affect the fit.
 - The data are deals on a television show, not a random sample of
   companies. This selection affects every estimate.
 - Precision and fit are not causation.
 
-**What you can do with it:** use the slope and its interval for the decision,
-use the residual standard error to judge how far single cases lie from the
-line, and prefer robust standard errors when the residual plot shows a fan.
+**What you can do with it:** use the slope and its interval for the decision.
+Use the residual standard error to judge how far single cases lie from the
+line. Prefer robust standard errors when the residual plot shows a fan.
 :::
 
 ### Answering the driving question
 
 The slope is known precisely, the line explains much of the outcome, and the
-model is useful, all under conditions. The slope 0.649 has standard error
+model is useful, but only under certain conditions. The slope 0.649 has standard error
 0.0111. Its 95% interval $(0.627, 0.670)$ is only about four cents per
 claimed dollar wide. With robust standard errors it is about 13 cents wide,
 from 0.58 to 0.72. The t-test clearly rejects a zero slope
@@ -717,17 +782,17 @@ from 0.58 to 0.72. The t-test clearly rejects a zero slope
 valuations, and the overall F-test ($F \approx 3435$) confirms that the
 model fits better than the mean alone. All of these statements depend on the
 assumptions checked in Lecture 2, where the residuals showed a fan and a few
-influential deals. None of them is causal.
+influential deals.
 
 ::: {.founder-box}
 <span class="label">A founder's decision (invented example)</span>
 
-Your advertising slope is 0.15 orders per euro, with a standard error of 0.05. The 95% interval runs from 0.05 to 0.25: each 100 euros of advertising goes with between 5 and 25 extra orders. At 4 euros of margin per order, that is between 20 and 100 euros. Even the best case only breaks even. The decision: reduce the advertising budget. The model has an $R^2$ of 0.20, so it predicts single weeks badly. That does not matter here. The decision depends on the slope and its interval, not on predicting next week.
+Your advertising slope is 0.15 orders per euro, with a standard error of 0.05. The 95% interval runs from 0.05 to 0.25: each 100 euros of advertising goes with between 5 and 25 extra orders. At 4 euros of margin per order, that is between 20 and 100 euros. Even the best case only breaks even. The decision: reduce the advertising budget. The model has an $R^2$ of 0.20, so it predicts single weeks badly. This low $R^2$ does not matter here. The decision depends on the slope and its interval, not on predicting next week.
 :::
 
 **Next:** Tutorial 1 practises Lectures 1--3 in the format of the exam: fit a
 model in R, check its residuals, and report its coefficients with intervals,
-tests, and $R^2$. The exam is taken in TestVision with R available.
+tests, and $R^2$. You take the exam in TestVision, and R is available during the exam.
 
 :::
 
@@ -742,15 +807,15 @@ tests, and $R^2$. The exam is taken in TestVision with R available.
 ### Read the lecture material (15 minutes)
 
 Read the Lecture material section above from start to end. The lecture
-covered the core of it. The text has every step, every example, and all the
+covered the main points. The text has every step, every example, and all the
 code, including parts that were not shown in class. Note what is still
 unclear and bring it to the next tutorial, or ask Tilly.
 
 ### Recall questions (10 minutes)
 
 1. Why are the residual degrees of freedom $n-2$ in simple regression?
-2. Which pentad quantities share the slope's units, and which are
-   unit-free?
+2. Which of the five quantities (estimate, standard error, t value,
+   p-value, interval) share the slope's units, and which are unit-free?
 3. What do SST, SSR, and SSE measure, and how are they related?
 4. Why is $R^2$ between 0 and 1 in an OLS model with an intercept?
 5. What is the null hypothesis of the overall F-test, and why does $F=t^2$
@@ -760,8 +825,8 @@ unclear and bring it to the next tutorial, or ask Tilly.
 ::: {.callout-note collapse="true"}
 ## Check your answers
 
-1. Two coefficients, intercept and slope, are estimated before
-   residual variation can be measured, using up two pieces of information.
+1. We estimate two coefficients, the intercept and the slope, before we
+   can measure the residual variation. This uses up two pieces of information.
 2. The estimate, its SE, and the interval endpoints share the slope's
    units. The t statistic and p-value are unit-free.
 3. Total, explained (fitted), and residual sample variation in the outcome.
@@ -775,11 +840,12 @@ unclear and bring it to the next tutorial, or ask Tilly.
 
 ### Finish a half-worked example: an interval for a new row (15 minutes)
 
-Re-read the worked slope interval (@exm-i03-interval). Then build the
+[Shark Tank data]{.shark-tag} Re-read the worked slope interval (@exm-i03-interval). Then build the
 interval for the **intercept row** of the same table.
 
 *Step 1 (given).* From the coefficient table: estimate $-0.068$, standard
-error $0.0685$, degrees of freedom $872$, multiplier $\approx 1.96$.
+error $0.0685$, degrees of freedom $872$, critical value `qt(0.975, 872)`
+= 1.963.
 
 *Step 2 (you).* Compute the 95% interval.
 
@@ -789,19 +855,19 @@ little use for a business decision (see the intercept in Lecture 1).
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-$-0.068 \pm 1.96 \times 0.0685 = -0.068 \pm 0.134 = (-0.202,\; 0.066)$, in
+$-0.068 \pm 1.963 \times 0.0685 = -0.068 \pm 0.134 = (-0.202,\; 0.066)$, in
 \$ millions, which matches R. Under the model assumptions, the data are
 consistent with a population intercept between about $-\$202{,}000$ and
-\$66,000. The interval includes zero, so the line may well pass through the
-origin. But the intercept is the fitted mean at a claimed valuation of zero,
-outside the observed range of claims. The interval is calculated correctly
-and still tells a founder little.
+\$66,000. The interval includes zero, so the line may pass through the
+origin (the point where both valuations are zero). But the intercept is the fitted mean at a claimed valuation of zero,
+outside the observed range of claims. The interval is calculated correctly,
+but it tells a founder little.
 :::
 
-Then four more tasks without given steps:
+Then do four more tasks. These tasks have no given steps:
 
-1. A study reports a coefficient of 2.40 with standard error 0.80 in a
-   large sample. Compute the t statistic, decide the 5% two-sided test
+1. An invented study reports a coefficient of 2.40 with standard error 0.80
+   and 200 residual degrees of freedom. Compute the t statistic, decide the 5% two-sided test
    against zero, and give the 95% interval.
 2. Interpret $R^2=0.20$ without calling the model "80% wrong."
 3. A model has $k=3$, $n=104$, SSR = 300, and SSE = 500. Calculate $R^2$
@@ -812,8 +878,9 @@ Then four more tasks without given steps:
 ::: {.callout-note collapse="true"}
 ## Check your answers
 
-1. $t = 2.40/0.80 = 3$. Reject at 5% (well beyond 1.96). Interval:
-   $2.40 \pm 1.96 \times 0.80 = (0.83,\; 3.97)$.
+1. $t_{obs} = 2.40/0.80 = 3$. The critical value is $t_{0.975,\,200}$ =
+   `qt(0.975, 200)` = 1.972. Since $3\ge1.972$, reject $H_0$ at 5%.
+   Interval: $2.40 \pm 1.972 \times 0.80 = 2.40 \pm 1.58 = (0.82,\; 3.98)$.
 2. The fitted values explain 20% of the variation of the outcome in the
    sample. 80% remains as residual variation around the fitted line. Nothing
    is "wrong". The fitted values are simply far from many single outcomes.
@@ -826,9 +893,9 @@ Then four more tasks without given steps:
 
 ### Practice: all steps on equity and season (20 minutes)
 
-Fit `equity_offered_pct ~ season` on all 1,441 pitches. Report the slope's
+[Shark Tank data]{.shark-tag} Fit `equity_offered_pct ~ season` on all 1,441 pitches. Report the slope's
 95% confidence interval, the t-test against zero, $R^2$, and the overall
-F-test, then write a 120-word conclusion that separates estimate,
+F-test. Then write a conclusion of 120 words that separates estimate,
 uncertainty, fit, and scope.
 
 ::: {.callout-note collapse="true"}
@@ -844,7 +911,7 @@ c(r_squared = summary(equity_model)$r.squared,
   F = unname(summary(equity_model)$fstatistic["value"]))
 ```
 
-A complete conclusion reports four things. Estimate: one later season
+A complete conclusion has four parts. Estimate: one later season
 (`season`) is associated with about 0.824 percentage points less equity
 offered (`equity_offered_pct`), with standard error 0.048. Uncertainty: the
 95% interval $(-0.917, -0.731)$ excludes zero, and the t-test rejects a zero
@@ -852,14 +919,14 @@ slope ($t\approx-17.3$, p $<$ 0.001). Fit: the season explains about 17.3%
 of the variation in the equity offered, and the overall F-test
 ($F\approx300.7 = t^2$) rejects the model with only an intercept. Scope:
 this is a trend over time among recorded pitches, not a causal effect of
-the season, and the standard errors rest on the assumptions of Lecture 2.
+the season, and the standard errors depend on the assumptions of Lecture 2.
 :::
 
 ### Review: one diagnostics question from Lecture 2 (5 minutes)
 
 The residual-versus-fitted plot of the valuation model shows unequal spread,
 the fan of Lecture 2. Which numbers of the coefficient table in this lecture
-does that pattern put most directly in doubt, and why?
+does this pattern make most doubtful, and why?
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
@@ -873,35 +940,36 @@ standard errors address exactly this one problem. They repair nothing else.
 
 ### Worked exam interpretation (5 minutes)
 
-**Question** (mock exam Question 3 pattern). A model of venture sales
-growth (percentage points) on marketing spending (€10,000s), fitted on
-$n = 102$ ventures, reports a slope of 1.38 with standard error 0.46,
-$R^2 = 0.083$, and $F = 9.0$. Build the 95% interval for the slope, decide
-the 5% test against zero, verify the F statistic from the t statistic, and
-state in one sentence what the low $R^2$ does and does not imply.
+**Exam-style question.** An invented example. A model regresses
+the weekly orders of food trucks on their number of social-media posts per
+week. The model is fitted on $n = 102$ food trucks. It reports a slope of
+1.20 with standard error 0.40, $R^2 = 0.083$, and $F = 9.0$. Build the 95% interval for the slope,
+decide the 5% test against zero, verify the F statistic from the t
+statistic, and state in one sentence what the low $R^2$ does and does not
+imply.
 
 ::: {.callout-note collapse="true"}
 ## Check a model answer
 
-$t = 1.38/0.46 = 3.0$. With $n-2 = 100$ degrees of freedom the multiplier
-`qt(0.975, 100)` is about 1.98, so the
-interval is $1.38 \pm 1.98\times0.46 \approx (0.47,\; 2.29)$ percentage
-points per €10,000. The interval excludes zero, so the two-sided 5% test
-rejects $H_0:\beta_1=0$. In agreement with this, $F = t^2 = 9.0$. The low
-$R^2$ says that marketing spending explains about 8% of the variation in
-growth, so predictions for single ventures will be poor. It does not remove
-the evidence that the association is not zero. Neither number makes the
-association causal.
+$t_{obs} = 1.20/0.40 = 3.0$. With $n-2 = 100$ degrees of freedom the
+critical value $t_{0.975,\,100}$ = `qt(0.975, 100)` is 1.984, so the
+interval is $1.20 \pm 1.984\times0.40 \approx (0.41,\; 1.99)$ orders per
+post. Since $3.0\ge1.984$, the two-sided 5% test rejects $H_0:\beta_1=0$.
+The interval excludes zero, which gives the same decision. In
+agreement with this, $F = t^2 = 9.0$. The low $R^2$ says that the number of
+posts explains about 8% of the variation in weekly orders, so predictions
+for single food trucks will be poor. It does not remove the evidence that
+the association is not zero.
 :::
 
 ### Check the AI (5 minutes)
 
-You asked an AI assistant: "R squared is 0.80 and the p-value is below 0.001. Is my model good?" It answered:
+[Shark Tank data]{.shark-tag} You asked an AI assistant: "R squared is 0.80 and the p-value is below 0.001. Is my model good?" It answered:
 
 > "Yes. The model predicts 80% of the valuations correctly, and the tiny p-value proves that the model assumptions hold."
 
-Find what is wrong and write the corrected answer. This is the **Verify**
-step of Attempt → Ask → Verify → Explain, and the exam asks for it.
+Find what is wrong and write the corrected answer. This task is the **Verify**
+step of Attempt → Ask → Verify → Explain, and the exam asks for this step.
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
@@ -912,10 +980,10 @@ Two errors. R squared is the share of the variation that the line explains, not 
 ### Make it yours (5 minutes)
 
 :::: {.utility-prompt}
-<span class="label">Utility: two sentences</span>
+<span class="label">Two sentences about your own venture</span>
 
-Think of your EiA3 venture, or any business you know well, and one
-regression you might run on its data. Write two sentences: first say which
+Think of your EiA3 venture, or any business you know well. Think of one
+regression you might run on its data. Write two sentences. First, say which
 you would rather have for your next decision, a precise slope (narrow
 interval) or a high $R^2$, and why. Then name the meaning of "useful" from
 the list of four in this lecture that matters most for that decision. There
@@ -924,13 +992,13 @@ is no wrong answer. Precision and fit answer different questions.
 ::: {.callout-note collapse="true"}
 ## See an example, then write your own
 
-Take a student-run campus meal-prep box venture. "For setting next month's ad budget I would take a precise slope over a high $R^2$: I need to know what an extra €100 buys, even if week-to-week orders stay noisy. That is the first meaning on the list, a reliable slope with a low $R^2$: predicting individual weeks matters less to me than the payoff of an input I control."
+Take a student venture that sells boxes of prepared meals on campus. "For setting next month's advertising budget I would prefer a precise slope to a high $R^2$. I need to know how many orders an extra €100 brings, even if orders change a lot from week to week. That is the first meaning on the list, a reliable slope with a low $R^2$. Predicting individual weeks matters less to me than the return on an input that I control."
 :::
 
 You can discuss this task, and any other task in this chapter, with
-**Tilly**, the course AI assistant: ask it to invent a business
-model with a significant slope and a low $R^2$ and challenge you to say
-what the model is still useful for.
+**Tilly**, the course AI assistant: ask it to invent a regression
+model for a business, with a significant slope and a low $R^2$. Then let
+Tilly ask you what the model is still useful for.
 ::::
 
 [Continue to Tutorial 1: Simple regression, diagnostics, and model usefulness](t01-exam-prep.qmd).

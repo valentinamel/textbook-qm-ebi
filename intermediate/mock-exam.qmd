@@ -3,63 +3,836 @@
 ```{r}
 #| label: imock-setup
 #| include: false
-# Chunk options only. Every object used on this page is constructed in
-# visible code in the "Dataset used throughout" section below.
+# Chunk options only.
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
                       fig.width = 7, fig.height = 4.5)
 ```
 
 This mock exam covers all six lectures of the course. It has **100
-points**, so the exam grade is
+points**, so your test score is
 
 $$
-\text{grade} = \frac{\text{points earned}}{10}.
+\text{test score} = \frac{\text{points earned}}{10},
 $$
 
-The Intermediate exam is taken in TestVision, with R available. The practice
-exam in TestVision appears in your own TestVision account once it is
-published. You log in with your university account. There is no separate
+on a scale from 1.00 to 10.00, with two decimals. A score below 1.00 counts
+as 1.00. The lecturer enters this test score in Osiris. Osiris then rounds it to a
+whole or half grade for your final course grade. A score from 5.50 to 5.74
+becomes 6.0, and a score from 5.25 to 5.49 becomes 5.0. For example, 72
+points give a test score of 7.20 and a final grade of 7.0. You pass with a
+final grade of 6.0 or higher, that is, with 55 points or more.
+
+You take the Intermediate exam in TestVision. It lasts 120 minutes. You may
+use RStudio, Excel, the calculator in TestVision, a simple pocket
+calculator, and scrap paper. The practice
+exam in TestVision appears in your own TestVision account once the
+lecturer publishes it. You log in with your university account. There is no separate
 link. General information about TestVision for students is on the
 [university page about TestVision](https://www.tilburguniversity.edu/students/studying/exams/e-assessment/testvision).
 
-The [QM Intermediate Code Sheet](#intermediate-code-sheet) is provided at
-the exam. Use it to review the R commands and the formulas before you try
-this mock exam.
+You receive the [QM Intermediate Code Sheet](code-sheet.qmd) at
+the exam. Keep it open while you work on this mock exam.
 
-Unless a question says otherwise, use a 5% significance level. Interpret
-every coefficient in the units and for the sample defined below. Do not use
-causal language unless the way the data were produced supports it.
+Use **120 minutes** as the practice time limit, as in the exam.
 
-| Question | Topic | Points |
-|---|---|---:|
-| 1 | Simple regression and least squares | 20 |
-| 2 | Assumptions and diagnostics | 20 |
-| 3 | Model fit and the overall F-test | 20 |
-| 4 | Multiple regression and a dummy predictor | 20 |
-| 5 | Interactions, curvature, and a partial F-test | 20 |
-| **Total** |  | **100** |
+| Question | Topic | What you do | Points | Suggested minutes |
+|---|---|---|---:|---:|
+| 1 | Simple regression | Run a regression in R and interpret it | 13 | 14 |
+| 2 | Assumptions and diagnostics | Check the model in R | 15 | 17 |
+| 3 | Inference and fit | Interpret an R output of a colleague | 10 | 12 |
+| 4 | Multiple regression and a dummy predictor | Interpret a regression table from a paper | 23 | 26 |
+| 5 | Interactions and curvature | Run two models in R and use them | 19 | 20 |
+| 6 | An answer of an AI assistant, and a decision | Assess an AI answer and make a decision for a founder | 20 | 21 |
+| **Total** |  |  | **100** | **110** |
+
+The suggested minutes leave about 10 minutes to read the instructions, to
+load the data, and to check your answers.
+
+## How this mock exam works
+
+You work as in the real exam. You download a data file, you run R yourself,
+and you type your answers.
+
+All parts are open questions. You type a number with your calculation, or
+one to three sentences. An answer without a calculation or an explanation
+gets no points, unless the part asks only to report or to state something.
+
+You do not have to simulate data, and you do not have to reproduce a
+simulation. The practice data are invented. The code that made them is in a
+collapsed box at the end of this page. It is there only so that anyone can
+check how we made the data. It is not part of the exam.
+
+A part that starts with "In R:" needs code that you write and run yourself.
+Its answer is not printed in the question. For these parts, type the R
+command that you used and the numbers that the part asks for. You can
+answer all other parts from your own results, from printed output, or with a
+short calculation. You may use R as a calculator everywhere.
+
+Question 3 shows an R output of a colleague, and Question 4 shows a
+regression table in the layout of a research paper. You interpret them.
+Question 6 shows an answer of an AI assistant. You assess it.
+
+## How answers are marked
+
+1. "In R:" parts. The points are for the numbers that you report. A correct
+   R command with a wrong or missing number earns 1 point of the part if
+   the part has at least 2 points for reported numbers. In the two plot
+   parts (Question 2, parts 1 and 4) the points are for what
+   you read from the plot. An answer based on the stand-in figure can earn
+   all points of these two parts.
+2. Stand-in values. Some later parts use the results of an "In R:" part.
+   Each such "In R:" part is followed by stand-in values. Use them if your
+   code does not run. They are rounded on purpose, so they earn no points in
+   the "In R:" part itself. We then mark all later parts with your stand-in
+   values, and you can still earn every later point.
+3. Error carried forward. A wrong number in one part does not cost points a
+   second time. A later part is correct if it uses your earlier number in
+   the right way.
+4. Rounding. Report a number that you read from R with three decimals.
+   Round the result of your own calculation to two decimals. A reported
+   number is correct within 0.001. A calculated result is correct within
+   0.02.
+5. Units. Sales growth, a fitted growth, and an intercept are in percent. A
+   residual, a slope, a dummy coefficient, and every other difference
+   between two growth values are in percentage points. A slope also names
+   the step of its predictor, for example "percentage points per €10,000".
+   "Report" parts need no unit. In every other part a missing or wrong unit
+   costs 1 point of that part, only once. A t value, an F value, and $R^2$ have no
+   unit.
+6. The verbs. "Report" asks for a number from your R output. "Calculate"
+   asks for one line of calculation and the result. "Show" asks for the
+   calculation that leads to a printed value. "State" asks for one sentence
+   without a reason. "Explain" asks for the reason, in one or two sentences.
+   "Assess" asks for your judgement of a statement: what is correct, what is
+   not correct, and why. "Decide" asks for a choice and the numbers on which
+   the choice is based.
+7. "Interpret" for a coefficient asks for one sentence with five elements.
+   These are the size and direction of the estimate, the step of the
+   predictor with its unit, the unit of the outcome, what is held fixed, and
+   the sample. In a simple regression nothing is held fixed. For a dummy,
+   name the reference group too. Write "is associated with" or "goes with".
+   Do not write "causes" or "leads to", because the data do not come from an
+   experiment. The sample belongs in the sentence, but it earns no
+   separate point.
+8. Points and length. When a part has several tasks, its points are listed
+   in the order of the tasks. For example, "(4 points: 2 + 1 + 1)" means 2
+   points for the first task and 1 point for each of the next two. The
+   number of sentences that a part asks for is enough for full points. A
+   longer answer does not earn more points. If your answer contains a correct
+   sentence and also a sentence that says the opposite, you do not get the
+   point.
+9. Other correct answers. A correct answer that is not in the model answer
+   gets full points. This includes another correct method.
+10. Tests. All tests are two-sided. Use a 5% significance level.
 
 ## Dataset used throughout
 
-The exam dataset is simulated. Treat it as a simple random sample of 320
-independent young ventures from a business registry. One row is one venture.
-The data are observational: none of the predictors was assigned by chance.
+The practice data are invented. Treat them as a simple random sample of 320
+young ventures from a business registry. One row is one venture. The data
+are observational: none of the predictors was assigned by chance.
 
-- `growth_pct`: change in annual sales, in percentage points
-- `marketing_10k`: annual marketing spending, in €10,000s
+- `growth_pct`: growth of annual sales compared with the year before, in
+  percent. A value of 12 means that sales were 12% higher than in the year
+  before
+- `marketing_10k`: annual marketing spending, in €10,000s. The values run
+  from 0.25 (€2,500) to 7.99 (€79,900)
 - `experience_years`: prior industry experience of the lead founder, in
-  years
-- `team_size`: number of current team members
+  years, from 0 to 18
+- `team_size`: number of current team members, from 1 to 10
 - `digital`: `No` for a mainly physical offering and `Yes` for a mainly
   digital offering. `No` is the reference category
-- `spend_c = marketing_10k - 4`: marketing spending centred at €40,000.
+- `spend_c`: `marketing_10k - 4`, marketing spending centred at €40,000.
+  This is close to the sample mean of about €40,400.
 
-The population is the set of ventures in this registry. Later survival and
-market conditions are not measured.
+The population is the set of ventures in this registry. The data do not
+measure later survival or market conditions.
 
-The dataset is simulated with a fixed seed, so you can reproduce every
-printed result on this page exactly. The code below generates the data and
-fits the four models used in the questions:
+[Download `qm-intermediate-mock-exam.csv`](../data/qm-intermediate-mock-exam.csv),
+save it in the folder `data` of your R project, and load it with the code
+below. If you save the file directly in your project folder, write
+`"qm-intermediate-mock-exam.csv"` as the file name.
+
+```{r}
+#| label: imock-load
+ventures <- read.csv("data/qm-intermediate-mock-exam.csv")
+ventures$digital <- factor(ventures$digital, levels = c("No", "Yes"))
+```
+
+## Question 1: Simple regression (13 points)
+
+A founder asks whether ventures that spend more on marketing grow faster.
+The outcome is `growth_pct` and the predictor is `marketing_10k`.
+
+1. In R: load the data and check that the file has 320 rows. Report the
+   mean and the largest value of `growth_pct`. **(2 points: 1 + 1)**
+2. In R: fit the simple regression of `growth_pct` on `marketing_10k`.
+   Report the intercept and the slope. **(2 points: 1 + 1)**
+
+   Stand-in values, if your code does not run: intercept 6.6 and slope 1.4.
+   Use them in parts 3 and 4.
+3. Interpret the slope in one sentence. **(4 points)**
+4. In R: use `predict()` to calculate the fitted growth of a venture that
+   spends €50,000 on marketing. The actual sales growth of this venture is 11%.
+   Calculate its residual. State what the sign of the residual means.
+   **(5 points: 3 + 1 + 1)**
+
+::: {.callout-note collapse="true"}
+## Model answer and marking guide
+
+```{r}
+#| label: imock-q1-fit
+dim(ventures)
+summary(ventures)
+mean(ventures$growth_pct)
+simple_model <- lm(growth_pct ~ marketing_10k, data = ventures)
+coef(simple_model)
+```
+
+1. The mean sales growth is 12.172% (1 point). The largest sales growth is
+   31.940% (1 point). Both numbers are in the output of `summary(ventures)`.
+2. Intercept 6.598 and slope 1.378 (1 point each, within 0.001). The fitted
+   line is $\widehat{growth\_pct}=6.598+1.378\,marketing\_10k$. The stand-in
+   values 6.6 and 1.4 earn no points here.
+3. Among the 320 sampled ventures, a venture that spends €10,000 more on
+   marketing has on average 1.38 percentage points higher fitted sales
+   growth. One point each for: the size and direction (1.38 higher), the
+   step of the predictor (€10,000 more marketing spending), the unit of the
+   outcome (percentage points of sales growth), and the wording as an
+   association. An answer with "causes", "leads to", or "will raise" loses
+   the last point. With the stand-in value the size is 1.4.
+4. €50,000 is `marketing_10k = 5`. The command
+   `predict(simple_model, newdata = data.frame(marketing_10k = 5))` gives a
+   fitted growth of 13.490% (3 points: 1 for the value 5, 2 for the fitted
+   growth). The calculation by hand,
+   $6.598+1.378\times5=13.49$%, also earns the 2 points. The residual is
+   $11-13.49=-2.49$ percentage points (1 point). The sign is negative: this
+   venture grew less than the fitted growth for ventures with the same
+   marketing spending (1 point). With the stand-in values the fitted growth is
+   $6.6+1.4\times5=13.60$% and the residual is $-2.60$ percentage points.
+   These earn all 5 points.
+
+```{r}
+#| label: imock-q1-case
+new_venture <- data.frame(marketing_10k = 5)
+fit_50k <- unname(predict(simple_model, newdata = new_venture))
+c(fitted = fit_50k, residual = 11 - fit_50k)
+c(fitted_stand_in = 6.6 + 1.4 * 5, residual_stand_in = 11 - (6.6 + 1.4 * 5))
+```
+:::
+
+## Question 2: Assumptions and diagnostics (15 points)
+
+Check the model of Question 1, `growth_pct ~ marketing_10k`. Parts 1 and 4
+ask for two plots. If your plots do not work, open the stand-in figure
+below part 4 and answer from it.
+
+1. In R: make the residual-versus-fitted plot of the model. Describe in one
+   sentence the pattern that you see. State the assumption that this pattern
+   challenges. **(5 points: 3 + 2)**
+2. In R: count the ventures with a standardised residual beyond $\pm3$.
+   Then count the ventures with a Cook's distance above $4/n$. Report both
+   counts. **(2 points: 1 + 1)**
+3. A colleague wants to delete all ventures that part 2 flags, "to get a
+   cleaner model". Respond to her plan in two or three sentences. State the
+   rule of Lecture 2 for flagged observations, and say what you would do
+   with these ventures. **(4 points: 1 + 3)**
+4. In R: make the normal Q--Q plot of the standardised residuals. Describe
+   in one sentence how the points lie relative to the line. Then explain in
+   one sentence whether a departure from normality is a serious problem for
+   this model with 320 ventures. **(4 points: 1 + 3)**
+
+::: {.callout-note collapse="true"}
+## Stand-in figure for parts 1 and 4 (open it only if your own plots do not work)
+
+```{r}
+#| label: fig-imock-diagnostics
+#| code-fold: true
+#| code-summary: "See the R code for this figure"
+#| fig-cap: "Residual-versus-fitted plot (left) and normal Q-Q plot (right) for the simple model of sales growth (growth_pct) on marketing spending (marketing_10k) in the practice data. The dashed line in the left panel marks a residual of zero."
+library(ggplot2)
+library(patchwork)
+simple_model <- lm(growth_pct ~ marketing_10k, data = ventures)
+
+resid_df <- data.frame(
+  fitted = fitted(simple_model),
+  residual = residuals(simple_model)
+)
+qq_df <- data.frame(rs = rstandard(simple_model))
+theme_mock <- theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    plot.caption = element_text(colour = "#5B6976"),
+    axis.title = element_text(colour = "#17324D")
+  )
+
+p_resid <- ggplot(resid_df, aes(x = fitted, y = residual)) +
+  geom_hline(yintercept = 0, colour = "#C98B2E",
+             linetype = "dashed", linewidth = 0.8) +
+  geom_point(alpha = 0.45, size = 1.6, colour = "#009E73") +
+  labs(x = "Fitted growth (%)",
+       y = "Residual (percentage points)") +
+  theme_mock
+
+p_qq <- ggplot(qq_df, aes(sample = rs)) +
+  geom_qq_line(colour = "#D55E00", linewidth = 0.9) +
+  geom_qq(colour = "#009E73", alpha = 0.45, size = 1.6) +
+  labs(x = "Normal theoretical quantile",
+       y = "Standardised residual") +
+  theme_mock
+
+p_resid + p_qq
+```
+:::
+
+::: {.callout-note collapse="true"}
+## Model answer and marking guide
+
+The two plots with the commands of the code sheet:
+
+```{r}
+#| label: imock-q2-plots
+#| fig-height: 3.8
+simple_model <- lm(growth_pct ~ marketing_10k, data = ventures)
+old_par <- par(no.readonly = TRUE)
+par(mfrow = c(1, 2), mar = c(4.5, 4.4, 1.3, 0.7), las = 1)
+plot(fitted(simple_model), residuals(simple_model),
+     xlab = "Fitted growth (%)", ylab = "Residual (percentage points)")
+abline(h = 0, lty = 2)
+qqnorm(rstandard(simple_model), main = "",
+       xlab = "Normal theoretical quantile",
+       ylab = "Standardised residual")
+qqline(rstandard(simple_model))
+par(old_par)
+```
+
+1. The vertical spread of the residuals grows from left to right, that is,
+   with the fitted growth. The points form a fan (3 points). Give 1 point
+   for "the spread changes" and 3 points for "the spread grows with the
+   fitted growth" or "a fan". This challenges the assumption of constant
+   variance of the errors (2 points, also for "homoskedasticity"). The
+   assumption earns 2 points or none. No clear curve is visible in this
+   plot. An answer that names only "linearity" earns no points for the
+   assumption. An answer that names constant variance and also mentions a
+   slight curve keeps the 2 points. The code below confirms what you see in
+   the plot.
+   The standard deviation of the residuals is 3.40 percentage points in the
+   third of the ventures with the lowest fitted growth and 5.42 in the third
+   with the highest.
+
+```{r}
+#| label: imock-q2-spread
+thirds <- cut(
+  fitted(simple_model),
+  breaks = quantile(fitted(simple_model), c(0, 1/3, 2/3, 1)),
+  include.lowest = TRUE, labels = c("lowest", "middle", "highest")
+)
+tapply(residuals(simple_model), thirds, sd)
+```
+
+2. One venture has a standardised residual beyond $\pm3$ (1 point). 19
+   ventures have a Cook's distance above $4/n=4/320=0.0125$ (1 point).
+
+```{r}
+#| label: imock-q2-flags
+sum(abs(rstandard(simple_model)) > 3)
+sum(cooks.distance(simple_model) > 4 / nobs(simple_model))
+```
+
+3. The rule is: investigate, report, never silently delete (1 point).
+   Investigate means to look at the flagged ventures in the data and to ask
+   whether a value is an error or whether the venture is of a different kind
+   (1 point). Report means to fit the model with and without these ventures
+   (1 point), to show both results, and to say which one you use and why
+   (1 point).
+4. The points follow the line in the middle. At the upper end they lie
+   above the line, and near the lower end slightly below it (1 point for
+   "close to the line in the middle, away from it at the ends"). This is not
+   a serious problem here. Normal errors matter in small samples. With 320
+   ventures the tests and intervals still hold approximately (3 points: 1
+   for the decision, 1 for "normal errors matter in small samples", 1 for
+   the sample size of 320). The fan of part 1 is the bigger problem.
+:::
+
+## Question 3: Inference and fit (10 points)
+
+A colleague drew 200 of the 320 ventures at random and fitted the model
+below to these 200 ventures. You do not know which ventures she drew, so you
+cannot run this model yourself. Answer from her output. The formulas are on
+the code sheet.
+
+```text
+Call:
+lm(formula = growth_pct ~ marketing_10k + experience_years + 
+    digital, data = ventures_200)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-11.2970  -2.7338  -0.0992   2.6132  12.3786 
+
+Coefficients:
+                 Estimate Std. Error t value Pr(>|t|)    
+(Intercept)       2.73159    0.78897   3.462 0.000658 ***
+marketing_10k     1.35473    0.12868  10.528  < 2e-16 ***
+experience_years  0.28585    0.05277   5.417 1.77e-07 ***
+digitalYes        3.17544    0.58246   5.452 1.49e-07 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 4.049 on 196 degrees of freedom
+Multiple R-squared:  0.4803,	Adjusted R-squared:  0.4723 
+F-statistic: 60.38 on 3 and 196 DF,  p-value: < 2.2e-16
+```
+
+For this model, SSE = 3212.85 and SST = 6181.93. The critical value for a
+95% confidence interval and a 5% test with 196 degrees of freedom is
+$t_{0.975,\,196}=1.972$. In R, `qt(0.975, 196)` gives it.
+
+1. &#40;a) Show with a calculation how the Multiple R-squared follows from SSE
+   and SST. (b) State in one sentence what this number says about the model
+   for these 200 ventures. **(4 points: 2 + 2)**
+2. &#40;a) Calculate the 95% confidence interval for the coefficient of
+   `marketing_10k`. Write the five parts of the
+   [exam procedure of Lecture 3](i03-inference-fit-ftest.qmd#i03-exam-procedure). (b)
+   State whether the 5% test rejects a coefficient of zero, and explain how the
+   interval shows this. **(6 points: 4 + 2)**
+
+::: {.callout-note collapse="true"}
+## Model answer and marking guide
+
+The code below is the code of the colleague. We show it so that you can
+check every printed number.
+
+```{r}
+#| label: imock-colleague
+set.seed(2026)
+rows_200 <- sort(sample(nrow(ventures), 200))
+ventures_200 <- ventures[rows_200, ]
+model_200 <- lm(
+  growth_pct ~ marketing_10k + experience_years + digital,
+  data = ventures_200
+)
+summary(model_200)
+SSE_200 <- sum(residuals(model_200)^2)
+SST_200 <- sum((ventures_200$growth_pct - mean(ventures_200$growth_pct))^2)
+c(SSE = SSE_200, SST = SST_200, R2 = 1 - SSE_200 / SST_200)
+qt(0.975, df.residual(model_200))
+confint(model_200)["marketing_10k", ]
+```
+
+1. &#40;a) $R^2=1-\text{SSE}/\text{SST}=1-3212.85/6181.93$ (1 point) $=0.48$
+   (1 point). (b) Among these 200 ventures, the model explains about 48% of
+   the variation in sales growth (2 points: 1 for "share of the variation of
+   the outcome that the model explains", 1 for naming the outcome and the
+   sample). "48% of the predictions are correct" earns no points for (b).
+2. &#40;a) The five parts of the interval:
+   1. **Formula.** $\hat\beta_j\pm t_{0.975,\,df}\,\operatorname{SE}(\hat\beta_j)$,
+      with $df=n-k-1=200-3-1=196$.
+   2. **Given values.** $\hat\beta_j=1.35473$,
+      $\operatorname{SE}(\hat\beta_j)=0.12868$, and
+      $t_{0.975,\,196}=1.972$.
+   3. **Calculations.** The margin of error is $1.972\times0.12868=0.254$.
+   4. **Interval.** $(1.355-0.254,\ 1.355+0.254)=(1.10,\ 1.61)$ percentage
+      points per €10,000.
+   5. **Conclusion.** See (b).
+
+   Marking of (a): 1 point for the formula with the given values, 1 for the
+   margin of error 0.254, 1 for both ends, and 1 for the unit. (b) Zero lies
+   outside the interval (1 point). The interval contains the values of the
+   coefficient that the two-sided 5% test does not reject, so the test
+   rejects a coefficient of zero. At the 5% level we can conclude the
+   following for all ventures in the registry: at the same experience and
+   offering type, more marketing spending goes with higher sales growth
+   (1 point).
+:::
+
+## Question 4: Multiple regression and a dummy predictor (23 points)
+
+The table below has the layout of a regression table in a research paper.
+It shows three models of sales growth (`growth_pct`), fitted to all 320
+ventures of the practice data. You do not need to run these models for
+parts 1 to 3.
+
+::: {.reg-table}
+| | (1) | (2) | (3) |
+|:---|---:|---:|---:|
+| Marketing spending (€10,000s) | 1.340\*\*\* | 1.338\*\*\* | 1.341\*\*\* |
+| | (0.106) | (0.100) | (0.100) |
+| Digital offering (1 = yes) | 2.969\*\*\* | 3.016\*\*\* | 3.084\*\*\* |
+| | (0.488) | (0.462) | (0.463) |
+| Founder experience (years) | | 0.255\*\*\* | 0.258\*\*\* |
+| | | (0.042) | (0.041) |
+| Team size (members) | | | 0.168 |
+| | | | (0.103) |
+| Intercept | 5.418\*\*\* | 3.206\*\*\* | 2.449\*\* |
+| | (0.528) | (0.617) | (0.771) |
+| Observations | 320 | 320 | 320 |
+| $R^2$ | 0.395 | 0.459 | 0.464 |
+| Adjusted $R^2$ | 0.391 | 0.454 | 0.457 |
+:::
+
+Outcome: sales growth (%). Ordinary least squares. Standard errors in
+parentheses. All three columns use the same 320 ventures. The reference
+group of the dummy is ventures with a mainly physical offering.
+\* p < 0.05, \*\* p < 0.01, \*\*\* p < 0.001.
+
+The critical value for a 95% confidence interval and a 5% test is
+$t_{0.975,\,df}=1.967$ in all three columns. For column (3), with
+$df=320-4-1=315$, R gives it with `qt(0.975, 315)`.
+
+1. Team size has no star in column (3). Calculate its t value. Then state
+   what the missing star means and what it does not mean.
+   **(4 points: 1 + 2 + 1)**
+2. Venture B spends €30,000 more on marketing than venture A. Its lead
+   founder has 4 more years of experience. B has a digital offering and A a
+   physical one. Both have the same team size. Calculate the fitted growth
+   of B minus the fitted growth of A with column (3). **(5 points)**
+3. Founder experience has three stars in column (2). Still, adding it moves
+   the marketing coefficient only from 1.340 to 1.338. Explain in one or two
+   sentences what this says about experience and marketing spending in this
+   sample. Then state one problem that the stable coefficient does not
+   exclude. **(5 points: 3 + 2)**
+4. In R: test whether founder experience and team size together improve the
+   model of column (1). Fit the models of columns (1) and (3) and compare
+   them with `anova()`. Report the F statistic. Then show how F follows from
+   the two residual sums of squares in your output.
+   **(4 points: 1 + 3)**
+
+   Stand-in values, if your code does not run: the residual sum of squares
+   is about 5950 on 317 degrees of freedom for column (1). It is about
+   5270 on 315 degrees of freedom for column (3). Calculate F from them.
+   For part 5, use a p-value below 0.001.
+5. State the null hypothesis of the test in part 4 and your conclusion at
+   the 5% level. Then explain in one sentence how this conclusion and the
+   missing star of team size can both be true. **(5 points: 1 + 2 + 2)**
+
+::: {.callout-note collapse="true"}
+## Model answer and marking guide
+
+We typed the table from the three outputs below.
+
+```{r}
+#| label: imock-q4-table
+col_1 <- lm(growth_pct ~ marketing_10k + digital, data = ventures)
+col_2 <- lm(growth_pct ~ marketing_10k + digital + experience_years,
+            data = ventures)
+col_3 <- lm(
+  growth_pct ~ marketing_10k + digital + experience_years + team_size,
+  data = ventures
+)
+summary(col_1)
+summary(col_2)
+summary(col_3)
+qt(0.975, df.residual(col_3))
+```
+
+1. The five steps of a test for one coefficient give the answer.
+   1. **Hypotheses.** $H_0:\beta_{team}=0$ versus $H_1:\beta_{team}\ne0$,
+      where $\beta_{team}$ is the coefficient of team size in the model of
+      column (3) for all ventures of the registry. The significance level is
+      $\alpha=0.05$.
+   2. **Test statistic.** $T=\hat\beta_{team}/\operatorname{SE}(\hat\beta_{team})$,
+      which has the $t_{315}$ distribution if $H_0$ is true.
+   3. **Critical value and rejection region.** $t_{0.975,\,315}=1.967$.
+      Reject $H_0$ if $t\le-1.967$ or $t\ge1.967$.
+   4. **Observed value.** The numbers in parentheses are standard errors, so
+      $t=0.168/0.103=1.63$.
+   5. **Conclusion.** 1.63 lies between $-1.967$ and 1.967, so do not
+      reject $H_0$. The p-value is above 0.05, and so there is no star. At
+      the 5% level we cannot conclude that team size goes with growth at
+      fixed marketing spending, offering type, and experience.
+
+   Marking: 1 point for $t=1.63$. 2 points for what the missing star means:
+   1 for the comparison of 1.63 with 1.967 (or "the p-value is above
+   0.05"), and 1 for the conclusion in words. 1 point for what it does not
+   mean: the missing star does not show that the coefficient is zero. The
+   95% interval, $0.168\pm1.967\times0.103$, runs from $-0.035$ to 0.371
+   percentage points per team member. It contains zero and also clearly
+   positive values (you also get this point without the interval).
+2. Marketing: €30,000 is 3 steps, so $3\times1.341=4.023$ (2 points).
+   Experience: $4\times0.258=1.032$ (1 point). Digital offering: 3.084
+   (1 point). Sum: $4.023+1.032+3.084=8.14$ percentage points (1 point for
+   the sum with its unit).
+
+```{r}
+#| label: imock-q4-compare
+b3 <- coef(col_3)
+unname(3 * b3["marketing_10k"] + 4 * b3["experience_years"] + b3["digitalYes"])
+confint(col_3)
+cor(ventures$marketing_10k, ventures$experience_years)
+```
+
+3. A coefficient changes when the added predictor is related to the outcome
+   and also to the predictor of interest (1 point). Experience is related to
+   growth, but in this sample it is almost unrelated to marketing spending
+   (1 point). So holding it fixed changes the marketing comparison
+   very little (1 point for the link to the stable coefficient). The
+   correlation of the two variables in the data is 0.001. The stable
+   coefficient does not exclude a variable that is not in the data
+   (1 point) and that is related to both marketing spending and growth
+   (1 point). A concrete example, such as the quality of the product, earns
+   the second point.
+4. $F=20.216$ (1 point, within 0.001). From the output:
+   $F=\dfrac{(5949.3-5272.6)/2}{5272.6/315}=\dfrac{338.35}{16.74}=20.21$
+   (3 points: 1 for the formula of the partial F statistic, 1 for the
+   numbers in the right places with $q=2$ and $df=315$, 1 for the result).
+   With the stand-in values, $F=\dfrac{(5950-5270)/2}{5270/315}=20.32$.
+   This earns the 3 points for the calculation and not the point for the
+   reported F.
+
+```{r}
+#| label: imock-q4-anova
+anova(col_1, col_3)
+c(F_by_hand = ((deviance(col_1) - deviance(col_3)) / 2) /
+    (deviance(col_3) / df.residual(col_3)),
+  F_stand_in = ((5950 - 5270) / 2) / (5270 / 315))
+```
+
+5. $H_0$: the coefficients of founder experience and team size are both
+   zero (1 point). The p-value in the `anova()` output is 5.491e-09, that
+   is 0.000000005, far below 0.05. So reject $H_0$ (1 point). At the 5%
+   level we can conclude that the two predictors together improve the
+   model of column (1) (1 point). The F-test asks about the two terms
+   together, and the t-test asks about team size alone (1 point). The joint
+   result comes from experience. A set of terms can be jointly useful while
+   one of its terms is not significant (1 point).
+:::
+
+## Question 5: Interactions and curvature (19 points)
+
+Parts 1 to 3 ask whether marketing spending goes with more growth for
+digital ventures than for physical ventures. Parts 4 to 6 use a model in
+which the relation between marketing spending and growth can be curved.
+
+1. In R: fit a model of `growth_pct` with `spend_c`, `digital`, the
+   interaction of the two, and `experience_years`. Report the coefficients
+   of `spend_c`, `digitalYes`, and the interaction.
+   **(3 points: 1 + 1 + 1)**
+
+   Stand-in values, if your code does not run: 1.0 for `spend_c`, 3.0 for
+   `digitalYes`, and 0.7 for the interaction. Use them in parts 2 and 3.
+2. State the marketing slope for physical ventures. Calculate the
+   marketing slope for digital ventures. **(3 points: 1 + 2)**
+3. Interpret the interaction coefficient in one sentence. **(4 points)**
+4. In R: run the model below, which has no interaction and adds the square
+   of marketing spending. Report the coefficients of `marketing_10k` and
+   `I(marketing_10k^2)`. **(2 points: 1 + 1)**
+
+   ```r
+   curve_model <- lm(
+     growth_pct ~ marketing_10k + I(marketing_10k^2) + digital +
+       experience_years,
+     data = ventures
+   )
+   ```
+
+   Stand-in values, if your code does not run: 2.2 for `marketing_10k` and
+   $-0.10$ for `I(marketing_10k^2)`. Use them in part 5.
+5. Use the model of part 4. Calculate the fitted change in growth when
+   marketing spending rises from €20,000 to €30,000, and when it rises from
+   €60,000 to €70,000. Offering type and experience stay fixed. Then state
+   in one sentence what the two results show together.
+   **(4 points: 1 + 1 + 2)**
+6. A founder plans to spend €150,000 on marketing. She wants to use the
+   model of part 4 to calculate her fitted growth. Explain in one or two
+   sentences why she should not do this. **(3 points)**
+
+::: {.callout-note collapse="true"}
+## Model answer and marking guide
+
+```{r}
+#| label: imock-q5-interaction
+interaction_model <- lm(
+  growth_pct ~ spend_c * digital + experience_years,
+  data = ventures
+)
+summary(interaction_model)$coefficients
+b5 <- coef(interaction_model)
+c(slope_physical = unname(b5["spend_c"]),
+  slope_digital = unname(b5["spend_c"] + b5["spend_c:digitalYes"]))
+```
+
+1. `spend_c` 1.044, `digitalYes` 2.967, interaction `spend_c:digitalYes`
+   0.660 (1 point each, within 0.001). The stand-in values earn no points
+   here.
+2. Physical ventures (`digital = No`): 1.044 percentage points per €10,000
+   (1 point). Digital ventures: $1.044+0.660$ (1 point) $=1.704$ percentage
+   points per €10,000 (1 point). With the stand-in values: 1.0 and 1.7.
+3. Among the 320 sampled ventures and at the same founder experience, each
+   additional €10,000 of marketing spending goes with 0.66 percentage points
+   more sales growth for digital ventures than for physical ventures. Give
+   1 point for "difference between the two slopes" or the same idea in
+   words, 2 points for the size with its unit (0.66 percentage points of
+   growth per €10,000), and 1 point for the comparison of digital with
+   physical ventures as an association. "Digital ventures grow 0.66
+   percentage points more" without the step of €10,000 earns 1 of the 2
+   points for the size. An answer with "causes" or "leads to" loses the
+   last point. With the stand-in value the size is 0.7.
+
+4. `marketing_10k` 2.179 and `I(marketing_10k^2)` $-0.105$ (1 point each,
+   within 0.001).
+
+```{r}
+#| label: imock-q5-quadratic
+curve_model <- lm(
+  growth_pct ~ marketing_10k + I(marketing_10k^2) + digital +
+    experience_years,
+  data = ventures
+)
+bq <- coef(curve_model)
+bq
+c(from_2_to_3 = unname(bq["marketing_10k"] +
+                         bq["I(marketing_10k^2)"] * (2 * 2 + 1)),
+  from_6_to_7 = unname(bq["marketing_10k"] +
+                         bq["I(marketing_10k^2)"] * (2 * 6 + 1)))
+c(stand_in_2_to_3 = 2.2 - 0.10 * 5, stand_in_6_to_7 = 2.2 - 0.10 * 13)
+unname(-bq["marketing_10k"] / (2 * bq["I(marketing_10k^2)"]))
+```
+
+5. The fitted change from $x$ to $x+1$ is
+   $\hat\beta_1+\hat\beta_2(2x+1)$. From €20,000 to €30,000, $x=2$:
+   $2.1794-0.1046\times5=1.66$ percentage points (1 point). From €60,000 to
+   €70,000, $x=6$: $2.1794-0.1046\times13=0.82$ percentage points
+   (1 point). With the coefficients rounded to three decimals the results
+   are 1.65 and 0.81. These are also correct. With the stand-in values:
+   1.70 and 0.90. Together: the same extra €10,000 goes with about half as
+   much extra growth at the higher level of spending (1 point). The fitted
+   curve becomes flatter (1 point). An answer that uses only the
+   coefficient 2.179 earns no points for the two changes.
+6. €150,000 is far outside the range of the data. The largest spending in
+   the sample is €79,900 (1 point). No venture in the data supports the
+   curve there (1 point). A quadratic curve does not stop curving. This one turns
+   downward at about €104,000 of spending, and no data show such a turn
+   (1 point). With the stand-in values the turn is at about €110,000.
+:::
+
+## Question 6: An answer of an AI assistant, and a decision (20 points)
+
+Sara runs a young venture with a mainly digital offering. She gave column
+(3) of the table in Question 4 to an AI assistant. Here is column (3) again:
+
+```text
+Outcome: sales growth (%), 320 ventures     Estimate  Std. Error
+Marketing spending (€10,000s)                  1.341       0.100
+Digital offering (1 = yes)                     3.084       0.463
+Founder experience (years)                     0.258       0.041
+Team size (members)                            0.168       0.103
+Intercept                                      2.449       0.771
+```
+
+She asked: "What does this mean for my marketing budget?" The AI answered:
+
+> "Good news. Your model controls for experience, team size, and offering
+> type. So the marketing coefficient is a causal effect: if you spend
+> €20,000 more on marketing, your sales growth will rise by 2.68 percentage
+> points. Your venture is digital, and digital ventures grow 3.084% faster
+> than the average venture. And the p-value of marketing is below 0.001, which proves that the assumptions of the
+> model hold."
+
+1. Assess the claim that the marketing coefficient is a causal effect.
+   &#40;a) Explain whether the controls in the model justify this claim. (b)
+   Write a sentence about €20,000 more marketing spending that the table
+   does support. **(5 points: 3 + 2)**
+2. Assess the sentence about digital ventures. Explain two errors in it,
+   and write a correct sentence about the coefficient 3.084.
+   **(4 points: 1 + 1 + 2)**
+3. Assess the last sentence. (a) Explain whether a small p-value can show
+   that the assumptions of the model hold. (b) State what the small p-value
+   of marketing does show. **(4 points: 2 + 2)**
+
+Sara's venture had sales of €1,000,000 last year. So 1 percentage point of
+sales growth is €10,000 of extra sales. Of each euro of sales, 50 cents are
+left as margin after the direct costs. Sara is considering spending €10,000 more
+on marketing next year.
+
+4. The 95% confidence interval of the marketing coefficient in column (3)
+   runs from 1.14 to 1.54 percentage points per €10,000. Show with a
+   calculation that €10,000 more marketing spending goes with extra sales
+   between €11,400 and €15,400, and with an extra margin between €5,700 and
+   €7,700. **(2 points: 1 + 1)**
+5. &#40;a) Decide whether Sara should spend the extra €10,000 on the basis of
+   these numbers, and give your reason in one sentence. (b) Explain one
+   reason why her true gain could differ from these numbers.
+   **(5 points: 3 + 2)**
+
+::: {.callout-note collapse="true"}
+## Model answer and marking guide
+
+The calculation $2\times1.341=2.68$ in the AI answer is correct. The
+wording around it is not.
+
+1. &#40;a) No. A control holds fixed only what is measured and in the model
+   (1 point). Variables that are not in the data can influence both marketing
+   spending and growth (1 point), for example the quality of the product
+   (1 point for one concrete variable that is not in the model). (b) "At
+   the same experience, team size, and offering type, ventures that spend
+   €20,000 more on marketing have on average 2.68 percentage points higher
+   fitted sales growth." Give 1 point for 2.68 percentage points with the
+   step of €20,000, and 1 point for a comparison of ventures at the same
+   experience, team size, and offering type. A sentence with "will rise" or
+   "causes" loses the second point.
+2. Two of the three errors, 1 point each. The outcome is in percent, so
+   the difference is 3.084 percentage points, not 3.084%: "3.084% faster"
+   would be a relative change. The comparison is with the reference group,
+   ventures with a mainly physical offering, and not with the average
+   venture. The AI sentence also does not say what is held fixed. A correct
+   sentence (2 points: 1 for percentage points and the physical reference
+   group, 1 for what is held fixed): "Ventures with a mainly digital
+   offering have on average 3.084 percentage points higher fitted sales
+   growth than ventures with a mainly physical offering that have the same
+   marketing spending, experience, and team size."
+3. &#40;a) No. A p-value is calculated under the assumptions of the model
+   (1 point), so it cannot prove them (1 point). (b) The small p-value is
+   evidence against a marketing coefficient of zero (1 point), if the
+   assumptions hold (1 point).
+
+```{r}
+#| label: imock-q6-decision
+2 * unname(coef(col_3)["marketing_10k"])
+ci_marketing <- confint(col_3)["marketing_10k", ]
+ci_marketing
+extra_sales <- round(ci_marketing, 2) * 10000
+extra_margin <- 0.5 * extra_sales
+rbind(extra_sales, extra_margin)
+```
+
+4. The interval of part 4 follows from column (3):
+   $1.341\pm1.967\times0.100$, or `confint(col_3)`, gives 1.144 to 1.538.
+   Extra sales: $1.14\times\text{€}10{,}000=\text{€}11{,}400$ at the lower end and
+   $1.54\times\text{€}10{,}000=\text{€}15{,}400$ at the upper end (1 point). Extra margin
+   at 50 cents per euro: $0.5\times\text{€}11{,}400=\text{€}5{,}700$ and
+   $0.5\times\text{€}15{,}400=\text{€}7{,}700$ (1 point).
+5. &#40;a) Decision: do not spend the extra €10,000 on this evidence (1 point).
+   Reason: even at the upper end of the interval, the extra margin of €7,700
+   is below the €10,000 that the marketing costs (2 points for this
+   comparison). "Spend it only as a small test" is also a correct decision
+   if it comes with this comparison. A decision to spend can also earn all 3
+   points. It must then compare the margin with the €10,000 and name a
+   further gain, for example customers who return in later years. A decision to spend
+   because growth rises, without the comparison with the cost, earns no
+   points.
+
+   &#40;b) One reason why the true gain could differ, with its explanation
+   (1 point for the reason, 1 point for the explanation). The coefficient
+   is an association among 320 ventures in observational data. It is not
+   the effect of a change in her own budget, which can be smaller or larger.
+   Customers who come back in later years add margin that these numbers
+   leave out. Her venture may differ from the average venture of the
+   sample.
+:::
+
+The six questions have 100 points together. Do the mock exam in R before
+you open the answers. Use the marking guide to check your numbers, and also
+your units, reference groups, statements about what is held fixed, and the
+limits of causal claims.
+
+::: {.callout-tip collapse="true"}
+## Optional: how the practice data were made (not part of the exam)
+
+You do not need this box for any question. The practice data were made with
+the code below. The fixed seed makes sure that the code always gives the
+same 320 rows as the file that you download. Answer every question for the
+registry data as the text describes them, not for this code.
 
 ```{r}
 #| label: imock-data
@@ -87,395 +860,5 @@ growth_pct <- round(
 ventures <- data.frame(
   growth_pct, marketing_10k, experience_years, team_size, digital, spend_c
 )
-
-simple_model <- lm(growth_pct ~ marketing_10k, data = ventures)
-multiple_model <- lm(
-  growth_pct ~ marketing_10k + experience_years + team_size + digital,
-  data = ventures
-)
-additive_model <- lm(
-  growth_pct ~ spend_c + digital + experience_years,
-  data = ventures
-)
-extended_model <- lm(
-  growth_pct ~ spend_c * digital + I(spend_c^2) + experience_years,
-  data = ventures
-)
 ```
-
-```{r}
-#| label: imock-write-csv
-#| include: false
-# Writes the downloadable copy of the dataset into data/, which the project
-# copies into the rendered site as a listed resource (this survives frozen
-# re-renders, unlike writing into docs/ directly).
-# No analysis objects are created here.
-write.csv(
-  ventures, "data/qm-intermediate-mock-exam.csv", row.names = FALSE
-)
-```
-
-[Download `qm-intermediate-mock-exam.csv`](../data/qm-intermediate-mock-exam.csv),
-save it in your R project, and load it with:
-
-```r
-ventures <- read.csv("qm-intermediate-mock-exam.csv")
-ventures$digital <- factor(ventures$digital, levels = c("No", "Yes"))
-```
-
-The printed results below let you continue if R is not available for a
-moment. When you practise with a time limit, reproduce them from the
-downloaded file.
-
-## Question 1: Simple regression and least squares (20 points)
-
-The first model is
-
-```r
-simple_model <- lm(growth_pct ~ marketing_10k, data = ventures)
-```
-
-and R reports
-
-```text
-Coefficients:
-                Estimate  Std. Error  t value  Pr(>|t|)
-(Intercept)        6.60       0.52      12.72   <2e-16
-marketing_10k      1.38       0.11      12.35   <2e-16
-
-Residual standard error: 4.57 on 318 degrees of freedom
-Multiple R-squared: 0.324
-```
-
-1. Write the fitted regression equation with units. **(3 points)**
-2. Interpret the slope and intercept in context. Comment on whether the
-   intercept has a useful meaning here. **(6 points)**
-3. Calculate the fitted growth for a venture spending €30,000 on marketing.
-   If its observed growth is 15 percentage points, calculate its residual and
-   interpret the sign. **(5 points)**
-4. Explain what least squares minimises and why residuals are squared rather
-   than simply summed. **(4 points)**
-5. State the observational unit and why the fitted slope is not automatically
-   causal. **(2 points)**
-
-::: {.callout-note collapse="true"}
-## Model answer and marking guide
-
-1. $\widehat{growth\_pct}=6.60+1.38\,marketing\_10k$, where the outcome is
-   in percentage points and the predictor in €10,000s (3 points).
-2. For each additional €10,000 of marketing spending, fitted annual sales
-   growth is 1.38 percentage points higher among sampled ventures (3 points).
-   At zero marketing spending, fitted growth is 6.60 percentage points
-   (2 points). This intercept is useful only if zero lies in or near the
-   observed spending range and defines a meaningful venture (1 point).
-3. €30,000 gives `marketing_10k = 3`, so the fitted value is
-   $6.60+1.38(3)=10.74$ percentage points (3 points). The residual is
-   $15-10.74=4.26$ percentage points. Positive means observed growth exceeds
-   the model's fitted value (2 points).
-4. Least squares chooses the coefficients that minimise the sum of squared
-   residuals, $\sum_i(y_i-\hat y_i)^2$ (2 points). Residuals that are not
-   squared cancel: with an intercept, the positive and negative residuals
-   sum to zero. Squaring also counts large misses more heavily (2 points).
-5. The unit is one venture (1 point). An association in observational data
-   can come from confounding, reverse causality, selection, or measurement
-   error (1 point).
 :::
-
-## Question 2: Assumptions and diagnostics (20 points)
-
-R produced the following diagnostics for
-`lm(growth_pct ~ marketing_10k, data = ventures)`. In the left panel,
-each point has fitted growth on the horizontal axis and its residual on the
-vertical axis. In the right panel, observed standardised residuals are plotted
-against theoretical standard-normal quantiles. A normal pattern would follow
-the straight reference line.
-
-```{r}
-#| label: fig-imock-diagnostics
-#| code-fold: true
-#| code-summary: "See the R code for this figure"
-#| fig-cap: "Residual-versus-fitted plot and normal Q-Q plot for the simple model."
-library(ggplot2)
-library(patchwork)
-# Rebuilds the same ventures dataset as the visible chunk above (same seed).
-set.seed(734)
-n_mock <- 320
-marketing_10k <- round(runif(n_mock, 0.25, 8), 2)
-experience_years <- sample(0:18, n_mock, replace = TRUE)
-team_size <- sample(
-  1:10, n_mock, replace = TRUE,
-  prob = c(8, 16, 20, 20, 14, 9, 6, 4, 2, 1)
-)
-digital <- factor(
-  ifelse(runif(n_mock) < 0.45, "Yes", "No"),
-  levels = c("No", "Yes")
-)
-spend_c <- marketing_10k - 4
-growth_mean <-
-  8 + 1.10 * spend_c + 3 * (digital == "Yes") -
-  0.10 * spend_c^2 + 0.30 * experience_years +
-  0.70 * spend_c * (digital == "Yes") + 0.20 * team_size
-growth_pct <- round(
-  growth_mean + rnorm(n_mock, 0, 2.5 + 0.40 * marketing_10k),
-  2
-)
-ventures <- data.frame(
-  growth_pct, marketing_10k, experience_years, team_size, digital, spend_c
-)
-simple_model <- lm(growth_pct ~ marketing_10k, data = ventures)
-
-resid_df <- data.frame(
-  fitted = fitted(simple_model),
-  residual = residuals(simple_model)
-)
-qq_df <- data.frame(rs = rstandard(simple_model))
-theme_mock <- theme_minimal(base_size = 13) +
-  theme(
-    panel.grid.minor = element_blank(),
-    panel.grid.major.x = element_blank(),
-    plot.caption = element_text(colour = "#5B6976"),
-    axis.title = element_text(colour = "#17324D")
-  )
-
-p_resid <- ggplot(resid_df, aes(x = fitted, y = residual)) +
-  geom_hline(yintercept = 0, colour = "#C98B2E",
-             linetype = "dashed", linewidth = 0.8) +
-  geom_point(alpha = 0.45, size = 1.6, colour = "#009E73") +
-  annotate("text", x = max(resid_df$fitted), y = 0,
-           label = "residual = 0", hjust = 1, vjust = -0.7,
-           colour = "#17324D", size = 3) +
-  labs(x = "Fitted growth (percentage points)",
-       y = "Residual (percentage points)") +
-  theme_mock
-
-p_qq <- ggplot(qq_df, aes(sample = rs)) +
-  geom_qq_line(colour = "#D55E00", linewidth = 0.9) +
-  geom_qq(colour = "#009E73", alpha = 0.45, size = 1.6) +
-  labs(x = "Normal theoretical quantile",
-       y = "Observed standardised residual") +
-  theme_mock
-
-p_resid + p_qq
-```
-
-1. Read both axes of the residual-versus-fitted panel and explain what a point
-   above zero represents. **(4 points)**
-2. What pattern do you see in that panel? Name the assumption it challenges.
-   **(4 points)**
-3. Explain how to read the Q--Q plot and assess normality here. **(4 points)**
-4. Name two regression assumptions that these plots cannot establish, and
-   state what information would help assess each. **(4 points)**
-5. Would heteroskedasticity-robust standard errors repair a curved conditional
-   mean or make the slope causal? Explain. **(4 points)**
-
-::: {.callout-note collapse="true"}
-## Model answer and marking guide
-
-1. The horizontal axis is model-fitted growth. The vertical axis is
-   observed-minus-fitted growth, both in percentage points (2 points). A point
-   above zero is a venture whose observed growth is higher than its fitted
-   growth (2 points).
-2. Vertical spread increases with fitted growth, creating a fan shape
-   (2 points). This challenges constant conditional variance
-   (homoskedasticity) (2 points).
-3. The Q--Q plot compares ordered residuals with values expected under a
-   normal distribution. Agreement appears as points near the line (2 points).
-   The middle is reasonably aligned but tail departures suggest imperfect
-   normality and possible extreme residuals (2 points).
-4. Examples. Independence: you need to know whether ventures are clustered,
-   observed more than once, or sampled in a particular order. No
-   confounding: you need knowledge of how the data came about and of
-   relevant variables that are not in the model. Correct measurement: you
-   need information about how the variables were recorded. (2 points for
-   each valid assumption with the information that would help, maximum 4.)
-5. Robust standard errors give better estimates of the uncertainty in large
-   samples when the error variance is not constant (2 points). They do not
-   change the fitted conditional mean, they do not repair a curve that the
-   model leaves out, they do not remove confounding, and they do not make a
-   coefficient from observational data causal (2 points).
-:::
-
-## Question 3: Model fit and the overall F-test (20 points)
-
-The researcher next fits
-
-```r
-multiple_model <- lm(
-  growth_pct ~ marketing_10k + experience_years + team_size + digital,
-  data = ventures
-)
-```
-
-R reports:
-
-```text
-Residual standard error: 4.09 on 315 degrees of freedom
-Multiple R-squared: 0.464, Adjusted R-squared: 0.457
-F-statistic: 68.10 on 4 and 315 DF, p-value: < 2.2e-16
-```
-
-For the intercept-only model, SST = 9,831.91. For `multiple_model`,
-SSE = 5,272.57.
-
-1. Verify $R^2$ from SST and SSE. Interpret it precisely. **(6 points)**
-2. Explain why adjusted $R^2$ is lower than $R^2$, and when adjusted
-   $R^2$ is useful. **(4 points)**
-3. State the null and alternative hypotheses of the reported overall F-test.
-   Give its conclusion. **(6 points)**
-4. Explain why this F-test is not equivalent to four separate 5% t-tests.
-   **(2 points)**
-5. Does $R^2=0.464$ show that the model predicts future ventures well?
-   Explain briefly. **(2 points)**
-
-::: {.callout-note collapse="true"}
-## Model answer and marking guide
-
-1. $R^2=1-5272.57/9831.91\approx0.464$ (3 points). The fitted values explain
-   46.4% of the observed sample variation in sales-growth percentage points.
-   It is not a percentage of correct predictions (3 points).
-2. Adjusted $R^2$ contains a penalty for every predictor in the model, and
-   it can fall when a term adds little to the fit (2 points). It helps to
-   compare models with different numbers of predictors that are fitted to
-   the same outcome and the same observations (2 points).
-3. $H_0:\beta_{marketing}=\beta_{experience}=\beta_{team}=\beta_{digital}=0$
-   against the alternative that at least one of them is not zero
-   (3 points). The p-value is far below 0.05, so reject $H_0$: the model
-   with four predictors fits better than a model with only an intercept, if
-   the assumptions of the test hold (3 points).
-4. The F-test is one joint test of all four coefficients together. Four
-   separate t-tests answer four single questions. A set of terms can be
-   jointly useful even when no single t-test rejects (2 points).
-5. No. $R^2$ measures the fit in this sample only. To judge predictions for
-   future ventures, the model must be checked on new data that were not
-   used to fit it (2 points).
-:::
-
-## Question 4: Multiple regression and a dummy predictor (20 points)
-
-The coefficient table below comes from
-`lm(growth_pct ~ marketing_10k + experience_years + team_size + digital, data = ventures)`.
-The reference category for `digital` is `No`.
-
-```text
-                  Estimate  Std. Error  t value  Pr(>|t|)
-(Intercept)          2.45       0.77       3.18     0.002
-marketing_10k        1.34       0.10      13.40    <0.001
-experience_years     0.26       0.04       6.23    <0.001
-team_size            0.17       0.10       1.63     0.104
-digitalYes           3.08       0.46       6.67    <0.001
-```
-
-1. Interpret `marketing_10k`, including the predictor step, outcome unit,
-   held-fixed variables, and sample. **(5 points)**
-2. Interpret `digitalYes` and name its reference category. **(4 points)**
-3. Compare two otherwise identical ventures: A spends €20,000 on marketing,
-   has 5 years of founder experience, a team of 4, and `digital = No`. B has
-   the same values except it spends €40,000 and has `digital = Yes`. Calculate
-   B's fitted growth minus A's. **(5 points)**
-4. Test $H_0:\beta_{team\_size}=0$ against a two-sided alternative and give
-   a careful conclusion. **(3 points)**
-5. Explain why including controls does not by itself give the marketing or
-   digital coefficients a causal interpretation. **(3 points)**
-
-::: {.callout-note collapse="true"}
-## Model answer and marking guide
-
-1. Among sampled registry ventures, an additional €10,000 in annual marketing
-   spending is associated with 1.34 percentage points higher fitted sales
-   growth, holding founder experience, team size, and offering type fixed
-   (5 points).
-2. At equal marketing spending, experience, and team size, primarily digital
-   ventures have fitted growth 3.08 percentage points higher than primarily
-   physical ventures. `No` is the reference (4 points).
-3. The spending change is two units, contributing $2(1.34)=2.68$. Changing
-   from `No` to `Yes` contributes 3.08. The fitted difference is
-   $2.68+3.08=5.76$ percentage points (5 points).
-4. $t=1.63$, $p=0.104>0.05$, so do not reject $H_0$. The data do not show
-   an association between team size and growth, holding the other
-   predictors fixed. This does not prove that the coefficient is zero
-   (3 points).
-5. Controls adjust only for variables that are measured and included in the
-   model. Unmeasured confounders, reverse causality, selection, and
-   measurement error can remain in these observational data (3 points).
-:::
-
-## Question 5: Interactions, curvature, and a partial F-test (20 points)
-
-The researcher fits the extended model
-
-```r
-extended_model <- lm(
-  growth_pct ~ spend_c * digital + I(spend_c^2) + experience_years,
-  data = ventures
-)
-```
-
-with estimates:
-
-```text
-                         Estimate
-(Intercept)                  9.20
-spend_c                      1.04
-digitalYes                   2.96
-I(spend_c^2)                -0.11
-experience_years             0.24
-spend_c:digitalYes           0.68
-```
-
-The partial comparison with the additive linear model reports:
-
-```text
-Analysis of Variance Table
-
-Model 1: growth_pct ~ spend_c + digital + experience_years
-Model 2: growth_pct ~ spend_c * digital + I(spend_c^2) + experience_years
-  Res.Df    RSS  Df  Sum of Sq    F   Pr(>F)
-1    316  5317.0
-2    314  5053.8   2     263.23  8.18  0.00035
-```
-
-1. At €40,000 of marketing spending (`spend_c = 0`), give the fitted spending
-   slope for each offering type and the fitted `Yes`--`No` difference.
-   **(6 points)**
-2. At €60,000 (`spend_c = 2`), calculate the fitted `Yes`--`No` difference.
-   **(3 points)**
-3. For a physical-offering venture, calculate the fitted change when spending
-   rises from €60,000 (`spend_c = 2`) to €70,000 (`spend_c = 3`), holding
-   experience fixed. Repeat for a digital venture. **(5 points)**
-4. State the hypotheses and conclusion of the partial F-test. **(4 points)**
-5. State the hierarchy rule and one reason not to extrapolate this quadratic
-   far beyond the observed spending range. **(2 points)**
-
-::: {.callout-note collapse="true"}
-## Model answer and marking guide
-
-1. At `spend_c = 0`, the physical-offering slope is 1.04 percentage points per
-   €10,000 and the digital slope is $1.04+0.68=1.72$ (2 points each). The
-   fitted digital-minus-physical difference is 2.96 percentage points
-   (2 points). The slopes 1.04 and 1.72 are the slopes of the two curves
-   exactly at `spend_c = 0`. The fitted change from `spend_c = 0` to
-   `spend_c = 1` is $1.04-0.11=0.93$ for physical and $0.93+0.68=1.61$ for
-   digital offerings. Either pair earns the points if the reasoning is
-   shown.
-2. The group difference is $2.96+0.68(2)=4.32$ percentage points
-   (3 points).
-3. For physical offerings, the change from 2 to 3 is
-   $1.04(1)-0.11(3^2-2^2)=1.04-0.55=0.49$ percentage points
-   (2 points). For digital offerings, add the interaction change of 0.68, so
-   the fitted change is 1.17 percentage points (2 points). Units and the
-   held-fixed experience condition earn 1 point.
-4. $H_0:\beta_{spend\times digital}=\beta_{spend^2}=0$ against the
-   alternative that at least one of the two is not zero (2 points). Since
-   $p=0.00035<0.05$, reject $H_0$: the two added terms are jointly useful
-   beyond the additive linear model, if the assumptions of the test hold
-   (2 points).
-5. Keep `spend_c` and `digital` in the model when their interaction or the
-   square of `spend_c` is in it (1 point). A quadratic curve can turn
-   sharply and give unrealistic values outside the observed range
-   (1 point).
-:::
-
-The points of the five questions sum to 100. Do the mock exam in R before
-you open the answers. Use the marking guide to check your calculations, and
-also your units, reference groups, statements about what is held fixed,
-uncertainty, and the limits of causal claims.
