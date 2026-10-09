@@ -214,6 +214,11 @@ These points supersede earlier entries where they differ.
   standard econometric terms (perfect multicollinearity, reference category,
   heteroskedasticity, control variables, jointly significant, quadratic term,
   error term). A common informal name appears once in brackets at first use.
+- **Intermediate Lecture 6 extended** (9 October, Valentina). Worked examples
+  on reading an interaction with units and on a continuous moderator, and a
+  basic section on moderation and mediation (total, direct, indirect effect;
+  moderator versus mediator versus confounder). No turning-point example.
+  Basic Lecture 10 stays as it is (regression preview is Gabriela's call).
 - **Regression assumptions (Intermediate Lectures 2 and 4)** (9 October,
   Valentina). Listed as in Wooldridge: variation in X / no perfect
   multicollinearity, linearity, independence (random sampling),

@@ -12,8 +12,8 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 ::: {.outcomes}
 <span class="label">By the end of Lecture 6, you can</span>
 
-- interpret an interaction coefficient as a difference in slopes between groups
-- report an interaction that is not significant without claiming too much
+- interpret an interaction coefficient as a difference in slopes, also when it is not significant
+- tell a moderator from a mediator and a confounder
 - fit a quadratic term and compute a fitted change from the curve
 - test added terms jointly and avoid using a curve beyond the data
 :::
@@ -108,8 +108,8 @@ and [polynomial terms](../resources/math-refresher.html#polynomial-terms).
 ## Lecture material
 
 This section adds two terms to the regression model. An interaction term
-lets a slope differ between two groups. A quadratic term lets a slope change
-along the predictor itself.
+lets a slope differ between two groups, or change with the value of another
+predictor. A quadratic term lets a slope change along the predictor itself.
 
 <p class="concept-video"><strong>Stanford explanations (review):</strong>
 <a href="https://www.youtube.com/watch?v=dEBQmiXv9fk">3.5 Extensions of the Linear Model</a> and
@@ -196,9 +196,10 @@ combines the two variables. If $X$ is measured in seasons and $D$ is a
 dummy, $\beta_3$ is in outcome units per season: here, equity percentage
 points per season, the group with $D=1$ minus the reference category. The same algebra
 works when the second variable is a number $Z$ and not a dummy. The slope of
-$X$ is then $\beta_1+\beta_3Z$, a slope that changes with $Z$.
+$X$ is then $\beta_1+\beta_3Z$, a slope that changes with $Z$. The section
+on a continuous moderator below works through this case.
 
-**Centring.** Centring a predictor means subtracting its mean. With $XD$
+[**Centring.**]{#i06-centring} Centring a predictor means subtracting its mean. With $XD$
 in the model, $\beta_2$ compares the two groups at $X=0$. For the Shark Tank
 data this would be Season 0, which does not exist. Replacing season with
 
@@ -275,19 +276,82 @@ interaction_model <- lm(
 summary(interaction_model)
 ```
 
-Use the table with one row per group to get the two season slopes, holding
-requested amount fixed. For all-men teams (`women = 0`), the fitted season
-slope is about $-0.799$ percentage points per season. For teams with women
-(`women = 1`), it is
+::: {#exm-i06-reading-interaction}
+## Worked example: reading each coefficient of the interaction model
+
+[Shark Tank data]{.shark-tag} The outcome is the equity offered in percent, so every coefficient is in
+percentage points. The predictor `season_c` is in seasons, measured from the
+average season. The requested amount `ask_1k` is in \$1,000s. The reference
+category is all-men teams (`women = 0`). The code below stores the
+coefficients and computes the two group lines at the average requested
+amount:
+
+```{r}
+#| label: i06-interaction-read
+b_int <- coef(interaction_model)
+ask_bar <- mean(known_gender$ask_1k)
+intercept_men <- unname(b_int["(Intercept)"] + b_int["ask_1k"] * ask_bar)
+intercept_women <- intercept_men + unname(b_int["women"])
+c(intercept_men = intercept_men,
+  intercept_women = intercept_women,
+  slope_men = unname(b_int["season_c"]),
+  slope_women = unname(b_int["season_c"] + b_int["season_c:women"]))
+c(mean_season = mean(known_gender$season),
+  min_ask_1k = min(known_gender$ask_1k),
+  gap_share_of_men = unname(b_int["women"]) / intercept_men,
+  interaction_share_of_slope = unname(b_int["season_c:women"] /
+                                        b_int["season_c"]))
+```
+
+Step 1: the two lines. Fill in the table with one row per group. At the
+average requested amount, with $\text{season\_c}$ as the predictor:
 
 $$
--0.7994+(-0.0615)=-0.861
-\text{ percentage points per season.}
+\begin{aligned}
+\text{all-men teams: } & \widehat{\text{equity}} = 12.866 - 0.799\times\text{season\_c},\\
+\text{teams with women: } & \widehat{\text{equity}} = (12.866+0.807) + (-0.7994-0.0615)\times\text{season\_c}\\
+& \phantom{\widehat{\text{equity}}} = 13.673 - 0.861\times\text{season\_c}.
+\end{aligned}
 $$
+
+Step 2: one sentence per coefficient.
+
+- `season_c` ($-0.799$). Among all-men teams, one season later is
+  associated with an equity offered that is on average 0.80 percentage points
+  lower, at the same requested amount. This is the slope of the reference
+  category only.
+- `season_c:women` ($-0.061$). Per one season more, the equity offered by
+  teams with women falls 0.061 percentage points more than that of all-men
+  teams. This is the difference between the two slopes. It is about 8% of
+  the all-men slope.
+- `women` ($0.807$). In the average season (about 8.8), teams with women are
+  fitted to offer about 0.81 percentage points more equity than all-men teams,
+  at the same requested amount. With the interaction in the model, this
+  difference holds only where $\text{season\_c}=0$. In other seasons the gap
+  is $0.807-0.061\times\text{season\_c}$.
+- `ask_1k` ($-0.0027$). A request that is \$1,000 higher is associated with
+  an equity offered that is on average 0.0027 percentage points lower, in
+  both groups. Per \$100,000 more, this is about 0.27 percentage points.
+- The intercept ($13.62$) is the fitted equity offered for all-men teams in
+  the average season with a requested amount of \$0. The smallest request in
+  the data is \$10,000, so the intercept has no useful meaning of its own.
+
+Step 3: how large is it? In the average season, all-men teams are fitted to
+offer 12.87% and teams with women 13.67%. The gap is 0.81 percentage points.
+Measured as a percent of the all-men level, the same gap is about 6%. So
+"0.81 percent more" would be wrong. The coefficient is a difference in
+percentage points.
+
+Why does the model use `season_c` and not `season`? The dummy coefficient
+always compares the groups at $X=0$. Without [centring](#i06-centring), $X=0$
+would be Season 0, a season outside the data. Centring moves the comparison
+to the average season, where there are many pitches.
+:::
 
 The interaction estimate is $-0.061$ equity percentage points per season,
-with a p-value of about 0.520. The difference is small: about 8% of the
-all-men slope. Draw two conclusions from this result. First, the model gives no
+with a p-value of about 0.520. The difference is small, about 8% of the
+all-men slope (@exm-i06-reading-interaction). Draw two conclusions from
+this result. First, the model gives no
 evidence that the season trend differs between the two groups. Second, the model
 does not prove that the two slopes are equal. The estimate is imprecise
 (standard error about 0.096), so the data are consistent with a somewhat
@@ -352,14 +416,176 @@ Always graph a model that contains an interaction. In @fig-i06-interaction,
 the main result is that the two lines are almost parallel. Once $XD$ is in the model,
 neither $\hat\beta_1$ nor $\hat\beta_2$ alone describes all teams.
 
+### A continuous moderator
+
+The second variable of an interaction need not be a dummy. It can be any
+number $Z$, such as a price, a firm size, or a number of stores. The model is
+
+$$
+E[Y\mid X,Z]=\beta_0+\beta_1X+\beta_2Z+\beta_3XZ,
+$$
+
+and a one-unit increase in $X$ changes the conditional mean by
+$\beta_1+\beta_3Z$. There are now not two lines but one line for every value
+of $Z$.
+
+::: {.definition-box}
+<span class="label">Definition</span>
+
+**Moderator.** A variable $Z$ that changes the slope of another predictor
+$X$ through the interaction term $XZ$. The slope of $X$ at one value of $Z$,
+$\beta_1+\beta_3Z$, is called the conditional effect of $X$ at that value.
+:::
+
+The name "conditional effect" is standard, but it is still a fitted slope.
+It is a causal effect only when the design of the study allows a causal
+reading. Two coefficients now need care. $\beta_1$ is the slope of $X$ only
+where $Z=0$, and $\beta_2$ is the slope of $Z$ only where $X=0$. If zero lies
+outside the data, neither number describes any real case. The coefficients
+$\beta_1$ and $\beta_2$ are often called the main effects. With $XZ$ in the
+model they are conditional too. [Centring](#i06-centring) $Z$ makes
+$\beta_1$ the slope of $X$ at the mean of $Z$.
+
+::: {#exm-i06-moderator}
+## Worked example: marketing pays more in regions with more stores
+
+An invented example. A franchise chain has 150 regions. For each region it
+records the monthly sales and the monthly marketing spending, both in
+€1,000s, and the number of stores. The question: does an extra €1,000 of
+marketing go with more sales in regions with many stores? The code below
+builds the invented data and fits the model with the interaction term:
+
+```{r}
+#| label: i06-moderator-fit
+set.seed(606)
+n_regions <- 150
+stores <- sample(1:12, n_regions, replace = TRUE)
+marketing <- round(runif(n_regions, min = 2, max = 20), 1)
+sales <- round(30 + 1.0 * marketing + 6 * stores +
+               0.25 * marketing * stores + rnorm(n_regions, sd = 12), 1)
+franchise <- data.frame(sales, marketing, stores)
+summary(franchise)
+
+moderator_model <- lm(sales ~ marketing * stores, data = franchise)
+summary(moderator_model)$coefficients
+```
+
+Step 1: the slope of marketing as a function of stores. With the
+coefficients from the output,
+
+$$
+\widehat{\text{slope of marketing}} = 1.745 + 0.147\times\text{stores}.
+$$
+
+Step 2: the slope at three meaningful values of the moderator. Take the
+lower quartile, the median, and the upper quartile of the number of stores:
+
+```{r}
+#| label: i06-moderator-slopes
+b_mod <- coef(moderator_model)
+store_values <- quantile(franchise$stores, c(0.25, 0.5, 0.75))
+store_values
+marketing_slopes <- b_mod["marketing"] + b_mod["marketing:stores"] * store_values
+marketing_slopes
+marketing_slopes[3] / marketing_slopes[1]
+```
+
+In a region with 3 stores (the lower quartile), €1,000 more marketing is
+associated with about €2,190 more monthly sales on average. With 6 stores
+(the median) it is about €2,630, and with 10 stores (the upper quartile)
+about €3,220. The slope at the upper quartile is about 1.47 times the slope
+at the lower quartile.
+
+Step 3: one sentence per coefficient.
+
+- `marketing:stores` ($0.147$). Each extra store raises the slope of
+  marketing by 0.147: €147 more monthly sales per €1,000 of marketing. Read
+  the other way round, each extra €1,000 of marketing raises the slope of
+  stores by €147 of monthly sales per store.
+- `marketing` ($1.745$). This is the slope of marketing in a region with 0
+  stores. No region has 0 stores (the minimum is 1), so this number does not
+  describe the marketing slope of any region.
+- `stores` ($6.768$). This is the slope of stores at €0 of marketing. The
+  smallest spending in the data is €2,300, so this number also lies outside
+  the data.
+
+Step 4: centre the moderator. With $\text{stores\_c}$, the number of stores
+minus its mean, the marketing coefficient becomes the slope at the average
+number of stores (about 6.3):
+
+```{r}
+#| label: i06-moderator-centred
+franchise$stores_c <- franchise$stores - mean(franchise$stores)
+coef(lm(sales ~ marketing * stores_c, data = franchise))
+```
+
+The marketing coefficient is now 2.676: at the average number of stores,
+€1,000 more marketing is associated with about €2,680 more monthly sales.
+The interaction coefficient stays 0.147. As with the dummy, centring moves
+the place of the comparison and not the fitted lines.
+:::
+
+@fig-i06-moderator draws the fitted lines at the three values of the
+moderator. The lines fan out because their slopes differ.
+
+```{r}
+#| label: fig-i06-moderator
+#| code-fold: true
+#| code-summary: "See the R code for this figure"
+#| fig-cap: "Fitted monthly sales against marketing spending (invented example) in regions with 3, 6, and 10 stores, the quartiles of the number of stores. The lines become steeper as the number of stores grows: the slope of marketing depends on the moderator."
+library(ggplot2)
+set.seed(606)
+n_regions <- 150
+stores <- sample(1:12, n_regions, replace = TRUE)
+marketing <- round(runif(n_regions, min = 2, max = 20), 1)
+sales <- round(30 + 1.0 * marketing + 6 * stores +
+               0.25 * marketing * stores + rnorm(n_regions, sd = 12), 1)
+franchise <- data.frame(sales, marketing, stores)
+moderator_model <- lm(sales ~ marketing * stores, data = franchise)
+
+lines_data <- expand.grid(marketing = seq(2, 20, length.out = 50),
+                          stores = c(3, 6, 10))
+lines_data$fit <- predict(moderator_model, newdata = lines_data)
+lines_data$group <- factor(paste(lines_data$stores, "stores"),
+                           levels = c("3 stores", "6 stores", "10 stores"))
+label_data <- subset(lines_data, marketing == 20)
+
+ggplot(franchise, aes(x = marketing, y = sales)) +
+  geom_point(colour = "grey80", size = 1.6) +
+  geom_line(data = lines_data,
+            aes(x = marketing, y = fit, colour = group, linetype = group),
+            linewidth = 1.1) +
+  geom_text(data = label_data,
+            aes(x = marketing + 0.4, y = fit, label = group, colour = group),
+            hjust = 0, size = 3.4) +
+  scale_colour_manual(values = c("3 stores" = "#009E73",
+                                 "6 stores" = "#0072B2",
+                                 "10 stores" = "#D55E00"),
+                      guide = "none") +
+  scale_linetype_manual(values = c("3 stores" = "solid",
+                                   "6 stores" = "longdash",
+                                   "10 stores" = "dashed"),
+                        guide = "none") +
+  coord_cartesian(xlim = c(2, 23)) +
+  labs(x = "Monthly marketing spending (EUR 1,000s)",
+       y = "Monthly sales (EUR 1,000s)") +
+  theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    plot.caption = element_text(colour = "#5B6976"),
+    axis.title = element_text(colour = "#17324D")
+  )
+```
+
 ### The hierarchy principle and the `*` shorthand
 
 The **hierarchy principle** says: if a model contains $XD$, keep both $X$
 and $D$ in the model, even when one of them is not significant on its own.
-The terms $X$ and $D$ define the two lines, and the interaction describes
-the difference between these lines. If you leave out $D$, the model forces
-both lines to start at the same height. This distorts the interaction
-coefficient. The `*` shorthand in an R formula follows the principle for
+The same holds for $XZ$ with a continuous moderator $Z$. The terms $X$ and
+$D$ define the two lines, and the interaction describes the difference
+between these lines. If you leave out $D$, the model forces both lines to
+start at the same height. This distorts the interaction coefficient. The `*` shorthand in an R formula follows the principle for
 you:
 
 ```{r}
@@ -368,8 +594,151 @@ you:
 lm(y ~ x * z, data = df)  # x * z expands to x + z + x:z
 ```
 
-An interaction term lets the slope differ by group. A quadratic term lets the
-slope change as $x$ itself changes. Both add one new column to the data, a product or a
+### Moderation and mediation
+
+Two words often appear in business research about a third variable: a
+moderator and a mediator. They describe different roles, and a regression
+handles them in different ways.
+
+Moderation first. A moderator changes the strength or the direction of the
+relationship between $X$ and $Y$. With a moderator, the answer to "how is $X$
+related to $Y$?" is "it depends on $Z$". In a regression, moderation shows up
+as an interaction term. You have seen two cases. In
+@exm-i06-reading-interaction the moderator is a dummy, the `women` group,
+and the season slope differs between two groups. In @exm-i06-moderator the
+moderator is a number, the number of stores, and the marketing slope grows
+with every extra store. A moderator can also reverse a relationship, for
+example a price cut that raises orders for students and lowers them for a
+luxury segment.
+
+::: {.definition-box}
+<span class="label">Definition</span>
+
+**Mediator.** A variable $M$ that lies on the path from $X$ to $Y$: $X$
+affects $M$, and $M$ affects $Y$. The part of the effect of $X$ on $Y$ that
+runs through $M$ is called the indirect effect.
+:::
+
+Take marketing spending ($X$), website visits ($M$), and sales ($Y$).
+Marketing brings visitors to the website, and visitors buy. Marketing can
+also raise sales in other ways, for example through people who see an
+advert and buy in a shop. @fig-i06-mediation shows the two paths. Three
+effects describe them:
+
+- the total effect: how much $Y$ changes when $X$ changes, by all paths
+  together
+- the direct effect: the part that does not run through $M$
+- the indirect effect: the part that runs through $M$.
+
+The total effect is the direct effect plus the indirect effect.
+
+```{r}
+#| label: fig-i06-mediation
+#| code-fold: true
+#| code-summary: "See the R code for this figure"
+#| fig-height: 3
+#| fig-cap: "A mediation diagram (invented example). The indirect path runs from marketing spending through website visits to sales. The direct path goes from marketing spending to sales without visits. The total effect is the sum of both paths."
+library(ggplot2)
+boxes <- data.frame(x = c(1, 3, 5), y = c(1, 2, 1),
+                    label = c("Marketing\nspending (X)",
+                              "Website\nvisits (M)",
+                              "Sales (Y)"))
+arrows_data <- data.frame(x = c(1.45, 3.55, 1.6),
+                          y = c(1.25, 1.75, 1),
+                          xend = c(2.45, 4.55, 4.4),
+                          yend = c(1.75, 1.25, 1),
+                          path = c("indirect", "indirect", "direct"))
+
+ggplot() +
+  geom_segment(data = arrows_data,
+               aes(x = x, y = y, xend = xend, yend = yend, colour = path),
+               linewidth = 1.1,
+               arrow = arrow(length = grid::unit(0.25, "cm"), type = "closed")) +
+  geom_label(data = boxes, aes(x = x, y = y, label = label),
+             colour = "#17324D", size = 3.6, label.padding = grid::unit(0.4, "lines")) +
+  annotate("text", x = 3, y = 1.55, label = "indirect path",
+           colour = "#009E73", size = 3.4) +
+  annotate("text", x = 3, y = 0.85, label = "direct path",
+           colour = "#D55E00", size = 3.4) +
+  scale_colour_manual(values = c("indirect" = "#009E73",
+                                 "direct" = "#D55E00"),
+                      guide = "none") +
+  coord_cartesian(xlim = c(0.4, 5.6), ylim = c(0.7, 2.3)) +
+  theme_void()
+```
+
+::: {#exm-i06-mediation}
+## Worked example: how much of the marketing slope runs through visits?
+
+An invented example. For 120 small web shops we know the monthly marketing
+spending and the monthly sales, both in €1,000s, and the monthly website
+visits in 1,000s. The code below builds the invented data. It sets a
+direct path and a path through visits, which a real founder never knows.
+
+```{r}
+#| label: i06-mediation-fit
+set.seed(616)
+n_shops <- 120
+marketing <- round(runif(n_shops, min = 2, max = 12), 1)
+visits <- round(4 + 1.5 * marketing + rnorm(n_shops, sd = 2), 1)
+sales <- round(20 + 2 * marketing + 2 * visits + rnorm(n_shops, sd = 5), 1)
+shop <- data.frame(sales, marketing, visits)
+
+total_model <- lm(sales ~ marketing, data = shop)
+direct_model <- lm(sales ~ marketing + visits, data = shop)
+visits_model <- lm(visits ~ marketing, data = shop)
+coef(total_model)
+coef(direct_model)
+coef(visits_model)
+
+total <- unname(coef(total_model)["marketing"])
+direct <- unname(coef(direct_model)["marketing"])
+c(total = total, direct = direct, through_visits = total - direct,
+  share_through_visits = (total - direct) / total)
+unname(coef(visits_model)["marketing"] * coef(direct_model)["visits"])
+```
+
+Step 1: the total association. Without visits in the model, €1,000 more
+marketing is associated with about €5,040 more monthly sales on average.
+
+Step 2: the direct part. With visits added, the marketing coefficient falls
+to 2.62. At the same number of visits, €1,000 more marketing is associated
+with about €2,620 more sales.
+
+Step 3: the part through visits. The difference is $5.04-2.62=2.42$, about
+€2,420 of sales per €1,000 of marketing. That is about 48% of the total.
+The same number comes from the two paths. €1,000 more marketing goes with
+about 1,490 more visits ($1.488$ in 1,000s), and 1,000 more visits go with
+about €1,630 more sales at the same marketing ($1.625$). The product is
+$1.488\times1.625\approx2.42$.
+:::
+
+::: {.caveat-box}
+<span class="label">A mediator is not a control variable</span>
+
+- In [Lecture 4](i04-multiple-regression.qmd#what-control-variables-can-and-cannot-do)
+  you added control variables to hold confounders fixed. A mediator looks
+  like one more predictor, but adding it changes the question.
+- With visits in the model, the marketing coefficient no longer contains
+  the part that runs through visits. If you want the total effect of
+  marketing, do not control for visits.
+- So ask first what role a variable plays. Control for a confounder. Do not
+  control for a mediator when you want the total effect.
+- Mediation is a causal idea. It needs a causal design, such as an
+  experiment, or strong assumptions. With observational data, the split into
+  a direct and an indirect part only describes the data.
+:::
+
+The table compares the three roles of a third variable $Z$.
+
+| Role | What it is | How it appears in a regression | Example |
+|---|---|---|---|
+| Moderator | Changes the slope of $X$ | Interaction term $XZ$ | Number of stores changes the marketing slope |
+| Mediator | Lies on the path from $X$ to $Y$ | Adding it shrinks the coefficient of $X$ to the direct part | Website visits between marketing and sales |
+| Confounder | Affects both $X$ and $Y$ | Control variable, to remove omitted variable bias | Firm size behind both advertising and sales |
+
+An interaction term lets the slope differ by group or change with a
+moderator. A quadratic term lets the slope change as $x$ itself changes. Both add one new column to the data, a product or a
 square. In both, you read two coefficients together.
 
 ### Curvature: polynomials are still linear regression
@@ -581,6 +950,15 @@ assistant.
 4. Why is a quadratic model still a linear regression model?
 5. Why should you graph a quadratic curve, and why should you not
    extrapolate it?
+6. In the invented franchise model, `marketing` is 1.745 and
+   `marketing:stores` is 0.147, with sales and marketing in €1,000s. What
+   is the slope of marketing in a region with 6 stores, and why does 1.745
+   alone not describe any region?
+7. A researcher finds that training is related to productivity, and that
+   the relationship is stronger in large firms. A second researcher finds
+   that training raises skills and that skills raise productivity. Which
+   finding is about a moderator and which about a mediator, and how does
+   each appear in a regression?
 
 ::: {.callout-note collapse="true"}
 ## Check your answers
@@ -599,6 +977,15 @@ assistant.
 5. No single coefficient is the slope, so only fitted values or the curve
    show what the model says. Outside the observed range the curve can turn
    sharply, and no data support that turn.
+6. $1.745+0.147\times6\approx2.63$: in a region with 6 stores, €1,000 more
+   marketing is associated with about €2,630 more monthly sales on average.
+   The number 1.745 is the slope at 0 stores. No region has 0 stores, so it
+   is a conditional effect at a value outside the data.
+7. Firm size is a moderator: it changes the slope of training. It appears
+   as an interaction term of training and firm size. Skills are a mediator:
+   they lie on the path from training to productivity. Adding skills to the
+   model shrinks the training coefficient to the direct part, so leave
+   skills out if you want the total effect.
 :::
 
 ### Centring verification

@@ -403,8 +403,8 @@ window.Quarto = {
 <div class="outcomes">
 <p><span class="label">By the end of Lecture 6, you can</span></p>
 <ul>
-<li>interpret an interaction coefficient as a difference in slopes between groups</li>
-<li>report an interaction that is not significant without claiming too much</li>
+<li>interpret an interaction coefficient as a difference in slopes, also when it is not significant</li>
+<li>tell a moderator from a mediator and a confounder</li>
 <li>fit a quadratic term and compute a fitted change from the curve</li>
 <li>test added terms jointly and avoid using a curve beyond the data</li>
 </ul>
@@ -464,7 +464,7 @@ Check your preparation
 </section>
 <section id="lecture-material" class="level2 course-phase phase-in-class">
 <h2 class="anchored" data-anchor-id="lecture-material">Lecture material</h2>
-<p>This section adds two terms to the regression model. An interaction term lets a slope differ between two groups. A quadratic term lets a slope change along the predictor itself.</p>
+<p>This section adds two terms to the regression model. An interaction term lets a slope differ between two groups, or change with the value of another predictor. A quadratic term lets a slope change along the predictor itself.</p>
 <p class="concept-video">
 <strong>Stanford explanations (review):</strong> <a href="https://www.youtube.com/watch?v=dEBQmiXv9fk">3.5 Extensions of the Linear Model</a> and <a href="https://www.youtube.com/watch?v=F-D3lZzYn50">7.1 Polynomials and Step Functions</a>.
 </p>
@@ -547,8 +547,8 @@ E[Y\mid X,D]
 <p><span class="math display">\[
 \beta_1+\beta_3D.
 \]</span></p>
-<p>So <span class="math inline">\(\beta_3\)</span> is the difference between the slope of the group with <span class="math inline">\(D=1\)</span> and the slope of the reference category (<span class="math inline">\(D=0\)</span>). It is not an effect on its own. Its unit combines the two variables. If <span class="math inline">\(X\)</span> is measured in seasons and <span class="math inline">\(D\)</span> is a dummy, <span class="math inline">\(\beta_3\)</span> is in outcome units per season: here, equity percentage points per season, the group with <span class="math inline">\(D=1\)</span> minus the reference category. The same algebra works when the second variable is a number <span class="math inline">\(Z\)</span> and not a dummy. The slope of <span class="math inline">\(X\)</span> is then <span class="math inline">\(\beta_1+\beta_3Z\)</span>, a slope that changes with <span class="math inline">\(Z\)</span>.</p>
-<p><strong>Centring.</strong> Centring a predictor means subtracting its mean. With <span class="math inline">\(XD\)</span> in the model, <span class="math inline">\(\beta_2\)</span> compares the two groups at <span class="math inline">\(X=0\)</span>. For the Shark Tank data this would be Season 0, which does not exist. Replacing season with</p>
+<p>So <span class="math inline">\(\beta_3\)</span> is the difference between the slope of the group with <span class="math inline">\(D=1\)</span> and the slope of the reference category (<span class="math inline">\(D=0\)</span>). It is not an effect on its own. Its unit combines the two variables. If <span class="math inline">\(X\)</span> is measured in seasons and <span class="math inline">\(D\)</span> is a dummy, <span class="math inline">\(\beta_3\)</span> is in outcome units per season: here, equity percentage points per season, the group with <span class="math inline">\(D=1\)</span> minus the reference category. The same algebra works when the second variable is a number <span class="math inline">\(Z\)</span> and not a dummy. The slope of <span class="math inline">\(X\)</span> is then <span class="math inline">\(\beta_1+\beta_3Z\)</span>, a slope that changes with <span class="math inline">\(Z\)</span>. The section on a continuous moderator below works through this case.</p>
+<p><span id="i06-centring"><strong>Centring.</strong></span> Centring a predictor means subtracting its mean. With <span class="math inline">\(XD\)</span> in the model, <span class="math inline">\(\beta_2\)</span> compares the two groups at <span class="math inline">\(X=0\)</span>. For the Shark Tank data this would be Season 0, which does not exist. Replacing season with</p>
 <p><span class="math display">\[
 \text{season\_c} = \text{season} - \overline{\text{season}}
 \]</span></p>
@@ -651,62 +651,103 @@ Multiple R-squared:  0.1894,    Adjusted R-squared:  0.1871
 F-statistic: 83.47 on 4 and 1429 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 </div>
-<p>Use the table with one row per group to get the two season slopes, holding requested amount fixed. For all-men teams (<code>women = 0</code>), the fitted season slope is about <span class="math inline">\(-0.799\)</span> percentage points per season. For teams with women (<code>women = 1</code>), it is</p>
+<div id="exm-i06-reading-interaction" class="theorem example">
+<p><span class="theorem-title"><strong>Example 23.1 (Worked example: reading each coefficient of the interaction model)</strong></span> <span class="shark-tag">Shark Tank data</span> The outcome is the equity offered in percent, so every coefficient is in percentage points. The predictor <code>season_c</code> is in seasons, measured from the average season. The requested amount <code>ask_1k</code> is in $1,000s. The reference category is all-men teams (<code>women = 0</code>). The code below stores the coefficients and computes the two group lines at the average requested amount:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>b_int <span class="ot">&lt;-</span> <span class="fu">coef</span>(interaction_model)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>ask_bar <span class="ot">&lt;-</span> <span class="fu">mean</span>(known_gender<span class="sc">$</span>ask_1k)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>intercept_men <span class="ot">&lt;-</span> <span class="fu">unname</span>(b_int[<span class="st">"(Intercept)"</span>] <span class="sc">+</span> b_int[<span class="st">"ask_1k"</span>] <span class="sc">*</span> ask_bar)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>intercept_women <span class="ot">&lt;-</span> intercept_men <span class="sc">+</span> <span class="fu">unname</span>(b_int[<span class="st">"women"</span>])</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">intercept_men =</span> intercept_men,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">intercept_women =</span> intercept_women,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">slope_men =</span> <span class="fu">unname</span>(b_int[<span class="st">"season_c"</span>]),</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">slope_women =</span> <span class="fu">unname</span>(b_int[<span class="st">"season_c"</span>] <span class="sc">+</span> b_int[<span class="st">"season_c:women"</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  intercept_men intercept_women       slope_men     slope_women 
+     12.8661626      13.6731291      -0.7993817      -0.8608411 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">mean_season =</span> <span class="fu">mean</span>(known_gender<span class="sc">$</span>season),</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">min_ask_1k =</span> <span class="fu">min</span>(known_gender<span class="sc">$</span>ask_1k),</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">gap_share_of_men =</span> <span class="fu">unname</span>(b_int[<span class="st">"women"</span>]) <span class="sc">/</span> intercept_men,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">interaction_share_of_slope =</span> <span class="fu">unname</span>(b_int[<span class="st">"season_c:women"</span>] <span class="sc">/</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>                                        b_int[<span class="st">"season_c"</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>               mean_season                 min_ask_1k 
+                8.77894003                10.00000000 
+          gap_share_of_men interaction_share_of_slope 
+                0.06272006                 0.07688369 </code></pre>
+</div>
+</div>
+<p>Step 1: the two lines. Fill in the table with one row per group. At the average requested amount, with <span class="math inline">\(\text{season\_c}\)</span> as the predictor:</p>
 <p><span class="math display">\[
--0.7994+(-0.0615)=-0.861
-\text{ percentage points per season.}
+\begin{aligned}
+\text{all-men teams: } &amp; \widehat{\text{equity}} = 12.866 - 0.799\times\text{season\_c},\\
+\text{teams with women: } &amp; \widehat{\text{equity}} = (12.866+0.807) + (-0.7994-0.0615)\times\text{season\_c}\\
+&amp; \phantom{\widehat{\text{equity}}} = 13.673 - 0.861\times\text{season\_c}.
+\end{aligned}
 \]</span></p>
-<p>The interaction estimate is <span class="math inline">\(-0.061\)</span> equity percentage points per season, with a p-value of about 0.520. The difference is small: about 8% of the all-men slope. Draw two conclusions from this result. First, the model gives no evidence that the season trend differs between the two groups. Second, the model does not prove that the two slopes are equal. The estimate is imprecise (standard error about 0.096), so the data are consistent with a somewhat steeper trend and also with a somewhat flatter trend for teams with women. No evidence of a difference is not proof of no difference.</p>
+<p>Step 2: one sentence per coefficient.</p>
+<ul>
+<li><code>season_c</code> (<span class="math inline">\(-0.799\)</span>). Among all-men teams, one season later is associated with an equity offered that is on average 0.80 percentage points lower, at the same requested amount. This is the slope of the reference category only.</li>
+<li><code>season_c:women</code> (<span class="math inline">\(-0.061\)</span>). Per one season more, the equity offered by teams with women falls 0.061 percentage points more than that of all-men teams. This is the difference between the two slopes. It is about 8% of the all-men slope.</li>
+<li><code>women</code> (<span class="math inline">\(0.807\)</span>). In the average season (about 8.8), teams with women are fitted to offer about 0.81 percentage points more equity than all-men teams, at the same requested amount. With the interaction in the model, this difference holds only where <span class="math inline">\(\text{season\_c}=0\)</span>. In other seasons the gap is <span class="math inline">\(0.807-0.061\times\text{season\_c}\)</span>.</li>
+<li><code>ask_1k</code> (<span class="math inline">\(-0.0027\)</span>). A request that is $1,000 higher is associated with an equity offered that is on average 0.0027 percentage points lower, in both groups. Per $100,000 more, this is about 0.27 percentage points.</li>
+<li>The intercept (<span class="math inline">\(13.62\)</span>) is the fitted equity offered for all-men teams in the average season with a requested amount of $0. The smallest request in the data is $10,000, so the intercept has no useful meaning of its own.</li>
+</ul>
+<p>Step 3: how large is it? In the average season, all-men teams are fitted to offer 12.87% and teams with women 13.67%. The gap is 0.81 percentage points. Measured as a percent of the all-men level, the same gap is about 6%. So “0.81 percent more” would be wrong. The coefficient is a difference in percentage points.</p>
+<p>Why does the model use <code>season_c</code> and not <code>season</code>? The dummy coefficient always compares the groups at <span class="math inline">\(X=0\)</span>. Without <a href="#i06-centring">centring</a>, <span class="math inline">\(X=0\)</span> would be Season 0, a season outside the data. Centring moves the comparison to the average season, where there are many pitches.</p>
+</div>
+<p>The interaction estimate is <span class="math inline">\(-0.061\)</span> equity percentage points per season, with a p-value of about 0.520. The difference is small, about 8% of the all-men slope (<a href="#exm-i06-reading-interaction" class="quarto-xref">Example&nbsp;<span>23.1</span></a>). Draw two conclusions from this result. First, the model gives no evidence that the season trend differs between the two groups. Second, the model does not prove that the two slopes are equal. The estimate is imprecise (standard error about 0.096), so the data are consistent with a somewhat steeper trend and also with a somewhat flatter trend for teams with women. No evidence of a difference is not proof of no difference.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>See the R code for this figure</summary>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>sharks<span class="sc">$</span>ask_1k <span class="ot">&lt;-</span> sharks<span class="sc">$</span>ask_amount_usd <span class="sc">/</span> <span class="dv">1000</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>known_gender <span class="ot">&lt;-</span> <span class="fu">subset</span>(sharks, pitcher_gender_group <span class="sc">!=</span> <span class="st">"unknown"</span>)</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>known_gender<span class="sc">$</span>women <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  known_gender<span class="sc">$</span>pitcher_gender_group <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"all_women"</span>, <span class="st">"mixed"</span>)</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>known_gender<span class="sc">$</span>season_c <span class="ot">&lt;-</span> known_gender<span class="sc">$</span>season <span class="sc">-</span> <span class="fu">mean</span>(known_gender<span class="sc">$</span>season)</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>interaction_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  equity_offered_pct <span class="sc">~</span> season_c <span class="sc">*</span> women <span class="sc">+</span> ask_1k,</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> known_gender</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>season_grid <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">16</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>ask_bar <span class="ot">&lt;-</span> <span class="fu">mean</span>(known_gender<span class="sc">$</span>ask_1k)</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>newdat <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(<span class="at">season =</span> season_grid, <span class="at">women =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>))</span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>newdat<span class="sc">$</span>season_c <span class="ot">&lt;-</span> newdat<span class="sc">$</span>season <span class="sc">-</span> <span class="fu">mean</span>(known_gender<span class="sc">$</span>season)</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>newdat<span class="sc">$</span>ask_1k <span class="ot">&lt;-</span> ask_bar</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>newdat<span class="sc">$</span>fit <span class="ot">&lt;-</span> <span class="fu">predict</span>(interaction_model, <span class="at">newdata =</span> newdat)</span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>newdat<span class="sc">$</span>group <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(newdat<span class="sc">$</span>women <span class="sc">==</span> <span class="dv">1</span>, <span class="st">"Teams with women"</span>, <span class="st">"All-men"</span>)</span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>fit_men_13 <span class="ot">&lt;-</span> newdat<span class="sc">$</span>fit[newdat<span class="sc">$</span>women <span class="sc">==</span> <span class="dv">0</span> <span class="sc">&amp;</span> newdat<span class="sc">$</span>season <span class="sc">==</span> <span class="dv">13</span>]</span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>fit_women_13 <span class="ot">&lt;-</span> newdat<span class="sc">$</span>fit[newdat<span class="sc">$</span>women <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> newdat<span class="sc">$</span>season <span class="sc">==</span> <span class="dv">13</span>]</span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(newdat, <span class="fu">aes</span>(<span class="at">x =</span> season, <span class="at">y =</span> fit,</span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>                   <span class="at">colour =</span> group, <span class="at">linetype =</span> group)) <span class="sc">+</span></span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">1.1</span>) <span class="sc">+</span></span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> <span class="fu">subset</span>(newdat, season <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">16</span>)), <span class="at">size =</span> <span class="fl">2.2</span>) <span class="sc">+</span></span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="dv">13</span>, <span class="at">y =</span> fit_women_13 <span class="sc">+</span> <span class="fl">1.1</span>,</span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>           <span class="at">label =</span> <span class="st">"Teams with women"</span>,</span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>           <span class="at">colour =</span> <span class="st">"#D55E00"</span>, <span class="at">size =</span> <span class="fl">3.4</span>) <span class="sc">+</span></span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="dv">13</span>, <span class="at">y =</span> fit_men_13 <span class="sc">-</span> <span class="fl">1.1</span>,</span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>           <span class="at">label =</span> <span class="st">"All-men"</span>,</span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>           <span class="at">colour =</span> <span class="st">"#009E73"</span>, <span class="at">size =</span> <span class="fl">3.4</span>) <span class="sc">+</span></span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"All-men"</span> <span class="ot">=</span> <span class="st">"#009E73"</span>,</span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>                                 <span class="st">"Teams with women"</span> <span class="ot">=</span> <span class="st">"#D55E00"</span>),</span>
-<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>                      <span class="at">guide =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
-<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_linetype_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"All-men"</span> <span class="ot">=</span> <span class="st">"solid"</span>,</span>
-<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>                                   <span class="st">"Teams with women"</span> <span class="ot">=</span> <span class="st">"dashed"</span>),</span>
-<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>                        <span class="at">guide =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
-<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">16</span>, <span class="at">by =</span> <span class="dv">3</span>)) <span class="sc">+</span></span>
-<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Season"</span>, <span class="at">y =</span> <span class="st">"Fitted initial equity offered (%)"</span>) <span class="sc">+</span></span>
-<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
-<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.x =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#5B6976"</span>),</span>
-<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>)</span>
-<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>sharks<span class="sc">$</span>ask_1k <span class="ot">&lt;-</span> sharks<span class="sc">$</span>ask_amount_usd <span class="sc">/</span> <span class="dv">1000</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>known_gender <span class="ot">&lt;-</span> <span class="fu">subset</span>(sharks, pitcher_gender_group <span class="sc">!=</span> <span class="st">"unknown"</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>known_gender<span class="sc">$</span>women <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  known_gender<span class="sc">$</span>pitcher_gender_group <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"all_women"</span>, <span class="st">"mixed"</span>)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>known_gender<span class="sc">$</span>season_c <span class="ot">&lt;-</span> known_gender<span class="sc">$</span>season <span class="sc">-</span> <span class="fu">mean</span>(known_gender<span class="sc">$</span>season)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>interaction_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  equity_offered_pct <span class="sc">~</span> season_c <span class="sc">*</span> women <span class="sc">+</span> ask_1k,</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> known_gender</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>season_grid <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">16</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>ask_bar <span class="ot">&lt;-</span> <span class="fu">mean</span>(known_gender<span class="sc">$</span>ask_1k)</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>newdat <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(<span class="at">season =</span> season_grid, <span class="at">women =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>))</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>newdat<span class="sc">$</span>season_c <span class="ot">&lt;-</span> newdat<span class="sc">$</span>season <span class="sc">-</span> <span class="fu">mean</span>(known_gender<span class="sc">$</span>season)</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>newdat<span class="sc">$</span>ask_1k <span class="ot">&lt;-</span> ask_bar</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>newdat<span class="sc">$</span>fit <span class="ot">&lt;-</span> <span class="fu">predict</span>(interaction_model, <span class="at">newdata =</span> newdat)</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>newdat<span class="sc">$</span>group <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(newdat<span class="sc">$</span>women <span class="sc">==</span> <span class="dv">1</span>, <span class="st">"Teams with women"</span>, <span class="st">"All-men"</span>)</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>fit_men_13 <span class="ot">&lt;-</span> newdat<span class="sc">$</span>fit[newdat<span class="sc">$</span>women <span class="sc">==</span> <span class="dv">0</span> <span class="sc">&amp;</span> newdat<span class="sc">$</span>season <span class="sc">==</span> <span class="dv">13</span>]</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>fit_women_13 <span class="ot">&lt;-</span> newdat<span class="sc">$</span>fit[newdat<span class="sc">$</span>women <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> newdat<span class="sc">$</span>season <span class="sc">==</span> <span class="dv">13</span>]</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(newdat, <span class="fu">aes</span>(<span class="at">x =</span> season, <span class="at">y =</span> fit,</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>                   <span class="at">colour =</span> group, <span class="at">linetype =</span> group)) <span class="sc">+</span></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">1.1</span>) <span class="sc">+</span></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> <span class="fu">subset</span>(newdat, season <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">16</span>)), <span class="at">size =</span> <span class="fl">2.2</span>) <span class="sc">+</span></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="dv">13</span>, <span class="at">y =</span> fit_women_13 <span class="sc">+</span> <span class="fl">1.1</span>,</span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>           <span class="at">label =</span> <span class="st">"Teams with women"</span>,</span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>           <span class="at">colour =</span> <span class="st">"#D55E00"</span>, <span class="at">size =</span> <span class="fl">3.4</span>) <span class="sc">+</span></span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="dv">13</span>, <span class="at">y =</span> fit_men_13 <span class="sc">-</span> <span class="fl">1.1</span>,</span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>           <span class="at">label =</span> <span class="st">"All-men"</span>,</span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>           <span class="at">colour =</span> <span class="st">"#009E73"</span>, <span class="at">size =</span> <span class="fl">3.4</span>) <span class="sc">+</span></span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"All-men"</span> <span class="ot">=</span> <span class="st">"#009E73"</span>,</span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>                                 <span class="st">"Teams with women"</span> <span class="ot">=</span> <span class="st">"#D55E00"</span>),</span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>                      <span class="at">guide =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_linetype_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"All-men"</span> <span class="ot">=</span> <span class="st">"solid"</span>,</span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>                                   <span class="st">"Teams with women"</span> <span class="ot">=</span> <span class="st">"dashed"</span>),</span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>                        <span class="at">guide =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">16</span>, <span class="at">by =</span> <span class="dv">3</span>)) <span class="sc">+</span></span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Season"</span>, <span class="at">y =</span> <span class="st">"Fitted initial equity offered (%)"</span>) <span class="sc">+</span></span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#5B6976"</span>),</span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>)</span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-i06-interaction" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -723,13 +764,313 @@ Figure&nbsp;23.2: Fitted equity offered by season for all-men teams and for team
 </div>
 <p>Always graph a model that contains an interaction. In <a href="#fig-i06-interaction" class="quarto-xref">Figure&nbsp;<span>23.2</span></a>, the main result is that the two lines are almost parallel. Once <span class="math inline">\(XD\)</span> is in the model, neither <span class="math inline">\(\hat\beta_1\)</span> nor <span class="math inline">\(\hat\beta_2\)</span> alone describes all teams.</p>
 </section>
+<section id="a-continuous-moderator" class="level3">
+<h3 class="anchored" data-anchor-id="a-continuous-moderator">A continuous moderator</h3>
+<p>The second variable of an interaction need not be a dummy. It can be any number <span class="math inline">\(Z\)</span>, such as a price, a firm size, or a number of stores. The model is</p>
+<p><span class="math display">\[
+E[Y\mid X,Z]=\beta_0+\beta_1X+\beta_2Z+\beta_3XZ,
+\]</span></p>
+<p>and a one-unit increase in <span class="math inline">\(X\)</span> changes the conditional mean by <span class="math inline">\(\beta_1+\beta_3Z\)</span>. There are now not two lines but one line for every value of <span class="math inline">\(Z\)</span>.</p>
+<div class="definition-box">
+<p><span class="label">Definition</span></p>
+<p><strong>Moderator.</strong> A variable <span class="math inline">\(Z\)</span> that changes the slope of another predictor <span class="math inline">\(X\)</span> through the interaction term <span class="math inline">\(XZ\)</span>. The slope of <span class="math inline">\(X\)</span> at one value of <span class="math inline">\(Z\)</span>, <span class="math inline">\(\beta_1+\beta_3Z\)</span>, is called the conditional effect of <span class="math inline">\(X\)</span> at that value.</p>
+</div>
+<p>The name “conditional effect” is standard, but it is still a fitted slope. It is a causal effect only when the design of the study allows a causal reading. Two coefficients now need care. <span class="math inline">\(\beta_1\)</span> is the slope of <span class="math inline">\(X\)</span> only where <span class="math inline">\(Z=0\)</span>, and <span class="math inline">\(\beta_2\)</span> is the slope of <span class="math inline">\(Z\)</span> only where <span class="math inline">\(X=0\)</span>. If zero lies outside the data, neither number describes any real case. The coefficients <span class="math inline">\(\beta_1\)</span> and <span class="math inline">\(\beta_2\)</span> are often called the main effects. With <span class="math inline">\(XZ\)</span> in the model they are conditional too. <a href="#i06-centring">Centring</a> <span class="math inline">\(Z\)</span> makes <span class="math inline">\(\beta_1\)</span> the slope of <span class="math inline">\(X\)</span> at the mean of <span class="math inline">\(Z\)</span>.</p>
+<div id="exm-i06-moderator" class="theorem example">
+<p><span class="theorem-title"><strong>Example 23.2 (Worked example: marketing pays more in regions with more stores)</strong></span> An invented example. A franchise chain has 150 regions. For each region it records the monthly sales and the monthly marketing spending, both in €1,000s, and the number of stores. The question: does an extra €1,000 of marketing go with more sales in regions with many stores? The code below builds the invented data and fits the model with the interaction term:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">606</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>n_regions <span class="ot">&lt;-</span> <span class="dv">150</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>stores <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">12</span>, n_regions, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>marketing <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">runif</span>(n_regions, <span class="at">min =</span> <span class="dv">2</span>, <span class="at">max =</span> <span class="dv">20</span>), <span class="dv">1</span>)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>sales <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="dv">30</span> <span class="sc">+</span> <span class="fl">1.0</span> <span class="sc">*</span> marketing <span class="sc">+</span> <span class="dv">6</span> <span class="sc">*</span> stores <span class="sc">+</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>               <span class="fl">0.25</span> <span class="sc">*</span> marketing <span class="sc">*</span> stores <span class="sc">+</span> <span class="fu">rnorm</span>(n_regions, <span class="at">sd =</span> <span class="dv">12</span>), <span class="dv">1</span>)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>franchise <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(sales, marketing, stores)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(franchise)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     sales          marketing          stores      
+ Min.   : 32.00   Min.   : 2.300   Min.   : 1.000  
+ 1st Qu.: 72.20   1st Qu.: 6.825   1st Qu.: 3.000  
+ Median : 94.55   Median :11.900   Median : 6.000  
+ Mean   : 98.11   Mean   :11.487   Mean   : 6.313  
+ 3rd Qu.:122.20   3rd Qu.:16.300   3rd Qu.:10.000  
+ Max.   :198.90   Max.   :19.900   Max.   :12.000  </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>moderator_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(sales <span class="sc">~</span> marketing <span class="sc">*</span> stores, <span class="at">data =</span> franchise)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(moderator_model)<span class="sc">$</span>coefficients</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                   Estimate Std. Error  t value     Pr(&gt;|t|)
+(Intercept)      24.9309191 5.04357562 4.943104 2.083727e-06
+marketing         1.7446662 0.39007324 4.472663 1.542400e-05
+stores            6.7676103 0.68626060 9.861575 6.754837e-18
+marketing:stores  0.1474736 0.05500072 2.681304 8.177947e-03</code></pre>
+</div>
+</div>
+<p>Step 1: the slope of marketing as a function of stores. With the coefficients from the output,</p>
+<p><span class="math display">\[
+\widehat{\text{slope of marketing}} = 1.745 + 0.147\times\text{stores}.
+\]</span></p>
+<p>Step 2: the slope at three meaningful values of the moderator. Take the lower quartile, the median, and the upper quartile of the number of stores:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>b_mod <span class="ot">&lt;-</span> <span class="fu">coef</span>(moderator_model)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>store_values <span class="ot">&lt;-</span> <span class="fu">quantile</span>(franchise<span class="sc">$</span>stores, <span class="fu">c</span>(<span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="fl">0.75</span>))</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>store_values</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>25% 50% 75% 
+  3   6  10 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>marketing_slopes <span class="ot">&lt;-</span> b_mod[<span class="st">"marketing"</span>] <span class="sc">+</span> b_mod[<span class="st">"marketing:stores"</span>] <span class="sc">*</span> store_values</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>marketing_slopes</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     25%      50%      75% 
+2.187087 2.629508 3.219403 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>marketing_slopes[<span class="dv">3</span>] <span class="sc">/</span> marketing_slopes[<span class="dv">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     75% 
+1.472005 </code></pre>
+</div>
+</div>
+<p>In a region with 3 stores (the lower quartile), €1,000 more marketing is associated with about €2,190 more monthly sales on average. With 6 stores (the median) it is about €2,630, and with 10 stores (the upper quartile) about €3,220. The slope at the upper quartile is about 1.47 times the slope at the lower quartile.</p>
+<p>Step 3: one sentence per coefficient.</p>
+<ul>
+<li><code>marketing:stores</code> (<span class="math inline">\(0.147\)</span>). Each extra store raises the slope of marketing by 0.147: €147 more monthly sales per €1,000 of marketing. Read the other way round, each extra €1,000 of marketing raises the slope of stores by €147 of monthly sales per store.</li>
+<li><code>marketing</code> (<span class="math inline">\(1.745\)</span>). This is the slope of marketing in a region with 0 stores. No region has 0 stores (the minimum is 1), so this number does not describe the marketing slope of any region.</li>
+<li><code>stores</code> (<span class="math inline">\(6.768\)</span>). This is the slope of stores at €0 of marketing. The smallest spending in the data is €2,300, so this number also lies outside the data.</li>
+</ul>
+<p>Step 4: centre the moderator. With <span class="math inline">\(\text{stores\_c}\)</span>, the number of stores minus its mean, the marketing coefficient becomes the slope at the average number of stores (about 6.3):</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>franchise<span class="sc">$</span>stores_c <span class="ot">&lt;-</span> franchise<span class="sc">$</span>stores <span class="sc">-</span> <span class="fu">mean</span>(franchise<span class="sc">$</span>stores)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(<span class="fu">lm</span>(sales <span class="sc">~</span> marketing <span class="sc">*</span> stores_c, <span class="at">data =</span> franchise))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       (Intercept)          marketing           stores_c marketing:stores_c 
+        67.6570986          2.6757165          6.7676103          0.1474736 </code></pre>
+</div>
+</div>
+<p>The marketing coefficient is now 2.676: at the average number of stores, €1,000 more marketing is associated with about €2,680 more monthly sales. The interaction coefficient stays 0.147. As with the dummy, centring moves the place of the comparison and not the fitted lines.</p>
+</div>
+<p><a href="#fig-i06-moderator" class="quarto-xref">Figure&nbsp;<span>23.3</span></a> draws the fitted lines at the three values of the moderator. The lines fan out because their slopes differ.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>See the R code for this figure</summary>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">606</span>)</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>n_regions <span class="ot">&lt;-</span> <span class="dv">150</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>stores <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">12</span>, n_regions, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>marketing <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">runif</span>(n_regions, <span class="at">min =</span> <span class="dv">2</span>, <span class="at">max =</span> <span class="dv">20</span>), <span class="dv">1</span>)</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>sales <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="dv">30</span> <span class="sc">+</span> <span class="fl">1.0</span> <span class="sc">*</span> marketing <span class="sc">+</span> <span class="dv">6</span> <span class="sc">*</span> stores <span class="sc">+</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>               <span class="fl">0.25</span> <span class="sc">*</span> marketing <span class="sc">*</span> stores <span class="sc">+</span> <span class="fu">rnorm</span>(n_regions, <span class="at">sd =</span> <span class="dv">12</span>), <span class="dv">1</span>)</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>franchise <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(sales, marketing, stores)</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>moderator_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(sales <span class="sc">~</span> marketing <span class="sc">*</span> stores, <span class="at">data =</span> franchise)</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>lines_data <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(<span class="at">marketing =</span> <span class="fu">seq</span>(<span class="dv">2</span>, <span class="dv">20</span>, <span class="at">length.out =</span> <span class="dv">50</span>),</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>                          <span class="at">stores =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">6</span>, <span class="dv">10</span>))</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>lines_data<span class="sc">$</span>fit <span class="ot">&lt;-</span> <span class="fu">predict</span>(moderator_model, <span class="at">newdata =</span> lines_data)</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>lines_data<span class="sc">$</span>group <span class="ot">&lt;-</span> <span class="fu">factor</span>(<span class="fu">paste</span>(lines_data<span class="sc">$</span>stores, <span class="st">"stores"</span>),</span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>                           <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"3 stores"</span>, <span class="st">"6 stores"</span>, <span class="st">"10 stores"</span>))</span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>label_data <span class="ot">&lt;-</span> <span class="fu">subset</span>(lines_data, marketing <span class="sc">==</span> <span class="dv">20</span>)</span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(franchise, <span class="fu">aes</span>(<span class="at">x =</span> marketing, <span class="at">y =</span> sales)) <span class="sc">+</span></span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">colour =</span> <span class="st">"grey80"</span>, <span class="at">size =</span> <span class="fl">1.6</span>) <span class="sc">+</span></span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> lines_data,</span>
+<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>            <span class="fu">aes</span>(<span class="at">x =</span> marketing, <span class="at">y =</span> fit, <span class="at">colour =</span> group, <span class="at">linetype =</span> group),</span>
+<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>            <span class="at">linewidth =</span> <span class="fl">1.1</span>) <span class="sc">+</span></span>
+<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="at">data =</span> label_data,</span>
+<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a>            <span class="fu">aes</span>(<span class="at">x =</span> marketing <span class="sc">+</span> <span class="fl">0.4</span>, <span class="at">y =</span> fit, <span class="at">label =</span> group, <span class="at">colour =</span> group),</span>
+<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a>            <span class="at">hjust =</span> <span class="dv">0</span>, <span class="at">size =</span> <span class="fl">3.4</span>) <span class="sc">+</span></span>
+<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"3 stores"</span> <span class="ot">=</span> <span class="st">"#009E73"</span>,</span>
+<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a>                                 <span class="st">"6 stores"</span> <span class="ot">=</span> <span class="st">"#0072B2"</span>,</span>
+<span id="cb22-28"><a href="#cb22-28" aria-hidden="true" tabindex="-1"></a>                                 <span class="st">"10 stores"</span> <span class="ot">=</span> <span class="st">"#D55E00"</span>),</span>
+<span id="cb22-29"><a href="#cb22-29" aria-hidden="true" tabindex="-1"></a>                      <span class="at">guide =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb22-30"><a href="#cb22-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_linetype_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"3 stores"</span> <span class="ot">=</span> <span class="st">"solid"</span>,</span>
+<span id="cb22-31"><a href="#cb22-31" aria-hidden="true" tabindex="-1"></a>                                   <span class="st">"6 stores"</span> <span class="ot">=</span> <span class="st">"longdash"</span>,</span>
+<span id="cb22-32"><a href="#cb22-32" aria-hidden="true" tabindex="-1"></a>                                   <span class="st">"10 stores"</span> <span class="ot">=</span> <span class="st">"dashed"</span>),</span>
+<span id="cb22-33"><a href="#cb22-33" aria-hidden="true" tabindex="-1"></a>                        <span class="at">guide =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb22-34"><a href="#cb22-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">23</span>)) <span class="sc">+</span></span>
+<span id="cb22-35"><a href="#cb22-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Monthly marketing spending (EUR 1,000s)"</span>,</span>
+<span id="cb22-36"><a href="#cb22-36" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Monthly sales (EUR 1,000s)"</span>) <span class="sc">+</span></span>
+<span id="cb22-37"><a href="#cb22-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
+<span id="cb22-38"><a href="#cb22-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb22-39"><a href="#cb22-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb22-40"><a href="#cb22-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb22-41"><a href="#cb22-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#5B6976"</span>),</span>
+<span id="cb22-42"><a href="#cb22-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>)</span>
+<span id="cb22-43"><a href="#cb22-43" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-i06-moderator" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-i06-moderator-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="i06-interactions-curvature_files/figure-html/fig-i06-moderator-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-i06-moderator-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;23.3: Fitted monthly sales against marketing spending (invented example) in regions with 3, 6, and 10 stores, the quartiles of the number of stores. The lines become steeper as the number of stores grows: the slope of marketing depends on the moderator.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
 <section id="the-hierarchy-principle-and-the-shorthand" class="level3">
 <h3 class="anchored" data-anchor-id="the-hierarchy-principle-and-the-shorthand">The hierarchy principle and the <code>*</code> shorthand</h3>
-<p>The <strong>hierarchy principle</strong> says: if a model contains <span class="math inline">\(XD\)</span>, keep both <span class="math inline">\(X\)</span> and <span class="math inline">\(D\)</span> in the model, even when one of them is not significant on its own. The terms <span class="math inline">\(X\)</span> and <span class="math inline">\(D\)</span> define the two lines, and the interaction describes the difference between these lines. If you leave out <span class="math inline">\(D\)</span>, the model forces both lines to start at the same height. This distorts the interaction coefficient. The <code>*</code> shorthand in an R formula follows the principle for you:</p>
+<p>The <strong>hierarchy principle</strong> says: if a model contains <span class="math inline">\(XD\)</span>, keep both <span class="math inline">\(X\)</span> and <span class="math inline">\(D\)</span> in the model, even when one of them is not significant on its own. The same holds for <span class="math inline">\(XZ\)</span> with a continuous moderator <span class="math inline">\(Z\)</span>. The terms <span class="math inline">\(X\)</span> and <span class="math inline">\(D\)</span> define the two lines, and the interaction describes the difference between these lines. If you leave out <span class="math inline">\(D\)</span>, the model forces both lines to start at the same height. This distorts the interaction coefficient. The <code>*</code> shorthand in an R formula follows the principle for you:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lm</span>(y <span class="sc">~</span> x <span class="sc">*</span> z, <span class="at">data =</span> df)  <span class="co"># x * z expands to x + z + x:z</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lm</span>(y <span class="sc">~</span> x <span class="sc">*</span> z, <span class="at">data =</span> df)  <span class="co"># x * z expands to x + z + x:z</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>An interaction term lets the slope differ by group. A quadratic term lets the slope change as <span class="math inline">\(x\)</span> itself changes. Both add one new column to the data, a product or a square. In both, you read two coefficients together.</p>
+</section>
+<section id="moderation-and-mediation" class="level3">
+<h3 class="anchored" data-anchor-id="moderation-and-mediation">Moderation and mediation</h3>
+<p>Two words often appear in business research about a third variable: a moderator and a mediator. They describe different roles, and a regression handles them in different ways.</p>
+<p>Moderation first. A moderator changes the strength or the direction of the relationship between <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>. With a moderator, the answer to “how is <span class="math inline">\(X\)</span> related to <span class="math inline">\(Y\)</span>?” is “it depends on <span class="math inline">\(Z\)</span>”. In a regression, moderation shows up as an interaction term. You have seen two cases. In <a href="#exm-i06-reading-interaction" class="quarto-xref">Example&nbsp;<span>23.1</span></a> the moderator is a dummy, the <code>women</code> group, and the season slope differs between two groups. In <a href="#exm-i06-moderator" class="quarto-xref">Example&nbsp;<span>23.2</span></a> the moderator is a number, the number of stores, and the marketing slope grows with every extra store. A moderator can also reverse a relationship, for example a price cut that raises orders for students and lowers them for a luxury segment.</p>
+<div class="definition-box">
+<p><span class="label">Definition</span></p>
+<p><strong>Mediator.</strong> A variable <span class="math inline">\(M\)</span> that lies on the path from <span class="math inline">\(X\)</span> to <span class="math inline">\(Y\)</span>: <span class="math inline">\(X\)</span> affects <span class="math inline">\(M\)</span>, and <span class="math inline">\(M\)</span> affects <span class="math inline">\(Y\)</span>. The part of the effect of <span class="math inline">\(X\)</span> on <span class="math inline">\(Y\)</span> that runs through <span class="math inline">\(M\)</span> is called the indirect effect.</p>
+</div>
+<p>Take marketing spending (<span class="math inline">\(X\)</span>), website visits (<span class="math inline">\(M\)</span>), and sales (<span class="math inline">\(Y\)</span>). Marketing brings visitors to the website, and visitors buy. Marketing can also raise sales in other ways, for example through people who see an advert and buy in a shop. <a href="#fig-i06-mediation" class="quarto-xref">Figure&nbsp;<span>23.4</span></a> shows the two paths. Three effects describe them:</p>
+<ul>
+<li>the total effect: how much <span class="math inline">\(Y\)</span> changes when <span class="math inline">\(X\)</span> changes, by all paths together</li>
+<li>the direct effect: the part that does not run through <span class="math inline">\(M\)</span></li>
+<li>the indirect effect: the part that runs through <span class="math inline">\(M\)</span>.</li>
+</ul>
+<p>The total effect is the direct effect plus the indirect effect.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>See the R code for this figure</summary>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>boxes <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span>), <span class="at">y =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">1</span>),</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>                    <span class="at">label =</span> <span class="fu">c</span>(<span class="st">"Marketing</span><span class="sc">\n</span><span class="st">spending (X)"</span>,</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>                              <span class="st">"Website</span><span class="sc">\n</span><span class="st">visits (M)"</span>,</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>                              <span class="st">"Sales (Y)"</span>))</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>arrows_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="fl">1.45</span>, <span class="fl">3.55</span>, <span class="fl">1.6</span>),</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>                          <span class="at">y =</span> <span class="fu">c</span>(<span class="fl">1.25</span>, <span class="fl">1.75</span>, <span class="dv">1</span>),</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>                          <span class="at">xend =</span> <span class="fu">c</span>(<span class="fl">2.45</span>, <span class="fl">4.55</span>, <span class="fl">4.4</span>),</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>                          <span class="at">yend =</span> <span class="fu">c</span>(<span class="fl">1.75</span>, <span class="fl">1.25</span>, <span class="dv">1</span>),</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>                          <span class="at">path =</span> <span class="fu">c</span>(<span class="st">"indirect"</span>, <span class="st">"indirect"</span>, <span class="st">"direct"</span>))</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="at">data =</span> arrows_data,</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>               <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y, <span class="at">xend =</span> xend, <span class="at">yend =</span> yend, <span class="at">colour =</span> path),</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>               <span class="at">linewidth =</span> <span class="fl">1.1</span>,</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>               <span class="at">arrow =</span> <span class="fu">arrow</span>(<span class="at">length =</span> grid<span class="sc">::</span><span class="fu">unit</span>(<span class="fl">0.25</span>, <span class="st">"cm"</span>), <span class="at">type =</span> <span class="st">"closed"</span>)) <span class="sc">+</span></span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_label</span>(<span class="at">data =</span> boxes, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y, <span class="at">label =</span> label),</span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>             <span class="at">colour =</span> <span class="st">"#17324D"</span>, <span class="at">size =</span> <span class="fl">3.6</span>, <span class="at">label.padding =</span> grid<span class="sc">::</span><span class="fu">unit</span>(<span class="fl">0.4</span>, <span class="st">"lines"</span>)) <span class="sc">+</span></span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="dv">3</span>, <span class="at">y =</span> <span class="fl">1.55</span>, <span class="at">label =</span> <span class="st">"indirect path"</span>,</span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>           <span class="at">colour =</span> <span class="st">"#009E73"</span>, <span class="at">size =</span> <span class="fl">3.4</span>) <span class="sc">+</span></span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="dv">3</span>, <span class="at">y =</span> <span class="fl">0.85</span>, <span class="at">label =</span> <span class="st">"direct path"</span>,</span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>           <span class="at">colour =</span> <span class="st">"#D55E00"</span>, <span class="at">size =</span> <span class="fl">3.4</span>) <span class="sc">+</span></span>
+<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"indirect"</span> <span class="ot">=</span> <span class="st">"#009E73"</span>,</span>
+<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>                                 <span class="st">"direct"</span> <span class="ot">=</span> <span class="st">"#D55E00"</span>),</span>
+<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a>                      <span class="at">guide =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">xlim =</span> <span class="fu">c</span>(<span class="fl">0.4</span>, <span class="fl">5.6</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="fl">0.7</span>, <span class="fl">2.3</span>)) <span class="sc">+</span></span>
+<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-i06-mediation" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-i06-mediation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="i06-interactions-curvature_files/figure-html/fig-i06-mediation-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-i06-mediation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;23.4: A mediation diagram (invented example). The indirect path runs from marketing spending through website visits to sales. The direct path goes from marketing spending to sales without visits. The total effect is the sum of both paths.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div id="exm-i06-mediation" class="theorem example">
+<p><span class="theorem-title"><strong>Example 23.3 (Worked example: how much of the marketing slope runs through visits?)</strong></span> An invented example. For 120 small web shops we know the monthly marketing spending and the monthly sales, both in €1,000s, and the monthly website visits in 1,000s. The code below builds the invented data. It sets a direct path and a path through visits, which a real founder never knows.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">616</span>)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>n_shops <span class="ot">&lt;-</span> <span class="dv">120</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>marketing <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">runif</span>(n_shops, <span class="at">min =</span> <span class="dv">2</span>, <span class="at">max =</span> <span class="dv">12</span>), <span class="dv">1</span>)</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>visits <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="dv">4</span> <span class="sc">+</span> <span class="fl">1.5</span> <span class="sc">*</span> marketing <span class="sc">+</span> <span class="fu">rnorm</span>(n_shops, <span class="at">sd =</span> <span class="dv">2</span>), <span class="dv">1</span>)</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>sales <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="dv">20</span> <span class="sc">+</span> <span class="dv">2</span> <span class="sc">*</span> marketing <span class="sc">+</span> <span class="dv">2</span> <span class="sc">*</span> visits <span class="sc">+</span> <span class="fu">rnorm</span>(n_shops, <span class="at">sd =</span> <span class="dv">5</span>), <span class="dv">1</span>)</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>shop <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(sales, marketing, visits)</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>total_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(sales <span class="sc">~</span> marketing, <span class="at">data =</span> shop)</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>direct_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(sales <span class="sc">~</span> marketing <span class="sc">+</span> visits, <span class="at">data =</span> shop)</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>visits_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(visits <span class="sc">~</span> marketing, <span class="at">data =</span> shop)</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(total_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>(Intercept)   marketing 
+  28.613248    5.039895 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(direct_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>(Intercept)   marketing      visits 
+  21.194789    2.621621    1.625205 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(visits_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>(Intercept)   marketing 
+   4.564631    1.487982 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>total <span class="ot">&lt;-</span> <span class="fu">unname</span>(<span class="fu">coef</span>(total_model)[<span class="st">"marketing"</span>])</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>direct <span class="ot">&lt;-</span> <span class="fu">unname</span>(<span class="fu">coef</span>(direct_model)[<span class="st">"marketing"</span>])</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">total =</span> total, <span class="at">direct =</span> direct, <span class="at">through_visits =</span> total <span class="sc">-</span> direct,</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">share_through_visits =</span> (total <span class="sc">-</span> direct) <span class="sc">/</span> total)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>               total               direct       through_visits 
+           5.0398953            2.6216208            2.4182745 
+share_through_visits 
+           0.4798263 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unname</span>(<span class="fu">coef</span>(visits_model)[<span class="st">"marketing"</span>] <span class="sc">*</span> <span class="fu">coef</span>(direct_model)[<span class="st">"visits"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2.418274</code></pre>
+</div>
+</div>
+<p>Step 1: the total association. Without visits in the model, €1,000 more marketing is associated with about €5,040 more monthly sales on average.</p>
+<p>Step 2: the direct part. With visits added, the marketing coefficient falls to 2.62. At the same number of visits, €1,000 more marketing is associated with about €2,620 more sales.</p>
+<p>Step 3: the part through visits. The difference is <span class="math inline">\(5.04-2.62=2.42\)</span>, about €2,420 of sales per €1,000 of marketing. That is about 48% of the total. The same number comes from the two paths. €1,000 more marketing goes with about 1,490 more visits (<span class="math inline">\(1.488\)</span> in 1,000s), and 1,000 more visits go with about €1,630 more sales at the same marketing (<span class="math inline">\(1.625\)</span>). The product is <span class="math inline">\(1.488\times1.625\approx2.42\)</span>.</p>
+</div>
+<div class="caveat-box">
+<p><span class="label">A mediator is not a control variable</span></p>
+<ul>
+<li>In <a href="../intermediate/i04-multiple-regression.html#what-control-variables-can-and-cannot-do">Lecture 4</a> you added control variables to hold confounders fixed. A mediator looks like one more predictor, but adding it changes the question.</li>
+<li>With visits in the model, the marketing coefficient no longer contains the part that runs through visits. If you want the total effect of marketing, do not control for visits.</li>
+<li>So ask first what role a variable plays. Control for a confounder. Do not control for a mediator when you want the total effect.</li>
+<li>Mediation is a causal idea. It needs a causal design, such as an experiment, or strong assumptions. With observational data, the split into a direct and an indirect part only describes the data.</li>
+</ul>
+</div>
+<p>The table compares the three roles of a third variable <span class="math inline">\(Z\)</span>.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Role</th>
+<th>What it is</th>
+<th>How it appears in a regression</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Moderator</td>
+<td>Changes the slope of <span class="math inline">\(X\)</span></td>
+<td>Interaction term <span class="math inline">\(XZ\)</span></td>
+<td>Number of stores changes the marketing slope</td>
+</tr>
+<tr class="even">
+<td>Mediator</td>
+<td>Lies on the path from <span class="math inline">\(X\)</span> to <span class="math inline">\(Y\)</span></td>
+<td>Adding it shrinks the coefficient of <span class="math inline">\(X\)</span> to the direct part</td>
+<td>Website visits between marketing and sales</td>
+</tr>
+<tr class="odd">
+<td>Confounder</td>
+<td>Affects both <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span></td>
+<td>Control variable, to remove omitted variable bias</td>
+<td>Firm size behind both advertising and sales</td>
+</tr>
+</tbody>
+</table>
+<p>An interaction term lets the slope differ by group or change with a moderator. A quadratic term lets the slope change as <span class="math inline">\(x\)</span> itself changes. Both add one new column to the data, a product or a square. In both, you read two coefficients together.</p>
 </section>
 <section id="curvature-polynomials-are-still-linear-regression" class="level3">
 <h3 class="anchored" data-anchor-id="curvature-polynomials-are-still-linear-regression">Curvature: polynomials are still linear regression</h3>
@@ -750,10 +1091,10 @@ E[Y\mid X=x]=\beta_0+\beta_1x+\beta_2x^2
 \]</span></p>
 <p>This change depends on the starting value <span class="math inline">\(x\)</span>. The rule is: never read <span class="math inline">\(\beta_1\)</span> alone while <span class="math inline">\(x^2\)</span> is in the model. Calculate fitted changes or graph the curve.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>linear_season <span class="ot">&lt;-</span> <span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> ask_1k, <span class="at">data =</span> sharks)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>poly_season <span class="ot">&lt;-</span> <span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> <span class="fu">I</span>(season<span class="sc">^</span><span class="dv">2</span>) <span class="sc">+</span> ask_1k,</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data =</span> sharks)</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(poly_season)<span class="sc">$</span>coefficients</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>linear_season <span class="ot">&lt;-</span> <span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> ask_1k, <span class="at">data =</span> sharks)</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>poly_season <span class="ot">&lt;-</span> <span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> <span class="fu">I</span>(season<span class="sc">^</span><span class="dv">2</span>) <span class="sc">+</span> ask_1k,</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data =</span> sharks)</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(poly_season)<span class="sc">$</span>coefficients</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>                Estimate   Std. Error   t value      Pr(&gt;|t|)
 (Intercept) 24.171680818 0.8205664983 29.457309 1.332051e-149
@@ -764,7 +1105,7 @@ ask_1k      -0.002710806 0.0005740121 -4.722559  2.556506e-06</code></pre>
 </div>
 <p><code>I()</code> tells R to calculate the square. Without <code>I()</code>, R would read <code>^</code> as part of the formula syntax and not as a square. The fitted coefficients are <span class="math inline">\(\hat\beta_1 \approx -1.713\)</span> for <code>season</code> and <span class="math inline">\(\hat\beta_2 \approx 0.051\)</span> for <code>I(season^2)</code>. Together they describe a steep decline in the early seasons that becomes flatter season by season.</p>
 <div id="exm-i06-quadratic-change" class="theorem example">
-<p><span class="theorem-title"><strong>Example 23.1 (Worked example: the fitted change from Season 5 to Season 6)</strong></span> <span class="shark-tag">Shark Tank data</span> Holding requested amount fixed, the fitted change from season <span class="math inline">\(x\)</span> to season <span class="math inline">\(x+1\)</span> is <span class="math inline">\(\hat\beta_1+\hat\beta_2(2x+1)\)</span>. From Season 5 to Season 6, <span class="math inline">\(x = 5\)</span>:</p>
+<p><span class="theorem-title"><strong>Example 23.4 (Worked example: the fitted change from Season 5 to Season 6)</strong></span> <span class="shark-tag">Shark Tank data</span> Holding requested amount fixed, the fitted change from season <span class="math inline">\(x\)</span> to season <span class="math inline">\(x+1\)</span> is <span class="math inline">\(\hat\beta_1+\hat\beta_2(2x+1)\)</span>. From Season 5 to Season 6, <span class="math inline">\(x = 5\)</span>:</p>
 <p><span class="math display">\[
 \hat\beta_1+\hat\beta_2(2\times5+1)
 =-1.713+0.051\times11
@@ -774,8 +1115,8 @@ ask_1k      -0.002710806 0.0005740121 -4.722559  2.556506e-06</code></pre>
 \]</span></p>
 <p>Reading <span class="math inline">\(\hat\beta_1=-1.713\)</span> alone would make the drop about 0.56 points too large, which is about half of the fitted drop of 1.15 points. The number <span class="math inline">\(-1.713\)</span> is not a constant slope. It describes the slope at <span class="math inline">\(x=0\)</span>, a season that does not exist. Check the calculation in R with the stored coefficients:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>b <span class="ot">&lt;-</span> <span class="fu">coef</span>(poly_season)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">unname</span>(b[<span class="st">"season"</span>] <span class="sc">+</span> b[<span class="st">"I(season^2)"</span>] <span class="sc">*</span> (<span class="dv">2</span> <span class="sc">*</span> <span class="dv">5</span> <span class="sc">+</span> <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>b <span class="ot">&lt;-</span> <span class="fu">coef</span>(poly_season)</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="fu">unname</span>(b[<span class="st">"season"</span>] <span class="sc">+</span> b[<span class="st">"I(season^2)"</span>] <span class="sc">*</span> (<span class="dv">2</span> <span class="sc">*</span> <span class="dv">5</span> <span class="sc">+</span> <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] -1.151857</code></pre>
 </div>
@@ -786,7 +1127,7 @@ ask_1k      -0.002710806 0.0005740121 -4.722559  2.556506e-06</code></pre>
 <h3 class="anchored" data-anchor-id="is-the-curvature-worth-having-the-partial-f">Is the curvature worth having? The partial F</h3>
 <p><span class="shark-tag">Shark Tank data</span> The quadratic model and the linear model are nested, so the partial F-test of Lecture 5 applies to the one added term:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(linear_season, poly_season)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(linear_season, poly_season)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Analysis of Variance Table
 
@@ -799,41 +1140,41 @@ Model 2: equity_offered_pct ~ season + I(season^2) + ask_1k
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 </div>
 </div>
-<p>The partial F-test for adding <code>I(season^2)</code> gives <span class="math inline">\(F \approx 20.1\)</span> with a p-value below 0.001. The data show a curve. But the gain in fit is small: adjusted <span class="math inline">\(R^2\)</span> rises from about 0.186 to about 0.196, one percentage point more of the variation in the equity offered. So also look at the shape of the curve in <a href="#fig-i06-polynomial" class="quarto-xref">Figure&nbsp;<span>23.3</span></a>:</p>
+<p>The partial F-test for adding <code>I(season^2)</code> gives <span class="math inline">\(F \approx 20.1\)</span> with a p-value below 0.001. The data show a curve. But the gain in fit is small: adjusted <span class="math inline">\(R^2\)</span> rises from about 0.186 to about 0.196, one percentage point more of the variation in the equity offered. So also look at the shape of the curve in <a href="#fig-i06-polynomial" class="quarto-xref">Figure&nbsp;<span>23.5</span></a>:</p>
 <div class="cell">
 <details class="code-fold">
 <summary>See the R code for this figure</summary>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>sharks<span class="sc">$</span>ask_1k <span class="ot">&lt;-</span> sharks<span class="sc">$</span>ask_amount_usd <span class="sc">/</span> <span class="dv">1000</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>poly_season <span class="ot">&lt;-</span> <span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> <span class="fu">I</span>(season<span class="sc">^</span><span class="dv">2</span>) <span class="sc">+</span> ask_1k,</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data =</span> sharks)</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>season_means <span class="ot">&lt;-</span> <span class="fu">aggregate</span>(equity_offered_pct <span class="sc">~</span> season, <span class="at">data =</span> sharks, mean)</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>curve_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">season =</span> <span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">16</span>, <span class="at">length.out =</span> <span class="dv">200</span>),</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>                         <span class="at">ask_1k =</span> <span class="fu">mean</span>(sharks<span class="sc">$</span>ask_1k))</span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>curve_data<span class="sc">$</span>fit <span class="ot">&lt;-</span> <span class="fu">predict</span>(poly_season, <span class="at">newdata =</span> curve_data)</span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(season_means, <span class="fu">aes</span>(<span class="at">x =</span> season, <span class="at">y =</span> equity_offered_pct)) <span class="sc">+</span></span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"rect"</span>, <span class="at">xmin =</span> <span class="dv">16</span>, <span class="at">xmax =</span> <span class="fl">17.6</span>, <span class="at">ymin =</span> <span class="sc">-</span><span class="cn">Inf</span>, <span class="at">ymax =</span> <span class="cn">Inf</span>,</span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>           <span class="at">fill =</span> <span class="st">"grey75"</span>, <span class="at">alpha =</span> <span class="fl">0.25</span>) <span class="sc">+</span></span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">16</span>, <span class="at">colour =</span> <span class="st">"grey60"</span>,</span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>             <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> curve_data, <span class="fu">aes</span>(<span class="at">x =</span> season, <span class="at">y =</span> fit),</span>
-<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>            <span class="at">colour =</span> <span class="st">"#D55E00"</span>, <span class="at">linewidth =</span> <span class="fl">1.1</span>) <span class="sc">+</span></span>
-<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="fl">2.6</span>, <span class="at">colour =</span> <span class="st">"#009E73"</span>) <span class="sc">+</span></span>
-<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="fl">16.8</span>, <span class="at">y =</span> <span class="fu">max</span>(season_means<span class="sc">$</span>equity_offered_pct),</span>
-<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>           <span class="at">label =</span> <span class="st">"no data beyond</span><span class="sc">\n</span><span class="st">season 16"</span>, <span class="at">colour =</span> <span class="st">"#5B6976"</span>,</span>
-<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>           <span class="at">size =</span> <span class="dv">3</span>, <span class="at">lineheight =</span> <span class="fl">0.95</span>) <span class="sc">+</span></span>
-<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">16</span>, <span class="at">by =</span> <span class="dv">3</span>)) <span class="sc">+</span></span>
-<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fl">17.6</span>)) <span class="sc">+</span></span>
-<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Season"</span>, <span class="at">y =</span> <span class="st">"Initial equity offered (%)"</span>) <span class="sc">+</span></span>
-<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
-<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.x =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#5B6976"</span>),</span>
-<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>)</span>
-<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>sharks<span class="sc">$</span>ask_1k <span class="ot">&lt;-</span> sharks<span class="sc">$</span>ask_amount_usd <span class="sc">/</span> <span class="dv">1000</span></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>poly_season <span class="ot">&lt;-</span> <span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> <span class="fu">I</span>(season<span class="sc">^</span><span class="dv">2</span>) <span class="sc">+</span> ask_1k,</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data =</span> sharks)</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>season_means <span class="ot">&lt;-</span> <span class="fu">aggregate</span>(equity_offered_pct <span class="sc">~</span> season, <span class="at">data =</span> sharks, mean)</span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>curve_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">season =</span> <span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">16</span>, <span class="at">length.out =</span> <span class="dv">200</span>),</span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>                         <span class="at">ask_1k =</span> <span class="fu">mean</span>(sharks<span class="sc">$</span>ask_1k))</span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>curve_data<span class="sc">$</span>fit <span class="ot">&lt;-</span> <span class="fu">predict</span>(poly_season, <span class="at">newdata =</span> curve_data)</span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(season_means, <span class="fu">aes</span>(<span class="at">x =</span> season, <span class="at">y =</span> equity_offered_pct)) <span class="sc">+</span></span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"rect"</span>, <span class="at">xmin =</span> <span class="dv">16</span>, <span class="at">xmax =</span> <span class="fl">17.6</span>, <span class="at">ymin =</span> <span class="sc">-</span><span class="cn">Inf</span>, <span class="at">ymax =</span> <span class="cn">Inf</span>,</span>
+<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a>           <span class="at">fill =</span> <span class="st">"grey75"</span>, <span class="at">alpha =</span> <span class="fl">0.25</span>) <span class="sc">+</span></span>
+<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">16</span>, <span class="at">colour =</span> <span class="st">"grey60"</span>,</span>
+<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a>             <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb41-16"><a href="#cb41-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> curve_data, <span class="fu">aes</span>(<span class="at">x =</span> season, <span class="at">y =</span> fit),</span>
+<span id="cb41-17"><a href="#cb41-17" aria-hidden="true" tabindex="-1"></a>            <span class="at">colour =</span> <span class="st">"#D55E00"</span>, <span class="at">linewidth =</span> <span class="fl">1.1</span>) <span class="sc">+</span></span>
+<span id="cb41-18"><a href="#cb41-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="fl">2.6</span>, <span class="at">colour =</span> <span class="st">"#009E73"</span>) <span class="sc">+</span></span>
+<span id="cb41-19"><a href="#cb41-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="fl">16.8</span>, <span class="at">y =</span> <span class="fu">max</span>(season_means<span class="sc">$</span>equity_offered_pct),</span>
+<span id="cb41-20"><a href="#cb41-20" aria-hidden="true" tabindex="-1"></a>           <span class="at">label =</span> <span class="st">"no data beyond</span><span class="sc">\n</span><span class="st">season 16"</span>, <span class="at">colour =</span> <span class="st">"#5B6976"</span>,</span>
+<span id="cb41-21"><a href="#cb41-21" aria-hidden="true" tabindex="-1"></a>           <span class="at">size =</span> <span class="dv">3</span>, <span class="at">lineheight =</span> <span class="fl">0.95</span>) <span class="sc">+</span></span>
+<span id="cb41-22"><a href="#cb41-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">16</span>, <span class="at">by =</span> <span class="dv">3</span>)) <span class="sc">+</span></span>
+<span id="cb41-23"><a href="#cb41-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fl">17.6</span>)) <span class="sc">+</span></span>
+<span id="cb41-24"><a href="#cb41-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Season"</span>, <span class="at">y =</span> <span class="st">"Initial equity offered (%)"</span>) <span class="sc">+</span></span>
+<span id="cb41-25"><a href="#cb41-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
+<span id="cb41-26"><a href="#cb41-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb41-27"><a href="#cb41-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb41-28"><a href="#cb41-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb41-29"><a href="#cb41-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#5B6976"</span>),</span>
+<span id="cb41-30"><a href="#cb41-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>)</span>
+<span id="cb41-31"><a href="#cb41-31" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-i06-polynomial" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -842,13 +1183,13 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <img src="i06-interactions-curvature_files/figure-html/fig-i06-polynomial-1.png" class="img-fluid figure-img" width="672">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-i06-polynomial-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;23.3: Season means of the equity offered (points) and the fitted quadratic curve at the average requested amount. The curve becomes flatter towards the last observed seasons. Beyond Season 16 (shaded) it would turn upward, but there are no data in that region.
+Figure&nbsp;23.5: Season means of the equity offered (points) and the fitted quadratic curve at the average requested amount. The curve becomes flatter towards the last observed seasons. Beyond Season 16 (shaded) it would turn upward, but there are no data in that region.
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
-<p>The points in <a href="#fig-i06-polynomial" class="quarto-xref">Figure&nbsp;<span>23.3</span></a> are the plain means of each season. The curve keeps the requested amount fixed at its sample mean. To extrapolate means to use a fitted model outside the range of the data. Do not extrapolate the quadratic beyond Seasons 1–16. The fitted curve reaches its lowest point just after Season 16 and would rise steeply afterwards. This rise comes from the shape of a quadratic, not from any data, so it is not a forecast.</p>
+<p>The points in <a href="#fig-i06-polynomial" class="quarto-xref">Figure&nbsp;<span>23.5</span></a> are the plain means of each season. The curve keeps the requested amount fixed at its sample mean. To extrapolate means to use a fitted model outside the range of the data. Do not extrapolate the quadratic beyond Seasons 1–16. The fitted curve reaches its lowest point just after Season 16 and would rise steeply afterwards. This rise comes from the shape of a quadratic, not from any data, so it is not a forecast.</p>
 <div class="caveat-box">
 <p><span class="label">What flexible terms can and cannot repair</span></p>
 <ul>
@@ -886,6 +1227,8 @@ Figure&nbsp;23.3: Season means of the equity offered (points) and the fitted qua
 <li>State the hierarchy principle.</li>
 <li>Why is a quadratic model still a linear regression model?</li>
 <li>Why should you graph a quadratic curve, and why should you not extrapolate it?</li>
+<li>In the invented franchise model, <code>marketing</code> is 1.745 and <code>marketing:stores</code> is 0.147, with sales and marketing in €1,000s. What is the slope of marketing in a region with 6 stores, and why does 1.745 alone not describe any region?</li>
+<li>A researcher finds that training is related to productivity, and that the relationship is stronger in large firms. A second researcher finds that training raises skills and that skills raise productivity. Which finding is about a moderator and which about a mediator, and how does each appear in a regression?</li>
 </ol>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
@@ -905,6 +1248,8 @@ Check your answers
 <li>Keep <span class="math inline">\(X\)</span> and <span class="math inline">\(D\)</span> in the model whenever their interaction <span class="math inline">\(XD\)</span> is in it, and keep <span class="math inline">\(x\)</span> whenever <span class="math inline">\(x^2\)</span> is in it.</li>
 <li>It is linear in the unknown coefficients. The squared column is one more predictor built from the data.</li>
 <li>No single coefficient is the slope, so only fitted values or the curve show what the model says. Outside the observed range the curve can turn sharply, and no data support that turn.</li>
+<li><span class="math inline">\(1.745+0.147\times6\approx2.63\)</span>: in a region with 6 stores, €1,000 more marketing is associated with about €2,630 more monthly sales on average. The number 1.745 is the slope at 0 stores. No region has 0 stores, so it is a conditional effect at a value outside the data.</li>
+<li>Firm size is a moderator: it changes the slope of training. It appears as an interaction term of training and firm size. Skills are a mediator: they lie on the path from training to productivity. Adding skills to the model shrinks the training coefficient to the direct part, so leave skills out if you want the total effect.</li>
 </ol>
 </div>
 </div>
@@ -926,30 +1271,30 @@ Check your answer
 <div id="callout-6" class="callout-6-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>sharks<span class="sc">$</span>ask_1k <span class="ot">&lt;-</span> sharks<span class="sc">$</span>ask_amount_usd <span class="sc">/</span> <span class="dv">1000</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>known_gender <span class="ot">&lt;-</span> <span class="fu">subset</span>(sharks, pitcher_gender_group <span class="sc">!=</span> <span class="st">"unknown"</span>)</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>known_gender<span class="sc">$</span>women <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  known_gender<span class="sc">$</span>pitcher_gender_group <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"all_women"</span>, <span class="st">"mixed"</span>)</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>known_gender<span class="sc">$</span>season_c <span class="ot">&lt;-</span> known_gender<span class="sc">$</span>season <span class="sc">-</span> <span class="fu">mean</span>(known_gender<span class="sc">$</span>season)</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>uncentred <span class="ot">&lt;-</span> <span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> season <span class="sc">*</span> women <span class="sc">+</span> ask_1k,</span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>                 <span class="at">data =</span> known_gender)</span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>centred <span class="ot">&lt;-</span> <span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> season_c <span class="sc">*</span> women <span class="sc">+</span> ask_1k,</span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>               <span class="at">data =</span> known_gender)</span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="fu">all.equal</span>(<span class="fu">fitted</span>(uncentred), <span class="fu">fitted</span>(centred))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>sharks<span class="sc">$</span>ask_1k <span class="ot">&lt;-</span> sharks<span class="sc">$</span>ask_amount_usd <span class="sc">/</span> <span class="dv">1000</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>known_gender <span class="ot">&lt;-</span> <span class="fu">subset</span>(sharks, pitcher_gender_group <span class="sc">!=</span> <span class="st">"unknown"</span>)</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>known_gender<span class="sc">$</span>women <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>  known_gender<span class="sc">$</span>pitcher_gender_group <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"all_women"</span>, <span class="st">"mixed"</span>)</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>known_gender<span class="sc">$</span>season_c <span class="ot">&lt;-</span> known_gender<span class="sc">$</span>season <span class="sc">-</span> <span class="fu">mean</span>(known_gender<span class="sc">$</span>season)</span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>uncentred <span class="ot">&lt;-</span> <span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> season <span class="sc">*</span> women <span class="sc">+</span> ask_1k,</span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>                 <span class="at">data =</span> known_gender)</span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>centred <span class="ot">&lt;-</span> <span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> season_c <span class="sc">*</span> women <span class="sc">+</span> ask_1k,</span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>               <span class="at">data =</span> known_gender)</span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a><span class="fu">all.equal</span>(<span class="fu">fitted</span>(uncentred), <span class="fu">fitted</span>(centred))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] TRUE</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">uncentred =</span> <span class="fu">unname</span>(<span class="fu">coef</span>(uncentred)[<span class="st">"season:women"</span>]),</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">centred =</span> <span class="fu">unname</span>(<span class="fu">coef</span>(centred)[<span class="st">"season_c:women"</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">uncentred =</span> <span class="fu">unname</span>(<span class="fu">coef</span>(uncentred)[<span class="st">"season:women"</span>]),</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">centred =</span> <span class="fu">unname</span>(<span class="fu">coef</span>(centred)[<span class="st">"season_c:women"</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  uncentred     centred 
 -0.06145941 -0.06145941 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">women_uncentred =</span> <span class="fu">unname</span>(<span class="fu">coef</span>(uncentred)[<span class="st">"women"</span>]),</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">women_centred =</span> <span class="fu">unname</span>(<span class="fu">coef</span>(centred)[<span class="st">"women"</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">women_uncentred =</span> <span class="fu">unname</span>(<span class="fu">coef</span>(uncentred)[<span class="st">"women"</span>]),</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">women_centred =</span> <span class="fu">unname</span>(<span class="fu">coef</span>(centred)[<span class="st">"women"</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>women_uncentred   women_centred 
       1.3465150       0.8069665 </code></pre>
@@ -962,7 +1307,7 @@ Check your answer
 </section>
 <section id="finish-a-half-worked-example-a-quadratic-change" class="level3">
 <h3 class="anchored" data-anchor-id="finish-a-half-worked-example-a-quadratic-change">Finish a half-worked example: a quadratic change</h3>
-<p><span class="shark-tag">Shark Tank data</span> Read the worked calculation for Season 5 to Season 6 again (<a href="#exm-i06-quadratic-change" class="quarto-xref">Example&nbsp;<span>23.1</span></a>). Then calculate the fitted change from <strong>Season 10 to Season 11</strong> in the same model.</p>
+<p><span class="shark-tag">Shark Tank data</span> Read the worked calculation for Season 5 to Season 6 again (<a href="#exm-i06-quadratic-change" class="quarto-xref">Example&nbsp;<span>23.4</span></a>). Then calculate the fitted change from <strong>Season 10 to Season 11</strong> in the same model.</p>
 <p><em>Step 1 (given).</em> The formula is <span class="math inline">\(\hat\beta_1+\hat\beta_2(2x+1)\)</span> with <span class="math inline">\(x=10\)</span>, so you multiply <span class="math inline">\(\hat\beta_2\)</span> by <span class="math inline">\(21\)</span>.</p>
 <p><em>Step 2 (you).</em> Insert <span class="math inline">\(\hat\beta_1\approx-1.713\)</span> and <span class="math inline">\(\hat\beta_2\approx0.051\)</span>.</p>
 <p><em>Step 3 (you).</em> Compare the result with the Season 5 to 6 change and state in one sentence what the comparison shows about the trend.</p>
