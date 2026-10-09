@@ -534,8 +534,29 @@ control variable can:
 - show that a simple association partly came from comparing different kinds
   of cases.
 
-A control variable also has a cost: it makes a coefficient less precise when
-the predictors are strongly correlated.
+A control variable also has a cost when it moves closely together with the
+predictor that you are interested in. Take the invented example of firm size
+and advertising. With `size` in the model, the advertising slope compares
+firms of the same size. But firms of the same size differ only a little in
+advertising spend. In @fig-i04-ovb-scatter, the points of one colour cover a
+much narrower range of advertising spend than all points together. With so
+little variation in advertising, the data say less about its slope. Its
+standard error grows, and its confidence interval gets wider. The numbers
+show this:
+
+```{r}
+#| label: i04-precision-cost
+round(cor(demo$adspend, demo$size), 2)
+# slope of adspend and its standard error, without and with size
+round(summary(lm(revenue ~ adspend, data = demo))$coefficients["adspend", 1:2], 3)
+round(summary(lm(revenue ~ adspend + size, data = demo))$coefficients["adspend", 1:2], 3)
+```
+
+Their correlation is about 0.93. The standard error of the advertising slope
+is about 0.06 without `size` and about 0.11 with `size` in the model, almost
+twice as large. Here the control is still needed, because without it the
+slope is biased. But the estimate that you get is less precise. The section
+on multicollinearity below returns to this.
 
 Including a control variable cannot:
 

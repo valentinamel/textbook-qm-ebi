@@ -940,7 +940,25 @@ Check your answer
 <li>reduce the residual variation, which makes confidence intervals narrower</li>
 <li>show that a simple association partly came from comparing different kinds of cases.</li>
 </ul>
-<p>A control variable also has a cost: it makes a coefficient less precise when the predictors are strongly correlated.</p>
+<p>A control variable also has a cost when it moves closely together with the predictor that you are interested in. Take the invented example of firm size and advertising. With <code>size</code> in the model, the advertising slope compares firms of the same size. But firms of the same size differ only a little in advertising spend. In <a href="#fig-i04-ovb-scatter" class="quarto-xref">Figure&nbsp;<span>4.1</span></a>, the points of one colour cover a much narrower range of advertising spend than all points together. With so little variation in advertising, the data say less about its slope. Its standard error grows, and its confidence interval gets wider. The numbers show this:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">cor</span>(demo<span class="sc">$</span>adspend, demo<span class="sc">$</span>size), <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.93</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># slope of adspend and its standard error, without and with size</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">summary</span>(<span class="fu">lm</span>(revenue <span class="sc">~</span> adspend, <span class="at">data =</span> demo))<span class="sc">$</span>coefficients[<span class="st">"adspend"</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>], <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  Estimate Std. Error 
+     1.663      0.061 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">summary</span>(<span class="fu">lm</span>(revenue <span class="sc">~</span> adspend <span class="sc">+</span> size, <span class="at">data =</span> demo))<span class="sc">$</span>coefficients[<span class="st">"adspend"</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>], <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  Estimate Std. Error 
+    -0.019      0.106 </code></pre>
+</div>
+</div>
+<p>Their correlation is about 0.93. The standard error of the advertising slope is about 0.06 without <code>size</code> and about 0.11 with <code>size</code> in the model, almost twice as large. Here the control is still needed, because without it the slope is biased. But the estimate that you get is less precise. The section on multicollinearity below returns to this.</p>
 <p>Including a control variable cannot:</p>
 <ul>
 <li>adjust for variables that were not measured</li>
@@ -986,39 +1004,39 @@ Check: which of these four problems does adding <code>ask_1k</code> address?
 <div class="cell">
 <details class="code-fold">
 <summary>See the R code for this figure</summary>
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>sharks<span class="sc">$</span>ask_1k <span class="ot">&lt;-</span> sharks<span class="sc">$</span>ask_amount_usd <span class="sc">/</span> <span class="dv">1000</span></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>equity_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> ask_1k <span class="sc">+</span> description_words,</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> sharks</span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>ci <span class="ot">&lt;-</span> <span class="fu">confint</span>(equity_model)[<span class="sc">-</span><span class="dv">1</span>, , drop <span class="ot">=</span> <span class="cn">FALSE</span>]</span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>term_labels <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Season"</span>, <span class="st">"Amount requested ($1,000s)"</span>,</span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"Description length (words)"</span>)</span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>coef_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">term =</span> <span class="fu">factor</span>(term_labels, <span class="at">levels =</span> term_labels),</span>
-<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">estimate =</span> <span class="fu">coef</span>(equity_model)[<span class="sc">-</span><span class="dv">1</span>],</span>
-<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">lower =</span> ci[, <span class="dv">1</span>],</span>
-<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">upper =</span> ci[, <span class="dv">2</span>]</span>
-<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(coef_df, <span class="fu">aes</span>(<span class="at">x =</span> estimate, <span class="at">y =</span> term)) <span class="sc">+</span></span>
-<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">colour =</span> <span class="st">"#C98B2E"</span>,</span>
-<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>             <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
-<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_pointrange</span>(<span class="fu">aes</span>(<span class="at">xmin =</span> lower, <span class="at">xmax =</span> upper),</span>
-<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>                  <span class="at">colour =</span> <span class="st">"#009E73"</span>, <span class="at">linewidth =</span> <span class="fl">0.7</span>, <span class="at">fatten =</span> <span class="fl">2.6</span>) <span class="sc">+</span></span>
-<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="sc">-</span><span class="fl">0.02</span>, <span class="at">y =</span> <span class="fl">3.35</span>, <span class="at">label =</span> <span class="st">"no change = 0"</span>,</span>
-<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>           <span class="at">hjust =</span> <span class="dv">1</span>, <span class="at">colour =</span> <span class="st">"#17324D"</span>, <span class="at">size =</span> <span class="fl">3.4</span>) <span class="sc">+</span></span>
-<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Estimated change in equity offered (percentage points)"</span>,</span>
-<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
-<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
-<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.y =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#5B6976"</span>),</span>
-<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>)</span>
-<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>sharks<span class="sc">$</span>ask_1k <span class="ot">&lt;-</span> sharks<span class="sc">$</span>ask_amount_usd <span class="sc">/</span> <span class="dv">1000</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>equity_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> ask_1k <span class="sc">+</span> description_words,</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> sharks</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>ci <span class="ot">&lt;-</span> <span class="fu">confint</span>(equity_model)[<span class="sc">-</span><span class="dv">1</span>, , drop <span class="ot">=</span> <span class="cn">FALSE</span>]</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>term_labels <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Season"</span>, <span class="st">"Amount requested ($1,000s)"</span>,</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"Description length (words)"</span>)</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>coef_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">term =</span> <span class="fu">factor</span>(term_labels, <span class="at">levels =</span> term_labels),</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">estimate =</span> <span class="fu">coef</span>(equity_model)[<span class="sc">-</span><span class="dv">1</span>],</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">lower =</span> ci[, <span class="dv">1</span>],</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">upper =</span> ci[, <span class="dv">2</span>]</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(coef_df, <span class="fu">aes</span>(<span class="at">x =</span> estimate, <span class="at">y =</span> term)) <span class="sc">+</span></span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">colour =</span> <span class="st">"#C98B2E"</span>,</span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>             <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_pointrange</span>(<span class="fu">aes</span>(<span class="at">xmin =</span> lower, <span class="at">xmax =</span> upper),</span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>                  <span class="at">colour =</span> <span class="st">"#009E73"</span>, <span class="at">linewidth =</span> <span class="fl">0.7</span>, <span class="at">fatten =</span> <span class="fl">2.6</span>) <span class="sc">+</span></span>
+<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="sc">-</span><span class="fl">0.02</span>, <span class="at">y =</span> <span class="fl">3.35</span>, <span class="at">label =</span> <span class="st">"no change = 0"</span>,</span>
+<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>           <span class="at">hjust =</span> <span class="dv">1</span>, <span class="at">colour =</span> <span class="st">"#17324D"</span>, <span class="at">size =</span> <span class="fl">3.4</span>) <span class="sc">+</span></span>
+<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Estimated change in equity offered (percentage points)"</span>,</span>
+<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
+<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb24-30"><a href="#cb24-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.y =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb24-31"><a href="#cb24-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#5B6976"</span>),</span>
+<span id="cb24-32"><a href="#cb24-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>)</span>
+<span id="cb24-33"><a href="#cb24-33" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-i04-coefplot" class="quarto-float quarto-figure quarto-figure-center anchored">

@@ -1414,3 +1414,4 @@ group.
 - Review sections in all lectures renamed "Review questions from past lectures", without naming the lectures.
 - Omitted variable bias defined in Intermediate Lecture 2, where the confounder is first defined. Lecture 4 refers back to it.
 - Intermediate Lecture 4: confounder example rebuilt with three size classes, so the clouds within a class are flat, with dashed within-class fitted lines. In-text figure references in Intermediate now also show the lecture number (post-render script fixed).
+- Intermediate Lecture 4: the cost of a control variable explained, with the standard errors of the invented example.
