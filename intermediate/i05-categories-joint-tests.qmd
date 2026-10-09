@@ -54,8 +54,8 @@ The video explains dummy variables, which take only the values 0 and 1. How
 many dummy variables does a model with an intercept need for three
 categories? Write down a number. Then answer this question before you come to
 class: at the same season and requested
-amount, do you expect all-women teams to offer **more**, **less**, or
-**about the same** equity as all-men teams? You will find both answers in
+amount, do you expect all-women teams to offer more, less, or
+about the same equity as all-men teams? You will find both answers in
 the lecture material.
 
 [Shark Tank data]{.shark-tag} **R warm-up.** The code below builds the subset of pitches and
@@ -232,8 +232,7 @@ problem.
 ::: {.definition-box}
 <span class="label">Definition</span>
 
-**A/B test.** A randomised controlled experiment (randomised experiment)
-with two groups. The **treatment group** gets the new version (B), and the
+**A/B test.** A randomised experiment with two groups. The **treatment group** gets the new version (B), and the
 **control group** gets the current version (A). With **random assignment**,
 chance decides which customer gets which version. The **outcome** $Y_i$ is
 what you measure for each customer, such as the order value. The
@@ -251,8 +250,8 @@ the average effect of the new page on the order value. This is called the
 
 Compare this with the Shark Tank comparisons of this lecture. Nobody
 assigned the gender of a team by chance. Teams of different composition can
-also differ in industry, experience, or product. The regression holds season
-and requested amount fixed, but not these other differences. That is why
+also differ in industry, experience, or product. The regression later in this
+lecture holds season and requested amount fixed, but not these other differences. That is why
 the coefficients of this lecture are adjusted comparisons, not effects. You
 met the same contrast in
 [QM Basic Lecture 7](../basic/b07-samples-estimators.qmd): random sampling
@@ -324,16 +323,31 @@ The test in five steps.
 1. **Hypotheses.** $H_0:\beta_1=0$, the new page has no effect on the mean
    order value. $H_1:\beta_1\ne0$. The significance level is 5%.
 2. **Test statistic.** $T=\hat\beta_1/\operatorname{SE}(\hat\beta_1)$, with
-   $df=n-k-1=200-1-1=198$.
+
+   $$
+   df=n-k-1=200-1-1=198.
+   $$
 3. **Critical value and rejection region.** The critical value is 1.972,
    from `qt(0.975, df = 198)`. Reject $H_0$ if $|t_{obs}|\ge 1.972$.
 4. **Observed value.** $t_{obs}=2.042/0.799\approx 2.56$.
 5. **Conclusion.** $2.56\ge1.972$, so reject $H_0$ (p $\approx$ 0.011). At
    the 5% level, the new page raises the mean order value.
 
-The interval is $2.04\pm1.972\times0.80$, from about 0.47 to 3.62 euros. It
-contains the true effect of 2 euros that the code built in. To judge the
-size, compare it with the mean of the control group:
+The 95% interval for $\beta_1$ in five parts.
+
+1. **Formula.**
+   $\hat\beta_1\pm t_{0.975,\,df}\,\operatorname{SE}(\hat\beta_1)$.
+2. **Given values.** $\hat\beta_1=2.042$,
+   $\operatorname{SE}(\hat\beta_1)=0.799$, $df=198$, and
+   $t_{0.975,\,198}=1.972$.
+3. **Calculations.** The margin of error is $1.972\times0.799\approx1.576$.
+4. **Interval.** $2.042\pm1.576$, from about 0.47 to 3.62 euros.
+5. **Conclusion.** With 95% confidence, the new page raises the mean order
+   value by between about 0.47 and 3.62 euros. The interval lies above 0,
+   which agrees with the test.
+
+The interval contains the true effect of 2 euros that the code built in. To
+judge the size, compare the estimate with the mean of the control group:
 
 ```{r}
 #| label: i05-ab-share
@@ -358,6 +372,46 @@ An A/B test also has limits.
 - Testing many versions or many outcomes needs care. With many tests at the
   5% level, some will reject by chance alone, even if no version has an
   effect.
+
+### When you may use causal words {#i05-causal-words}
+
+Since Lecture 1 you describe a coefficient with "is associated with" and
+"on average". You do not use causal words such as "increases", "raises",
+"leads to", or "the effect of". This stays the default in this course. Most
+data in business are observational: nobody decided by chance who got what.
+Then a coefficient mixes the role of the predictor with the role of
+everything that goes with it, measured or not. Control variables remove only
+the part that you measured.
+
+A well-run A/B test is the exception. Here causal words are correct, because
+the way the data were produced rules out the other explanations. Check three
+conditions before you use them:
+
+1. Random assignment. Chance decided which customer got which version. The
+   customers did not choose it, and neither did the team.
+2. One difference. During the test, the two groups had the same period, the
+   same prices, and the same website, apart from the version you test.
+3. Same measurement. You measured the outcome in the same way and over the
+   same time in both groups, and every customer kept the version assigned.
+
+If all three hold, the difference in means estimates the average treatment
+effect. You may then write "the new page raises the mean order value". If
+one condition fails, go back to the default wording. An example: the
+customers chose between the old and the new page themselves. Customers who
+like extras may pick the new page and also order more. Then the comparison
+is observational again.
+
+Compare two sentences about the same question:
+
+- Observational data, towns with and without free delivery: "Orders in
+  towns with free delivery are on average 2 euros higher." This is an
+  association. The towns may differ in more than delivery.
+- A/B test, free delivery assigned by chance to customers: "Free delivery
+  raises the mean order value by about 2 euros." This is a causal claim.
+
+The limits above still apply to a causal claim. It holds for the customers
+and the period of the test. It is also an average: it does not say that
+every customer orders more.
 
 ### More than two categories
 
@@ -882,6 +936,8 @@ assistant.
    $\hat\beta_1$ as an effect?
 7. What does the F-test of a one-way ANOVA test, and how is it related to
    the regression on the dummies of one categorical variable?
+8. In this course you describe a coefficient without causal words. When
+   may you use them, and which three conditions do you check first?
 
 ::: {.callout-note collapse="true"}
 ## Check your answers
@@ -909,6 +965,12 @@ assistant.
    that at least one differs. It is the overall F-test of the regression on
    the $G-1$ dummies, with nothing else in the model. A rejection says that
    some group mean differs, not which one.
+8. Only for a well-run randomised experiment, such as an A/B test. Check
+   random assignment (chance decided who got which version), one difference
+   (same period, prices and website apart from the tested version), and the
+   same measurement in both groups, with every customer keeping the assigned
+   version. If one condition fails, use "is associated with" and "on
+   average".
 :::
 
 ### Finish a half-worked example: a partial F with new numbers
@@ -995,13 +1057,33 @@ significant even in the model that adjusts only for season.
 3. $H_0:\beta_{\text{all\_women}}=\beta_{\text{mixed}}=0$ against the alternative that at
    least one of the two is not zero, with all-men as the reference category.
 4. Control group (old page): 18.40 euros. Treatment group (new page):
-   $18.40+1.20=19.60$ euros. Test: $H_0:\beta_1=0$ against
-   $H_1:\beta_1\ne0$ at 5%. $T=\hat\beta_1/\operatorname{SE}(\hat\beta_1)$
-   with $200-1-1=198$ degrees of freedom. Reject $H_0$ if
-   $|t_{obs}|\ge1.972$. $t_{obs}=1.20/0.50=2.40$, so reject $H_0$: the new
-   page raises the mean order value. Interval:
-   $1.20\pm1.972\times0.50=1.20\pm0.986$, about 0.21 to 2.19 euros. The
-   effect is $1.20/18.40\approx6.5\%$ of the control mean. Random
+   $18.40+1.20=19.60$ euros.
+
+   The test in five steps.
+
+   1. **Hypotheses.** $H_0:\beta_1=0$, the new page has no effect on the
+      mean order value. $H_1:\beta_1\ne0$. The significance level is 5%.
+   2. **Test statistic.** $T=\hat\beta_1/\operatorname{SE}(\hat\beta_1)$,
+      with $df=n-k-1=198$.
+   3. **Critical value and rejection region.** $t_{0.975,\,198}=1.972$.
+      Reject $H_0$ if $|t_{obs}|\ge1.972$.
+   4. **Observed value.** $t_{obs}=1.20/0.50=2.40$.
+   5. **Conclusion.** $2.40\ge1.972$, so reject $H_0$. At the 5% level, the
+      new page raises the mean order value.
+
+   The interval in five parts.
+
+   1. **Formula.**
+      $\hat\beta_1\pm t_{0.975,\,df}\,\operatorname{SE}(\hat\beta_1)$.
+   2. **Given values.** $\hat\beta_1=1.20$,
+      $\operatorname{SE}(\hat\beta_1)=0.50$, $df=198$, and
+      $t_{0.975,\,198}=1.972$.
+   3. **Calculations.** The margin of error is $1.972\times0.50=0.986$.
+   4. **Interval.** $1.20\pm0.986$, from about 0.21 to 2.19 euros.
+   5. **Conclusion.** With 95% confidence, the new page raises the mean
+      order value by between about 0.21 and 2.19 euros.
+
+   The effect is $1.20/18.40\approx6.5\%$ of the control mean. Random
    assignment makes the two groups alike on average in everything else, so
    the coefficient estimates the average treatment effect of the page.
 5. It confuses percent with percentage points, and it does not name the
@@ -1107,10 +1189,17 @@ Take a student-run venture that sells meal-prep boxes on campus. "My channels ar
 :::
 
 You can discuss this task, and any other task in this chapter, with
-**Tilly**, the course AI assistant. Ask it to check whether your two
+Tilly for QM Intermediate, the course AI assistant. Ask it to check whether your two
 sentences confuse percent with percentage points, or to ask you questions
 about perfect multicollinearity with your own categories.
 ::::
+
+### More practice
+
+For extra exercises on this lecture, with worked solutions, ask Tilly for
+QM Intermediate, the course AI assistant. For example: "Give me an extra
+exercise for Intermediate Lecture 5. Show the solution only after I send my
+answer."
 
 [Continue to Lecture 6: Interactions and curvature](i06-interactions-curvature.qmd).
 

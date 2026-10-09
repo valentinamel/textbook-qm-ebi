@@ -297,6 +297,32 @@ These points supersede earlier entries where they differ.
   calculation for CLG3 in Question 1, and the marking-rule fixes. Seven
   questions, 100 points, suggested minutes adding to at most 170.
 
+## 2026-10-09 — Final student-perspective review (R8), Valentina's decisions
+
+- **Numbering follows the lectures.** Tutorials, sheets, mocks, the QM
+  Advanced overview and the resources are unnumbered. Basic lectures are
+  chapters 1 to 10. A post-render script (`scripts/renumber-intermediate.ts`)
+  maps Intermediate figure and example numbers from 11 to 16 back to 1 to 6.
+- **Menu order follows the official timetable.** QM Basic Tutorial 2 (12 Nov)
+  comes after Lecture 6 (9 Nov) and still practises Lectures 4 and 5.
+- **Laptop or tablet.** The book is made for a laptop or a tablet. Wide
+  formulas and tables scroll inside their own box on small screens.
+- **Mock exams keep** "An answer without a calculation or an explanation gets
+  no points". The formula sheet no longer says students get "exactly this
+  sheet".
+- **Two Tilly bots**, "Tilly for QM Basic" and "Tilly for QM Intermediate",
+  linked on the course overview pages, not on the welcome page. Exact bot
+  links to follow from Valentina (generic chatbot.tilburg.ai for now).
+- **Intermediate** gets "More practice" blocks, `qf()` and the numerical
+  moderator on the code sheet, and a Tutorial 2 task on A/B test, one-way
+  ANOVA and moderator versus mediator.
+- **"Deal agreed on air"**, never "the deal closed".
+- **Causal words.** No causal language stays the default everywhere,
+  including the Lecture 1 box (no exception there). Lecture 5 explains the
+  one exception in its own subsection after the A/B test example ("When you
+  may use causal words", three conditions: random assignment, one
+  difference, same measurement), plus recall question 8.
+
 ## Prototype editorial log (carried forward for history)
 
 The full prototype log lives in

@@ -42,7 +42,7 @@ below and bring the plot to class.
 **Predict.** Answer this question before you come to class: the agreed valuations are strongly
 right-skewed (most are small and a few are very large), far from a normal
 distribution. Does that alone make the
-Lecture 1 regression invalid, **yes** or **no**? Choose one answer before
+Lecture 1 regression invalid, yes or no? Choose one answer before
 class and write one sentence explaining why. The lecture material gives the
 correct answer.
 
@@ -78,8 +78,8 @@ shows which assumptions no plot can check.
 
 ### Start with a founder's question
 
-[Shark Tank data]{.shark-tag} Lecture 1 gave you a number: the sharks accept about 65 cents of every
-claimed dollar. Before you plan a negotiation around this number, ask whether you
+[Shark Tank data]{.shark-tag} Lecture 1 gave you a number: each extra dollar of claimed valuation goes
+with about 65 cents more agreed valuation, on average. Before you plan a negotiation around this number, ask whether you
 can trust the line behind it. R draws a line through any data, even through
 data that do not support a line. R never warns you.
 
@@ -142,8 +142,8 @@ the right of the plot.
 :::
 
 In @fig-i02-warmup-residuals, both axes are in the units of the outcome,
-\$1 million. A point above zero is a deal that closed at a higher valuation
-than its fitted value. A point below zero is a deal that closed at a lower valuation than its
+\$1 million. A point above zero is a deal that was agreed at a higher valuation
+than its fitted value. A point below zero is a deal that was agreed at a lower valuation than its
 fitted value. To
 read patterns in this plot, you first need to know what the model assumes.
 
@@ -178,7 +178,7 @@ says what goes wrong if it fails.
 | Linearity | The average of $Y$ at each value of $X$ lies on a straight line: $E[Y\mid X=x]=\beta_0+\beta_1x$ | Residual plot: look for a curve | One slope misses part of the pattern, and the line is wrong in some parts of the range |
 | Independence (random sampling) | The observations are drawn independently: the error of one row says nothing about the error of another row | Knowledge of how the data were collected | The usual standard errors are often too small, so intervals are too narrow. A sample that is not random can also bias the line |
 | Homoskedasticity (constant variance) | The errors have the same variance at every value of $X$: $\operatorname{Var}(\varepsilon_i\mid X_i)=\sigma^2$ | Residual plot: look for a fan shape | The slope stays unbiased, but the usual standard errors, tests, and intervals are wrong |
-| Normality of the errors | At each value of $X$, the errors follow a normal distribution | Normal Q--Q plot of the standardised residuals | In small samples the t and F distributions of Lecture 3 are no longer exact. In large samples this matters little |
+| Normality of the errors | At each value of $X$, the errors follow a normal distribution | A normal Q--Q plot of the residuals (explained later in this lecture) | In small samples the t and F distributions of Lecture 3 are no longer exact. In large samples this matters little |
 | Zero conditional mean (exogeneity): no omitted confounder | The error averages zero at every value of $X$: $E[\varepsilon_i\mid X_i]=0$. For a causal reading: no other cause of $Y$ that is missing from the model is related to $X$ | Knowledge of how $X$ came about. No plot can show it | The slope is not the effect of changing $X$. It still describes how average outcomes differ across values of $X$ |
 
 The rows fall into groups. Variation in $X$ is needed before R can
@@ -321,7 +321,7 @@ round(tapply(residuals(val_model), fifth, sd), 2)
 The standard deviation of the residuals is about \$0.14 million in the fifth
 of deals with the smallest claimed valuations and about \$3.6 million in the
 fifth with the largest, about 25 times as much. The spread of agreed
-valuations grows with the size of the claim. This makes economic sense: founders
+valuations broadly grows with the size of the claim. This makes economic sense: founders
 and sharks can disagree by much more money about a \$20 million company than
 about a \$200,000 company. This pattern is heteroskedasticity. The usual standard errors
 assume one common variance $\sigma^2$, so here they depend on an assumption
@@ -422,7 +422,7 @@ summary(residuals(val_model))
 - The middle half of all residuals, from the first to the third quartile,
   runs from $-0.40$ to $0.17$: a band about \$570,000 wide.
 - The **minimum** is about $-7.8$ and the **maximum** about $13.4$: one deal
-  closed \$7.8 million below its fitted valuation and another \$13.4 million
+  was agreed \$7.8 million below its fitted valuation and another \$13.4 million
   above.
 
 The mean is zero, as it always is when the model has an intercept. If no
@@ -467,7 +467,7 @@ The command `nobs(val_model)` gives the number of observations $n$ that the
 model uses, here 874. Twenty-five deals have standardised residuals beyond
 $\pm 3$, and 64 have a Cook's distance above $4/n$. These are 3% and 7% of
 the 874 deals. The most
-influential deal claimed a valuation of \$50 million and closed at
+influential deal claimed a valuation of \$50 million and was agreed at
 \$25 million, half of the claim. Its claimed valuation lies far from the
 claimed valuations of the other deals. Such an observation has high
 leverage: like a long lever, it can pull the fitted line towards itself.
@@ -533,7 +533,7 @@ reference line.
 #| label: fig-i02-qq
 #| code-fold: true
 #| code-summary: "See the R code for this figure"
-#| fig-cap: "Normal Q--Q plot of the standardised residuals of the valuation model. Both ends leave the line: a few deals closed far above and far below their fitted valuation."
+#| fig-cap: "Normal Q--Q plot of the standardised residuals of the valuation model. Both ends leave the line: a few deals were agreed far above and far below their fitted valuation."
 library(ggplot2)
 sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
 vals <- subset(sharks, deal_on_show == 1 & deal_equity_pct > 0)
@@ -788,13 +788,13 @@ distance above $4/n$. These are about 1% and 4% of the 1,441 pitches.
 [Shark Tank data]{.shark-tag} Using the Lecture 1 fitted equation
 $\widehat{\text{agreed}} = -0.068 + 0.649 \times \text{claimed}$ (both in
 \$ millions): a founder claimed a valuation of \$3 million and the deal
-closed at \$1.5 million. Compute the fitted value and the residual.
+was agreed on air at \$1.5 million. Compute the fitted value and the residual.
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
 Fitted: $-0.068 + 0.649\times3 = 1.88$, about \$1.88 million. Residual:
-$1.5 - 1.88 = -0.38$, about $-\$380{,}000$: the deal closed below the
+$1.5 - 1.88 = -0.38$, about $-\$380{,}000$: the deal was agreed below the
 model's fitted conditional mean.
 :::
 
@@ -850,9 +850,16 @@ Take a student venture that sells boxes of prepared meals on campus. "For orders
 :::
 
 You can discuss this task, and any other task in this chapter, with
-**Tilly**, the course AI assistant: describe your venture's data
+Tilly for QM Intermediate, the course AI assistant: describe your venture's data
 and ask it to argue which assumption is least plausible.
 ::::
+
+### More practice
+
+For extra exercises on this lecture, with worked solutions, ask Tilly for
+QM Intermediate, the course AI assistant. For example: "Give me an extra
+exercise for Intermediate Lecture 2. Show the solution only after I send my
+answer."
 
 [Continue to Lecture 3: Coefficient inference, fit, and the F-test](i03-inference-fit-ftest.qmd).
 

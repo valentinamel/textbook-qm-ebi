@@ -1,4 +1,4 @@
-# Tutorial 2: Multiple regression and extensions {#i-ep02}
+# Tutorial 2: Multiple regression and extensions {#i-ep02 .unnumbered}
 
 ```{r}
 #| label: iep02-setup
@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 - read a regression table from a research paper and state its limits
 :::
 
-Tutorials are **exam preparation sessions**. The tasks below are exam-style
+Tutorials are exam preparation sessions. The tasks below are exam-style
 questions. You first try each task in pairs. You may use AI for this, following
 the four steps Attempt, Ask, Verify, Explain. Then the whole group discusses
 the solution with the tutor.
@@ -25,7 +25,9 @@ the solution with the tutor.
 The tasks follow the order of the course. Task 1 uses Lecture 4, Task 2
 uses Lecture 5, and Tasks 3 and 4 use Lecture 6. A regression table then
 puts the models of Tasks 2 to 4 side by side. Task 5 applies Lectures 3 to 5
-to an invented table in the layout of a research paper.
+to an invented table in the layout of a research paper. Task 6 uses
+Lectures 5 and 6 for an A/B test, a one-way ANOVA, and the roles of
+moderators and mediators.
 
 ::: {.course-phase .phase-before}
 
@@ -36,9 +38,9 @@ day before this tutorial: read its lecture material, and do its practice
 after the tutorial. Use the complete
 [QM Intermediate Code Sheet](code-sheet.qmd) while working. If needed,
 review
-[Mathematics Refresher: indicators and reference categories](../resources/math-refresher.html#indicators-and-reference-categories),
-[products, interactions, and combined effects](../resources/math-refresher.html#products-interactions-and-combined-effects),
-and [polynomial terms](../resources/math-refresher.html#polynomial-terms).
+[Mathematics Refresher: indicators and reference categories](../resources/math-refresher.qmd#indicators-and-reference-categories),
+[products, interactions, and combined effects](../resources/math-refresher.qmd#products-interactions-and-combined-effects),
+and [polynomial terms](../resources/math-refresher.qmd#polynomial-terms).
 
 Complete from memory:
 
@@ -65,7 +67,7 @@ Complete from memory:
 Try each task in R before you open the answer. Tasks 1 to 4 use the Shark
 Tank file, and money is measured in thousands of dollars (`ask_1k`). First
 build the data for the analysis. The code is the same as in Lectures 4--6.
-Tasks 1 to 5 and the regression table belong to the tutorial.
+Tasks 1 to 6 and the regression table belong to the tutorial.
 
 ```{r}
 #| label: iep02-load
@@ -165,8 +167,8 @@ m_interaction <- lm(
 summary(m_interaction)
 ```
 
-1. [Shark Tank data]{.shark-tag} Write the fitted line for `women = 0` and for `women = 1` at a fixed
-   requested amount.
+1. [Shark Tank data]{.shark-tag} Write the fitted line for `women = 0` and for `women = 1` at the
+   average requested amount.
 2. Calculate both season slopes.
 3. Interpret the interaction estimate and its p-value without claiming too
    much in either direction.
@@ -175,9 +177,12 @@ summary(m_interaction)
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-At a fixed requested amount, the fitted line for all-men teams is
-$13.625-0.799\,\text{season\_c}$ plus the term for the requested amount. For teams
-with women the intercept is $13.625+0.807=14.432$ and the slope is
+At the average requested amount, the fitted line for all-men teams is
+$12.866-0.799\,\text{season\_c}$, and for teams with women it is
+$13.673-0.861\,\text{season\_c}$, as in Lecture 6. The intercept 12.866 is
+the intercept 13.625 plus the `ask_1k` coefficient times the average
+requested amount, `mean(known_gender$ask_1k)`. For teams with women the
+intercept is $12.866+0.807=13.673$ and the slope is
 $-0.7994-0.0615=-0.861$. So the season slope is about $-0.799$ percentage
 points per season for all-men teams and about $-0.861$ for teams with
 women. The estimated difference in slopes is $-0.061$ percentage points per
@@ -352,6 +357,104 @@ squares. Standard errors in parentheses.
    you have the data, `anova()` of the two fitted models gives this test.
 :::
 
+### Task 6: A/B test, one-way ANOVA, moderator and mediator (Lectures 5 and 6)
+
+&#40;a) An invented A/B test. An online shop for refurbished phones shows 120
+new visitors either its current product page (`new_page = 0`) or a new page
+with customer videos (`new_page = 1`). Chance decides which page each
+visitor sees, 60 visitors per page. The outcome is the value of the first
+order in euros.
+
+```{r}
+#| label: iep02-ab-test
+set.seed(21)
+# random assignment: 60 zeros (old page) and 60 ones (new page)
+new_page <- sample(rep(c(0, 1), each = 60))
+# invented order values in euros, with a true effect of 3 euros
+order_value <- round(40 + 3 * new_page + rnorm(120, mean = 0, sd = 8), 2)
+ab_shop <- data.frame(new_page, order_value)
+ab_fit <- lm(order_value ~ new_page, data = ab_shop)
+summary(ab_fit)$coefficients
+qt(0.975, df = 118)
+```
+
+Test in five steps whether the new page changes the mean order value.
+Explain why $\hat\beta_1$ estimates the average treatment effect of the new
+page, and judge its size.
+
+&#40;b) An invented one-way ANOVA. The same shop records the delivery time in
+hours of 20 orders for each of three couriers.
+
+```{r}
+#| label: iep02-anova
+set.seed(7)
+courier <- factor(rep(c("cycle", "post", "van"), each = 20))
+delivery_hours <- round(c(rnorm(20, 20, 6), rnorm(20, 26, 6),
+                          rnorm(20, 22, 6)), 1)
+deliveries <- data.frame(courier, delivery_hours)
+courier_fit <- lm(delivery_hours ~ courier, data = deliveries)
+coef(courier_fit)
+anova(courier_fit)
+mean(deliveries$delivery_hours)   # overall mean
+qf(0.95, 2, 57)
+```
+
+Which regression lies behind this ANOVA table, and what do its two dummy
+coefficients say? Test at 5% whether the mean delivery time is the same for
+the three couriers: give $H_0$, $F$, both degrees of freedom, and the
+conclusion.
+
+&#40;c) A meal-kit start-up gives a discount coupon at random to half of its
+customers. Customers with the coupon order more meal kits. The coupon raises
+orders more for students than for other customers. The coupon also brings
+customers to the website more often, and more visits go with more orders.
+Which variable is a moderator, and which is a mediator? How does each one
+appear in a regression of orders on the coupon dummy?
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+&#40;a) The mean order value is 39.09 euros with the old page (the intercept)
+and $39.09+3.41=42.50$ euros with the new page.
+
+1. **Hypotheses.** $H_0:\beta_1=0$, the new page has no effect on the mean
+   order value. $H_1:\beta_1\ne0$. The significance level is 5%.
+2. **Test statistic.** $T=\hat\beta_1/\operatorname{SE}(\hat\beta_1)$, with
+   $df=n-k-1=118$.
+3. **Critical value and rejection region.** $t_{0.975,\,118}=1.980$, from
+   `qt(0.975, df = 118)`. Reject $H_0$ if $|t_{obs}|\ge1.980$.
+4. **Observed value.** $t_{obs}=3.409/1.341\approx2.54$.
+5. **Conclusion.** $2.54\ge1.980$, so reject $H_0$ (p $\approx$ 0.012). At
+   the 5% level, the new page raises the mean order value.
+
+Chance decided who saw the new page. So the two groups are alike on average
+in everything else, measured or not, and the only systematic difference is
+the page. That is why $\hat\beta_1\approx3.41$ euros estimates the average
+treatment effect of the new page. It is about 8.7% of the mean order value
+with the old page.
+
+&#40;b) The ANOVA table comes from the regression of `delivery_hours` on two
+dummies, `post` and `van`, with `cycle` as the reference category. The
+intercept 22.65 hours is the mean of the cycle courier. The post courier
+takes on average 3.94 hours longer, and the van courier 0.02 hours less.
+$H_0:\mu_{\text{cycle}}=\mu_{\text{post}}=\mu_{\text{van}}$ against $H_1$:
+at least one mean differs. $F_{obs}=103.62/35.11\approx2.95$ with
+$G-1=2$ and $n-G=57$ degrees of freedom. The critical value is 3.16, from
+`qf(0.95, 2, 57)`. Because $2.95<3.16$ (p $\approx$ 0.060), do not reject
+$H_0$. At the 5% level, the data do not show that the mean delivery time
+differs between the couriers. This does not prove that the means are equal.
+The largest difference, 3.95 hours between the post and the van courier,
+is about 16% of the overall mean of 23.96 hours.
+
+&#40;c) Student status is the moderator: it changes the slope of the coupon.
+It enters as an interaction, `lm(orders ~ coupon * student)`, and the
+coefficient of `coupon:student` is the difference in the coupon effect
+between students and other customers. Website visits are the mediator: they
+lie on the path from the coupon to orders. Adding visits,
+`lm(orders ~ coupon + visits)`, shrinks the coupon coefficient to the direct
+part. For the total effect of the coupon, leave visits out of the model.
+:::
+
 :::
 
 ::: {.course-phase .phase-after}
@@ -447,16 +550,23 @@ Take a student-run venture that sells meal-prep boxes on campus. "Outcome: weekl
 :::
 
 You can discuss this task, and any other task in this tutorial, with
-**Tilly**, the course AI assistant. Ask it to review your two sentences
+Tilly for QM Intermediate, the course AI assistant. Ask it to review your two sentences
 before you spend a lot of time on the data.
 ::::
+
+### More practice
+
+For extra exercises on the lectures of this tutorial, with worked solutions,
+ask Tilly for QM Intermediate, the course AI assistant. For example: "Give me
+an extra exercise for Intermediate Tutorial 2. Show the solution only after
+I send my answer."
 
 This is the end of the QM Intermediate lectures and tutorials. Review the
 [QM Intermediate Code Sheet](code-sheet.qmd), attempt the
 [QM Intermediate Mock Exam](mock-exam.qmd), then return to the
-[R Refresher](../resources/r-refresher.html),
-[Mathematics Refresher](../resources/math-refresher.html), or the
-[External Video Guide](../resources/video-guide.html) whenever you want to
+[R Refresher](../resources/r-refresher.qmd),
+[Mathematics Refresher](../resources/math-refresher.qmd), or the
+[External Video Guide](../resources/video-guide.qmd) whenever you want to
 review a specific topic.
 
 [Continue to QM Intermediate Code Sheet](code-sheet.qmd).

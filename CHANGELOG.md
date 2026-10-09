@@ -1385,3 +1385,19 @@ group.
   lectures. Maths refresher: stable section anchors, D1 slip fixed.
 - Overview pages, How to succeed, video guide, index, README: wording,
   links, exam length and aids.
+
+## 2026-10-09 — Final student-perspective review (R8) fixes
+
+- Figure and example numbers match the lecture number in both courses.
+- Basic Tutorial 2 after Lecture 6 in menu, overview and Continue links.
+- Mobile: display formulas and tables scroll in their own box, long inline
+  formulas turned into display formulas, formula sheet lines split.
+- QM Advanced menu entry is a link. Mock titles "QM Basic Mock Exam" and
+  "QM Intermediate Mock Exam".
+- Leftover minutes and exam wording removed, wording, consistency and typo
+  fixes across Basic and Intermediate (R8 list).
+- Intermediate: More practice blocks, code sheet (`qf()`, moderator), new
+  Tutorial 2 Task 6, "agreed on air", five-step answers in Lecture 5.
+- Tilly: one bot per course, linked on the course overview pages.
+- Intermediate Lecture 5: new subsection "When you may use causal words"
+  after the A/B test example, and recall question 8.
