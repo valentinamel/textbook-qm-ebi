@@ -197,6 +197,10 @@ These points supersede earlier entries where they differ.
   Tasks outside the core carry "(N minutes, extra practice for home)". One
   total for the core tasks under "In the tutorial", and time-budget lines for
   Before class and After class as in the lectures.
+- **No Wooclap in the textbook** (9 October, Valentina). Wooclap is only an
+  optional tool for interaction in the lectures and on the slides. The online
+  textbook never mentions it. The prediction questions before class are
+  questions that students answer for themselves.
 - **Extra practice through Tilly** (9 October, Valentina). The homework
   exercises with solutions (compiled from Nieuwenhuis) go to the Tilly bot,
   not into the public book. Every Basic lecture and tutorial ends its after
