@@ -403,30 +403,10 @@ window.Quarto = {
 <div class="outcomes">
 <p><span class="label">By the end of Lecture 1, you can</span></p>
 <ul>
-<li>state a simple linear regression model and identify its components</li>
-<li>read the slope as a difference of conditional means, with units</li>
-<li>convert a coefficient between measurement units (dollars, thousands, millions)</li>
-<li>distinguish observations, fitted values, errors, and residuals</li>
-<li>explain what least squares minimises and why</li>
-<li>follow the calculation of a slope and an intercept on a tiny dataset</li>
-<li>fit a regression with <code>lm()</code> in R and interpret both coefficients within the observed range.</li>
-</ul>
-</div>
-<div class="must-know">
-<p><span class="label">Must know</span></p>
-<p><strong>Be able to do yourself:</strong></p>
-<ul>
-<li>fit a simple regression with <code>lm()</code></li>
-<li>interpret the slope and the intercept with units</li>
-<li>calculate a fitted value and a residual</li>
-<li>say what least squares minimises</li>
-<li>rescale a coefficient to other units</li>
-<li>explain why a slope is a description first and an effect only under certain conditions.</li>
-</ul>
-<p><strong>Enough to recognise:</strong></p>
-<ul>
-<li>the two forms of the slope formula, <span class="math inline">\(\hat\beta_1=s_{XY}/s_X^2\)</span> and <span class="math inline">\(\hat\beta_1=r_{XY}\,s_Y/s_X\)</span></li>
-<li>the difference between <span class="math inline">\(\varepsilon_i\)</span> and <span class="math inline">\(e_i\)</span> in symbols.</li>
+<li>explain what a simple regression model describes and what its parts mean</li>
+<li>tell apart the errors of the model and the residuals of a fit</li>
+<li>explain how least squares chooses the best fitting line</li>
+<li>fit a simple regression in R and interpret the slope with units</li>
 </ul>
 </div>
 <div class="driving-question">
@@ -438,12 +418,11 @@ Every founder who pitches puts a price on the company. Asking 100,000 dollars fo
 </div>
 <section id="before-class" class="level2 course-phase phase-before">
 <h2 class="anchored" data-anchor-id="before-class">Before class</h2>
-<p><span class="time-budget">Total preparation time: about 30 minutes.</span></p>
-<p><strong>Minimum path:</strong> the video and the R task. <strong>Full path:</strong> everything in this section.</p>
+<p>Do all the preparation below before class.</p>
 <div class="video-prep">
-<p><span class="label">Video preparation (10 minutes)</span><br> Watch Stanford Statistical Learning <a href="https://www.youtube.com/watch?v=vCHtY6Me5FI&amp;list=PLoROMvodv4rOzrYsAxzQyHb8n_RWNuS1e&amp;index=9">3.1 Simple Linear Regression</a>. Focus on the population line, the fitted line, and least squares. The video writes RSS for the quantity this book calls SSE, the sum of squared residuals. All links are also listed in the <a href="../resources/video-guide.html">External Video Guide</a>.</p>
+<p><span class="label">Video preparation</span><br> Watch Stanford Statistical Learning <a href="https://www.youtube.com/watch?v=vCHtY6Me5FI&amp;list=PLoROMvodv4rOzrYsAxzQyHb8n_RWNuS1e&amp;index=9">3.1 Simple Linear Regression</a>. Focus on the population line, the fitted line, and least squares. The video writes RSS for the quantity this book calls SSE, the sum of squared residuals. All links are also listed in the <a href="../resources/video-guide.html">External Video Guide</a>. The videos explain key ideas in another way and can use a different notation. The lecture material and its notation always come first.</p>
 </div>
-<p><strong>Warm up: five quantities from QM Basic (10 minutes).</strong> QM Intermediate builds directly on five quantities from the end of QM Basic: estimate, standard error, t value, p-value, confidence interval. The sections for Lectures 9 and 10 of the <a href="../basic/formula-sheet.html#formula-l9">QM Basic formula sheet</a> list their formulas. With the sheet open, answer the five items below.</p>
+<p><strong>Warm up: five quantities from QM Basic.</strong> QM Intermediate builds directly on five quantities from the end of QM Basic: estimate, standard error, t value, p-value, confidence interval. The sections for Lectures 9 and 10 of the <a href="../basic/formula-sheet.html#formula-l9">QM Basic formula sheet</a> list their formulas. With the sheet open, answer the five items below.</p>
 <ol type="1">
 <li>A study reports an estimate of 12 with standard error 4. What is the t value for testing whether the underlying quantity is zero?</li>
 <li>With a large sample, what critical value goes into a 95% confidence interval?</li>
@@ -473,13 +452,13 @@ Check your preparation
 </div>
 </div>
 </div>
-<p><strong>Define the variables (2 minutes).</strong> The data of this course are 1,441 pitches from the television show Shark Tank, where founders ask investors (the sharks) for money in exchange for a share of their company. This lecture uses the 874 pitches that ended in a deal for a share of the company. It measures all money in <strong>millions of dollars</strong>:</p>
+<p><strong>Define the variables.</strong> The data of this course are 1,441 pitches from the television show Shark Tank, where founders ask investors (the sharks) for money in exchange for a share of their company. This lecture uses the 874 pitches that ended in a deal for a share of the company. It measures all money in <strong>millions of dollars</strong>:</p>
 <ul>
 <li><span class="math inline">\(X_i\)</span>: the valuation the founder claimed, in $ millions. Asking $100,000 for 10% claims $1 million, so <span class="math inline">\(X_i = 1\)</span>.</li>
 <li><span class="math inline">\(Y_i\)</span>: the valuation agreed on air (during the show), in $ millions. A deal of $100,000 for 20% values the company at $0.5 million, so <span class="math inline">\(Y_i = 0.5\)</span>.</li>
 </ul>
-<p><strong>Predict (3 minutes).</strong> Answer this question before you come to class: what are the <strong>sign</strong> and the <strong>unit</strong> of the slope in a regression of the agreed valuation on the claimed valuation, and is the slope above or below 1? Choose one answer before class. The lecture material gives the correct answer.</p>
-<p><span class="shark-tag">Shark Tank data</span> <strong>R warm-up (5 minutes).</strong> Every Intermediate lecture has a short R warm-up: you run a few lines of R and bring the output to class. This week, load the data, keep the deals for a share of the company, and plot the agreed valuation against the claimed valuation:</p>
+<p><strong>Predict.</strong> Answer this question before you come to class: what are the <strong>sign</strong> and the <strong>unit</strong> of the slope in a regression of the agreed valuation on the claimed valuation, and is the slope above or below 1? Choose one answer before class. The lecture material gives the correct answer.</p>
+<p><span class="shark-tag">Shark Tank data</span> <strong>R warm-up.</strong> Every Intermediate lecture has a short R warm-up: you run a few lines of R and bring the output to class. This week, load the data, keep the deals for a share of the company, and plot the agreed valuation against the claimed valuation:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>vals <span class="ot">&lt;-</span> <span class="fu">subset</span>(sharks, deal_on_show <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> deal_equity_pct <span class="sc">&gt;</span> <span class="dv">0</span>)</span>
@@ -1248,14 +1227,13 @@ Check your answer
 </section>
 <section id="after-class" class="level2 course-phase phase-after">
 <h2 class="anchored" data-anchor-id="after-class">After class</h2>
-<p><span class="time-budget">Total practice time: about 80 minutes.</span></p>
-<p><strong>Minimum path (about 35 minutes):</strong> read the lecture material, answer the recall questions, then work for 10 minutes on the tasks that follow. <strong>Full path:</strong> all tasks below.</p>
-<section id="read-the-lecture-material-15-minutes" class="level3">
-<h3 class="anchored" data-anchor-id="read-the-lecture-material-15-minutes">Read the lecture material (15 minutes)</h3>
+<p>After the lecture, work through all the practice below.</p>
+<section id="read-the-lecture-material" class="level3">
+<h3 class="anchored" data-anchor-id="read-the-lecture-material">Read the lecture material</h3>
 <p>Read the Lecture material section above from start to end. The lecture covered the main points. The text has every step, every example, and all the code, including parts that were not shown in class. Note what is still unclear and bring it to the next tutorial, or ask Tilly.</p>
 </section>
-<section id="recall-questions-10-minutes" class="level3">
-<h3 class="anchored" data-anchor-id="recall-questions-10-minutes">Recall questions (10 minutes)</h3>
+<section id="recall-questions" class="level3">
+<h3 class="anchored" data-anchor-id="recall-questions">Recall questions</h3>
 <ol type="1">
 <li>What is the difference between <span class="math inline">\(\varepsilon_i\)</span> and <span class="math inline">\(e_i\)</span>?</li>
 <li>What does least squares minimise, and why are the residuals squared before they are added up?</li>
@@ -1286,8 +1264,8 @@ Check your answers
 </div>
 </div>
 </section>
-<section id="finish-a-half-worked-example-20-minutes" class="level3">
-<h3 class="anchored" data-anchor-id="finish-a-half-worked-example-20-minutes">Finish a half-worked example (20 minutes)</h3>
+<section id="finish-a-half-worked-example" class="level3">
+<h3 class="anchored" data-anchor-id="finish-a-half-worked-example">Finish a half-worked example</h3>
 <p><span class="shark-tag">Shark Tank data</span> Re-read the prediction calculation in the chapter (fitted value at <code>claimed_m = 2</code>). Then complete the same calculation for a new claim.</p>
 <p><em>Step 1 (given).</em> A founder claims a valuation of $4 million, so <code>claimed_m = 4</code>. The fitted equation is <span class="math inline">\(\widehat{\text{agreed}} = -0.068 + 0.649 \times \text{claimed}\)</span>.</p>
 <p><em>Step 2 (you).</em> Compute the fitted agreed valuation, in $ millions and in dollars.</p>
@@ -1362,8 +1340,8 @@ Check your answers
 </div>
 </div>
 </section>
-<section id="practice-a-regression-of-your-own-15-minutes" class="level3">
-<h3 class="anchored" data-anchor-id="practice-a-regression-of-your-own-15-minutes">Practice: a regression of your own (15 minutes)</h3>
+<section id="practice-a-regression-of-your-own" class="level3">
+<h3 class="anchored" data-anchor-id="practice-a-regression-of-your-own">Practice: a regression of your own</h3>
 <p><span class="shark-tag">Shark Tank data</span> Fit <code>equity_offered_pct ~ season</code> on the full dataset (all 1,441 pitches) and interpret both coefficients with units. State the unit of every quantity you report.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
@@ -1390,8 +1368,8 @@ Check your answers
 </div>
 </div>
 </section>
-<section id="review-one-question-from-qm-basic-5-minutes" class="level3">
-<h3 class="anchored" data-anchor-id="review-one-question-from-qm-basic-5-minutes">Review: one question from QM Basic (5 minutes)</h3>
+<section id="review-one-question-from-qm-basic" class="level3">
+<h3 class="anchored" data-anchor-id="review-one-question-from-qm-basic">Review: one question from QM Basic</h3>
 <p>An invented example. A market survey of <span class="math inline">\(n = 400\)</span> customers gives an average willingness to pay of €24.60 with standard error €1.10. Write down the t value for testing a benchmark of €22 and the 95% confidence interval, and say in one sentence what the interval estimates.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
@@ -1410,8 +1388,8 @@ Check your answer
 </div>
 </div>
 </section>
-<section id="worked-exam-interpretation-5-minutes" class="level3">
-<h3 class="anchored" data-anchor-id="worked-exam-interpretation-5-minutes">Worked exam interpretation (5 minutes)</h3>
+<section id="worked-exam-interpretation" class="level3">
+<h3 class="anchored" data-anchor-id="worked-exam-interpretation">Worked exam interpretation</h3>
 <p><strong>Exam-style question.</strong> An invented example. A model of the monthly revenue of cafés (€1,000s) on their opening hours per week reports <span class="math inline">\(\widehat{\text{revenue}} = 4.20 + 0.85\,\text{hours}\)</span>. Interpret the slope with units, and calculate the fitted value and the residual for a café that is open 40 hours per week and has a monthly revenue of €35,000.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
@@ -1430,13 +1408,13 @@ Check a model answer
 </div>
 </div>
 </section>
-<section id="check-the-ai-5-minutes" class="level3">
-<h3 class="anchored" data-anchor-id="check-the-ai-5-minutes">Check the AI (5 minutes)</h3>
+<section id="check-the-ai" class="level3">
+<h3 class="anchored" data-anchor-id="check-the-ai">Check the AI</h3>
 <p><span class="shark-tag">Shark Tank data</span> You asked an AI assistant: “The slope of my valuation regression is 0.649 and the intercept is -0.068. What do they mean for my pitch?” It answered:</p>
 <blockquote class="blockquote">
 <p>“If you raise your claimed valuation by 1 million dollars, the sharks will pay you 649,000 dollars more. And a company with a claimed valuation of zero gets -68,000 dollars.”</p>
 </blockquote>
-<p>Find what is wrong and write the corrected answer. This task is the <strong>Verify</strong> step of Attempt → Ask → Verify → Explain, and the exam asks for this step.</p>
+<p>Find what is wrong and write the corrected answer. This task is the <strong>Verify</strong> step of Attempt → Ask → Verify → Explain.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -1454,8 +1432,8 @@ Check your answer
 </div>
 </div>
 </section>
-<section id="make-it-yours-5-minutes" class="level3">
-<h3 class="anchored" data-anchor-id="make-it-yours-5-minutes">Make it yours (5 minutes)</h3>
+<section id="make-it-yours" class="level3">
+<h3 class="anchored" data-anchor-id="make-it-yours">Make it yours</h3>
 <div class="utility-prompt">
 <p><span class="label">Two sentences about your own venture</span></p>
 <p>Think of your EiA3 venture, or any business you know well. Name one numerical outcome and one numerical input that you think affects it. Then write two sentences. First, state the slope you would expect (sign and units). Second, say what decision would change if the fitted slope turned out to be near zero. There is no wrong answer.</p>

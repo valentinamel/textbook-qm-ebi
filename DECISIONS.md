@@ -202,6 +202,20 @@ These points supersede earlier entries where they differ.
   rules with the verb definitions are internal. They are kept in
   `Assessment/Mock exams - planning tables and marking rules (internal)`,
   outside the repository.
+- **No exam-sensitive or student-specific material in the textbook** (9
+  October, Valentina, to avoid grounds for appeals). Removed: must-know boxes
+  (be able to do yourself, enough to recognise), minimum and full paths,
+  all time estimates for students, and the marking guides of the mock exams.
+  The mock exams keep answer indications (R&R article 3.3, paragraph 6). The
+  full marking guides are kept internally in `Assessment/`. Video boxes say
+  that the videos can use another notation and that the lecture material
+  comes first.
+- **No promises about the real exams** (9 October, Valentina). The textbook
+  does not state the number of questions, does not say that the mock exam has
+  the same form as the real exam, and makes no promises about exam content,
+  wording, or printed values. The mock exam gives an impression of what an
+  exam can look like. Kept: exam aids, length, grade rule, open questions
+  only, two-sided tests as a course convention, optional boxes not examined.
 - **No Wooclap in the textbook** (9 October, Valentina). Wooclap is only an
   optional tool for interaction in the lectures and on the slides. The online
   textbook never mentions it. The prediction questions before class are

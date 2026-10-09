@@ -403,28 +403,10 @@ window.Quarto = {
 <div class="outcomes">
 <p><span class="label">By the end of Lecture 3, you can</span></p>
 <ul>
-<li>read a coefficient’s standard error and build its confidence interval by hand, using the correct degrees of freedom</li>
-<li>test a regression coefficient against zero and say what the p-value does and does not establish</li>
-<li>split the variation of the outcome into an explained part and a residual part</li>
-<li>calculate and interpret <span class="math inline">\(R^2\)</span>, and correct four common misreadings</li>
-<li>state and interpret the overall F-test for model usefulness</li>
-<li>connect the simple-regression F-test to the slope t-test</li>
-<li>distinguish fit, statistical evidence, prediction, and causality.</li>
-</ul>
-</div>
-<div class="must-know">
-<p><span class="label">Must know</span></p>
-<p><strong>Be able to do yourself:</strong></p>
-<ul>
-<li>read a coefficient table: standard error, t value, p-value</li>
-<li>build a 95% interval for a slope by hand</li>
-<li>calculate <span class="math inline">\(R^2\)</span> from SST and SSE and say what it is not</li>
-<li>state the null hypothesis of the overall F-test.</li>
-</ul>
-<p><strong>Enough to recognise:</strong></p>
-<ul>
-<li>the formula of adjusted <span class="math inline">\(R^2\)</span></li>
-<li>what robust standard errors fix, and what they do not fix.</li>
+<li>build and read a confidence interval for a regression coefficient</li>
+<li>test whether a coefficient differs from zero and read the p-value carefully</li>
+<li>interpret <span class="math inline">\(R^2\)</span> as the share of variation the model explains</li>
+<li>use the F-test to judge whether a model is useful at all</li>
 </ul>
 </div>
 <div class="driving-question">
@@ -436,12 +418,11 @@ A slope is an estimate, not a fact. Before you put a number into a pitch deck or
 </div>
 <section id="before-class" class="level2 course-phase phase-before">
 <h2 class="anchored" data-anchor-id="before-class">Before class</h2>
-<p><span class="time-budget">Total preparation time: about 30 minutes.</span></p>
-<p><strong>Minimum path:</strong> the video and the R task. <strong>Full path:</strong> everything in this section.</p>
+<p>Do all the preparation below before class.</p>
 <div class="video-prep">
-<p><span class="label">Video preparation (10 minutes)</span><br> Watch Stanford Statistical Learning <a href="https://www.youtube.com/watch?v=3GiWpRfkSjc&amp;list=PLoROMvodv4rOzrYsAxzQyHb8n_RWNuS1e&amp;index=10">3.2 Hypothesis Testing and Confidence Intervals</a>. Focus on the standard error of the slope, its confidence interval, and the test against zero. The video writes RSS for the quantity this book calls SSE. All links are also listed in the <a href="../resources/video-guide.html">External Video Guide</a>.</p>
+<p><span class="label">Video preparation</span><br> Watch Stanford Statistical Learning <a href="https://www.youtube.com/watch?v=3GiWpRfkSjc&amp;list=PLoROMvodv4rOzrYsAxzQyHb8n_RWNuS1e&amp;index=10">3.2 Hypothesis Testing and Confidence Intervals</a>. Focus on the standard error of the slope, its confidence interval, and the test against zero. The video writes RSS for the quantity this book calls SSE. All links are also listed in the <a href="../resources/video-guide.html">External Video Guide</a>. The videos explain key ideas in another way and can use a different notation. The lecture material and its notation always come first.</p>
 </div>
-<p><strong>Warm up: the two recipes (5 minutes).</strong> Write from memory the general recipe for a 95% confidence interval and the two-sided test of a benchmark value. Then compare your recipes with the sections for Lectures 9 and 10 of the <a href="../basic/formula-sheet.html#formula-l9">QM Basic formula sheet</a>. <a href="../basic/b09-t-confidence-intervals.html">Basic Lecture 9: The t distribution and confidence intervals</a> explains the interval, and <a href="../basic/b10-testing-errors-power.html">Basic Lecture 10</a> explains the p-value and the test decision. This lecture applies both recipes to a regression slope.</p>
+<p><strong>Warm up: the two recipes.</strong> Write from memory the general recipe for a 95% confidence interval and the two-sided test of a benchmark value. Then compare your recipes with the sections for Lectures 9 and 10 of the <a href="../basic/formula-sheet.html#formula-l9">QM Basic formula sheet</a>. <a href="../basic/b09-t-confidence-intervals.html">Basic Lecture 9: The t distribution and confidence intervals</a> explains the interval, and <a href="../basic/b10-testing-errors-power.html">Basic Lecture 10</a> explains the p-value and the test decision. This lecture applies both recipes to a regression slope.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -459,7 +440,7 @@ Check your preparation
 </div>
 </div>
 </div>
-<p><strong>Classify (5 minutes).</strong> Answer this question before you come to class. Three quantities measure how well a line fits. SSE is the sum of squared residuals from Lecture 1. SSR is the part of the variation in the outcome that the line explains. <span class="math inline">\(R^2\)</span> is the share of the variation that the line explains. For a useful model, decide whether each of the three should be relatively small or relatively large. Choose your three answers before class. The lecture material defines all three quantities precisely and gives the correct answers.</p>
+<p><strong>Classify.</strong> Answer this question before you come to class. Three quantities measure how well a line fits. SSE is the sum of squared residuals from Lecture 1. SSR is the part of the variation in the outcome that the line explains. <span class="math inline">\(R^2\)</span> is the share of the variation that the line explains. For a useful model, decide whether each of the three should be relatively small or relatively large. Choose your three answers before class. The lecture material defines all three quantities precisely and gives the correct answers.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -476,7 +457,7 @@ Check your preparation
 </div>
 </div>
 </div>
-<p><span class="shark-tag">Shark Tank data</span> <strong>R warm-up (10 minutes).</strong> Rebuild the Lecture 1 model and print its coefficient table. Bring the table to class:</p>
+<p><span class="shark-tag">Shark Tank data</span> <strong>R warm-up.</strong> Rebuild the Lecture 1 model and print its coefficient table. Bring the table to class:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>vals <span class="ot">&lt;-</span> <span class="fu">subset</span>(sharks, deal_on_show <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> deal_equity_pct <span class="sc">&gt;</span> <span class="dv">0</span>)</span>
@@ -643,7 +624,7 @@ Check: the p-value is 1×10<sup>-304</sup>. Is this slope therefore trustworthy?
 </div>
 </div>
 </div>
-<p>The box below collects the interval and the test for one coefficient in the order that the exam asks for them.</p>
+<p>The box below collects the interval and the test for one coefficient in the order of a complete answer.</p>
 <div id="i03-exam-procedure" class="exam-procedure">
 <p><span class="label">Exam procedure: a test and an interval for a coefficient</span></p>
 <p>The interval for <span class="math inline">\(\beta_j\)</span>, in five parts.</p>
@@ -664,7 +645,7 @@ Check: the p-value is 1×10<sup>-304</sup>. Is this slope therefore trustworthy?
 </ol>
 <p>The p-value, when the question asks for it, comes after step 5. It is the <code>Pr(&gt;|t|)</code> column. It gives the same decision: <span class="math inline">\(p\le0.05\)</span> exactly when <span class="math inline">\(|t_{obs}|\ge t_{0.975,\,df}\)</span>.</p>
 <p class="exam-note">
-In the exam, write the formula before the numbers, and give the parts of the interval and the steps of the test in this order.
+A complete answer writes the formula before the numbers and gives the parts of the interval and the steps of the test in this order.
 </p>
 </div>
 </section>
@@ -977,19 +958,18 @@ claimed_m    0.5820233 0.7154583</code></pre>
 <p><span class="label">A founder’s decision (invented example)</span></p>
 <p>Your advertising slope is 0.15 orders per euro, with a standard error of 0.05. The 95% interval runs from 0.05 to 0.25: each 100 euros of advertising goes with between 5 and 25 extra orders. At 4 euros of margin per order, that is between 20 and 100 euros. Even the best case only breaks even. The decision: reduce the advertising budget. The model has an <span class="math inline">\(R^2\)</span> of 0.20, so it predicts single weeks badly. This low <span class="math inline">\(R^2\)</span> does not matter here. The decision depends on the slope and its interval, not on predicting next week.</p>
 </div>
-<p><strong>Next:</strong> Tutorial 1 practises Lectures 1–3 in the format of the exam: fit a model in R, check its residuals, and report its coefficients with intervals, tests, and <span class="math inline">\(R^2\)</span>. You take the exam in TestVision, and R is available during the exam.</p>
+<p><strong>Next:</strong> Tutorial 1 practises Lectures 1–3 with exam-style questions: fit a model in R, check its residuals, and report its coefficients with intervals, tests, and <span class="math inline">\(R^2\)</span>. You take the exam in TestVision, and R is available during the exam.</p>
 </section>
 </section>
 <section id="after-class" class="level2 course-phase phase-after">
 <h2 class="anchored" data-anchor-id="after-class">After class</h2>
-<p><span class="time-budget">Total practice time: about 80 minutes.</span></p>
-<p><strong>Minimum path (about 35 minutes):</strong> read the lecture material, answer the recall questions, then work for 10 minutes on the tasks that follow. <strong>Full path:</strong> all tasks below.</p>
-<section id="read-the-lecture-material-15-minutes" class="level3">
-<h3 class="anchored" data-anchor-id="read-the-lecture-material-15-minutes">Read the lecture material (15 minutes)</h3>
+<p>After the lecture, work through all the practice below.</p>
+<section id="read-the-lecture-material" class="level3">
+<h3 class="anchored" data-anchor-id="read-the-lecture-material">Read the lecture material</h3>
 <p>Read the Lecture material section above from start to end. The lecture covered the main points. The text has every step, every example, and all the code, including parts that were not shown in class. Note what is still unclear and bring it to the next tutorial, or ask Tilly.</p>
 </section>
-<section id="recall-questions-10-minutes" class="level3">
-<h3 class="anchored" data-anchor-id="recall-questions-10-minutes">Recall questions (10 minutes)</h3>
+<section id="recall-questions" class="level3">
+<h3 class="anchored" data-anchor-id="recall-questions">Recall questions</h3>
 <ol type="1">
 <li>Why are the residual degrees of freedom <span class="math inline">\(n-2\)</span> in simple regression?</li>
 <li>Which of the five quantities (estimate, standard error, t value, p-value, interval) share the slope’s units, and which are unit-free?</li>
@@ -1022,8 +1002,8 @@ Check your answers
 </div>
 </div>
 </section>
-<section id="finish-a-half-worked-example-an-interval-for-a-new-row-15-minutes" class="level3">
-<h3 class="anchored" data-anchor-id="finish-a-half-worked-example-an-interval-for-a-new-row-15-minutes">Finish a half-worked example: an interval for a new row (15 minutes)</h3>
+<section id="finish-a-half-worked-example-an-interval-for-a-new-row" class="level3">
+<h3 class="anchored" data-anchor-id="finish-a-half-worked-example-an-interval-for-a-new-row">Finish a half-worked example: an interval for a new row</h3>
 <p><span class="shark-tag">Shark Tank data</span> Re-read the worked slope interval (<a href="#exm-i03-interval" class="quarto-xref">Example&nbsp;<span>19.1</span></a>). Then build the interval for the <strong>intercept row</strong> of the same table.</p>
 <p><em>Step 1 (given).</em> From the coefficient table: estimate <span class="math inline">\(-0.068\)</span>, standard error <span class="math inline">\(0.0685\)</span>, degrees of freedom <span class="math inline">\(872\)</span>, critical value <code>qt(0.975, 872)</code> = 1.963.</p>
 <p><em>Step 2 (you).</em> Compute the 95% interval.</p>
@@ -1073,8 +1053,8 @@ Check your answers
 </div>
 </div>
 </section>
-<section id="practice-all-steps-on-equity-and-season-20-minutes" class="level3">
-<h3 class="anchored" data-anchor-id="practice-all-steps-on-equity-and-season-20-minutes">Practice: all steps on equity and season (20 minutes)</h3>
+<section id="practice-all-steps-on-equity-and-season" class="level3">
+<h3 class="anchored" data-anchor-id="practice-all-steps-on-equity-and-season">Practice: all steps on equity and season</h3>
 <p><span class="shark-tag">Shark Tank data</span> Fit <code>equity_offered_pct ~ season</code> on all 1,441 pitches. Report the slope’s 95% confidence interval, the t-test against zero, <span class="math inline">\(R^2\)</span>, and the overall F-test. Then write a conclusion of 120 words that separates estimate, uncertainty, fit, and scope.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
@@ -1115,8 +1095,8 @@ season      -0.9173458 -0.7309023</code></pre>
 </div>
 </div>
 </section>
-<section id="review-one-diagnostics-question-from-lecture-2-5-minutes" class="level3">
-<h3 class="anchored" data-anchor-id="review-one-diagnostics-question-from-lecture-2-5-minutes">Review: one diagnostics question from Lecture 2 (5 minutes)</h3>
+<section id="review-one-diagnostics-question-from-lecture-2" class="level3">
+<h3 class="anchored" data-anchor-id="review-one-diagnostics-question-from-lecture-2">Review: one diagnostics question from Lecture 2</h3>
 <p>The residual-versus-fitted plot of the valuation model shows unequal spread, the fan of Lecture 2. Which numbers of the coefficient table in this lecture does this pattern make most doubtful, and why?</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
@@ -1135,8 +1115,8 @@ Check your answer
 </div>
 </div>
 </section>
-<section id="worked-exam-interpretation-5-minutes" class="level3">
-<h3 class="anchored" data-anchor-id="worked-exam-interpretation-5-minutes">Worked exam interpretation (5 minutes)</h3>
+<section id="worked-exam-interpretation" class="level3">
+<h3 class="anchored" data-anchor-id="worked-exam-interpretation">Worked exam interpretation</h3>
 <p><strong>Exam-style question.</strong> An invented example. A model regresses the weekly orders of food trucks on their number of social-media posts per week. The model is fitted on <span class="math inline">\(n = 102\)</span> food trucks. It reports a slope of 1.20 with standard error 0.40, <span class="math inline">\(R^2 = 0.083\)</span>, and <span class="math inline">\(F = 9.0\)</span>. Build the 95% interval for the slope, decide the 5% test against zero, verify the F statistic from the t statistic, and state in one sentence what the low <span class="math inline">\(R^2\)</span> does and does not imply.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
@@ -1155,13 +1135,13 @@ Check a model answer
 </div>
 </div>
 </section>
-<section id="check-the-ai-5-minutes" class="level3">
-<h3 class="anchored" data-anchor-id="check-the-ai-5-minutes">Check the AI (5 minutes)</h3>
+<section id="check-the-ai" class="level3">
+<h3 class="anchored" data-anchor-id="check-the-ai">Check the AI</h3>
 <p><span class="shark-tag">Shark Tank data</span> You asked an AI assistant: “R squared is 0.80 and the p-value is below 0.001. Is my model good?” It answered:</p>
 <blockquote class="blockquote">
 <p>“Yes. The model predicts 80% of the valuations correctly, and the tiny p-value proves that the model assumptions hold.”</p>
 </blockquote>
-<p>Find what is wrong and write the corrected answer. This task is the <strong>Verify</strong> step of Attempt → Ask → Verify → Explain, and the exam asks for this step.</p>
+<p>Find what is wrong and write the corrected answer. This task is the <strong>Verify</strong> step of Attempt → Ask → Verify → Explain.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -1179,8 +1159,8 @@ Check your answer
 </div>
 </div>
 </section>
-<section id="make-it-yours-5-minutes" class="level3">
-<h3 class="anchored" data-anchor-id="make-it-yours-5-minutes">Make it yours (5 minutes)</h3>
+<section id="make-it-yours" class="level3">
+<h3 class="anchored" data-anchor-id="make-it-yours">Make it yours</h3>
 <div class="utility-prompt">
 <p><span class="label">Two sentences about your own venture</span></p>
 <p>Think of your EiA3 venture, or any business you know well. Think of one regression you might run on its data. Write two sentences. First, say which you would rather have for your next decision, a precise slope (narrow interval) or a high <span class="math inline">\(R^2\)</span>, and why. Then name the meaning of “useful” from the list of four in this lecture that matters most for that decision. There is no wrong answer. Precision and fit answer different questions.</p>

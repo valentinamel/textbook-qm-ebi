@@ -403,29 +403,10 @@ window.Quarto = {
 <div class="outcomes">
 <p><span class="label">By the end of Lecture 6, you can</span></p>
 <ul>
-<li>read a picture of two lines as four numbers: two intercepts and two slopes</li>
-<li>explain an interaction coefficient as a difference in slopes, with units</li>
-<li>interpret the other coefficients in a model with an interaction, and use centring to give them a useful meaning</li>
-<li>report an interaction that is not significant without claiming too much in either direction</li>
-<li>apply the hierarchy principle and the <code>x * z</code> formula shorthand</li>
-<li>fit a quadratic term, explain why the model is still a linear regression, and compute a fitted change from both coefficients together</li>
-<li>test added terms with a partial F-test, and explain why a curve must not be used outside the range of the data.</li>
-</ul>
-</div>
-<div class="must-know">
-<p><span class="label">Must know</span></p>
-<p><strong>Be able to do yourself:</strong></p>
-<ul>
-<li>write the two lines of an interaction model</li>
-<li>interpret an interaction as a difference in slopes</li>
-<li>say what centring changes and what it cannot change</li>
-<li>calculate a fitted change in a quadratic model with <span class="math inline">\(\hat\beta_1+\hat\beta_2(2x+1)\)</span></li>
-<li>explain why a curve must not be used beyond the range of the data.</li>
-</ul>
-<p><strong>Enough to recognise:</strong></p>
-<ul>
-<li>the <code>I()</code> syntax, which is on the code sheet</li>
-<li>the name hierarchy principle.</li>
+<li>interpret an interaction coefficient as a difference in slopes between groups</li>
+<li>report an interaction that is not significant without claiming too much</li>
+<li>fit a quadratic term and compute a fitted change from the curve</li>
+<li>test added terms jointly and avoid using a curve beyond the data</li>
 </ul>
 </div>
 <div class="driving-question">
@@ -437,12 +418,11 @@ An average slope can hide important differences. A relationship may differ betwe
 </div>
 <section id="before-class" class="level2 course-phase phase-before">
 <h2 class="anchored" data-anchor-id="before-class">Before class</h2>
-<p><span class="time-budget">Total preparation time: about 30 minutes.</span></p>
-<p><strong>Minimum path:</strong> the video and the R task. <strong>Full path:</strong> everything in this section.</p>
+<p>Do all the preparation below before class.</p>
 <div class="video-prep">
-<p><span class="label">Video preparation (15 minutes)</span><br> Watch Stanford Statistical Learning <a href="https://www.youtube.com/watch?v=dEBQmiXv9fk&amp;list=PLoROMvodv4rOzrYsAxzQyHb8n_RWNuS1e&amp;index=13">3.5 Extensions of the Linear Model</a> and <a href="https://www.youtube.com/watch?v=F-D3lZzYn50&amp;list=PLoROMvodv4rOzrYsAxzQyHb8n_RWNuS1e&amp;index=48">7.1 Polynomials and Step Functions</a>. Focus on why an interaction changes a slope, and why a model with a squared term is still a linear regression. All links are also listed in the <a href="../resources/video-guide.html">External Video Guide</a>.</p>
+<p><span class="label">Video preparation</span><br> Watch Stanford Statistical Learning <a href="https://www.youtube.com/watch?v=dEBQmiXv9fk&amp;list=PLoROMvodv4rOzrYsAxzQyHb8n_RWNuS1e&amp;index=13">3.5 Extensions of the Linear Model</a> and <a href="https://www.youtube.com/watch?v=F-D3lZzYn50&amp;list=PLoROMvodv4rOzrYsAxzQyHb8n_RWNuS1e&amp;index=48">7.1 Polynomials and Step Functions</a>. Focus on why an interaction changes a slope, and why a model with a squared term is still a linear regression. All links are also listed in the <a href="../resources/video-guide.html">External Video Guide</a>. The videos explain key ideas in another way and can use a different notation. The lecture material and its notation always come first.</p>
 </div>
-<p><strong>Derive the two lines (5 minutes).</strong> In the model <span class="math inline">\(Y=\beta_0+\beta_1X+\beta_2D+\beta_3XD+\varepsilon\)</span> with a dummy variable <span class="math inline">\(D\in\{0,1\}\)</span>, write the line for <span class="math inline">\(D=0\)</span> and the line for <span class="math inline">\(D=1\)</span>.</p>
+<p><strong>Derive the two lines.</strong> In the model <span class="math inline">\(Y=\beta_0+\beta_1X+\beta_2D+\beta_3XD+\varepsilon\)</span> with a dummy variable <span class="math inline">\(D\in\{0,1\}\)</span>, write the line for <span class="math inline">\(D=0\)</span> and the line for <span class="math inline">\(D=1\)</span>.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -459,8 +439,8 @@ Check your preparation
 </div>
 </div>
 </div>
-<p><strong>Predict (2 minutes).</strong> Answer this question before you come to class: how many separate numbers do you need to fully describe a picture of <strong>two straight lines with different slopes</strong>? Choose one answer. You will find the answer in the lecture material.</p>
-<p><span class="shark-tag">Shark Tank data</span> <strong>R warm-up (8 minutes).</strong> Build the variables for the analysis. The code uses the same <code>known_gender</code> subset as Lecture 5. It adds a dummy <code>women</code> and a centred season <code>season_c</code>, which is the season minus the mean season. It then fits one line of equity offered on season for each group and draws both lines. Bring the plot:</p>
+<p><strong>Predict.</strong> Answer this question before you come to class: how many separate numbers do you need to fully describe a picture of <strong>two straight lines with different slopes</strong>? Choose one answer. You will find the answer in the lecture material.</p>
+<p><span class="shark-tag">Shark Tank data</span> <strong>R warm-up.</strong> Build the variables for the analysis. The code uses the same <code>known_gender</code> subset as Lecture 5. It adds a dummy <code>women</code> and a centred season <code>season_c</code>, which is the season minus the mean season. It then fits one line of equity offered on season for each group and draws both lines. Bring the plot:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>sharks<span class="sc">$</span>ask_1k <span class="ot">&lt;-</span> sharks<span class="sc">$</span>ask_amount_usd <span class="sc">/</span> <span class="dv">1000</span></span>
@@ -888,19 +868,18 @@ Figure&nbsp;23.3: Season means of the equity offered (points) and the fitted qua
 <p><span class="label">A founder’s decision (invented example)</span></p>
 <p>You suspect that advertising works better in exam weeks. The model with an interaction gives an advertising slope of 0.10 orders per euro in ordinary weeks and 0.10 + 0.12 = 0.22 in exam weeks. After a price increase, each order now brings 6 euros of margin. So 100 euros of advertising goes with 10 more orders and 60 euros of margin in an ordinary week, which is less than the advertising costs. In an exam week it goes with 22 more orders and 132 euros of margin. The decision: advertise in the exam weeks only. One check first: the interaction of 0.12 has its own interval. If that interval includes zero, the data do not yet show that the two kinds of weeks differ. Then keep spreading the advertising budget over both kinds of weeks for one more study period before you decide.</p>
 </div>
-<p><strong>Next:</strong> Tutorial 2 practises Lectures 4–6 in the format of the exam. It ends with one full analysis, from a research question to a conclusion of 150 words. The exam asks for this kind of analysis, and your thesis will too.</p>
+<p><strong>Next:</strong> Tutorial 2 practises Lectures 4–6 with exam-style questions. It ends with one full analysis, from a research question to a conclusion of 150 words. Your thesis asks for this kind of analysis too.</p>
 </section>
 </section>
 <section id="after-class" class="level2 course-phase phase-after">
 <h2 class="anchored" data-anchor-id="after-class">After class</h2>
-<p><span class="time-budget">Total practice time: about 85 minutes.</span></p>
-<p><strong>Minimum path (about 35 minutes):</strong> read the lecture material, answer the recall questions, then work for 10 minutes on the tasks that follow. <strong>Full path:</strong> all tasks below.</p>
-<section id="read-the-lecture-material-15-minutes" class="level3">
-<h3 class="anchored" data-anchor-id="read-the-lecture-material-15-minutes">Read the lecture material (15 minutes)</h3>
+<p>After the lecture, work through all the practice below.</p>
+<section id="read-the-lecture-material" class="level3">
+<h3 class="anchored" data-anchor-id="read-the-lecture-material">Read the lecture material</h3>
 <p>Read the Lecture material section above from start to end. The lecture covered the main ideas. The text has every step, every example, and all the code, including parts that were not shown in class. Note what is still unclear and bring it to the next tutorial, or ask Tilly, the course AI assistant.</p>
 </section>
-<section id="recall-questions-10-minutes" class="level3">
-<h3 class="anchored" data-anchor-id="recall-questions-10-minutes">Recall questions (10 minutes)</h3>
+<section id="recall-questions" class="level3">
+<h3 class="anchored" data-anchor-id="recall-questions">Recall questions</h3>
 <ol type="1">
 <li>What does an interaction coefficient measure, and what is its unit in the model with season and the <code>women</code> dummy?</li>
 <li>Why centre a predictor before you use it in an interaction, and what can centring never change?</li>
@@ -931,8 +910,8 @@ Check your answers
 </div>
 </div>
 </section>
-<section id="centring-verification-10-minutes" class="level3">
-<h3 class="anchored" data-anchor-id="centring-verification-10-minutes">Centring verification (10 minutes)</h3>
+<section id="centring-verification" class="level3">
+<h3 class="anchored" data-anchor-id="centring-verification">Centring verification</h3>
 <p><span class="shark-tag">Shark Tank data</span> Fit the interaction model with and without centring season. Check that the fitted values and the interaction coefficient are unchanged, and report which coefficients do change.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
@@ -981,8 +960,8 @@ Check your answer
 </div>
 </div>
 </section>
-<section id="finish-a-half-worked-example-a-quadratic-change-15-minutes" class="level3">
-<h3 class="anchored" data-anchor-id="finish-a-half-worked-example-a-quadratic-change-15-minutes">Finish a half-worked example: a quadratic change (15 minutes)</h3>
+<section id="finish-a-half-worked-example-a-quadratic-change" class="level3">
+<h3 class="anchored" data-anchor-id="finish-a-half-worked-example-a-quadratic-change">Finish a half-worked example: a quadratic change</h3>
 <p><span class="shark-tag">Shark Tank data</span> Read the worked calculation for Season 5 to Season 6 again (<a href="#exm-i06-quadratic-change" class="quarto-xref">Example&nbsp;<span>23.1</span></a>). Then calculate the fitted change from <strong>Season 10 to Season 11</strong> in the same model.</p>
 <p><em>Step 1 (given).</em> The formula is <span class="math inline">\(\hat\beta_1+\hat\beta_2(2x+1)\)</span> with <span class="math inline">\(x=10\)</span>, so you multiply <span class="math inline">\(\hat\beta_2\)</span> by <span class="math inline">\(21\)</span>.</p>
 <p><em>Step 2 (you).</em> Insert <span class="math inline">\(\hat\beta_1\approx-1.713\)</span> and <span class="math inline">\(\hat\beta_2\approx0.051\)</span>.</p>
@@ -1030,8 +1009,8 @@ Check your answers
 </div>
 </div>
 </section>
-<section id="practice-all-steps-together-15-minutes" class="level3">
-<h3 class="anchored" data-anchor-id="practice-all-steps-together-15-minutes">Practice: all steps together (15 minutes)</h3>
+<section id="practice-all-steps-together" class="level3">
+<h3 class="anchored" data-anchor-id="practice-all-steps-together">Practice: all steps together</h3>
 <p><span class="shark-tag">Shark Tank data</span> In Lecture 4 you wrote a paragraph that connects the diagnostics of Lecture 2 to the three-predictor model of the equity offered. Add one argument to that paragraph. Propose either an interaction or a quadratic term for that model. State the question about the business or the data that motivates the term, and say how you would test whether the term belongs in the model.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
@@ -1050,8 +1029,8 @@ Check a model answer
 </div>
 </div>
 </section>
-<section id="review-one-partial-f-question-from-lecture-5-5-minutes" class="level3">
-<h3 class="anchored" data-anchor-id="review-one-partial-f-question-from-lecture-5-5-minutes">Review: one partial-F question from Lecture 5 (5 minutes)</h3>
+<section id="review-one-partial-f-question-from-lecture-5" class="level3">
+<h3 class="anchored" data-anchor-id="review-one-partial-f-question-from-lecture-5">Review: one partial-F question from Lecture 5</h3>
 <p><span class="shark-tag">Shark Tank data</span> Adding the two gender dummies to the model of equity on season and requested amount reduced the residual sum of squares by 436.25 using 2 degrees of freedom, and the complete model left 82,792 on 1,429 degrees of freedom. Compute the partial F statistic and state the 5% conclusion.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
@@ -1070,8 +1049,8 @@ Check your answer
 </div>
 </div>
 </section>
-<section id="worked-exam-interpretation-5-minutes" class="level3">
-<h3 class="anchored" data-anchor-id="worked-exam-interpretation-5-minutes">Worked exam interpretation (5 minutes)</h3>
+<section id="worked-exam-interpretation" class="level3">
+<h3 class="anchored" data-anchor-id="worked-exam-interpretation">Worked exam interpretation</h3>
 <p><strong>Exam-style question.</strong> An invented example. A model of the weekly revenue of market stalls (in €100s) on opening hours per week, a dummy for indoor stalls, and their interaction reports <code>hours 1.20</code>, <code>indoor 2.00</code>, <code>hours:indoor -0.50</code>. A student writes: “One more opening hour raises weekly revenue by €120 for all stalls.” Correct the sentence.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
@@ -1090,13 +1069,13 @@ Check a model answer
 </div>
 </div>
 </section>
-<section id="check-the-ai-5-minutes" class="level3">
-<h3 class="anchored" data-anchor-id="check-the-ai-5-minutes">Check the AI (5 minutes)</h3>
+<section id="check-the-ai" class="level3">
+<h3 class="anchored" data-anchor-id="check-the-ai">Check the AI</h3>
 <p><span class="shark-tag">Shark Tank data</span> You asked an AI assistant: “The interaction has a coefficient of -0.061 and a p-value of 0.52. What do I conclude?” It answered:</p>
 <blockquote class="blockquote">
 <p>“The p-value proves that the season trend is identical for both groups. And the season coefficient of -0.80 is the season trend for all teams.”</p>
 </blockquote>
-<p>Find what is wrong and write the corrected answer. This is the <strong>Verify</strong> step of Attempt → Ask → Verify → Explain, and the exam asks for it.</p>
+<p>Find what is wrong and write the corrected answer. This is the <strong>Verify</strong> step of Attempt → Ask → Verify → Explain.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -1114,8 +1093,8 @@ Check your answer
 </div>
 </div>
 </section>
-<section id="make-it-yours-5-minutes" class="level3">
-<h3 class="anchored" data-anchor-id="make-it-yours-5-minutes">Make it yours (5 minutes)</h3>
+<section id="make-it-yours" class="level3">
+<h3 class="anchored" data-anchor-id="make-it-yours">Make it yours</h3>
 <div class="utility-prompt">
 <p><span class="label">Two sentences about your own venture</span></p>
 <p>Think of your EiA3 venture, or any business you know well. Name one relationship in its data whose slope could depend on something else. For example, the response to price may differ by customer segment, the result of a campaign may differ by channel, or growth may become flatter as the business gets larger. Then write two sentences. First, state the interaction or quadratic term you would add and the question behind it. Second, say what a result that is not significant would tell you, and what it would not tell you. There is no wrong answer.</p>
