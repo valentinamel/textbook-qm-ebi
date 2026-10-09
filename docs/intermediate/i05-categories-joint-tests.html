@@ -684,7 +684,7 @@ df=n-k-1=200-1-1=198.
 </section>
 <section id="i05-causal-words" class="level3">
 <h3 class="anchored" data-anchor-id="i05-causal-words">When you may use causal words</h3>
-<p>Since Lecture 1 you describe a coefficient with “is associated with” and “on average”. You do not use causal words such as “increases”, “raises”, “leads to”, or “the effect of”. This stays the default in this course. Most data in business are observational: nobody decided by chance who got what. Then a coefficient mixes the role of the predictor with the role of everything that goes with it, measured or not. Control variables remove only the part that you measured.</p>
+<p>Since Lecture 1 you describe a coefficient with “is associated with” and “on average”. You do not use causal words such as “increases”, “raises”, “leads to”, or “the effect of”. Most data in business are observational: who got what was not randomly assigned. Then a coefficient mixes the role of the predictor with the role of everything that goes with it, measured or not. Control variables remove only the part that you measured.</p>
 <p>A well-run A/B test is the exception. Here causal words are correct, because the way the data were produced rules out the other explanations. Check three conditions before you use them:</p>
 <ol type="1">
 <li>Random assignment. Chance decided which customer got which version. The customers did not choose it, and neither did the team.</li>
@@ -1155,7 +1155,7 @@ Check your answers
 </section>
 <section id="finish-a-half-worked-example-a-partial-f-with-new-numbers" class="level3">
 <h3 class="anchored" data-anchor-id="finish-a-half-worked-example-a-partial-f-with-new-numbers">Finish a half-worked example: a partial F with new numbers</h3>
-<p><span class="shark-tag">Shark Tank data</span> Test the two category dummies again, now in a smaller complete model. The reduced model contains only <code>season</code>:</p>
+<p><span class="shark-tag">Shark Tank data</span> Test the two team-category dummies again, now in a smaller complete model. The outcome is the equity offered, in percent (<code>equity_offered_pct</code>). The data are the 1,434 pitches with a known team classification (<code>known_gender</code>). The reduced model contains only the season (<code>season</code>). The complete model adds the team category (<code>gender</code>, reference all-men teams):</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>reduced_season <span class="ot">&lt;-</span> <span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> season, <span class="at">data =</span> known_gender)</span>
 <span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>full_season    <span class="ot">&lt;-</span> <span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> gender,</span>
@@ -1174,8 +1174,8 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 </div>
 </div>
 <p><em>Step 1 (given).</em> Adding the two dummies reduces the residual sum of squares by <span class="math inline">\(643.43\)</span> using <span class="math inline">\(2\)</span> degrees of freedom. The complete model leaves <span class="math inline">\(84{,}003\)</span> on <span class="math inline">\(1{,}430\)</span> degrees of freedom.</p>
-<p><em>Step 2 (you).</em> Put these numbers into the F formula of the definition box.</p>
-<p><em>Step 3 (you).</em> Compare with the table’s F and p-value and state the conclusion at 5% in one sentence.</p>
+<p><em>Step 2 (you).</em> Put these numbers into the partial F formula of the definition box in the section “Are the category terms worth having at all?”.</p>
+<p><em>Step 3 (you).</em> Compare your F with the F and the p-value in the R output above. State the conclusion at 5% in one sentence.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -1195,12 +1195,13 @@ Check your answer
 </section>
 <section id="practice-relevelling-hypotheses-an-ab-test-and-an-anova-table" class="level3">
 <h3 class="anchored" data-anchor-id="practice-relevelling-hypotheses-an-ab-test-and-an-anova-table">Practice: relevelling, hypotheses, an A/B test, and an ANOVA table</h3>
+<p>Questions 1, 2, 3, and 5 use the model of the section “The adjusted comparison” in this lecture, saved as <code>gender_model</code>. It regresses the equity offered (<code>equity_offered_pct</code>) on the season, the requested amount in thousands of dollars (<code>ask_1k</code>), and the team category <code>gender</code>, with all-men teams as the reference category. The data are the 1,434 pitches with a known team classification (<code>known_gender</code>).</p>
 <ol type="1">
-<li><p><span class="shark-tag">Shark Tank data</span> Relevel <code>gender</code> so that <code>mixed</code> is the reference category, and interpret both dummy coefficients. Save the relevelled model as <code>relevelled_model</code>.</p></li>
-<li><p><span class="shark-tag">Shark Tank data</span> Check that the fitted values are unchanged after relevelling by comparing them with those of <code>gender_model</code>.</p></li>
-<li><p>State the hypotheses for the partial F-test of both gender dummies.</p></li>
+<li><p><span class="shark-tag">Shark Tank data</span> Fit the same model again, but with mixed teams as the reference category. Save it as <code>relevelled_model</code>, and interpret both dummy coefficients.</p></li>
+<li><p><span class="shark-tag">Shark Tank data</span> Show that the fitted values of <code>relevelled_model</code> are the same as those of <code>gender_model</code>.</p></li>
+<li><p>State the hypotheses of the partial F-test of both gender dummies in <code>gender_model</code>.</p></li>
 <li><p>An invented A/B test, analysed as in <a href="#i05-ab-test">Comparing two versions: the A/B test</a>. Random assignment puts 200 new customers in a control group (old checkout page) and a treatment group (new page), 100 each. A regression of the order value (euros) on the treatment dummy <code>new_page</code> reports an intercept of 18.40 and a coefficient of 1.20 with standard error 0.50. Give the mean order value of each group. Test at 5% whether the new page has an effect, in five steps. Give a 95% interval for <span class="math inline">\(\beta_1\)</span>, and the effect as a share of the control mean. The critical value is <span class="math inline">\(t_{0.975,\,198}\)</span> = <code>qt(0.975, 198)</code> = 1.972.</p></li>
-<li><p><span class="shark-tag">Shark Tank data</span> Explain why “the all-women coefficient is 1.28%” is ambiguous, then rewrite it precisely.</p></li>
+<li><p><span class="shark-tag">Shark Tank data</span> In <code>gender_model</code>, the all-women coefficient is about 1.28. A student writes “the all-women coefficient is 1.28%”. Explain why this sentence is unclear, then rewrite it precisely.</p></li>
 <li><p>An invented example. A franchise compares the weekly revenue (in thousands of euros) of its shops in four regions. Fill in the three missing numbers A, B, and C of this ANOVA table:</p>
 <pre class="text"><code>            Df Sum Sq Mean Sq F value  Pr(&gt;F)
 region       3    240       A       B 0.00053
@@ -1257,7 +1258,7 @@ Check your answers
 </section>
 <section id="the-120-word-interpretation" class="level3">
 <h3 class="anchored" data-anchor-id="the-120-word-interpretation">The 120-word interpretation</h3>
-<p><span class="shark-tag">Shark Tank data</span> Write an interpretation of the full <code>gender_model</code> in about 120 words. Include what the team categories do and do not record, and say why the result is not causal.</p>
+<p><span class="shark-tag">Shark Tank data</span> Write an interpretation of <code>gender_model</code> (see the Practice above) in about 120 words. Include what the team categories do and do not record, and say why the result is not causal.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -1277,7 +1278,7 @@ Check a model answer
 </section>
 <section id="review-one-question-from-lecture-4" class="level3">
 <h3 class="anchored" data-anchor-id="review-one-question-from-lecture-4">Review: one question from Lecture 4</h3>
-<p><span class="shark-tag">Shark Tank data</span> Using the Lecture 4 three-predictor model, compute the combined fitted difference for a pitch three seasons later requesting $200,000 more, at the same description length.</p>
+<p><span class="shark-tag">Shark Tank data</span> Lecture 4 regressed the equity offered on season, requested amount (<code>ask_1k</code>, in thousands of dollars), and the number of words in the description. Its slopes are about <span class="math inline">\(-0.836\)</span> per season and <span class="math inline">\(-0.0029\)</span> per $1,000 requested. Compute the combined fitted difference for a pitch three seasons later that requests $200,000 more, at the same description length.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -1297,7 +1298,7 @@ Check your answer
 </section>
 <section id="worked-exam-interpretation" class="level3">
 <h3 class="anchored" data-anchor-id="worked-exam-interpretation">Worked exam interpretation</h3>
-<p><strong>Exam-style question.</strong> An invented example. A model of equity offered on season, <code>ask_1k</code>, and industry (four categories, reference <code>Food and Beverage</code>) reports <code>industryTechnology 1.9 (p = 0.04)</code>. A student writes: “Technology pitches offer 1.9% more equity, so entering tech makes founders more generous.” Correct the sentence.</p>
+<p><strong>Exam-style question.</strong> An invented example. A model of equity offered on season, the requested amount in thousands of dollars (<code>ask_1k</code>), and industry (four categories, reference <code>Food and Beverage</code>) reports <code>industryTechnology 1.9 (p = 0.04)</code>. A student writes: “Technology pitches offer 1.9% more equity, so entering tech makes founders more generous.” Correct the sentence.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -1317,7 +1318,7 @@ Check a model answer
 </section>
 <section id="check-the-ai" class="level3">
 <h3 class="anchored" data-anchor-id="check-the-ai">Check the AI</h3>
-<p><span class="shark-tag">Shark Tank data</span> You asked an AI assistant: “The coefficient of the all-women dummy is 1.28. What does that mean?” It answered:</p>
+<p><span class="shark-tag">Shark Tank data</span> You regressed the equity offered on the season, the requested amount, and the team category, with all-men teams as the reference. You asked an AI assistant: “The coefficient of the all-women dummy is 1.28. What does that mean?” It answered:</p>
 <blockquote class="blockquote">
 <p>“All-women teams offer 1.28% more equity than the average team.”</p>
 </blockquote>

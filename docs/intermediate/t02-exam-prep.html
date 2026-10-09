@@ -435,8 +435,7 @@ window.Quarto = {
 <li>read a regression table from a research paper and state its limits</li>
 </ul>
 </div>
-<p>Tutorials are exam preparation sessions. The tasks below are exam-style questions. You first try each task in pairs. You may use AI for this, following the four steps Attempt, Ask, Verify, Explain. Then the whole group discusses the solution with the tutor.</p>
-<p>The tasks follow the order of the course. Task 1 uses Lecture 4, Task 2 uses Lecture 5, and Tasks 3 and 4 use Lecture 6. A regression table then puts the models of Tasks 2 to 4 side by side. Task 5 applies Lectures 3 to 5 to an invented table in the layout of a research paper. Task 6 uses Lectures 5 and 6 for an A/B test, a one-way ANOVA, and the roles of moderators and mediators.</p>
+<p>Tutorials are exam preparation sessions. The tasks below are exam-style questions. You first try each task in pairs. You may use AI for this, following Attempt, Ask, Verify, Explain. Then the class discusses the solution together.</p>
 <section id="before-class" class="level2 course-phase phase-before">
 <h2 class="anchored" data-anchor-id="before-class">Before class</h2>
 <p>Complete the after-class practice from Lectures 4 and 5. Lecture 6 is on the day before this tutorial: read its lecture material, and do its practice after the tutorial. Use the complete <a href="../intermediate/code-sheet.html">QM Intermediate Code Sheet</a> while working. If needed, review <a href="../resources/math-refresher.html#indicators-and-reference-categories">Mathematics Refresher: indicators and reference categories</a>, <a href="../resources/math-refresher.html#products-interactions-and-combined-effects">products, interactions, and combined effects</a>, and <a href="../resources/math-refresher.html#polynomial-terms">polynomial terms</a>.</p>
@@ -471,7 +470,7 @@ Check your preparation
 </section>
 <section id="in-the-tutorial" class="level2 course-phase phase-in-class">
 <h2 class="anchored" data-anchor-id="in-the-tutorial">In the tutorial</h2>
-<p>Try each task in R before you open the answer. Tasks 1 to 4 use the Shark Tank file, and money is measured in thousands of dollars (<code>ask_1k</code>). First build the data for the analysis. The code is the same as in Lectures 4–6. Tasks 1 to 6 and the regression table belong to the tutorial.</p>
+<p>Try each task in R before you open the answer. Tasks 1 to 4 use the Shark Tank file, and money is measured in thousands of dollars (<code>ask_1k</code>). First build the data for the analysis. The code is the same as in Lectures 4–6.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>sharks<span class="sc">$</span>ask_1k <span class="ot">&lt;-</span> sharks<span class="sc">$</span>ask_amount_usd <span class="sc">/</span> <span class="dv">1000</span></span>
@@ -486,7 +485,25 @@ Check your preparation
 </div>
 <section id="task-1-multiple-regression-coefficients-lecture-4" class="level3">
 <h3 class="anchored" data-anchor-id="task-1-multiple-regression-coefficients-lecture-4">Task 1: Multiple-regression coefficients (Lecture 4)</h3>
-<p><span class="shark-tag">Shark Tank data</span> Fit:</p>
+<p><span class="shark-tag">Shark Tank data</span> With all 1,441 pitches (<code>sharks</code>), fit a regression of the equity offered, in percent (<code>equity_offered_pct</code>), on the season (<code>season</code>), the requested amount in thousands of dollars (<code>ask_1k</code>), and the number of words in the description (<code>description_words</code>). Then answer these questions.</p>
+<ol type="1">
+<li>Interpret all three slopes with units and with the predictors that are held fixed.</li>
+<li>Find out which 95% confidence interval of a coefficient includes zero.</li>
+<li>Interpret adjusted <span class="math inline">\(R^2\)</span> and the overall F-test.</li>
+<li>Give two reasons why the coefficients cannot be read as causal effects.</li>
+</ol>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check your answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>m1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> ask_1k <span class="sc">+</span> description_words,</span>
@@ -518,13 +535,31 @@ F-statistic: 110.6 on 3 and 1437 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 </div>
 <ol type="1">
-<li>Interpret all three slopes with units and with the predictors that are held fixed.</li>
-<li>Find out which 95% confidence interval of a coefficient includes zero.</li>
-<li>Interpret adjusted <span class="math inline">\(R^2\)</span> and the overall F-test.</li>
-<li>Give two reasons why the coefficients cannot be read as causal effects.</li>
+<li>Among the 1,441 recorded pitches, at fixed values of the other included predictors:
+<ul>
+<li>one later season is associated with about 0.836 percentage points less equity offered, on average</li>
+<li>an extra $1,000 requested is associated with about 0.0029 percentage points less (about 0.29 points per $100,000), on average</li>
+<li>one additional description word is associated with about 0.128 percentage points less, on average.</li>
+</ul></li>
+<li><code>confint(m1)</code> shows that the interval for the description words, about <span class="math inline">\((-0.351, 0.095)\)</span>, includes zero.</li>
+<li><span class="math inline">\(R^2\approx0.188\)</span>: the model explains about 19% of the variation in the equity offered. Adjusted <span class="math inline">\(R^2\approx0.186\)</span> is almost the same, so the fit does not come from extra predictors that only fit chance variation. The overall F-test (<span class="math inline">\(F\approx110.6\)</span> on 3 and 1437 df) rejects the null hypothesis that all three slopes are zero.</li>
+<li>Any two of these: only selected pitches reach the show, the quality of the venture is not measured, the equity offered may influence the amount requested, and the variables may be measured with error.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="task-2-dummy-variables-and-a-partial-f-test-lecture-5" class="level3">
+<h3 class="anchored" data-anchor-id="task-2-dummy-variables-and-a-partial-f-test-lecture-5">Task 2: Dummy variables and a partial F-test (Lecture 5)</h3>
+<p>Use the 1,434 pitches with a known team classification (<code>known_gender</code>). Fit a reduced model of the equity offered (<code>equity_offered_pct</code>) on the season and the requested amount (<code>ask_1k</code>). Fit a complete model that adds the team category <code>gender</code> (all-men, all-women, or mixed). Compare the two models with <code>anova()</code>.</p>
+<ol type="1">
+<li><span class="shark-tag">Shark Tank data</span> Name the reference category.</li>
+<li>Interpret both dummy coefficients.</li>
+<li>State the hypotheses of the partial F-test and decide.</li>
+<li>Explain why the partial F-test and the individual t-tests answer different questions.</li>
 </ol>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -533,15 +568,8 @@ Check your answer
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>At fixed values of the other included predictors, among the 1,441 recorded pitches: one later season is associated with about 0.836 percentage points less equity offered, an extra $1,000 requested with about 0.0029 percentage points less (about 0.29 points per $100,000), and one additional description word with about 0.128 percentage points less. <code>confint(m1)</code> shows that the interval for the description words, about <span class="math inline">\((-0.351, 0.095)\)</span>, includes zero. <span class="math inline">\(R^2\approx0.188\)</span>: the model explains about 19% of the variation in the equity offered. Adjusted <span class="math inline">\(R^2\approx0.186\)</span> is almost the same, so the fit does not come from extra predictors that only fit chance variation. The overall F-test (<span class="math inline">\(F\approx110.6\)</span> on 3 and 1437 df) rejects the null hypothesis that all three slopes are zero. Possible reasons against a causal reading: only selected pitches reach the show, the quality of the venture is not measured, the equity offered may influence the amount requested, and the variables may be measured with error.</p>
-</div>
-</div>
-</div>
-</section>
-<section id="task-2-dummy-variables-and-a-partial-f-test-lecture-5" class="level3">
-<h3 class="anchored" data-anchor-id="task-2-dummy-variables-and-a-partial-f-test-lecture-5">Task 2: Dummy variables and a partial F-test (Lecture 5)</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>reduced <span class="ot">&lt;-</span> <span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> ask_1k,</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>              <span class="at">data =</span> known_gender)</span>
@@ -585,13 +613,26 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 </div>
 </div>
 <ol type="1">
-<li><span class="shark-tag">Shark Tank data</span> Name the reference category.</li>
-<li>Interpret both dummy coefficients.</li>
-<li>State the hypotheses of the partial F-test and decide.</li>
-<li>Explain why the partial F-test and the individual t-tests answer different questions.</li>
+<li>The reference category is all-men.</li>
+<li>At the same season and requested amount, all-women presenting teams are fitted to offer about 1.28 equity percentage points more than all-men teams, and mixed teams about 0.12 points more. The unit is percentage points, not percent. The categories are broad and the data do not come from an experiment, so the result does not show a causal effect of gender.</li>
+<li><span class="math inline">\(H_0\)</span>: both dummy coefficients are zero. <span class="math inline">\(H_1\)</span>: at least one of them is not zero. <span class="math inline">\(F\approx3.76\)</span> and p <span class="math inline">\(\approx\)</span> 0.023, so reject <span class="math inline">\(H_0\)</span> at the 5% level. The two terms are jointly significant.</li>
+<li>The t-test of the mixed dummy alone (p <span class="math inline">\(\approx\)</span> 0.82) is far from significant, but the F-test rejects. The F-test asks whether the two terms together improve the model. Each t-test asks about one comparison with the reference category.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="task-3-interaction-lecture-6" class="level3">
+<h3 class="anchored" data-anchor-id="task-3-interaction-lecture-6">Task 3: Interaction (Lecture 6)</h3>
+<p>With the 1,434 pitches with a known team classification (<code>known_gender</code>), fit a regression of the equity offered (<code>equity_offered_pct</code>) on the centred season <code>season_c</code>, the dummy <code>women</code> (1 for all-women and mixed teams), their interaction, and the requested amount (<code>ask_1k</code>).</p>
+<ol type="1">
+<li><span class="shark-tag">Shark Tank data</span> Write the fitted line for <code>women = 0</code> and for <code>women = 1</code> at the average requested amount.</li>
+<li>Calculate both season slopes.</li>
+<li>Interpret the interaction estimate and its p-value without claiming too much in either direction.</li>
+<li>Explain what centring does.</li>
 </ol>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -600,15 +641,8 @@ Check your answer
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>The reference category is all-men. At the same season and requested amount, all-women presenting teams are fitted to offer about 1.28 equity percentage points more than all-men teams, and mixed teams about 0.12 points more. The unit is percentage points, not percent. The null hypothesis of the partial F-test is that both dummy coefficients are zero. <span class="math inline">\(F\approx3.76\)</span> and p <span class="math inline">\(\approx\)</span> 0.023, so we reject the null hypothesis at 5%. The two terms are jointly significant, even though the t-test of the mixed dummy alone (p <span class="math inline">\(\approx\)</span> 0.82) is far from significant. The F-test asks whether the two terms together improve the model. Each t-test asks about one comparison with the reference category. The categories are broad and the data do not come from an experiment, so the result does not show a causal effect of gender.</p>
-</div>
-</div>
-</div>
-</section>
-<section id="task-3-interaction-lecture-6" class="level3">
-<h3 class="anchored" data-anchor-id="task-3-interaction-lecture-6">Task 3: Interaction (Lecture 6)</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>m_interaction <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  equity_offered_pct <span class="sc">~</span> season_c <span class="sc">*</span> women <span class="sc">+</span> ask_1k,</span>
@@ -641,13 +675,26 @@ F-statistic: 83.47 on 4 and 1429 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 </div>
 <ol type="1">
-<li><span class="shark-tag">Shark Tank data</span> Write the fitted line for <code>women = 0</code> and for <code>women = 1</code> at the average requested amount.</li>
-<li>Calculate both season slopes.</li>
-<li>Interpret the interaction estimate and its p-value without claiming too much in either direction.</li>
-<li>Explain what centring does.</li>
+<li>At the average requested amount, the fitted line for all-men teams is <span class="math inline">\(12.866-0.799\,\text{season\_c}\)</span>, and for teams with women it is <span class="math inline">\(13.673-0.861\,\text{season\_c}\)</span>, as in Lecture 6. The intercept 12.866 is the intercept 13.625 plus the <code>ask_1k</code> coefficient times the average requested amount, <code>mean(known_gender$ask_1k)</code>. For teams with women the intercept is <span class="math inline">\(12.866+0.807=13.673\)</span>.</li>
+<li>The season slope is about <span class="math inline">\(-0.799\)</span> percentage points per season for all-men teams. For teams with women it is <span class="math inline">\(-0.7994-0.0615\approx-0.861\)</span>.</li>
+<li>The estimated difference in slopes is <span class="math inline">\(-0.061\)</span> percentage points per season, with p <span class="math inline">\(\approx\)</span> 0.520. The model gives no evidence that the season trends differ between the two groups. It also does not prove that the trends are equal, because the estimate is imprecise.</li>
+<li>Centring makes the <code>women</code> coefficient compare the groups at the average season (about 8.8) and not at Season 0, which does not exist. It changes neither the fitted values nor the interaction estimate.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="task-4-polynomial-term-lecture-6" class="level3">
+<h3 class="anchored" data-anchor-id="task-4-polynomial-term-lecture-6">Task 4: Polynomial term (Lecture 6)</h3>
+<p>With all 1,441 pitches (<code>sharks</code>), fit a linear model of the equity offered (<code>equity_offered_pct</code>) on the season and the requested amount (<code>ask_1k</code>), and a quadratic model that adds the square of <code>season</code>, written <code>I(season^2)</code>. Compare the two models with <code>anova()</code>.</p>
+<ol type="1">
+<li><span class="shark-tag">Shark Tank data</span> Why must you write <code>I(season^2)</code> in the R formula?</li>
+<li>Decide with the partial F-test whether the quadratic term improves the model.</li>
+<li>Calculate the fitted change from Season 10 to Season 11.</li>
+<li>State why you should not extrapolate the curve beyond Season 16.</li>
 </ol>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -656,15 +703,8 @@ Check your answer
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>At the average requested amount, the fitted line for all-men teams is <span class="math inline">\(12.866-0.799\,\text{season\_c}\)</span>, and for teams with women it is <span class="math inline">\(13.673-0.861\,\text{season\_c}\)</span>, as in Lecture 6. The intercept 12.866 is the intercept 13.625 plus the <code>ask_1k</code> coefficient times the average requested amount, <code>mean(known_gender$ask_1k)</code>. For teams with women the intercept is <span class="math inline">\(12.866+0.807=13.673\)</span> and the slope is <span class="math inline">\(-0.7994-0.0615=-0.861\)</span>. So the season slope is about <span class="math inline">\(-0.799\)</span> percentage points per season for all-men teams and about <span class="math inline">\(-0.861\)</span> for teams with women. The estimated difference in slopes is <span class="math inline">\(-0.061\)</span> percentage points per season with p <span class="math inline">\(\approx\)</span> 0.520. The model gives no evidence that the season trends differ between the two groups. It also does not prove that the trends are equal, because the estimate is imprecise. Centring makes the <code>women</code> coefficient compare the groups at the average season (about 8.8) and not at Season 0, which does not exist. It changes neither the fitted values nor the interaction estimate.</p>
-</div>
-</div>
-</div>
-</section>
-<section id="task-4-polynomial-term-lecture-6" class="level3">
-<h3 class="anchored" data-anchor-id="task-4-polynomial-term-lecture-6">Task 4: Polynomial term (Lecture 6)</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>m_linear <span class="ot">&lt;-</span> <span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> ask_1k, <span class="at">data =</span> sharks)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>m_quadratic <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
@@ -709,31 +749,18 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 </div>
 </div>
 <ol type="1">
-<li><span class="shark-tag">Shark Tank data</span> Why must you write <code>I(season^2)</code> in the R formula?</li>
-<li>Decide with the partial F-test whether the quadratic term improves the model.</li>
-<li>Calculate the fitted change from Season 10 to Season 11.</li>
-<li>State why you should not extrapolate the curve beyond Season 16.</li>
+<li><code>I()</code> tells R to calculate the square. Without <code>I()</code>, R would read <code>^</code> as part of the formula syntax and not as a square.</li>
+<li><span class="math inline">\(H_0\)</span>: the coefficient of the quadratic term is zero. The partial F-test gives <span class="math inline">\(F\approx20.1\)</span> with p <span class="math inline">\(&lt;\)</span> 0.001, so reject <span class="math inline">\(H_0\)</span> at the 5% level. The quadratic term improves the model.</li>
+<li>With <span class="math inline">\(\hat\beta_1\approx-1.713\)</span> and <span class="math inline">\(\hat\beta_2\approx0.051\)</span>, the change from Season 10 to 11 is <span class="math inline">\(\hat\beta_1+\hat\beta_2(2\times10+1)=\hat\beta_1+21\hat\beta_2\approx-0.64\)</span> percentage points. Never read <span class="math inline">\(\hat\beta_1\)</span> alone while the quadratic term is in the model.</li>
+<li>Beyond Season 16 the fitted curve turns upward, and no data support that turn. A quadratic curve can change direction sharply outside the observed range.</li>
 </ol>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Check your answer
-</div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
-</div>
-<div id="callout-5" class="callout-5-contents callout-collapse collapse">
-<div class="callout-body-container callout-body">
-<p><code>I()</code> tells R to calculate the square. Without <code>I()</code>, R would read <code>^</code> as part of the formula syntax and not as a square. The partial F-test gives <span class="math inline">\(F\approx20.1\)</span> with p <span class="math inline">\(&lt;\)</span> 0.001, so the quadratic term improves the model. With <span class="math inline">\(\hat\beta_1\approx-1.713\)</span> and <span class="math inline">\(\hat\beta_2\approx0.051\)</span>, the change from Season 10 to 11 is <span class="math inline">\(\hat\beta_1+\hat\beta_2(2\times10+1)=\hat\beta_1+21\hat\beta_2\approx-0.64\)</span> percentage points. Never read <span class="math inline">\(\hat\beta_1\)</span> alone while the quadratic term is in the model. Beyond Season 16 the fitted curve turns upward, and no data support that turn. A quadratic curve can change direction sharply outside the observed range.</p>
 </div>
 </div>
 </div>
 </section>
 <section id="iep02-spec-table" class="level3">
 <h3 class="anchored" data-anchor-id="iep02-spec-table">The models of Tasks 2 to 4 in one table</h3>
-<p><span class="shark-tag">Shark Tank data</span> Lecture 4 showed how research papers put several models side by side in one regression table. The table below does this for the models of Tasks 2 to 4. All columns of such a table must use the same observations. Tasks 2 and 3 use the 1,434 pitches with a known team classification (<code>known_gender</code>). Task 4 uses all 1,441 pitches. So first fit the quadratic model again on the 1,434 pitches. The code then prints the two model outputs that this tutorial has not shown yet.</p>
+<p><span class="shark-tag">Shark Tank data</span> Lecture 4 showed how research papers put several models side by side in one regression table. The table below does this for the models of Tasks 2 to 4. All columns of such a table must use the same observations. Tasks 2 and 3 use the 1,434 pitches with a known team classification (<code>known_gender</code>). Task 4 uses all 1,441 pitches. So first fit the quadratic model again on the 1,434 pitches. The code then prints the two model outputs that the answers above do not show.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>m_quadratic_known <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> <span class="fu">I</span>(season<span class="sc">^</span><span class="dv">2</span>) <span class="sc">+</span> ask_1k,</span>
@@ -1018,7 +1045,7 @@ F-statistic: 117.9 on 3 and 1430 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 <p>Outcome: entrepreneurial intention (scale from 1 to 7). Ordinary least squares. Standard errors in parentheses. * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001.</p>
 <ol type="1">
-<li>What do the numbers in parentheses and the stars mean? Check the stars of the self-efficacy coefficient with its t statistic.</li>
+<li>What do the numbers in parentheses and the stars mean? Check the stars of the self-efficacy coefficient with its t statistic. The critical value is <span class="math inline">\(t_{0.975,\,260}\)</span> = <code>qt(0.975, 260)</code> = 1.969.</li>
 <li>Interpret the self-efficacy coefficient in column (2) in one complete sentence.</li>
 <li>The coefficient of Female changes from <span class="math inline">\(-0.21\)</span> with a star in column (1) to <span class="math inline">\(-0.15\)</span> without a star in column (2). Explain what happened with the ideas of Lecture 4, and say what the missing star does and does not mean.</li>
 <li><span class="math inline">\(R^2\)</span> rises from 0.03 to 0.19. What does that say, and which test would show whether the two added predictors are jointly significant?</li>
@@ -1054,54 +1081,18 @@ Check your answer
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>new_page <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">rep</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">each =</span> <span class="dv">60</span>))</span>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co"># invented order values in euros, with a true effect of 3 euros</span></span>
 <span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>order_value <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="dv">40</span> <span class="sc">+</span> <span class="dv">3</span> <span class="sc">*</span> new_page <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="dv">120</span>, <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="dv">8</span>), <span class="dv">2</span>)</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>ab_shop <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(new_page, order_value)</span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>ab_fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(order_value <span class="sc">~</span> new_page, <span class="at">data =</span> ab_shop)</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ab_fit)<span class="sc">$</span>coefficients</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>             Estimate Std. Error  t value     Pr(&gt;|t|)
-(Intercept) 39.086333  0.9480553 41.22790 6.427869e-72
-new_page     3.409333  1.3407527  2.54285 1.228932e-02</code></pre>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>ab_shop <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(new_page, order_value)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qt</span>(<span class="fl">0.975</span>, <span class="at">df =</span> <span class="dv">118</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 1.980272</code></pre>
-</div>
-</div>
-<p>Test in five steps whether the new page changes the mean order value. Explain why <span class="math inline">\(\hat\beta_1\)</span> estimates the average treatment effect of the new page, and judge its size.</p>
+<p>Regress <code>order_value</code> on the treatment dummy <code>new_page</code>. Test in five steps whether the new page changes the mean order value. The critical value is <span class="math inline">\(t_{0.975,\,118}\)</span> = <code>qt(0.975, 118)</code> = 1.980. Explain why <span class="math inline">\(\hat\beta_1\)</span> estimates the average treatment effect of the new page, and judge its size.</p>
 <p>(b) An invented one-way ANOVA. The same shop records the delivery time in hours of 20 orders for each of three couriers.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">7</span>)</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>courier <span class="ot">&lt;-</span> <span class="fu">factor</span>(<span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"cycle"</span>, <span class="st">"post"</span>, <span class="st">"van"</span>), <span class="at">each =</span> <span class="dv">20</span>))</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>delivery_hours <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">c</span>(<span class="fu">rnorm</span>(<span class="dv">20</span>, <span class="dv">20</span>, <span class="dv">6</span>), <span class="fu">rnorm</span>(<span class="dv">20</span>, <span class="dv">26</span>, <span class="dv">6</span>),</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>                          <span class="fu">rnorm</span>(<span class="dv">20</span>, <span class="dv">22</span>, <span class="dv">6</span>)), <span class="dv">1</span>)</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>deliveries <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(courier, delivery_hours)</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>courier_fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(delivery_hours <span class="sc">~</span> courier, <span class="at">data =</span> deliveries)</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(courier_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>(Intercept) courierpost  couriervan 
-     22.650       3.935      -0.015 </code></pre>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">7</span>)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>courier <span class="ot">&lt;-</span> <span class="fu">factor</span>(<span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"cycle"</span>, <span class="st">"post"</span>, <span class="st">"van"</span>), <span class="at">each =</span> <span class="dv">20</span>))</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>delivery_hours <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">c</span>(<span class="fu">rnorm</span>(<span class="dv">20</span>, <span class="dv">20</span>, <span class="dv">6</span>), <span class="fu">rnorm</span>(<span class="dv">20</span>, <span class="dv">26</span>, <span class="dv">6</span>),</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>                          <span class="fu">rnorm</span>(<span class="dv">20</span>, <span class="dv">22</span>, <span class="dv">6</span>)), <span class="dv">1</span>)</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>deliveries <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(courier, delivery_hours)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(courier_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Analysis of Variance Table
-
-Response: delivery_hours
-          Df  Sum Sq Mean Sq F value  Pr(&gt;F)  
-courier    2  207.25 103.623  2.9512 0.06031 .
-Residuals 57 2001.40  35.112                  
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(deliveries<span class="sc">$</span>delivery_hours)   <span class="co"># overall mean</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 23.95667</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qf</span>(<span class="fl">0.95</span>, <span class="dv">2</span>, <span class="dv">57</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 3.158843</code></pre>
-</div>
-</div>
-<p>Which regression lies behind this ANOVA table, and what do its two dummy coefficients say? Test at 5% whether the mean delivery time is the same for the three couriers: give <span class="math inline">\(H_0\)</span>, <span class="math inline">\(F\)</span>, both degrees of freedom, and the conclusion.</p>
+<p>Fit the regression of <code>delivery_hours</code> on <code>courier</code> and make its ANOVA table with <code>anova()</code>. Which dummies does this regression use? What do its two dummy coefficients say? Test at 5% whether the mean delivery time is the same for the three couriers. Give <span class="math inline">\(H_0\)</span>, <span class="math inline">\(F\)</span>, both degrees of freedom, and the conclusion. The critical value is <code>qf(0.95, 2, 57)</code> = 3.16.</p>
 <p>(c) A meal-kit start-up gives a discount coupon at random to half of its customers. Customers with the coupon order more meal kits. The coupon raises orders more for students than for other customers. The coupon also brings customers to the website more often, and more visits go with more orders. Which variable is a moderator, and which is a mediator? How does each one appear in a regression of orders on the coupon dummy?</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
@@ -1115,7 +1106,21 @@ Check your answer
 </div>
 <div id="callout-7" class="callout-7-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>(a) The mean order value is 39.09 euros with the old page (the intercept) and <span class="math inline">\(39.09+3.41=42.50\)</span> euros with the new page.</p>
+<p>(a)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>ab_fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(order_value <span class="sc">~</span> new_page, <span class="at">data =</span> ab_shop)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ab_fit)<span class="sc">$</span>coefficients</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>             Estimate Std. Error  t value     Pr(&gt;|t|)
+(Intercept) 39.086333  0.9480553 41.22790 6.427869e-72
+new_page     3.409333  1.3407527  2.54285 1.228932e-02</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qt</span>(<span class="fl">0.975</span>, <span class="at">df =</span> <span class="dv">118</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1.980272</code></pre>
+</div>
+</div>
+<p>The mean order value is 39.09 euros with the old page (the intercept) and <span class="math inline">\(39.09+3.41=42.50\)</span> euros with the new page.</p>
 <ol type="1">
 <li><strong>Hypotheses.</strong> <span class="math inline">\(H_0:\beta_1=0\)</span>, the new page has no effect on the mean order value. <span class="math inline">\(H_1:\beta_1\ne0\)</span>. The significance level is 5%.</li>
 <li><strong>Test statistic.</strong> <span class="math inline">\(T=\hat\beta_1/\operatorname{SE}(\hat\beta_1)\)</span>, with <span class="math inline">\(df=n-k-1=118\)</span>.</li>
@@ -1124,8 +1129,48 @@ Check your answer
 <li><strong>Conclusion.</strong> <span class="math inline">\(2.54\ge1.980\)</span>, so reject <span class="math inline">\(H_0\)</span> (p <span class="math inline">\(\approx\)</span> 0.012). At the 5% level, the new page raises the mean order value.</li>
 </ol>
 <p>Chance decided who saw the new page. So the two groups are alike on average in everything else, measured or not, and the only systematic difference is the page. That is why <span class="math inline">\(\hat\beta_1\approx3.41\)</span> euros estimates the average treatment effect of the new page. It is about 8.7% of the mean order value with the old page.</p>
-<p>(b) The ANOVA table comes from the regression of <code>delivery_hours</code> on two dummies, <code>post</code> and <code>van</code>, with <code>cycle</code> as the reference category. The intercept 22.65 hours is the mean of the cycle courier. The post courier takes on average 3.94 hours longer, and the van courier 0.02 hours less. <span class="math inline">\(H_0:\mu_{\text{cycle}}=\mu_{\text{post}}=\mu_{\text{van}}\)</span> against <span class="math inline">\(H_1\)</span>: at least one mean differs. <span class="math inline">\(F_{obs}=103.62/35.11\approx2.95\)</span> with <span class="math inline">\(G-1=2\)</span> and <span class="math inline">\(n-G=57\)</span> degrees of freedom. The critical value is 3.16, from <code>qf(0.95, 2, 57)</code>. Because <span class="math inline">\(2.95&lt;3.16\)</span> (p <span class="math inline">\(\approx\)</span> 0.060), do not reject <span class="math inline">\(H_0\)</span>. At the 5% level, the data do not show that the mean delivery time differs between the couriers. This does not prove that the means are equal. The largest difference, 3.95 hours between the post and the van courier, is about 16% of the overall mean of 23.96 hours.</p>
-<p>(c) Student status is the moderator: it changes the slope of the coupon. It enters as an interaction, <code>lm(orders ~ coupon * student)</code>, and the coefficient of <code>coupon:student</code> is the difference in the coupon effect between students and other customers. Website visits are the mediator: they lie on the path from the coupon to orders. Adding visits, <code>lm(orders ~ coupon + visits)</code>, shrinks the coupon coefficient to the direct part. For the total effect of the coupon, leave visits out of the model.</p>
+<p>(b)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>courier_fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(delivery_hours <span class="sc">~</span> courier, <span class="at">data =</span> deliveries)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(courier_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>(Intercept) courierpost  couriervan 
+     22.650       3.935      -0.015 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(courier_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Analysis of Variance Table
+
+Response: delivery_hours
+          Df  Sum Sq Mean Sq F value  Pr(&gt;F)  
+courier    2  207.25 103.623  2.9512 0.06031 .
+Residuals 57 2001.40  35.112                  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(deliveries<span class="sc">$</span>delivery_hours)   <span class="co"># overall mean</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 23.95667</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qf</span>(<span class="fl">0.95</span>, <span class="dv">2</span>, <span class="dv">57</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 3.158843</code></pre>
+</div>
+</div>
+<p>The ANOVA table comes from the regression of <code>delivery_hours</code> on two dummies, <code>post</code> and <code>van</code>, with <code>cycle</code> as the reference category. The intercept 22.65 hours is the mean of the cycle courier. The post courier takes on average 3.94 hours longer, and the van courier 0.02 hours less.</p>
+<ol type="1">
+<li><strong>Hypotheses.</strong> <span class="math inline">\(H_0:\mu_{\text{cycle}}=\mu_{\text{post}}=\mu_{\text{van}}\)</span>. <span class="math inline">\(H_1\)</span>: at least one mean differs. The significance level is 5%.</li>
+<li><strong>Test statistic.</strong> <span class="math inline">\(F\)</span> = mean square of <code>courier</code> divided by the mean square of the residuals, with <span class="math inline">\(G-1=2\)</span> and <span class="math inline">\(n-G=57\)</span> degrees of freedom.</li>
+<li><strong>Critical value and rejection region.</strong> The critical value is 3.16, from <code>qf(0.95, 2, 57)</code>. Reject <span class="math inline">\(H_0\)</span> if <span class="math inline">\(F_{obs}\ge3.16\)</span>.</li>
+<li><strong>Observed value.</strong> <span class="math inline">\(F_{obs}=103.62/35.11\approx2.95\)</span>.</li>
+<li><strong>Conclusion.</strong> <span class="math inline">\(2.95&lt;3.16\)</span> (p <span class="math inline">\(\approx\)</span> 0.060), so do not reject <span class="math inline">\(H_0\)</span>. At the 5% level, the data do not show that the mean delivery time differs between the couriers. This does not prove that the means are equal.</li>
+</ol>
+<p>The largest difference, 3.95 hours between the post and the van courier, is about 16% of the overall mean of 23.96 hours.</p>
+<p>(c)</p>
+<ul>
+<li>Student status is the moderator: it changes the slope of the coupon. It enters as an interaction, <code>lm(orders ~ coupon * student)</code>, and the coefficient of <code>coupon:student</code> is the difference in the coupon effect between students and other customers.</li>
+<li>Website visits are the mediator: they lie on the path from the coupon to orders. Adding visits, <code>lm(orders ~ coupon + visits)</code>, shrinks the coupon coefficient to the direct part. For the total effect of the coupon, leave visits out of the model.</li>
+</ul>
 </div>
 </div>
 </div>
@@ -1135,7 +1180,7 @@ Check your answer
 <h2 class="anchored" data-anchor-id="after-class">After class</h2>
 <section id="individual-practice" class="level3">
 <h3 class="anchored" data-anchor-id="individual-practice">Individual practice</h3>
-<p><span class="shark-tag">Shark Tank data</span> Build one model of the equity offered (<code>equity_offered_pct</code>) in the Shark Tank file. Use season, the requested amount in $1,000s, the presenting team, and one extension that you can justify: an interaction of season with the dummy <code>women</code>, or a quadratic term in season next to the three known team categories (<code>gender</code>).</p>
+<p><span class="shark-tag">Shark Tank data</span> Build one model of the equity offered (<code>equity_offered_pct</code>) in the Shark Tank file. Use season, the requested amount in $1,000s, the presenting team, and one extension that you can justify: an interaction of season with the dummy <code>women</code> (1 for all-women and mixed teams), or a quadratic term in season next to the three known team categories (<code>gender</code>).</p>
 <p>Your answer must include:</p>
 <ol type="1">
 <li>a precise research question</li>
@@ -1160,12 +1205,20 @@ Check a model structure
 </div>
 <div id="callout-8" class="callout-8-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>A good solution could fit</p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  equity_offered_pct <span class="sc">~</span> season_c <span class="sc">*</span> women <span class="sc">+</span> ask_1k,</span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> known_gender</span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>or a model with a quadratic term for season and the group dummies. Keep <code>season_c</code> and <code>women</code> in the model next to their interaction (the hierarchy principle), and name the reference category. Interpret slopes that combine several coefficients, or differences between fitted values. Use <code>anova()</code> to compare the model with a nested reduced model. Inspect the residuals, including <code>rstandard()</code> and Cook’s distance, and plot fitted values inside Seasons 1–16. The conclusion must say that the team categories are broad, that only broadcast pitches are in the file, and that the results therefore do not show a causal effect of gender or season.</p>
+<p>This model structure covers points 4 to 9.</p>
+<ol start="4" type="1">
+<li><p>A good solution could fit</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  equity_offered_pct <span class="sc">~</span> season_c <span class="sc">*</span> women <span class="sc">+</span> ask_1k,</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> known_gender</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>or a model with a quadratic term for season and the group dummies. Keep <code>season_c</code> and <code>women</code> in the model next to their interaction (the hierarchy principle).</p></li>
+<li><p>Name the reference category. Interpret slopes that combine several coefficients, or differences between fitted values.</p></li>
+<li><p>Use <code>anova()</code> to compare the model with a nested reduced model.</p></li>
+<li><p>Inspect the residuals, including <code>rstandard()</code> and Cook’s distance.</p></li>
+<li><p>Plot fitted values inside Seasons 1–16.</p></li>
+<li><p>The conclusion must say that the team categories are broad, that only broadcast pitches are in the file, and that the results therefore do not show a causal effect of gender or season.</p></li>
+</ol>
 </div>
 </div>
 </div>
@@ -1176,7 +1229,7 @@ Check a model structure
 <ol type="1">
 <li>A coefficient in a multiple regression compares cases that …</li>
 <li>In a model with an intercept, R includes a factor with three categories as …</li>
-<li>In the model <code>season_c * women + ask_1k</code>, the season slope for teams with women is …</li>
+<li>In the model of the equity offered on the centred season, the dummy <code>women</code>, their interaction, and the requested amount (<code>season_c * women + ask_1k</code>), the season slope for teams with women is …</li>
 <li>Centring a predictor changes …, and it does not change …</li>
 <li>In a model with <span class="math inline">\(x\)</span> and <span class="math inline">\(x^2\)</span>, the fitted change from <span class="math inline">\(x\)</span> to <span class="math inline">\(x+1\)</span> is …</li>
 </ol>

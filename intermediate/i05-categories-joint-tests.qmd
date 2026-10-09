@@ -377,11 +377,10 @@ An A/B test also has limits.
 
 Since Lecture 1 you describe a coefficient with "is associated with" and
 "on average". You do not use causal words such as "increases", "raises",
-"leads to", or "the effect of". This stays the default in this course. Most
-data in business are observational: nobody decided by chance who got what.
-Then a coefficient mixes the role of the predictor with the role of
-everything that goes with it, measured or not. Control variables remove only
-the part that you measured.
+"leads to", or "the effect of". Most data in business are observational:
+who got what was not randomly assigned. Then a coefficient mixes the role of
+the predictor with the role of everything that goes with it, measured or
+not. Control variables remove only the part that you measured.
 
 A well-run A/B test is the exception. Here causal words are correct, because
 the way the data were produced rules out the other explanations. Check three
@@ -975,8 +974,11 @@ assistant.
 
 ### Finish a half-worked example: a partial F with new numbers
 
-[Shark Tank data]{.shark-tag} Test the two category dummies again, now in a smaller complete model. The
-reduced model contains only `season`:
+[Shark Tank data]{.shark-tag} Test the two team-category dummies again, now in a smaller complete
+model. The outcome is the equity offered, in percent (`equity_offered_pct`).
+The data are the 1,434 pitches with a known team classification
+(`known_gender`). The reduced model contains only the season (`season`). The
+complete model adds the team category (`gender`, reference all-men teams):
 
 ```{r}
 #| label: i05-faded-anova
@@ -990,10 +992,11 @@ anova(reduced_season, full_season)
 by $643.43$ using $2$ degrees of freedom. The complete model leaves
 $84{,}003$ on $1{,}430$ degrees of freedom.
 
-*Step 2 (you).* Put these numbers into the F formula of the definition box.
+*Step 2 (you).* Put these numbers into the partial F formula of the
+definition box in the section "Are the category terms worth having at all?".
 
-*Step 3 (you).* Compare with the table's F and p-value and state the
-conclusion at 5% in one sentence.
+*Step 3 (you).* Compare your F with the F and the p-value in the R output
+above. State the conclusion at 5% in one sentence.
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
@@ -1005,11 +1008,20 @@ significant even in the model that adjusts only for season.
 
 ### Practice: relevelling, hypotheses, an A/B test, and an ANOVA table
 
-1. [Shark Tank data]{.shark-tag} Relevel `gender` so that `mixed` is the reference category, and interpret
-   both dummy coefficients. Save the relevelled model as `relevelled_model`.
-2. [Shark Tank data]{.shark-tag} Check that the fitted values are unchanged after relevelling by comparing
-   them with those of `gender_model`.
-3. State the hypotheses for the partial F-test of both gender dummies.
+Questions 1, 2, 3, and 5 use the model of the section "The adjusted
+comparison" in this lecture, saved as `gender_model`. It regresses the
+equity offered (`equity_offered_pct`) on the season, the requested amount
+in thousands of dollars (`ask_1k`), and the team category `gender`, with
+all-men teams as the reference category. The data are the 1,434 pitches
+with a known team classification (`known_gender`).
+
+1. [Shark Tank data]{.shark-tag} Fit the same model again, but with mixed
+   teams as the reference category. Save it as `relevelled_model`, and
+   interpret both dummy coefficients.
+2. [Shark Tank data]{.shark-tag} Show that the fitted values of
+   `relevelled_model` are the same as those of `gender_model`.
+3. State the hypotheses of the partial F-test of both gender dummies in
+   `gender_model`.
 4. An invented A/B test, analysed as in
    [Comparing two versions: the A/B test](#i05-ab-test). Random assignment
    puts 200 new customers in a control group (old checkout page) and a
@@ -1020,8 +1032,9 @@ significant even in the model that adjusts only for season.
    five steps. Give a 95% interval for $\beta_1$, and the effect as a share
    of the control mean. The critical value is
    $t_{0.975,\,198}$ = `qt(0.975, 198)` = 1.972.
-5. [Shark Tank data]{.shark-tag} Explain why "the all-women coefficient is 1.28%" is ambiguous, then
-   rewrite it precisely.
+5. [Shark Tank data]{.shark-tag} In `gender_model`, the all-women
+   coefficient is about 1.28. A student writes "the all-women coefficient is
+   1.28%". Explain why this sentence is unclear, then rewrite it precisely.
 6. An invented example. A franchise compares the weekly revenue (in
    thousands of euros) of its shops in four regions. Fill in the three
    missing numbers A, B, and C of this ANOVA table:
@@ -1100,9 +1113,9 @@ significant even in the model that adjusts only for season.
 
 ### The 120-word interpretation
 
-[Shark Tank data]{.shark-tag} Write an interpretation of the full `gender_model` in about 120 words.
-Include what the team categories do and do not record, and say why the
-result is not causal.
+[Shark Tank data]{.shark-tag} Write an interpretation of `gender_model`
+(see the Practice above) in about 120 words. Include what the team
+categories do and do not record, and say why the result is not causal.
 
 ::: {.callout-note collapse="true"}
 ## Check a model answer
@@ -1122,9 +1135,12 @@ pitches, not causal effects.
 
 ### Review: one question from Lecture 4
 
-[Shark Tank data]{.shark-tag} Using the Lecture 4 three-predictor model, compute the combined fitted
-difference for a pitch three seasons later requesting \$200,000 more, at the
-same description length.
+[Shark Tank data]{.shark-tag} Lecture 4 regressed the equity offered on
+season, requested amount (`ask_1k`, in thousands of dollars), and the number
+of words in the description. Its slopes are about $-0.836$ per season and
+$-0.0029$ per \$1,000 requested. Compute the combined fitted difference for
+a pitch three seasons later that requests \$200,000 more, at the same
+description length.
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
@@ -1137,8 +1153,9 @@ of `ask_1k`.
 ### Worked exam interpretation
 
 **Exam-style question.** An invented example.
-A model of equity offered on season, `ask_1k`, and industry (four
-categories, reference `Food and Beverage`) reports
+A model of equity offered on season, the requested amount in thousands of
+dollars (`ask_1k`), and industry (four categories, reference
+`Food and Beverage`) reports
 `industryTechnology 1.9 (p = 0.04)`. A student
 writes: "Technology pitches offer 1.9% more equity, so entering tech makes
 founders more generous." Correct the sentence.
@@ -1156,7 +1173,7 @@ reference category as an effect of choosing an industry.
 
 ### Check the AI
 
-[Shark Tank data]{.shark-tag} You asked an AI assistant: "The coefficient of the all-women dummy is 1.28. What does that mean?" It answered:
+[Shark Tank data]{.shark-tag} You regressed the equity offered on the season, the requested amount, and the team category, with all-men teams as the reference. You asked an AI assistant: "The coefficient of the all-women dummy is 1.28. What does that mean?" It answered:
 
 > "All-women teams offer 1.28% more equity than the average team."
 

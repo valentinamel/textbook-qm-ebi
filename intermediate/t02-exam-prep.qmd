@@ -19,15 +19,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 
 Tutorials are exam preparation sessions. The tasks below are exam-style
 questions. You first try each task in pairs. You may use AI for this, following
-the four steps Attempt, Ask, Verify, Explain. Then the whole group discusses
-the solution with the tutor.
-
-The tasks follow the order of the course. Task 1 uses Lecture 4, Task 2
-uses Lecture 5, and Tasks 3 and 4 use Lecture 6. A regression table then
-puts the models of Tasks 2 to 4 side by side. Task 5 applies Lectures 3 to 5
-to an invented table in the layout of a research paper. Task 6 uses
-Lectures 5 and 6 for an A/B test, a one-way ANOVA, and the roles of
-moderators and mediators.
+Attempt, Ask, Verify, Explain. Then the class discusses the solution together.
 
 ::: {.course-phase .phase-before}
 
@@ -67,7 +59,6 @@ Complete from memory:
 Try each task in R before you open the answer. Tasks 1 to 4 use the Shark
 Tank file, and money is measured in thousands of dollars (`ask_1k`). First
 build the data for the analysis. The code is the same as in Lectures 4--6.
-Tasks 1 to 6 and the regression table belong to the tutorial.
 
 ```{r}
 #| label: iep02-load
@@ -85,16 +76,11 @@ known_gender$season_c <- known_gender$season - mean(known_gender$season)
 
 ### Task 1: Multiple-regression coefficients (Lecture 4)
 
-[Shark Tank data]{.shark-tag} Fit:
-
-```{r}
-#| label: iep02-base-model
-m1 <- lm(
-  equity_offered_pct ~ season + ask_1k + description_words,
-  data = sharks
-)
-summary(m1)
-```
+[Shark Tank data]{.shark-tag} With all 1,441 pitches (`sharks`), fit a regression
+of the equity offered, in percent (`equity_offered_pct`), on the season
+(`season`), the requested amount in thousands of dollars (`ask_1k`), and the
+number of words in the description (`description_words`).
+Then answer these questions.
 
 1. Interpret all three slopes with units and with the predictors that are
    held fixed.
@@ -105,24 +91,51 @@ summary(m1)
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-At fixed values of the other included predictors, among the 1,441 recorded
-pitches: one later season is associated with about 0.836 percentage points
-less equity offered, an extra \$1,000 requested with about 0.0029
-percentage points less (about 0.29 points per \$100,000), and one
-additional description word with about 0.128 percentage points less.
-`confint(m1)` shows that the interval for the description words, about
-$(-0.351, 0.095)$, includes zero. $R^2\approx0.188$: the model explains
-about 19% of the variation in the equity offered. Adjusted
-$R^2\approx0.186$ is almost the same, so the fit does not come from extra
-predictors that only fit chance variation. The overall
-F-test ($F\approx110.6$ on 3 and 1437 df) rejects the null hypothesis that
-all three slopes are zero. Possible reasons against a causal reading: only
-selected pitches reach the show, the quality of the venture is not
-measured, the equity offered may influence the amount requested, and the
-variables may be measured with error.
+```{r}
+#| label: iep02-base-model
+m1 <- lm(
+  equity_offered_pct ~ season + ask_1k + description_words,
+  data = sharks
+)
+summary(m1)
+```
+
+1. Among the 1,441 recorded pitches, at fixed values of the other included
+   predictors:
+   - one later season is associated with about 0.836 percentage points less
+     equity offered, on average
+   - an extra \$1,000 requested is associated with about 0.0029 percentage
+     points less (about 0.29 points per \$100,000), on average
+   - one additional description word is associated with about 0.128
+     percentage points less, on average.
+2. `confint(m1)` shows that the interval for the description words, about
+   $(-0.351, 0.095)$, includes zero.
+3. $R^2\approx0.188$: the model explains about 19% of the variation in the
+   equity offered. Adjusted $R^2\approx0.186$ is almost the same, so the
+   fit does not come from extra predictors that only fit chance variation.
+   The overall F-test ($F\approx110.6$ on 3 and 1437 df) rejects the null
+   hypothesis that all three slopes are zero.
+4. Any two of these: only selected pitches reach the show, the quality of
+   the venture is not measured, the equity offered may influence the amount
+   requested, and the variables may be measured with error.
 :::
 
 ### Task 2: Dummy variables and a partial F-test (Lecture 5)
+
+Use the 1,434 pitches with a known team classification (`known_gender`).
+Fit a reduced model of the equity offered (`equity_offered_pct`) on the
+season and the requested amount (`ask_1k`). Fit a complete model that adds
+the team category `gender` (all-men, all-women, or mixed). Compare the two
+models with `anova()`.
+
+1. [Shark Tank data]{.shark-tag} Name the reference category.
+2. Interpret both dummy coefficients.
+3. State the hypotheses of the partial F-test and decide.
+4. Explain why the partial F-test and the individual t-tests answer
+   different questions.
+
+::: {.callout-note collapse="true"}
+## Check your answer
 
 ```{r}
 #| label: iep02-gender-models
@@ -134,38 +147,28 @@ summary(complete)
 anova(reduced, complete)
 ```
 
-1. [Shark Tank data]{.shark-tag} Name the reference category.
-2. Interpret both dummy coefficients.
-3. State the hypotheses of the partial F-test and decide.
-4. Explain why the partial F-test and the individual t-tests answer
-   different questions.
-
-::: {.callout-note collapse="true"}
-## Check your answer
-
-The reference category is all-men. At the same season and requested amount,
-all-women presenting teams are fitted to offer about 1.28 equity percentage
-points more than all-men teams, and mixed teams about 0.12 points more. The
-unit is percentage points, not percent. The null hypothesis of the partial
-F-test is that both dummy coefficients are zero. $F\approx3.76$ and
-p $\approx$ 0.023, so we reject the null hypothesis at 5%. The two terms are jointly significant, even
-though the t-test of the mixed dummy alone (p $\approx$ 0.82) is far from
-significant. The F-test asks whether the two terms together improve the
-model. Each t-test asks about one comparison with the reference category. The
-categories are broad and the data do not come from an experiment, so the
-result does not show a causal effect of gender.
+1. The reference category is all-men.
+2. At the same season and requested amount, all-women presenting teams are
+   fitted to offer about 1.28 equity percentage points more than all-men
+   teams, and mixed teams about 0.12 points more. The unit is percentage
+   points, not percent. The categories are broad and the data do not come
+   from an experiment, so the result does not show a causal effect of
+   gender.
+3. $H_0$: both dummy coefficients are zero. $H_1$: at least one of them is
+   not zero. $F\approx3.76$ and p $\approx$ 0.023, so reject $H_0$ at the
+   5% level. The two terms are jointly significant.
+4. The t-test of the mixed dummy alone (p $\approx$ 0.82) is far from
+   significant, but the F-test rejects. The F-test asks whether the two
+   terms together improve the model. Each t-test asks about one comparison
+   with the reference category.
 :::
 
 ### Task 3: Interaction (Lecture 6)
 
-```{r}
-#| label: iep02-interaction
-m_interaction <- lm(
-  equity_offered_pct ~ season_c * women + ask_1k,
-  data = known_gender
-)
-summary(m_interaction)
-```
+With the 1,434 pitches with a known team classification (`known_gender`),
+fit a regression of the equity offered (`equity_offered_pct`) on the
+centred season `season_c`, the dummy `women` (1 for all-women and mixed
+teams), their interaction, and the requested amount (`ask_1k`).
 
 1. [Shark Tank data]{.shark-tag} Write the fitted line for `women = 0` and for `women = 1` at the
    average requested amount.
@@ -177,24 +180,46 @@ summary(m_interaction)
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-At the average requested amount, the fitted line for all-men teams is
-$12.866-0.799\,\text{season\_c}$, and for teams with women it is
-$13.673-0.861\,\text{season\_c}$, as in Lecture 6. The intercept 12.866 is
-the intercept 13.625 plus the `ask_1k` coefficient times the average
-requested amount, `mean(known_gender$ask_1k)`. For teams with women the
-intercept is $12.866+0.807=13.673$ and the slope is
-$-0.7994-0.0615=-0.861$. So the season slope is about $-0.799$ percentage
-points per season for all-men teams and about $-0.861$ for teams with
-women. The estimated difference in slopes is $-0.061$ percentage points per
-season with p $\approx$ 0.520. The model gives no evidence that the season
-trends differ between the two groups. It also does not prove that the trends
-are equal, because the estimate is imprecise. Centring makes the `women`
-coefficient compare the groups at the average season (about 8.8) and not at
-Season 0, which does not exist. It changes neither the fitted values nor the
-interaction estimate.
+```{r}
+#| label: iep02-interaction
+m_interaction <- lm(
+  equity_offered_pct ~ season_c * women + ask_1k,
+  data = known_gender
+)
+summary(m_interaction)
+```
+
+1. At the average requested amount, the fitted line for all-men teams is
+   $12.866-0.799\,\text{season\_c}$, and for teams with women it is
+   $13.673-0.861\,\text{season\_c}$, as in Lecture 6. The intercept 12.866
+   is the intercept 13.625 plus the `ask_1k` coefficient times the average
+   requested amount, `mean(known_gender$ask_1k)`. For teams with women the
+   intercept is $12.866+0.807=13.673$.
+2. The season slope is about $-0.799$ percentage points per season for
+   all-men teams. For teams with women it is $-0.7994-0.0615\approx-0.861$.
+3. The estimated difference in slopes is $-0.061$ percentage points per
+   season, with p $\approx$ 0.520. The model gives no evidence that the
+   season trends differ between the two groups. It also does not prove that
+   the trends are equal, because the estimate is imprecise.
+4. Centring makes the `women` coefficient compare the groups at the average
+   season (about 8.8) and not at Season 0, which does not exist. It changes
+   neither the fitted values nor the interaction estimate.
 :::
 
 ### Task 4: Polynomial term (Lecture 6)
+
+With all 1,441 pitches (`sharks`), fit a linear model of the equity offered
+(`equity_offered_pct`) on the season and the requested amount (`ask_1k`), and a quadratic model that adds the square of
+`season`, written `I(season^2)`. Compare the two models with `anova()`.
+
+1. [Shark Tank data]{.shark-tag} Why must you write `I(season^2)` in the R formula?
+2. Decide with the partial F-test whether the quadratic term improves the
+   model.
+3. Calculate the fitted change from Season 10 to Season 11.
+4. State why you should not extrapolate the curve beyond Season 16.
+
+::: {.callout-note collapse="true"}
+## Check your answer
 
 ```{r}
 #| label: iep02-polynomial
@@ -207,24 +232,19 @@ summary(m_quadratic)
 anova(m_linear, m_quadratic)
 ```
 
-1. [Shark Tank data]{.shark-tag} Why must you write `I(season^2)` in the R formula?
-2. Decide with the partial F-test whether the quadratic term improves the
-   model.
-3. Calculate the fitted change from Season 10 to Season 11.
-4. State why you should not extrapolate the curve beyond Season 16.
-
-::: {.callout-note collapse="true"}
-## Check your answer
-
-`I()` tells R to calculate the square. Without `I()`, R would read `^` as
-part of the formula syntax and not as a square. The partial F-test gives $F\approx20.1$ with p $<$ 0.001,
-so the quadratic term improves the model. With $\hat\beta_1\approx-1.713$
-and $\hat\beta_2\approx0.051$, the change from Season 10 to 11 is
-$\hat\beta_1+\hat\beta_2(2\times10+1)=\hat\beta_1+21\hat\beta_2\approx-0.64$
-percentage points. Never read $\hat\beta_1$ alone while the quadratic term is
-in the model. Beyond Season 16 the fitted curve turns upward, and no data
-support that turn. A quadratic curve can change direction sharply outside
-the observed range.
+1. `I()` tells R to calculate the square. Without `I()`, R would read `^`
+   as part of the formula syntax and not as a square.
+2. $H_0$: the coefficient of the quadratic term is zero. The partial F-test
+   gives $F\approx20.1$ with p $<$ 0.001, so reject $H_0$ at the 5% level.
+   The quadratic term improves the model.
+3. With $\hat\beta_1\approx-1.713$ and $\hat\beta_2\approx0.051$, the
+   change from Season 10 to 11 is
+   $\hat\beta_1+\hat\beta_2(2\times10+1)=\hat\beta_1+21\hat\beta_2\approx-0.64$
+   percentage points. Never read $\hat\beta_1$ alone while the quadratic
+   term is in the model.
+4. Beyond Season 16 the fitted curve turns upward, and no data support that
+   turn. A quadratic curve can change direction sharply outside the observed
+   range.
 :::
 
 ### The models of Tasks 2 to 4 in one table {#iep02-spec-table}
@@ -234,8 +254,8 @@ regression table. The table below does this for the models of Tasks 2 to 4.
 All columns of such a table must use the same observations. Tasks 2 and 3
 use the 1,434 pitches with a known team classification (`known_gender`).
 Task 4 uses all 1,441 pitches. So first fit the quadratic model again on the
-1,434 pitches. The code then prints the two model outputs that this
-tutorial has not shown yet.
+1,434 pitches. The code then prints the two model outputs that the answers
+above do not show.
 
 ```{r}
 #| label: iep02-table-models
@@ -323,7 +343,8 @@ squares. Standard errors in parentheses.
 \* p < 0.05, \*\* p < 0.01, \*\*\* p < 0.001.
 
 1. What do the numbers in parentheses and the stars mean? Check the stars
-   of the self-efficacy coefficient with its t statistic.
+   of the self-efficacy coefficient with its t statistic. The critical
+   value is $t_{0.975,\,260}$ = `qt(0.975, 260)` = 1.969.
 2. Interpret the self-efficacy coefficient in column (2) in one complete
    sentence.
 3. The coefficient of Female changes from $-0.21$ with a star in column (1)
@@ -373,12 +394,11 @@ new_page <- sample(rep(c(0, 1), each = 60))
 # invented order values in euros, with a true effect of 3 euros
 order_value <- round(40 + 3 * new_page + rnorm(120, mean = 0, sd = 8), 2)
 ab_shop <- data.frame(new_page, order_value)
-ab_fit <- lm(order_value ~ new_page, data = ab_shop)
-summary(ab_fit)$coefficients
-qt(0.975, df = 118)
 ```
 
-Test in five steps whether the new page changes the mean order value.
+Regress `order_value` on the treatment dummy `new_page`. Test in five steps
+whether the new page changes the mean order value. The critical value is
+$t_{0.975,\,118}$ = `qt(0.975, 118)` = 1.980.
 Explain why $\hat\beta_1$ estimates the average treatment effect of the new
 page, and judge its size.
 
@@ -392,17 +412,13 @@ courier <- factor(rep(c("cycle", "post", "van"), each = 20))
 delivery_hours <- round(c(rnorm(20, 20, 6), rnorm(20, 26, 6),
                           rnorm(20, 22, 6)), 1)
 deliveries <- data.frame(courier, delivery_hours)
-courier_fit <- lm(delivery_hours ~ courier, data = deliveries)
-coef(courier_fit)
-anova(courier_fit)
-mean(deliveries$delivery_hours)   # overall mean
-qf(0.95, 2, 57)
 ```
 
-Which regression lies behind this ANOVA table, and what do its two dummy
-coefficients say? Test at 5% whether the mean delivery time is the same for
-the three couriers: give $H_0$, $F$, both degrees of freedom, and the
-conclusion.
+Fit the regression of `delivery_hours` on `courier` and make its ANOVA table
+with `anova()`. Which dummies does this regression use? What do its two
+dummy coefficients say? Test at 5% whether the mean delivery time is the
+same for the three couriers. Give $H_0$, $F$, both degrees of freedom, and
+the conclusion. The critical value is `qf(0.95, 2, 57)` = 3.16.
 
 &#40;c) A meal-kit start-up gives a discount coupon at random to half of its
 customers. Customers with the coupon order more meal kits. The coupon raises
@@ -414,7 +430,16 @@ appear in a regression of orders on the coupon dummy?
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-&#40;a) The mean order value is 39.09 euros with the old page (the intercept)
+&#40;a)
+
+```{r}
+#| label: iep02-ab-fit
+ab_fit <- lm(order_value ~ new_page, data = ab_shop)
+summary(ab_fit)$coefficients
+qt(0.975, df = 118)
+```
+
+The mean order value is 39.09 euros with the old page (the intercept)
 and $39.09+3.41=42.50$ euros with the new page.
 
 1. **Hypotheses.** $H_0:\beta_1=0$, the new page has no effect on the mean
@@ -433,26 +458,48 @@ the page. That is why $\hat\beta_1\approx3.41$ euros estimates the average
 treatment effect of the new page. It is about 8.7% of the mean order value
 with the old page.
 
-&#40;b) The ANOVA table comes from the regression of `delivery_hours` on two
+&#40;b)
+
+```{r}
+#| label: iep02-courier-fit
+courier_fit <- lm(delivery_hours ~ courier, data = deliveries)
+coef(courier_fit)
+anova(courier_fit)
+mean(deliveries$delivery_hours)   # overall mean
+qf(0.95, 2, 57)
+```
+
+The ANOVA table comes from the regression of `delivery_hours` on two
 dummies, `post` and `van`, with `cycle` as the reference category. The
 intercept 22.65 hours is the mean of the cycle courier. The post courier
 takes on average 3.94 hours longer, and the van courier 0.02 hours less.
-$H_0:\mu_{\text{cycle}}=\mu_{\text{post}}=\mu_{\text{van}}$ against $H_1$:
-at least one mean differs. $F_{obs}=103.62/35.11\approx2.95$ with
-$G-1=2$ and $n-G=57$ degrees of freedom. The critical value is 3.16, from
-`qf(0.95, 2, 57)`. Because $2.95<3.16$ (p $\approx$ 0.060), do not reject
-$H_0$. At the 5% level, the data do not show that the mean delivery time
-differs between the couriers. This does not prove that the means are equal.
+
+1. **Hypotheses.**
+   $H_0:\mu_{\text{cycle}}=\mu_{\text{post}}=\mu_{\text{van}}$.
+   $H_1$: at least one mean differs. The significance level is 5%.
+2. **Test statistic.** $F$ = mean square of `courier` divided by the mean
+   square of the residuals, with $G-1=2$ and $n-G=57$ degrees of freedom.
+3. **Critical value and rejection region.** The critical value is 3.16,
+   from `qf(0.95, 2, 57)`. Reject $H_0$ if $F_{obs}\ge3.16$.
+4. **Observed value.** $F_{obs}=103.62/35.11\approx2.95$.
+5. **Conclusion.** $2.95<3.16$ (p $\approx$ 0.060), so do not reject
+   $H_0$. At the 5% level, the data do not show that the mean delivery time
+   differs between the couriers. This does not prove that the means are
+   equal.
+
 The largest difference, 3.95 hours between the post and the van courier,
 is about 16% of the overall mean of 23.96 hours.
 
-&#40;c) Student status is the moderator: it changes the slope of the coupon.
-It enters as an interaction, `lm(orders ~ coupon * student)`, and the
-coefficient of `coupon:student` is the difference in the coupon effect
-between students and other customers. Website visits are the mediator: they
-lie on the path from the coupon to orders. Adding visits,
-`lm(orders ~ coupon + visits)`, shrinks the coupon coefficient to the direct
-part. For the total effect of the coupon, leave visits out of the model.
+&#40;c)
+
+- Student status is the moderator: it changes the slope of the coupon.
+  It enters as an interaction, `lm(orders ~ coupon * student)`, and the
+  coefficient of `coupon:student` is the difference in the coupon effect
+  between students and other customers.
+- Website visits are the mediator: they lie on the path from the coupon to
+  orders. Adding visits, `lm(orders ~ coupon + visits)`, shrinks the coupon
+  coefficient to the direct part. For the total effect of the coupon, leave
+  visits out of the model.
 :::
 
 :::
@@ -466,7 +513,7 @@ part. For the total effect of the coupon, leave visits out of the model.
 [Shark Tank data]{.shark-tag} Build one model of the equity offered (`equity_offered_pct`) in the Shark
 Tank file. Use season, the requested amount in \$1,000s, the presenting
 team, and one extension that you can justify: an interaction of season with
-the dummy `women`, or a quadratic term in season next to the three known
+the dummy `women` (1 for all-women and mixed teams), or a quadratic term in season next to the three known
 team categories (`gender`).
 
 Your answer must include:
@@ -486,24 +533,28 @@ Your answer must include:
 ::: {.callout-note collapse="true"}
 ## Check a model structure
 
-A good solution could fit
+This model structure covers points 4 to 9.
 
-```r
-m <- lm(
-  equity_offered_pct ~ season_c * women + ask_1k,
-  data = known_gender
-)
-```
+4. A good solution could fit
 
-or a model with a quadratic term for season and the group dummies. Keep
-`season_c` and `women` in the model next to their interaction (the hierarchy
-principle), and name the reference category. Interpret slopes that combine
-several coefficients, or differences between fitted values. Use `anova()` to
-compare the model with a nested reduced model. Inspect
-the residuals, including `rstandard()` and Cook's distance, and plot fitted
-values inside Seasons 1--16. The conclusion must say that the team
-categories are broad, that only broadcast pitches are in the file, and that
-the results therefore do not show a causal effect of gender or season.
+   ```r
+   m <- lm(
+     equity_offered_pct ~ season_c * women + ask_1k,
+     data = known_gender
+   )
+   ```
+
+   or a model with a quadratic term for season and the group dummies. Keep
+   `season_c` and `women` in the model next to their interaction (the
+   hierarchy principle).
+5. Name the reference category. Interpret slopes that combine several
+   coefficients, or differences between fitted values.
+6. Use `anova()` to compare the model with a nested reduced model.
+7. Inspect the residuals, including `rstandard()` and Cook's distance.
+8. Plot fitted values inside Seasons 1--16.
+9. The conclusion must say that the team categories are broad, that only
+   broadcast pitches are in the file, and that the results therefore do not
+   show a causal effect of gender or season.
 :::
 
 ### Check your understanding
@@ -513,8 +564,10 @@ Complete from memory:
 1. A coefficient in a multiple regression compares cases that ...
 2. In a model with an intercept, R includes a factor with three categories
    as ...
-3. In the model `season_c * women + ask_1k`, the season slope for teams
-   with women is ...
+3. In the model of the equity offered on the centred season, the dummy
+   `women`, their interaction, and the requested amount
+   (`season_c * women + ask_1k`), the season slope for teams with women
+   is ...
 4. Centring a predictor changes ..., and it does not change ...
 5. In a model with $x$ and $x^2$, the fitted change from $x$ to $x+1$ is ...
 

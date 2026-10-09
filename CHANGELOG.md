@@ -1401,3 +1401,11 @@ group.
 - Tilly: one bot per course, linked on the course overview pages.
 - Intermediate Lecture 5: new subsection "When you may use causal words"
   after the A/B test example, and recall question 8.
+- All tutorials: model answers numbered to follow the questions (tests in
+  five steps, intervals in five parts). Intermediate tutorials: tasks say in
+  words what to fit, and the code with its output sits in the answer box.
+  Internal task-order paragraphs removed from the Intermediate tutorials.
+- Intermediate Lecture 5: causal-words paragraph in Valentina's wording.
+- Practice and review questions in all lectures, tutorials and mocks made
+  self-contained: each names the model, variables, data or numbers it uses.
+- How to succeed: section "If you fall behind" removed. R Refresher: "Assessment reminder" box removed.
