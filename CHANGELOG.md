@@ -1409,3 +1409,6 @@ group.
 - Practice and review questions in all lectures, tutorials and mocks made
   self-contained: each names the model, variables, data or numbers it uses.
 - How to succeed: section "If you fall behind" removed. R Refresher: "Assessment reminder" box removed.
+- Widget homework added to Intermediate Lecture 1 (least-squares lab) and
+  Basic Lecture 7 (sampling lab).
+- Review sections in all lectures renamed "Review questions from past lectures", without naming the lectures.

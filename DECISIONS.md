@@ -317,6 +317,9 @@ These points supersede earlier entries where they differ.
   moderator on the code sheet, and a Tutorial 2 task on A/B test, one-way
   ANOVA and moderator versus mediator.
 - **"Deal agreed on air"**, never "the deal closed".
+- **Widget homework.** Every lecture with an interactive widget has a
+  "Widget homework" block after class (Basic Lectures 7 and 8, Intermediate
+  Lecture 1). New widgets get one too.
 - **Causal words.** No causal language stays the default everywhere,
   including the Lecture 1 box (no exception there). Lecture 5 explains the
   one exception in its own subsection after the A/B test example ("When you
