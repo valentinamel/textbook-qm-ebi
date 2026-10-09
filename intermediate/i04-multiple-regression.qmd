@@ -122,13 +122,14 @@ $$
 ::: {.definition-box}
 <span class="label">Definition</span>
 
-**Partial slope.** The coefficient $\beta_j$ of one predictor in a model with
-several predictors. It is the expected difference in $Y$ that goes with a
+**Partial regression coefficient** (often called partial slope). The
+coefficient $\beta_j$ of one predictor in a model with several predictors. It is the expected difference in $Y$ that goes with a
 one-unit difference in $X_j$, holding the other included predictors fixed.
 
 **Holding the other predictors fixed.** The comparison is between cases that
 have the same values of all other predictors in the model and differ only in
-$X_j$.
+$X_j$. Econometrics textbooks use the Latin term ceteris paribus, which
+means "other things equal".
 :::
 
 Write the phrase "holding the other included predictors fixed" in every
@@ -176,7 +177,7 @@ out of the model.
 **Confounder.** An omitted variable that is related to both a predictor and
 the outcome. The slope of that predictor then also picks up the relationship
 between the confounder and the outcome. This distortion is called
-omitted-variable bias. In the invented example, `size` is the confounder of
+omitted variable bias. In the invented example, `size` is the confounder of
 `adspend`.
 :::
 
@@ -245,7 +246,7 @@ makes.
 [Shark Tank data]{.shark-tag} Now make the same comparison on the Shark Tank data. From here on, money is
 measured in thousands of dollars: `ask_1k` is the requested amount divided by
 1,000. One unit is \$1,000 and 100 units are \$100,000. Lecture 1 showed how
-a coefficient changes when the unit changes.
+a coefficient changes when the units of measurement change.
 
 ```{r}
 #| label: i04-compare-slopes
@@ -454,8 +455,8 @@ fixed.
   percentage points. This coefficient is not significantly different from
   zero, so the scaled version is not either.
 
-Changing the unit of a predictor changes the coefficient and its standard
-error by the same factor. It does not change the fitted values, the t
+Changing the units of measurement of a predictor changes the coefficient and
+its standard error by the same factor. It does not change the fitted values, the t
 statistic, or the relationship itself. A coefficient "per dollar" of
 $-0.0000029$ would be correct but hard to read. Per \$1,000 is readable. Per
 \$100,000 is often the best unit for a sentence.
@@ -497,9 +498,11 @@ b <- coef(equity_model)
 :::
 :::
 
-### What controls can and cannot do
+### What control variables can and cannot do
 
-Including a control can:
+A control variable (often just called a control) is a predictor that is
+included in the model so that the comparison holds it fixed. Including a
+control variable can:
 
 - make a comparison fairer, because the compared cases are alike on the
   measured variables
@@ -507,10 +510,10 @@ Including a control can:
 - show that a simple association partly came from comparing different kinds
   of cases.
 
-A control also has a cost: it makes a coefficient less precise when the
-predictors are strongly correlated.
+A control variable also has a cost: it makes a coefficient less precise when
+the predictors are strongly correlated.
 
-Including a control cannot:
+Including a control variable cannot:
 
 - adjust for variables that were not measured
 - fix reverse causality, where the outcome influences the predictor
@@ -518,8 +521,8 @@ Including a control cannot:
   cases you want to talk about
 - remove errors in how a variable was measured.
 
-A control variable is simply a predictor that is included in the model. The
-word "control" does not make any coefficient causal. Only the way the data
+A control variable is simply a predictor like any other. The word
+"control" does not make any coefficient causal. Only the way the data
 were produced can make a coefficient causal, for example when the data come
 from an experiment.
 
@@ -533,7 +536,7 @@ asked. (d) Only pitches that were broadcast are in the file.
 Only (a). The requested amount is measured, and holding `ask_1k` fixed
 removes it from the season comparison. Problem (b) is an unmeasured
 confounder, (c) is reverse causality, and (d) is selection. Adding a measured
-control does not solve any of these three.
+control variable does not solve any of these three.
 :::
 
 ### Assumptions extend to the full predictor set
@@ -541,24 +544,27 @@ control does not solve any of these three.
 For multiple regression, the Lecture 2 assumption list applies to the whole
 set of included predictors:
 
-1. The conditional mean is linear in the included terms.
-2. For a causal reading only: nothing outside the model drives both an
-   included predictor and the outcome (no confounding).
-3. The observations are independent.
-4. No predictor can be calculated exactly from the others, for example as
-   the sum of two of them.
-5. The usual standard errors require a constant conditional error
-   variance.
-6. In small samples, exact t and F inference also requires normally
+1. The conditional mean is linear in the included terms (linearity).
+2. Each predictor varies, and no predictor can be calculated exactly from
+   the others, for example as the sum of two of them (no perfect
+   multicollinearity).
+3. The observations are independent (random sampling).
+4. The usual standard errors require homoskedasticity, a constant
+   conditional error variance.
+5. In small samples, exact t and F inference also requires normally
    distributed errors.
+6. Zero conditional mean of the error given all included predictors. For a
+   causal reading of a coefficient, this means that no omitted confounder
+   drives both an included predictor and the outcome.
 
-A high correlation among the predictors is called **collinearity**. It does
-not bias the coefficients. It makes the single coefficients imprecise and
+A high correlation among the predictors is called **multicollinearity**
+It does not bias the coefficients. It makes the single coefficients imprecise and
 unstable, because the data contain little information to separate predictors
 that move together. It is worse when one predictor can be calculated exactly
-from the others. R then cannot estimate all coefficients and leaves one term
-out. Collinearity makes the estimates less precise. With exact dependence, one
-coefficient cannot be estimated at all.
+from the others. This is called perfect multicollinearity. R then cannot
+estimate all coefficients and leaves one term out. Multicollinearity makes
+the estimates less precise. With perfect multicollinearity, one coefficient
+cannot be estimated at all.
 
 ### A coefficient plot keeps units visible
 
@@ -628,13 +634,13 @@ Read @fig-i04-coefplot with the
 - "Holding fixed" covers only the predictors in the model. The maturity of
   the venture, its revenue, and the experience of the founder are not held
   fixed.
-- If a coefficient stays stable across models, the measured controls do
-  not explain it. This proves nothing about variables that were not
+- If a coefficient stays stable across models, the measured control
+  variables do not explain it. This proves nothing about variables that were not
   measured.
 - The equity offered is the opening offer in the pitch, not a completed
   investment.
 
-**What you can do with it:** add the controls that a critic would name first.
+**What you can do with it:** add the control variables that a critic would name first.
 If your coefficient stays about the same after you add them, you can act on it
 for cheap decisions. For expensive decisions, test it first.
 :::
@@ -643,14 +649,14 @@ for cheap decisions. For expensive decisions, test it first.
 
 At the same requested amount and description length, the season trend
 remains: about $-0.836$ equity percentage points per season, against $-0.824$
-without the two controls. The requested amount does not explain the season trend.
+without the two control variables. The requested amount does not explain the season trend.
 Later pitches offer less equity even when they are compared at the same
 requested amount.
 
 ::: {.founder-box}
 <span class="label">A founder's decision (invented example)</span>
 
-Suppose you run a campus venture that sells meal boxes. In weeks with lower prices you get more orders: the simple slope is 60 more orders per euro of price cut. But you lowered prices mainly in exam weeks, when demand is high anyway. With exam weeks included in the model as a control, the slope is 25 orders per euro. You sell about 150 meal boxes a week at a margin of 4 euros per box. A price cut of 1 euro costs 150 euros of margin on the boxes that you would sell anyway. After the cut, each extra order earns a margin of 3 euros. With the simple slope, the cut would bring 60 more orders at 3 euros each, so 180 euros, and the cut would be profitable. With the adjusted slope, the cut brings 25 orders, so 75 euros, which is less than the 150 euros that the cut costs. The decision: keep the price. The control changed the decision.
+Suppose you run a campus venture that sells meal boxes. In weeks with lower prices you get more orders: the simple slope is 60 more orders per euro of price cut. But you lowered prices mainly in exam weeks, when demand is high anyway. With exam weeks included in the model as a control variable, the slope is 25 orders per euro. You sell about 150 meal boxes a week at a margin of 4 euros per box. A price cut of 1 euro costs 150 euros of margin on the boxes that you would sell anyway. After the cut, each extra order earns a margin of 3 euros. With the simple slope, the cut would bring 60 more orders at 3 euros each, so 180 euros, and the cut would be profitable. With the adjusted slope, the cut brings 25 orders, so 75 euros, which is less than the 150 euros that the cut costs. The decision: keep the price. The control variable changed the decision.
 :::
 
 **Next:** You can now hold other predictors fixed, as long as they are
@@ -680,7 +686,7 @@ assistant.
    regression?
 2. Why can a coefficient change after another predictor is added?
 3. What does the no-confounding condition say, and when is it needed?
-4. Why does adding controls not make a coefficient causal?
+4. Why does adding control variables not make a coefficient causal?
 5. What problem can strongly correlated predictors create?
 6. Which five elements belong in the interpretation of a slope?
 
@@ -695,9 +701,9 @@ assistant.
    outcome. It is needed only when a coefficient is read as the effect of
    changing that predictor.
 4. Unmeasured confounders, selection, reverse causality, and measurement
-   error can all remain after a control is added.
-5. Imprecise and unstable estimates of the single coefficients. With an exact
-   dependence R cannot estimate all coefficients and leaves one term out.
+   error can all remain after a control variable is added.
+5. Imprecise and unstable estimates of the single coefficients. With perfect
+   multicollinearity R cannot estimate all coefficients and leaves one term out.
 6. Estimate and direction, predictor step and unit, outcome unit, the
    predictors that are held fixed, and the scope (which records, association
    or effect).
@@ -734,7 +740,7 @@ task, now done from start to finish.
 2. Test each coefficient against zero. Explain how these three single tests
    differ from the one overall F-test of the model.
 3. Remove `description_words`. Compare the coefficients of season and
-   requested amount with those of the full model.
+   requested amount with those of the three-predictor model.
 4. Name one plausible omitted variable and explain which interpretation of
    the coefficients it would make questionable.
 5. Interpret a difference of five seasons with the fitted season
@@ -791,8 +797,8 @@ influential pitch if you found one?
 
 A plot of residuals against fitted values checks that the conditional mean
 is roughly linear in the included terms and that the spread is roughly
-constant. A curve would suggest that assumption 1 fails. A funnel shape
-would suggest that the usual standard errors are wrong. Standardised residuals (`rstandard`)
+constant. A curve would suggest that assumption 1 fails. A fan shape
+would suggest heteroskedasticity, and then the usual standard errors are wrong. Standardised residuals (`rstandard`)
 flag pitches that the model fits unusually badly. Cook's distance flags
 pitches that move the coefficients on their own. Investigate a flagged
 pitch, for example one with an extreme requested amount, but do not delete
@@ -847,7 +853,7 @@ step of Attempt → Ask → Verify → Explain.
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-A control only holds fixed what was measured and included. Venture maturity, founder experience, and the choices of the producers are not in the model. The correct sentence: at the same requested amount, one later season is associated with about 0.81 percentage points less equity offered.
+A control variable only holds fixed what was measured and included. Venture maturity, founder experience, and the choices of the producers are not in the model. The correct sentence: at the same requested amount, one later season is associated with about 0.81 percentage points less equity offered.
 :::
 
 ### Make it yours
@@ -871,7 +877,7 @@ Take a student-run venture that sells meal-prep boxes on campus. "Outcome: weekl
 You can discuss this task, and any other task in this chapter, with
 **Tilly**, the course AI assistant. Ask it to propose an omitted variable for
 the regression of your venture, and to ask you whether a measured control
-could fix it.
+variable could fix it.
 ::::
 
 [Continue to Lecture 5: Categories as predictors and joint tests](i05-categories-joint-tests.qmd).

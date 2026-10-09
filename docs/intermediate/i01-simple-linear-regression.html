@@ -404,17 +404,17 @@ window.Quarto = {
 <p><span class="label">By the end of Lecture 1, you can</span></p>
 <ul>
 <li>explain what a simple regression model describes and what its parts mean</li>
-<li>tell apart the errors of the model and the residuals of a fit</li>
+<li>tell apart the error terms of the model and the residuals of a fit</li>
 <li>explain how least squares chooses the best fitting line</li>
-<li>fit a simple regression in R and interpret the slope with units</li>
+<li>fit a simple regression in R and interpret the slope and the intercept in the units of the data</li>
 </ul>
 </div>
 <div class="driving-question">
 <p><span class="label">Driving question</span></p>
 <p class="dq-context">
-Every founder who pitches puts a price on the company. Asking 100,000 dollars for 10 percent of the company claims that the company is worth 1 million dollars. The question is how much of that claimed value is left after the negotiation. A line fitted through the data turns the question into one number a founder can use.
+A founder who asks for money in exchange for a share of the company puts a price on the whole company. This price is the claimed valuation: the amount asked divided by the share offered. Asking 100,000 dollars for 10 percent claims a valuation of 1 million dollars. The deal agreed on air has its own price, the agreed valuation: the amount paid divided by the share the sharks receive. A deal of 100,000 dollars for 20 percent agrees on a valuation of 0.5 million dollars. The slope of the regression line of the agreed valuation on the claimed valuation tells a founder how many dollars of agreed valuation go, on average, with one more dollar of claimed valuation.
 </p>
-<p>Among pitches that reached a deal, what is a claimed valuation worth: how much higher is the agreed valuation for each extra dollar of valuation that the founder claims?</p>
+<p>Among Shark Tank pitches that ended in a deal for a share of the company, how does the agreed valuation relate to the claimed valuation: how many dollars of agreed valuation go, on average, with one more dollar of claimed valuation?</p>
 </div>
 <section id="before-class" class="level2 course-phase phase-before">
 <h2 class="anchored" data-anchor-id="before-class">Before class</h2>
@@ -422,9 +422,9 @@ Every founder who pitches puts a price on the company. Asking 100,000 dollars fo
 <div class="video-prep">
 <p><span class="label">Video preparation</span><br> Watch Stanford Statistical Learning <a href="https://www.youtube.com/watch?v=vCHtY6Me5FI&amp;list=PLoROMvodv4rOzrYsAxzQyHb8n_RWNuS1e&amp;index=9">3.1 Simple Linear Regression</a>. Focus on the population line, the fitted line, and least squares. The video writes RSS for the quantity this book calls SSE, the sum of squared residuals. All links are also listed in the <a href="../resources/video-guide.html">External Video Guide</a>. The videos explain key ideas in another way and can use a different notation. The lecture material and its notation always come first.</p>
 </div>
-<p><strong>Warm up: five quantities from QM Basic.</strong> QM Intermediate builds directly on five quantities from the end of QM Basic: estimate, standard error, t value, p-value, confidence interval. The sections for Lectures 9 and 10 of the <a href="../basic/formula-sheet.html#formula-l9">QM Basic formula sheet</a> list their formulas. With the sheet open, answer the five items below.</p>
+<p><strong>Warm up: five quantities from QM Basic.</strong> QM Intermediate builds directly on five quantities from the end of QM Basic: estimate, standard error, t statistic (R calls it t value), p-value, confidence interval. The sections for Lectures 9 and 10 of the <a href="../basic/formula-sheet.html#formula-l9">QM Basic formula sheet</a> list their formulas. With the sheet open, answer the five items below.</p>
 <ol type="1">
-<li>A study reports an estimate of 12 with standard error 4. What is the t value for testing whether the underlying quantity is zero?</li>
+<li>A study reports an estimate of 12 with standard error 4. What is the t statistic for testing whether the underlying quantity is zero?</li>
 <li>With a large sample, what critical value goes into a 95% confidence interval?</li>
 <li>Compute that 95% interval for the estimate in item 1.</li>
 <li>The p-value is 0.003. Complete: “If the true value were zero, …”</li>
@@ -447,7 +447,7 @@ Check your preparation
 <li>About 1.96. The critical value <span class="math inline">\(t_{0.975,\,df}\)</span> is close to <span class="math inline">\(z_{0.975}=1.96\)</span> when the degrees of freedom are large.</li>
 <li><span class="math inline">\(12 \pm 1.96 \times 4 = (4.2,\; 19.8)\)</span>.</li>
 <li>“… an estimate at least this far from zero would occur in about 0.3% of samples.”</li>
-<li>The standard error and both interval endpoints. The t value and p-value are unit-free.</li>
+<li>The standard error and both interval endpoints. The t statistic and p-value are unit-free.</li>
 </ol>
 </div>
 </div>
@@ -471,13 +471,13 @@ Check your preparation
 </section>
 <section id="lecture-material" class="level2 course-phase phase-in-class">
 <h2 class="anchored" data-anchor-id="lecture-material">Lecture material</h2>
-<p>This section fits a straight line to the valuations in the Shark Tank data. It explains what the line is, how it is calculated, and how to read its slope and its intercept.</p>
+<p>This section fits the regression line to the valuations in the Shark Tank data. Many straight lines can be drawn through a cloud of points. The regression line is the one that fits best by the least-squares criterion: the sum of its squared vertical distances to the points (the residuals) is as small as possible. The section explains what this line describes, how it is calculated, and how to read its slope and its intercept.</p>
 <p class="concept-video">
 <strong>Stanford explanation (review):</strong> <a href="https://www.youtube.com/watch?v=vCHtY6Me5FI">3.1 Simple Linear Regression</a>.
 </p>
 <section id="start-with-a-founders-question" class="level3">
 <h3 class="anchored" data-anchor-id="start-with-a-founders-question">Start with a founder’s question</h3>
-<p>A founder who asks $100,000 for 10% of the company claims that it is worth $1 million. How much of this claimed value is left after the negotiation with the sharks? Your warm-up plot shows the answer as a cloud of points. A fitted line turns that cloud into one number.</p>
+<p>A founder who asks $100,000 for 10% of the company claims a valuation of $1 million (<code>claimed_m = 1</code>). If the sharks pay $100,000 for 20%, the agreed valuation is $0.5 million (<code>agreed_m = 0.5</code>). The question is how the agreed valuation relates to the claimed valuation across many deals. Your warm-up plot shows the answer as a cloud of points. The regression line summarises this cloud, and its slope gives one number: the difference in the average agreed valuation per $1 million more of claimed valuation.</p>
 </section>
 <section id="begin-with-the-data" class="level3">
 <h3 class="anchored" data-anchor-id="begin-with-the-data">Begin with the data</h3>
@@ -544,17 +544,31 @@ Figure&nbsp;17.1: Valuation agreed on air against the valuation claimed by the f
 </div>
 </div>
 </div>
-<p>Each point in <a href="#fig-i01-scatter" class="quarto-xref">Figure&nbsp;<span>17.1</span></a> is one deal. The claimed valuation is on the horizontal axis and the agreed valuation is on the vertical axis. Both axes use units of $1 million. The orange line is the straight line that fits the points best. It shows the average agreed valuation at each claimed valuation, not the outcome of every deal. The rest of this lecture explains what “fits best” means and how to read the line.</p>
+<p>Each point in <a href="#fig-i01-scatter" class="quarto-xref">Figure&nbsp;<span>17.1</span></a> is one deal. The claimed valuation is on the horizontal axis and the agreed valuation is on the vertical axis. Both axes use units of $1 million. The orange line is the regression line, the line that fits the points best by the least-squares criterion. It shows the average agreed valuation at each claimed valuation, not the result of every deal. The rest of this lecture explains this criterion and how to read the line.</p>
 <p>The figure shows 819 of the 874 deals, so that the area with many points is easy to read. The figure leaves out the 55 deals with a valuation above $10 million on at least one axis. R still uses these deals to calculate the orange line. Always say when a graph is zoomed in, that is, when it shows only part of the data. Otherwise readers may think that the displayed range is the complete data.</p>
-<p>Most points lie below the grey dashed line. In 81% of the deals the agreed valuation is lower than the valuation the founder claimed. In 13% it is the same, and in 6% it is higher. The sharks usually pay the amount that the founder asked for, but they take a larger share of the company for it. In this way the agreed valuation ends up lower than the claimed valuation.</p>
+<p>The code below counts the deals inside the zoomed area. It also gives the percentage of deals in which the agreed valuation is below, equal to, or above the claimed valuation.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(vals<span class="sc">$</span>claimed_m <span class="sc">&lt;=</span> <span class="dv">10</span> <span class="sc">&amp;</span> vals<span class="sc">$</span>agreed_m <span class="sc">&lt;=</span> <span class="dv">10</span>)   <span class="co"># deals shown in the figure</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 819</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> <span class="fu">c</span>(<span class="at">below =</span> <span class="fu">mean</span>(vals<span class="sc">$</span>agreed_m <span class="sc">&lt;</span> vals<span class="sc">$</span>claimed_m),</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>              <span class="at">equal =</span> <span class="fu">mean</span>(vals<span class="sc">$</span>agreed_m <span class="sc">==</span> vals<span class="sc">$</span>claimed_m),</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">above =</span> <span class="fu">mean</span>(vals<span class="sc">$</span>agreed_m <span class="sc">&gt;</span> vals<span class="sc">$</span>claimed_m)), <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>below equal above 
+ 81.5  12.8   5.7 </code></pre>
+</div>
+</div>
+<p>Most points lie below the grey dashed line. In 81.5% of the deals the agreed valuation is lower than the valuation the founder claimed. In 12.8% it is the same, and in 5.7% it is higher. The sharks usually pay the amount that the founder asked for, but they take a larger share of the company for it. In this way the agreed valuation ends up lower than the claimed valuation.</p>
 </section>
 <section id="units-first-money-in-millions" class="level3">
 <h3 class="anchored" data-anchor-id="units-first-money-in-millions">Units first: money in millions</h3>
-<p>Every number in this lecture has the units of these two columns. So we fix the units before we fit any model. We divide the raw dollar valuations by 1,000,000: a claimed valuation of $2,000,000 becomes <code>claimed_m = 2</code>. This change of scale does not change the relationship between the two valuations. <a href="#exm-i01-units" class="quarto-xref">Example&nbsp;<span>17.2</span></a>, after the model is fitted, shows what happens to the coefficients when the units change.</p>
+<p>Every number in this lecture has the units of these two columns. So we fix the units before we fit any model. We divide the raw dollar valuations by 1,000,000: a claimed valuation of $2,000,000 becomes <code>claimed_m = 2</code>. This change in the units of measurement does not change the relationship between the two valuations. <a href="#exm-i01-units" class="quarto-xref">Example&nbsp;<span>17.2</span></a>, after the model is fitted, shows what happens to the coefficients when the units change.</p>
 </section>
 <section id="the-population-model-and-the-conditional-mean" class="level3">
 <h3 class="anchored" data-anchor-id="the-population-model-and-the-conditional-mean">The population model and the conditional mean</h3>
-<p>A regression has an <strong>outcome</strong> <span class="math inline">\(Y\)</span>, the variable we want to describe, and a <strong>predictor</strong> <span class="math inline">\(X\)</span>, the variable we describe it with. Here the outcome is the agreed valuation and the predictor is the claimed valuation. The simple linear regression model is</p>
+<p>A regression has an <strong>outcome</strong> <span class="math inline">\(Y\)</span>, the variable we want to describe, and a <strong>predictor</strong> <span class="math inline">\(X\)</span>, the variable we describe it with. Here the outcome is the agreed valuation and the predictor is the claimed valuation. Other books, R help pages, and AI assistants use other names for the same things. The outcome is also called the dependent variable or the response. The predictor is also called the independent variable, the explanatory variable, or the regressor. This book always says outcome and predictor. The simple linear regression model is</p>
 <p><span class="math display">\[
 Y_i=\beta_0+\beta_1X_i+\varepsilon_i.
 \]</span></p>
@@ -563,8 +577,9 @@ Y_i=\beta_0+\beta_1X_i+\varepsilon_i.
 <li><span class="math inline">\(X_i\)</span> is the predictor for observation <span class="math inline">\(i\)</span>.</li>
 <li><span class="math inline">\(\beta_0\)</span> is the population intercept.</li>
 <li><span class="math inline">\(\beta_1\)</span> is the population slope.</li>
-<li><span class="math inline">\(\varepsilon_i\)</span> is the error: the part of <span class="math inline">\(Y_i\)</span> that the line does not capture.</li>
+<li><span class="math inline">\(\varepsilon_i\)</span> is the error term: the part of <span class="math inline">\(Y_i\)</span> that <span class="math inline">\(\beta_0+\beta_1X_i\)</span> does not capture. Nobody observes it.</li>
 </ul>
+<p>The intercept and the slope are the two coefficients of the model.</p>
 <p>The model is a statement about averages. The <strong>conditional mean</strong> <span class="math inline">\(E[Y\mid X=x]\)</span> is the average outcome among observations whose predictor equals <span class="math inline">\(x\)</span>. An example is the average agreed valuation among deals in which the founder claimed exactly $2 million. The model says that this average follows a line:</p>
 <p><span class="math display">\[
 E[Y\mid X=x]=\beta_0+\beta_1x.
@@ -580,73 +595,75 @@ E[Y\mid X=x]=\beta_0+\beta_1x.
 <p><strong>Intercept</strong> <span class="math inline">\(\beta_0\)</span>. The average outcome <span class="math inline">\(Y\)</span> at <span class="math inline">\(X=0\)</span>. It has the units of <span class="math inline">\(Y\)</span>, and it has a useful meaning only if <span class="math inline">\(X=0\)</span> lies inside the range of the data.</p>
 </div>
 <p>Here the slope is the difference in the average agreed valuation between deals whose claimed valuations differ by $1 million. The words “associated with” matter. A regression line compares averages across groups of observed deals. It does not say what would happen if one founder changed their claimed valuation. The box “What this fitted line can and cannot say” later in this section explains this limit.</p>
-<p>You can read the slope as an effect only under one condition: nothing outside the model affects both the claimed and the agreed valuation. Lecture 2 calls this condition no confounding.</p>
+<p>You can read the slope as an effect only under one condition: nothing outside the model affects both the claimed and the agreed valuation. Lecture 2 calls this condition zero conditional mean of the error, with no omitted confounder.</p>
 </section>
-<section id="errors-versus-residuals" class="level3">
-<h3 class="anchored" data-anchor-id="errors-versus-residuals">Errors versus residuals</h3>
-<p>The population line <span class="math inline">\(\beta_0+\beta_1x\)</span> is part of the model. Nobody can observe it, because <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> are unknown. What we calculate from the data is the fitted line. Its coefficients <span class="math inline">\(\hat\beta_0\)</span> and <span class="math inline">\(\hat\beta_1\)</span> have a hat symbol on top. The hat marks an estimate: these are the values that we calculate from the data for the unknown <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span>. The fitted line is</p>
+<section id="error-terms-versus-residuals" class="level3">
+<h3 class="anchored" data-anchor-id="error-terms-versus-residuals">Error terms versus residuals</h3>
+<p>The population line <span class="math inline">\(\beta_0+\beta_1x\)</span> is part of the model. Nobody can observe it, because <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> are unknown. In the words of <a href="../basic/b07-samples-estimators.html">Basic Lecture 7</a>, they are parameters. What we calculate from the data is the fitted line. Its coefficients <span class="math inline">\(\hat\beta_0\)</span> and <span class="math inline">\(\hat\beta_1\)</span> have a hat symbol on top. The hat marks an estimate: these are the values that we calculate from the data for the unknown <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span>. The rule that turns the data into these numbers is the estimator. Here it is least squares, explained in the next section. The fitted line is</p>
 <p><span class="math display">\[
 \widehat Y_i=\hat\beta_0+\hat\beta_1X_i.
 \]</span></p>
+<p>Because least squares chooses it, the fitted line is also called the least-squares line or the regression line. The three names mean the same line.</p>
 <div class="definition-box">
 <p><span class="label">Definition</span></p>
+<p><strong>Error term</strong> <span class="math inline">\(\varepsilon_i\)</span>. The distance of observation <span class="math inline">\(i\)</span> from the population line: <span class="math inline">\(\varepsilon_i=Y_i-(\beta_0+\beta_1X_i)\)</span>. It belongs to the model and is never observed.</p>
 <p><strong>Fitted value</strong> <span class="math inline">\(\widehat Y_i\)</span>. The value on the fitted line at the predictor value of observation <span class="math inline">\(i\)</span>: <span class="math inline">\(\widehat Y_i=\hat\beta_0+\hat\beta_1X_i\)</span>.</p>
-<p><strong>Residual</strong> <span class="math inline">\(e_i\)</span>. The observed outcome minus the fitted value: <span class="math inline">\(e_i=Y_i-\widehat Y_i\)</span>. It is the vertical distance from the point to the fitted line, positive above the line and negative below it.</p>
+<p><strong>Residual</strong> <span class="math inline">\(e_i\)</span>. The observed outcome minus the fitted value: <span class="math inline">\(e_i=Y_i-\widehat Y_i\)</span>. It is the vertical distance from the point to the fitted line, positive above the line and negative below it. It is calculated from the data.</p>
 </div>
-<p>The error <span class="math inline">\(\varepsilon_i\)</span> and the residual <span class="math inline">\(e_i\)</span> have the same role in the two equations, but they are different quantities, as <a href="#fig-i01-error-residual" class="quarto-xref">Figure&nbsp;<span>17.2</span></a> shows.</p>
+<p>The error term <span class="math inline">\(\varepsilon_i\)</span> and the residual <span class="math inline">\(e_i\)</span> have the same role in the two equations, but they are different quantities, as <a href="#fig-i01-error-residual" class="quarto-xref">Figure&nbsp;<span>17.2</span></a> shows. This book uses “error term” only for <span class="math inline">\(\varepsilon_i\)</span> and “residual” only for <span class="math inline">\(e_i\)</span>.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>See the R code for this figure</summary>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">101</span>)</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>x_er <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fl">2.2</span>, <span class="fl">3.4</span>, <span class="fl">4.6</span>, <span class="fl">5.8</span>, <span class="fl">7.0</span>, <span class="fl">8.2</span>)</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>beta0_true <span class="ot">&lt;-</span> <span class="dv">1</span>; beta1_true <span class="ot">&lt;-</span> <span class="fl">0.8</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>y_er <span class="ot">&lt;-</span> beta0_true <span class="sc">+</span> beta1_true <span class="sc">*</span> x_er <span class="sc">+</span> <span class="fu">c</span>(<span class="fl">1.3</span>, <span class="sc">-</span><span class="fl">1.5</span>, <span class="fl">0.9</span>, <span class="sc">-</span><span class="fl">0.8</span>, <span class="fl">1.6</span>, <span class="sc">-</span><span class="fl">1.2</span>, <span class="fl">0.4</span>)</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>fit_er <span class="ot">&lt;-</span> <span class="fu">lm</span>(y_er <span class="sc">~</span> x_er)</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>panel_names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Population line (unknown)"</span>, <span class="st">"Fitted line (computed)"</span>)</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>er_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">panel =</span> <span class="fu">factor</span>(<span class="fu">rep</span>(panel_names, <span class="at">each =</span> <span class="dv">7</span>), <span class="at">levels =</span> panel_names),</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="fu">rep</span>(x_er, <span class="dv">2</span>),</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> <span class="fu">rep</span>(y_er, <span class="dv">2</span>),</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">line_y =</span> <span class="fu">c</span>(beta0_true <span class="sc">+</span> beta1_true <span class="sc">*</span> x_er, <span class="fu">fitted</span>(fit_er))</span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>line_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">panel =</span> <span class="fu">factor</span>(panel_names, <span class="at">levels =</span> panel_names),</span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">intercept =</span> <span class="fu">c</span>(beta0_true, <span class="fu">coef</span>(fit_er)[<span class="dv">1</span>]),</span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">slope =</span> <span class="fu">c</span>(beta1_true, <span class="fu">coef</span>(fit_er)[<span class="dv">2</span>])</span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>label_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">panel =</span> <span class="fu">factor</span>(panel_names, <span class="at">levels =</span> panel_names),</span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> x_er[<span class="dv">5</span>] <span class="sc">+</span> <span class="fl">0.45</span>,</span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> <span class="fu">c</span>((y_er[<span class="dv">5</span>] <span class="sc">+</span> beta0_true <span class="sc">+</span> beta1_true <span class="sc">*</span> x_er[<span class="dv">5</span>]) <span class="sc">/</span> <span class="dv">2</span>,</span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>        (y_er[<span class="dv">5</span>] <span class="sc">+</span> <span class="fu">fitted</span>(fit_er)[<span class="dv">5</span>]) <span class="sc">/</span> <span class="dv">2</span>),</span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">lab =</span> <span class="fu">c</span>(<span class="st">"epsilon[i]"</span>, <span class="st">"e[i]"</span>)</span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(er_df, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y)) <span class="sc">+</span></span>
-<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">data =</span> line_df[<span class="dv">1</span>, ],</span>
-<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>              <span class="fu">aes</span>(<span class="at">intercept =</span> intercept, <span class="at">slope =</span> slope),</span>
-<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>              <span class="at">colour =</span> <span class="st">"#5B6976"</span>, <span class="at">linewidth =</span> <span class="fl">0.9</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
-<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">data =</span> line_df[<span class="dv">2</span>, ],</span>
-<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>              <span class="fu">aes</span>(<span class="at">intercept =</span> intercept, <span class="at">slope =</span> slope),</span>
-<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>              <span class="at">colour =</span> <span class="st">"#D55E00"</span>, <span class="at">linewidth =</span> <span class="fl">0.9</span>) <span class="sc">+</span></span>
-<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="fu">aes</span>(<span class="at">xend =</span> x, <span class="at">yend =</span> line_y),</span>
-<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>               <span class="at">colour =</span> <span class="st">"#0072B2"</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
-<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="fl">2.6</span>, <span class="at">colour =</span> <span class="st">"#009E73"</span>) <span class="sc">+</span></span>
-<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="at">data =</span> label_df, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y, <span class="at">label =</span> lab),</span>
-<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>            <span class="at">parse =</span> <span class="cn">TRUE</span>, <span class="at">colour =</span> <span class="st">"#0072B2"</span>, <span class="at">size =</span> <span class="dv">4</span>) <span class="sc">+</span></span>
-<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">9.4</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">9.4</span>)) <span class="sc">+</span></span>
-<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> panel) <span class="sc">+</span></span>
-<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Predictor X"</span>, <span class="at">y =</span> <span class="st">"Outcome Y"</span>) <span class="sc">+</span></span>
-<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
-<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.x =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#5B6976"</span>),</span>
-<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>),</span>
-<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a>    <span class="at">strip.text =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>, <span class="at">face =</span> <span class="st">"bold"</span>)</span>
-<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">101</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>x_er <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fl">2.2</span>, <span class="fl">3.4</span>, <span class="fl">4.6</span>, <span class="fl">5.8</span>, <span class="fl">7.0</span>, <span class="fl">8.2</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>beta0_true <span class="ot">&lt;-</span> <span class="dv">1</span>; beta1_true <span class="ot">&lt;-</span> <span class="fl">0.8</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>y_er <span class="ot">&lt;-</span> beta0_true <span class="sc">+</span> beta1_true <span class="sc">*</span> x_er <span class="sc">+</span> <span class="fu">c</span>(<span class="fl">1.3</span>, <span class="sc">-</span><span class="fl">1.5</span>, <span class="fl">0.9</span>, <span class="sc">-</span><span class="fl">0.8</span>, <span class="fl">1.6</span>, <span class="sc">-</span><span class="fl">1.2</span>, <span class="fl">0.4</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>fit_er <span class="ot">&lt;-</span> <span class="fu">lm</span>(y_er <span class="sc">~</span> x_er)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>panel_names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Population line (unknown)"</span>, <span class="st">"Fitted line (computed)"</span>)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>er_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">panel =</span> <span class="fu">factor</span>(<span class="fu">rep</span>(panel_names, <span class="at">each =</span> <span class="dv">7</span>), <span class="at">levels =</span> panel_names),</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="fu">rep</span>(x_er, <span class="dv">2</span>),</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> <span class="fu">rep</span>(y_er, <span class="dv">2</span>),</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">line_y =</span> <span class="fu">c</span>(beta0_true <span class="sc">+</span> beta1_true <span class="sc">*</span> x_er, <span class="fu">fitted</span>(fit_er))</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>line_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">panel =</span> <span class="fu">factor</span>(panel_names, <span class="at">levels =</span> panel_names),</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">intercept =</span> <span class="fu">c</span>(beta0_true, <span class="fu">coef</span>(fit_er)[<span class="dv">1</span>]),</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">slope =</span> <span class="fu">c</span>(beta1_true, <span class="fu">coef</span>(fit_er)[<span class="dv">2</span>])</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>label_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">panel =</span> <span class="fu">factor</span>(panel_names, <span class="at">levels =</span> panel_names),</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> x_er[<span class="dv">5</span>] <span class="sc">+</span> <span class="fl">0.45</span>,</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> <span class="fu">c</span>((y_er[<span class="dv">5</span>] <span class="sc">+</span> beta0_true <span class="sc">+</span> beta1_true <span class="sc">*</span> x_er[<span class="dv">5</span>]) <span class="sc">/</span> <span class="dv">2</span>,</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>        (y_er[<span class="dv">5</span>] <span class="sc">+</span> <span class="fu">fitted</span>(fit_er)[<span class="dv">5</span>]) <span class="sc">/</span> <span class="dv">2</span>),</span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">lab =</span> <span class="fu">c</span>(<span class="st">"epsilon[i]"</span>, <span class="st">"e[i]"</span>)</span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(er_df, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y)) <span class="sc">+</span></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">data =</span> line_df[<span class="dv">1</span>, ],</span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>              <span class="fu">aes</span>(<span class="at">intercept =</span> intercept, <span class="at">slope =</span> slope),</span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>              <span class="at">colour =</span> <span class="st">"#5B6976"</span>, <span class="at">linewidth =</span> <span class="fl">0.9</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">data =</span> line_df[<span class="dv">2</span>, ],</span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>              <span class="fu">aes</span>(<span class="at">intercept =</span> intercept, <span class="at">slope =</span> slope),</span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>              <span class="at">colour =</span> <span class="st">"#D55E00"</span>, <span class="at">linewidth =</span> <span class="fl">0.9</span>) <span class="sc">+</span></span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="fu">aes</span>(<span class="at">xend =</span> x, <span class="at">yend =</span> line_y),</span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a>               <span class="at">colour =</span> <span class="st">"#0072B2"</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="fl">2.6</span>, <span class="at">colour =</span> <span class="st">"#009E73"</span>) <span class="sc">+</span></span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="at">data =</span> label_df, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y, <span class="at">label =</span> lab),</span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a>            <span class="at">parse =</span> <span class="cn">TRUE</span>, <span class="at">colour =</span> <span class="st">"#0072B2"</span>, <span class="at">size =</span> <span class="dv">4</span>) <span class="sc">+</span></span>
+<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">9.4</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">9.4</span>)) <span class="sc">+</span></span>
+<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> panel) <span class="sc">+</span></span>
+<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Predictor X"</span>, <span class="at">y =</span> <span class="st">"Outcome Y"</span>) <span class="sc">+</span></span>
+<span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
+<span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb11-46"><a href="#cb11-46" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb11-47"><a href="#cb11-47" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#5B6976"</span>),</span>
+<span id="cb11-48"><a href="#cb11-48" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>),</span>
+<span id="cb11-49"><a href="#cb11-49" aria-hidden="true" tabindex="-1"></a>    <span class="at">strip.text =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>, <span class="at">face =</span> <span class="st">"bold"</span>)</span>
+<span id="cb11-50"><a href="#cb11-50" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-i01-error-residual" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -655,7 +672,7 @@ E[Y\mid X=x]=\beta_0+\beta_1x.
 <img src="i01-simple-linear-regression_files/figure-html/fig-i01-error-residual-1.png" class="img-fluid figure-img" width="768">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-i01-error-residual-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;17.2: The same seven observations twice. Left: the unknown population line with the errors ε (distances to the true line). Right: the fitted line with the residuals e (distances to the fitted line). Only the right panel can be calculated from data.
+Figure&nbsp;17.2: The same seven observations twice. Left: the unknown population line with the error terms ε (distances to the population line). Right: the fitted line with the residuals e (distances to the fitted line). Only the right panel can be calculated from data.
 </figcaption>
 </figure>
 </div>
@@ -665,7 +682,7 @@ Figure&nbsp;17.2: The same seven observations twice. Left: the unknown populatio
 <li><span class="math inline">\(\varepsilon_i = Y_i - (\beta_0+\beta_1X_i)\)</span> measures the distance to the <strong>population</strong> line. Because <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> are unknown, <span class="math inline">\(\varepsilon_i\)</span> is never observed.</li>
 <li><span class="math inline">\(e_i = Y_i - (\hat\beta_0+\hat\beta_1X_i)\)</span> measures the distance to the <strong>fitted</strong> line. It is computed from data, one number per observation.</li>
 </ul>
-<p>We never see the errors. The residuals are what we can calculate in their place, so they are estimates of the errors and not the errors themselves. Lecture 2 uses residuals to check the model.</p>
+<p>We never see the error terms. The residuals are what we can calculate in their place, so they are estimates of the error terms and not the error terms themselves. Lecture 2 uses residuals to check the model.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -678,15 +695,15 @@ Check: which object is observable?
 </div>
 <div id="callout-2" class="callout-2-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>Only the residual <span class="math inline">\(e_i\)</span>. The observed data give <span class="math inline">\(Y_i\)</span> and <span class="math inline">\(X_i\)</span>. The fitted line gives <span class="math inline">\(\widehat Y_i\)</span>, so <span class="math inline">\(e_i = Y_i - \widehat Y_i\)</span> is a computable number. The error <span class="math inline">\(\varepsilon_i\)</span> depends on the unknown population coefficients <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span>, so we can think about it but we can never calculate it.</p>
+<p>Only the residual <span class="math inline">\(e_i\)</span>. The observed data give <span class="math inline">\(Y_i\)</span> and <span class="math inline">\(X_i\)</span>. The fitted line gives <span class="math inline">\(\widehat Y_i\)</span>, so <span class="math inline">\(e_i = Y_i - \widehat Y_i\)</span> is a computable number. The error term <span class="math inline">\(\varepsilon_i\)</span> depends on the unknown population coefficients <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span>, so we can think about it but we can never calculate it.</p>
 </div>
 </div>
 </div>
 </section>
 <section id="least-squares-why-vertical-why-squared" class="level3">
 <h3 class="anchored" data-anchor-id="least-squares-why-vertical-why-squared">Least squares: why vertical, why squared</h3>
-<p>Many lines can be drawn through a cloud of points. To choose one, we need a score that says how far a line misses the points. The residuals are the misses. Each residual is measured vertically, in the units of the outcome: millions of dollars of agreed valuation, not distance on the page. We measure vertically because we use the line to describe <span class="math inline">\(Y\)</span> at a given <span class="math inline">\(X\)</span>. So a miss is a miss in <span class="math inline">\(Y\)</span>.</p>
-<p>Adding up the residuals is not a useful score, because positive and negative misses cancel. Adding up their absolute values avoids this, but then there is no simple formula for the best line. Squared residuals are never negative, they count a large miss more heavily than a small one, and they lead to a direct formula for the best line. For these reasons squaring is the standard choice. But it is not the only possible choice.</p>
+<p>Many lines can be drawn through a cloud of points. To choose one, we need a criterion: a number that says how far a line lies from the points. The residuals measure these distances. Each residual is measured vertically, in the units of the outcome: millions of dollars of agreed valuation, not distance on the page. We measure vertically because we use the line to describe <span class="math inline">\(Y\)</span> at a given <span class="math inline">\(X\)</span>. So the distance that counts is a distance in <span class="math inline">\(Y\)</span>.</p>
+<p>Adding up the residuals is not a useful criterion, because positive and negative residuals cancel. Adding up their absolute values avoids this, but then there is no simple formula for the best line. Squared residuals are never negative, they count a large residual more heavily than a small one, and they lead to a direct formula for the best line. For these reasons squaring is the standard choice. But it is not the only possible choice.</p>
 <div class="definition-box">
 <p><span class="label">Definition</span></p>
 <p><strong>SSE.</strong> The sum of the squared residuals of a line. The letters come from its usual name, “sum of squared errors”, although it adds up squared residuals.</p>
@@ -989,31 +1006,31 @@ s_{XY}=\frac{1}{n-1}\sum_{i=1}^{n}(x_i-\bar x)(y_i-\bar y).
 <div class="cell">
 <details class="code-fold">
 <summary>See the R code for this figure</summary>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>x_toy <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>); y_toy <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">5</span>)</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>toy_fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(y_toy <span class="sc">~</span> x_toy)</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>toy_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> x_toy, <span class="at">y =</span> y_toy, <span class="at">fitted =</span> <span class="fu">fitted</span>(toy_fit))</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(toy_df, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y)) <span class="sc">+</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">intercept =</span> <span class="fu">coef</span>(toy_fit)[<span class="dv">1</span>], <span class="at">slope =</span> <span class="fu">coef</span>(toy_fit)[<span class="dv">2</span>],</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>              <span class="at">colour =</span> <span class="st">"#D55E00"</span>, <span class="at">linewidth =</span> <span class="fl">0.9</span>) <span class="sc">+</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="fu">aes</span>(<span class="at">xend =</span> x, <span class="at">yend =</span> fitted),</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>               <span class="at">colour =</span> <span class="st">"#0072B2"</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>, <span class="at">colour =</span> <span class="st">"#009E73"</span>) <span class="sc">+</span></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"point"</span>, <span class="at">x =</span> <span class="dv">2</span>, <span class="at">y =</span> <span class="dv">4</span>, <span class="at">shape =</span> <span class="dv">5</span>, <span class="at">size =</span> <span class="fl">3.4</span>, <span class="at">stroke =</span> <span class="fl">1.1</span>,</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>           <span class="at">colour =</span> <span class="st">"#17324D"</span>) <span class="sc">+</span></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="fl">2.34</span>, <span class="at">y =</span> <span class="fl">3.72</span>,</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>           <span class="at">label =</span> <span class="st">"'('*bar(x)*', '*bar(y)*')'"</span>, <span class="at">parse =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>           <span class="at">colour =</span> <span class="st">"#17324D"</span>, <span class="at">size =</span> <span class="fl">3.4</span>) <span class="sc">+</span></span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">xlim =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">3.5</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">6</span>)) <span class="sc">+</span></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"x"</span>, <span class="at">y =</span> <span class="st">"y"</span>) <span class="sc">+</span></span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.x =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#5B6976"</span>),</span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>)</span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>x_toy <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>); y_toy <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">5</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>toy_fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(y_toy <span class="sc">~</span> x_toy)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>toy_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> x_toy, <span class="at">y =</span> y_toy, <span class="at">fitted =</span> <span class="fu">fitted</span>(toy_fit))</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(toy_df, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y)) <span class="sc">+</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">intercept =</span> <span class="fu">coef</span>(toy_fit)[<span class="dv">1</span>], <span class="at">slope =</span> <span class="fu">coef</span>(toy_fit)[<span class="dv">2</span>],</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>              <span class="at">colour =</span> <span class="st">"#D55E00"</span>, <span class="at">linewidth =</span> <span class="fl">0.9</span>) <span class="sc">+</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="fu">aes</span>(<span class="at">xend =</span> x, <span class="at">yend =</span> fitted),</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>               <span class="at">colour =</span> <span class="st">"#0072B2"</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>, <span class="at">colour =</span> <span class="st">"#009E73"</span>) <span class="sc">+</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"point"</span>, <span class="at">x =</span> <span class="dv">2</span>, <span class="at">y =</span> <span class="dv">4</span>, <span class="at">shape =</span> <span class="dv">5</span>, <span class="at">size =</span> <span class="fl">3.4</span>, <span class="at">stroke =</span> <span class="fl">1.1</span>,</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>           <span class="at">colour =</span> <span class="st">"#17324D"</span>) <span class="sc">+</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="fl">2.34</span>, <span class="at">y =</span> <span class="fl">3.72</span>,</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>           <span class="at">label =</span> <span class="st">"'('*bar(x)*', '*bar(y)*')'"</span>, <span class="at">parse =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>           <span class="at">colour =</span> <span class="st">"#17324D"</span>, <span class="at">size =</span> <span class="fl">3.4</span>) <span class="sc">+</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">xlim =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">3.5</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">6</span>)) <span class="sc">+</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"x"</span>, <span class="at">y =</span> <span class="st">"y"</span>) <span class="sc">+</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#5B6976"</span>),</span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>)</span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-i01-toy" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1030,14 +1047,14 @@ Figure&nbsp;17.3: The three-point toy dataset with its least-squares line. The o
 </div>
 <p>You can verify the hand calculation in R:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>x_toy <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>); y_toy <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">5</span>)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">covariance =</span> <span class="fu">cov</span>(x_toy, y_toy), <span class="at">variance_x =</span> <span class="fu">var</span>(x_toy),</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">sd_y =</span> <span class="fu">sd</span>(y_toy), <span class="at">correlation =</span> <span class="fu">cor</span>(x_toy, y_toy))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>x_toy <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>); y_toy <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">5</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">covariance =</span> <span class="fu">cov</span>(x_toy, y_toy), <span class="at">variance_x =</span> <span class="fu">var</span>(x_toy),</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">sd_y =</span> <span class="fu">sd</span>(y_toy), <span class="at">correlation =</span> <span class="fu">cor</span>(x_toy, y_toy))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> covariance  variance_x        sd_y correlation 
   1.5000000   1.0000000   1.7320508   0.8660254 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(<span class="fu">lm</span>(y_toy <span class="sc">~</span> x_toy))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(<span class="fu">lm</span>(y_toy <span class="sc">~</span> x_toy))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>(Intercept)       x_toy 
         1.0         1.5 </code></pre>
@@ -1049,13 +1066,13 @@ Figure&nbsp;17.3: The three-point toy dataset with its least-squares line. The o
 <h3 class="anchored" data-anchor-id="fit-and-read-the-shark-tank-model-in-r">Fit and read the Shark Tank model in R</h3>
 <p><span class="shark-tag">Shark Tank data</span> Now the Shark Tank data. The function <code>lm()</code> (for “linear model”) fits the least-squares line. Its first argument is a formula of the form <code>outcome ~ predictor</code>. The block below loads the data again, so you can run it on its own:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>vals <span class="ot">&lt;-</span> <span class="fu">subset</span>(sharks, deal_on_show <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> deal_equity_pct <span class="sc">&gt;</span> <span class="dv">0</span>)</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>vals<span class="sc">$</span>claimed_m <span class="ot">&lt;-</span> vals<span class="sc">$</span>requested_valuation_usd <span class="sc">/</span> <span class="fl">1e6</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>vals<span class="sc">$</span>agreed_m <span class="ot">&lt;-</span> vals<span class="sc">$</span>deal_valuation_usd <span class="sc">/</span> <span class="fl">1e6</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>val_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(agreed_m <span class="sc">~</span> claimed_m, <span class="at">data =</span> vals)</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(val_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>vals <span class="ot">&lt;-</span> <span class="fu">subset</span>(sharks, deal_on_show <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> deal_equity_pct <span class="sc">&gt;</span> <span class="dv">0</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>vals<span class="sc">$</span>claimed_m <span class="ot">&lt;-</span> vals<span class="sc">$</span>requested_valuation_usd <span class="sc">/</span> <span class="fl">1e6</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>vals<span class="sc">$</span>agreed_m <span class="ot">&lt;-</span> vals<span class="sc">$</span>deal_valuation_usd <span class="sc">/</span> <span class="fl">1e6</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>val_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(agreed_m <span class="sc">~</span> claimed_m, <span class="at">data =</span> vals)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(val_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>(Intercept)   claimed_m 
 -0.06798986  0.64874084 </code></pre>
@@ -1069,61 +1086,35 @@ Figure&nbsp;17.3: The three-point toy dataset with its least-squares line. The o
 <p>with both valuations measured in $ millions.</p>
 <p>R calculated these two numbers with the formulas of the previous section. You can check this with the covariance, the variance, the correlation, and the standard deviations of the two columns:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> vals<span class="sc">$</span>claimed_m</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> vals<span class="sc">$</span>agreed_m</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">correlation =</span> <span class="fu">cor</span>(x, y), <span class="at">sd_x =</span> <span class="fu">sd</span>(x), <span class="at">sd_y =</span> <span class="fu">sd</span>(y))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> vals<span class="sc">$</span>claimed_m</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> vals<span class="sc">$</span>agreed_m</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">correlation =</span> <span class="fu">cor</span>(x, y), <span class="at">sd_x =</span> <span class="fu">sd</span>(x), <span class="at">sd_y =</span> <span class="fu">sd</span>(y))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>correlation        sd_x        sd_y 
   0.8930528   5.0880676   3.6961276 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">cov_over_var =</span> <span class="fu">cov</span>(x, y) <span class="sc">/</span> <span class="fu">var</span>(x),</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">cor_times_sd_ratio =</span> <span class="fu">cor</span>(x, y) <span class="sc">*</span> <span class="fu">sd</span>(y) <span class="sc">/</span> <span class="fu">sd</span>(x),</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">slope_from_lm =</span> <span class="fu">unname</span>(<span class="fu">coef</span>(val_model)[<span class="st">"claimed_m"</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">cov_over_var =</span> <span class="fu">cov</span>(x, y) <span class="sc">/</span> <span class="fu">var</span>(x),</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">cor_times_sd_ratio =</span> <span class="fu">cor</span>(x, y) <span class="sc">*</span> <span class="fu">sd</span>(y) <span class="sc">/</span> <span class="fu">sd</span>(x),</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">slope_from_lm =</span> <span class="fu">unname</span>(<span class="fu">coef</span>(val_model)[<span class="st">"claimed_m"</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>      cov_over_var cor_times_sd_ratio      slope_from_lm 
          0.6487408          0.6487408          0.6487408 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">mean_y_minus_slope_times_mean_x =</span> <span class="fu">mean</span>(y) <span class="sc">-</span> <span class="fu">cov</span>(x, y) <span class="sc">/</span> <span class="fu">var</span>(x) <span class="sc">*</span> <span class="fu">mean</span>(x),</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">intercept_from_lm =</span> <span class="fu">unname</span>(<span class="fu">coef</span>(val_model)[<span class="st">"(Intercept)"</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">mean_y_minus_slope_times_mean_x =</span> <span class="fu">mean</span>(y) <span class="sc">-</span> <span class="fu">cov</span>(x, y) <span class="sc">/</span> <span class="fu">var</span>(x) <span class="sc">*</span> <span class="fu">mean</span>(x),</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">intercept_from_lm =</span> <span class="fu">unname</span>(<span class="fu">coef</span>(val_model)[<span class="st">"(Intercept)"</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>mean_y_minus_slope_times_mean_x               intercept_from_lm 
                     -0.06798986                     -0.06798986 </code></pre>
 </div>
 </div>
 <p>Both formulas give the slope 0.649 that <code>lm()</code> reports, and the intercept formula gives <span class="math inline">\(-0.068\)</span>. The second form of the slope also shows why it is below 1. The correlation of the two valuations is 0.893, and the agreed valuations spread less than the claimed ones: their standard deviation is $3.70 million against $5.09 million. So <span class="math inline">\(\hat\beta_1 = 0.893 \times 3.70/5.09 \approx 0.649\)</span>.</p>
-<p><strong>The slope, with units.</strong> A claimed valuation that is $1 million higher is associated with an agreed valuation that is about $0.65 million higher, among deals for a share of the company. A founder would say: the sharks accept about 65 cents of every claimed dollar. This answers the prediction question from before class. The sign is positive, the unit is millions of dollars agreed per million claimed, and the slope is clearly below 1. The slope does not mean that claiming more causes the sharks to pay more.</p>
-<p><strong>The intercept, with units.</strong> The intercept gives a fitted agreed valuation of about <span class="math inline">\(-\$68{,}000\)</span> at a claimed valuation of zero. A company claimed to be worth nothing is not in the data (the smallest claimed valuation is $40,000), and a negative valuation has no meaning. The line needs an intercept so that it is at the right height. But this intercept has no useful meaning of its own.</p>
-<div id="exm-i01-units" class="theorem example">
-<p><span class="theorem-title"><strong>Example 17.2 (Worked example: the same coefficients in three unit systems)</strong></span> <span class="shark-tag">Shark Tank data</span> The fitted intercept is about <span class="math inline">\(-0.068\)</span> and the fitted slope is about <span class="math inline">\(0.649\)</span>, with both valuations in $ millions. Read the intercept in dollars first:</p>
-<p><span class="math display">\[
--0.068 \text{ (in \$ millions)} = -0.068 \times \$1{,}000{,}000 = -\$68{,}000.
-\]</span></p>
-<p>Suppose a report measures both valuations in $1,000s. Every value of <span class="math inline">\(Y\)</span> and of <span class="math inline">\(X\)</span> is then 1,000 times as large. The intercept has the units of <span class="math inline">\(Y\)</span>, so it is multiplied by 1,000. The slope is a ratio, units of <span class="math inline">\(Y\)</span> per unit of <span class="math inline">\(X\)</span>. Both parts of the ratio change by the same factor, so the slope stays the same:</p>
-<p><span class="math display">\[
-\text{intercept: } -0.068 \times 1000 = -68 \text{ (in \$1,000s)},
-\qquad
-\text{slope: } 0.649 \text{ (unchanged)}.
-\]</span></p>
-<p>R confirms this result:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>vals<span class="sc">$</span>claimed_k <span class="ot">&lt;-</span> vals<span class="sc">$</span>claimed_m <span class="sc">*</span> <span class="dv">1000</span>   <span class="co"># claimed valuation in $1,000s</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>vals<span class="sc">$</span>agreed_k <span class="ot">&lt;-</span> vals<span class="sc">$</span>agreed_m <span class="sc">*</span> <span class="dv">1000</span>     <span class="co"># agreed valuation in $1,000s</span></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(<span class="fu">lm</span>(agreed_k <span class="sc">~</span> claimed_k, <span class="at">data =</span> vals))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>(Intercept)   claimed_k 
--67.9898584   0.6487408 </code></pre>
-</div>
-</div>
-<p>In raw dollars, the intercept is <span class="math inline">\(-68{,}000\)</span> dollars and the slope is again 0.649: dollars of agreed valuation per dollar of claimed valuation.</p>
-<p>The general rule has three cases. If you multiply the outcome and the predictor by the same factor, the intercept is multiplied by that factor and the slope does not change. If you multiply only the outcome by a factor, the slope is multiplied by the same factor. If you multiply only the predictor by a factor, the slope is divided by it. When two sources disagree about a coefficient, check the units first.</p>
-</div>
 <p>The table below shows the observed value, the fitted value, and the residual for the first six rows of the data:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">data.frame</span>(</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">observed =</span> vals<span class="sc">$</span>agreed_m,</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">fitted =</span> <span class="fu">fitted</span>(val_model),</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">residual =</span> <span class="fu">residuals</span>(val_model)</span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">data.frame</span>(</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">observed =</span> vals<span class="sc">$</span>agreed_m,</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">fitted =</span> <span class="fu">fitted</span>(val_model),</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">residual =</span> <span class="fu">residuals</span>(val_model)</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   observed       fitted    residual
 1  0.090909  0.148256872 -0.05734787
@@ -1136,16 +1127,74 @@ Figure&nbsp;17.3: The three-point toy dataset with its least-squares line. The o
 </div>
 <p>For every row, <code>observed = fitted + residual</code>. Check it on the first row. The founders asked $50,000 for 15%, a claimed valuation of $0.333 million. They agreed to $50,000 for 55%, an agreed valuation of $0.091 million. The fitted value is <span class="math inline">\(-0.068 + 0.649 \times 0.333 = 0.148\)</span>, and indeed <span class="math inline">\(0.091 = 0.148 + (-0.057)\)</span>.</p>
 </section>
+<section id="i01-interpretation" class="level3">
+<h3 class="anchored" data-anchor-id="i01-interpretation">Reading a slope and an intercept</h3>
+<p>A coefficient is a number with units. The slope is in units of <span class="math inline">\(Y\)</span> per unit of <span class="math inline">\(X\)</span>, and the intercept is in units of <span class="math inline">\(Y\)</span>. So the same model can give different numbers in different units, and a number without its units says little. The box below gives a fixed way to read both coefficients.</p>
+<div class="exam-procedure">
+<p><span class="label">Method: interpreting a slope and an intercept</span></p>
+<ol type="1">
+<li>Units. Write down the unit of the outcome <span class="math inline">\(Y\)</span>, the unit of the predictor <span class="math inline">\(X\)</span>, and which data the model uses.</li>
+<li>Slope. “Among [the data], a [predictor] that is one [unit of <span class="math inline">\(X\)</span>] higher is associated with a [outcome] that is on average [<span class="math inline">\(\hat\beta_1\)</span>] [units of <span class="math inline">\(Y\)</span>] higher.” For a negative slope, write “lower” and drop the minus sign.</li>
+<li>Intercept. “At [predictor] equal to zero, the fitted [outcome] is [<span class="math inline">\(\hat\beta_0\)</span>] [units of <span class="math inline">\(Y\)</span>].” Use this sentence only if <span class="math inline">\(X=0\)</span> lies inside the range of the data. Otherwise say that the intercept has no useful meaning of its own.</li>
+<li>Words. Say “is associated with” and “on average”. Do not use causal words such as “increases”, “leads to”, “the effect of”, or “if you raise”.</li>
+</ol>
+</div>
+<p><strong>The slope, with units.</strong> In the Shark Tank model both valuations are in $ millions. Among the 874 deals for a share of the company, a claimed valuation that is $1 million higher is associated with an agreed valuation that is on average about $0.65 million higher. Both valuations have the same unit, so the slope also reads per dollar: each extra dollar of claimed valuation goes with about 65 cents more agreed valuation, on average. This answers the prediction question from before class. The sign is positive, the unit is millions of dollars agreed per million claimed, and the slope is clearly below 1. The slope does not mean that claiming more causes the sharks to pay more.</p>
+<p><strong>The intercept, with units.</strong> At a claimed valuation of zero, the fitted agreed valuation is about <span class="math inline">\(-\$68{,}000\)</span>. A company claimed to be worth nothing is not in the data (the smallest claimed valuation is $40,000), and a negative valuation has no meaning. The line needs an intercept so that it is at the right height. But this intercept has no useful meaning of its own.</p>
+<section id="thousands-and-millions-rescaling-a-variable" class="level4">
+<h4 class="anchored" data-anchor-id="thousands-and-millions-rescaling-a-variable">Thousands and millions: rescaling a variable</h4>
+<p>Money is often reported in thousands or millions. A change of unit multiplies every value of a variable by the same number <span class="math inline">\(c\)</span>. For example, going from dollars to $1,000s divides every value by 1,000, so <span class="math inline">\(c=1/1{,}000\)</span>. The fitted line itself does not change. Only the numbers that describe it change, by a simple rule:</p>
+<ul>
+<li>multiply only the outcome by <span class="math inline">\(c\)</span>: the intercept and the slope are both multiplied by <span class="math inline">\(c\)</span></li>
+<li>multiply only the predictor by <span class="math inline">\(c\)</span>: the slope is divided by <span class="math inline">\(c\)</span>, and the intercept stays the same</li>
+<li>multiply both by <span class="math inline">\(c\)</span>: the intercept is multiplied by <span class="math inline">\(c\)</span>, and the slope stays the same.</li>
+</ul>
+<p>An invented example shows the second case. A web shop regresses its weekly orders on its weekly advertising spending in euros and finds a slope of 0.15 orders per euro. With spending measured in 1,000s of euros, every value of the predictor is divided by 1,000, so the slope is multiplied by 1,000: 150 orders per 1,000 euros. Both numbers say the same thing. The <a href="../intermediate/code-sheet.html#lecture-1-simple-linear-regression">code sheet</a> lists the rule as a table.</p>
+<div id="exm-i01-units" class="theorem example">
+<p><span class="theorem-title"><strong>Example 17.2 (Worked example: the same coefficients in three unit systems)</strong></span> <span class="shark-tag">Shark Tank data</span> The fitted intercept is about <span class="math inline">\(-0.068\)</span> and the fitted slope is about <span class="math inline">\(0.649\)</span>, with both valuations in $ millions. Read the intercept in dollars first:</p>
+<p><span class="math display">\[
+-0.068 \text{ (in \$ millions)} = -0.068 \times \$1{,}000{,}000 = -\$68{,}000.
+\]</span></p>
+<p>Suppose a report measures both valuations in $1,000s. Every value of <span class="math inline">\(Y\)</span> and of <span class="math inline">\(X\)</span> is then 1,000 times as large. This is the third case of the rule. The intercept has the units of <span class="math inline">\(Y\)</span>, so it is multiplied by 1,000. The slope is a ratio, units of <span class="math inline">\(Y\)</span> per unit of <span class="math inline">\(X\)</span>. Both parts of the ratio change by the same factor, so the slope stays the same:</p>
+<p><span class="math display">\[
+\text{intercept: } -0.068 \times 1000 = -68 \text{ (in \$1,000s)},
+\qquad
+\text{slope: } 0.649 \text{ (unchanged)}.
+\]</span></p>
+<p>R confirms this result:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>vals<span class="sc">$</span>claimed_k <span class="ot">&lt;-</span> vals<span class="sc">$</span>claimed_m <span class="sc">*</span> <span class="dv">1000</span>   <span class="co"># claimed valuation in $1,000s</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>vals<span class="sc">$</span>agreed_k <span class="ot">&lt;-</span> vals<span class="sc">$</span>agreed_m <span class="sc">*</span> <span class="dv">1000</span>     <span class="co"># agreed valuation in $1,000s</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(<span class="fu">lm</span>(agreed_k <span class="sc">~</span> claimed_k, <span class="at">data =</span> vals))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>(Intercept)   claimed_k 
+-67.9898584   0.6487408 </code></pre>
+</div>
+</div>
+<p>The sentence for the slope now uses the new unit. Among the 874 deals, a claimed valuation that is $1,000 higher is associated with an agreed valuation that is on average about $649 higher. In raw dollars, the intercept is <span class="math inline">\(-68{,}000\)</span> dollars and the slope is again 0.649: dollars of agreed valuation per dollar of claimed valuation. When two sources disagree about a coefficient, check the units first.</p>
+</div>
+</section>
+<section id="percent-and-percentage-points" class="level4">
+<h4 class="anchored" data-anchor-id="percent-and-percentage-points">Percent and percentage points</h4>
+<p>Some outcomes are percentages, such as the equity offered or a conversion rate (the percentage of visitors who buy). The slope is then in percentage points per unit of <span class="math inline">\(X\)</span>. A percentage point is the difference between two percentages. A conversion rate that falls from 3.0% to 2.6% falls by 0.4 percentage points. In percent of its old value, the same fall is about 13%. The two statements are different, so always say which one you mean.</p>
+<p>An invented example. A web shop regresses its daily conversion rate (in %) on the loading time of its website (in seconds) and finds a slope of <span class="math inline">\(-0.4\)</span>. The sentence is: days with a loading time that is one second longer are associated with a conversion rate that is on average 0.4 percentage points lower. “0.4 percent lower” would be wrong. At a conversion rate of 3.0%, the difference of 0.4 percentage points is about 13% of the rate.</p>
+</section>
+<section id="a-predictor-that-is-0-or-1" class="level4">
+<h4 class="anchored" data-anchor-id="a-predictor-that-is-0-or-1">A predictor that is 0 or 1</h4>
+<p>A predictor can also record yes or no, coded 1 for yes and 0 for no. Such a predictor is called a dummy variable. For a dummy, “one unit higher” means the step from 0 to 1. The intercept is then the average outcome in the group with <span class="math inline">\(X=0\)</span>. The slope is the difference in the average outcome between the group with <span class="math inline">\(X=1\)</span> and the group with <span class="math inline">\(X=0\)</span>: a difference in means.</p>
+<p>An invented example. A web shop regresses its weekly orders on a dummy that is 1 in weeks with a discount campaign. The intercept is 200 and the slope is 35. Weeks without a campaign have on average 200 orders. Weeks with a campaign have on average 35 orders more, that is 235, or about 18% more. <a href="../intermediate/i05-categories-joint-tests.html">Lecture 5</a> treats such predictors in detail.</p>
+</section>
+</section>
 <section id="prediction-inside-the-range-of-the-data" class="level3">
 <h3 class="anchored" data-anchor-id="prediction-inside-the-range-of-the-data">Prediction inside the range of the data</h3>
 <p><span class="shark-tag">Shark Tank data</span> The function <code>predict()</code> calculates the fitted value for a new value of the predictor:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">predict</span>(val_model, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">claimed_m =</span> <span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">predict</span>(val_model, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">claimed_m =</span> <span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>       1 
 1.229492 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">range</span>(vals<span class="sc">$</span>claimed_m)   <span class="co"># smallest and largest claimed valuation</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">range</span>(vals<span class="sc">$</span>claimed_m)   <span class="co"># smallest and largest claimed valuation</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1]  0.04 50.00</code></pre>
 </div>
@@ -1185,7 +1234,7 @@ Check your answer
 <div class="callout-body-container callout-body">
 <p>Fitted: <span class="math inline">\(-0.068+0.649\times8=5.12\)</span>, about $5.12 million. Residual: <span class="math inline">\(6-5.12=0.88\)</span>, about $880,000. The sign is positive: this deal closed above the fitted value. R confirms the residual:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unname</span>(<span class="dv">6</span> <span class="sc">-</span> <span class="fu">predict</span>(val_model, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">claimed_m =</span> <span class="dv">8</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unname</span>(<span class="dv">6</span> <span class="sc">-</span> <span class="fu">predict</span>(val_model, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">claimed_m =</span> <span class="dv">8</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.8780631</code></pre>
 </div>
@@ -1203,7 +1252,7 @@ Check your answer
 <li>Only pitches that reached a deal are in the data.</li>
 <li>The model does not say what happens if you raise your own claim.</li>
 </ul>
-<p><strong>What you can do with it:</strong> expect the sharks to accept about two thirds of a claimed valuation, and prepare your negotiation for that.</p>
+<p><strong>What you can do with it:</strong> expect each extra dollar you claim to go with only about two thirds of a dollar more in the agreed valuation, and prepare your negotiation for that.</p>
 </div>
 </section>
 <section id="from-an-association-to-a-decision" class="level3">
@@ -1217,12 +1266,12 @@ Check your answer
 </section>
 <section id="answering-the-driving-question" class="level3">
 <h3 class="anchored" data-anchor-id="answering-the-driving-question">Answering the driving question</h3>
-<p>Among pitches that reached a deal, a claimed valuation is worth about two thirds of the claimed amount. The fitted slope is 0.649, so each extra $1 million of claimed valuation is associated with about $0.65 million more agreed valuation. The limits in the box “What this fitted line can and cannot say” still apply.</p>
+<p>Among the 874 Shark Tank deals for a share of the company, the agreed valuation rises with the claimed valuation, but less than one for one. The slope of the regression line is 0.649. So one more dollar of claimed valuation goes with about 65 cents more agreed valuation, on average. In the units of the model: each extra $1 million of claimed valuation is associated with about $0.65 million more agreed valuation. For a founder, about two thirds of each extra claimed dollar shows up in the agreed valuation. The limits in the box “What this fitted line can and cannot say” still apply.</p>
 <div class="founder-box">
 <p><span class="label">A founder’s decision (invented example)</span></p>
-<p>You regress weekly orders on weekly advertising spending in euros and get: fitted orders = 120 + 0.15 × spending. Each extra 100 euros of advertising goes with 15 more orders. You earn 4 euros per order, so 100 euros of advertising goes with 60 euros of extra margin. The decision: at this slope, advertising does not pay for itself, unless new customers come back and order again. The slope turned a feeling that ads help into a number that you can compare with the cost. But the slope only describes your past weeks. Before a large budget change, vary the spending on purpose for a few weeks and see whether the orders follow.</p>
+<p>You regress weekly orders on weekly advertising spending in euros and get: fitted orders = 120 + 0.15 × spending. Each extra 100 euros of advertising goes with 15 more orders. You earn 4 euros per order, so 100 euros of advertising goes with 60 euros of extra margin. The decision: at this slope, advertising does not pay for itself, unless new customers come back and order again. The slope turned a feeling that ads help into a number that you can compare with the cost. But the slope only describes your past weeks. Before a large budget change, vary the spending on purpose for a few weeks and see whether the orders follow. Such small planned changes also help to separate the effect of the spending from timing effects, such as the season or the day of the week.</p>
 </div>
-<p><strong>Next:</strong> R fits a line to any data, even to data that a line describes badly. R gives no warning. Lecture 2 states the assumptions behind the fitted line and shows how to check them with residual plots.</p>
+<p><strong>Next:</strong> R fits a least-squares line to any data, even to data that a straight line describes badly. R gives no warning. Lecture 2 states the assumptions behind the fitted line and shows how to check them with residual plots.</p>
 </section>
 </section>
 <section id="after-class" class="level2 course-phase phase-after">
@@ -1240,6 +1289,7 @@ Check your answer
 <li>Why must a slope interpretation include units?</li>
 <li>Why can an intercept be calculated correctly and still have no useful meaning?</li>
 <li>Why is the slope not automatically causal?</li>
+<li>The outcome is a conversion rate in percent, and the slope is <span class="math inline">\(-0.4\)</span>. Is the outcome 0.4 percent or 0.4 percentage points lower per unit of the predictor?</li>
 </ol>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
@@ -1254,11 +1304,12 @@ Check your answers
 <div id="callout-5" class="callout-5-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ol type="1">
-<li><span class="math inline">\(\varepsilon_i\)</span> is the error of the population model: the distance to the unknown population line. It is never observed. <span class="math inline">\(e_i\)</span> is the residual: the distance to the fitted line, calculated from the data.</li>
-<li>The sum of squared residuals, <span class="math inline">\(\operatorname{SSE}=\sum_i e_i^2\)</span>. In a plain sum the positive and the negative residuals would cancel. Squares are never negative, and they count a large miss more heavily than a small one.</li>
+<li><span class="math inline">\(\varepsilon_i\)</span> is the error term of the population model: the distance to the unknown population line. It is never observed. <span class="math inline">\(e_i\)</span> is the residual: the distance to the fitted line, calculated from the data.</li>
+<li>The sum of squared residuals, <span class="math inline">\(\operatorname{SSE}=\sum_i e_i^2\)</span>. In a plain sum the positive and the negative residuals would cancel. Squares are never negative, and they count a large residual more heavily than a small one.</li>
 <li>The slope is a difference in outcome units per one unit of the predictor. Without units the number 0.649 could mean anything.</li>
 <li>The value <span class="math inline">\(X=0\)</span> may lie outside the observed range, or it may make no sense for the variable.</li>
 <li>The predictor was not randomly assigned, and other factors may affect both variables.</li>
+<li>0.4 percentage points. The slope of a percentage outcome is a difference between two percentages. A fall of 0.4 percentage points from 3.0% is a fall of about 13% of the rate.</li>
 </ol>
 </div>
 </div>
@@ -1284,12 +1335,12 @@ Check your answer
 <div class="callout-body-container callout-body">
 <p>Fitted: <span class="math inline">\(-0.068 + 0.649 \times 4 = 2.53\)</span>, about $2.53 million. Residual: <span class="math inline">\(2 - 2.53 = -0.53\)</span>, about <span class="math inline">\(-\$530{,}000\)</span>. The negative sign means this deal closed below the model’s fitted conditional mean for a claimed valuation of $4 million.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>vals <span class="ot">&lt;-</span> <span class="fu">subset</span>(sharks, deal_on_show <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> deal_equity_pct <span class="sc">&gt;</span> <span class="dv">0</span>)</span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>vals<span class="sc">$</span>claimed_m <span class="ot">&lt;-</span> vals<span class="sc">$</span>requested_valuation_usd <span class="sc">/</span> <span class="fl">1e6</span></span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>vals<span class="sc">$</span>agreed_m <span class="ot">&lt;-</span> vals<span class="sc">$</span>deal_valuation_usd <span class="sc">/</span> <span class="fl">1e6</span></span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>val_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(agreed_m <span class="sc">~</span> claimed_m, <span class="at">data =</span> vals)</span>
-<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="fu">unname</span>(<span class="dv">2</span> <span class="sc">-</span> <span class="fu">predict</span>(val_model, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">claimed_m =</span> <span class="dv">4</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>vals <span class="ot">&lt;-</span> <span class="fu">subset</span>(sharks, deal_on_show <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> deal_equity_pct <span class="sc">&gt;</span> <span class="dv">0</span>)</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>vals<span class="sc">$</span>claimed_m <span class="ot">&lt;-</span> vals<span class="sc">$</span>requested_valuation_usd <span class="sc">/</span> <span class="fl">1e6</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>vals<span class="sc">$</span>agreed_m <span class="ot">&lt;-</span> vals<span class="sc">$</span>deal_valuation_usd <span class="sc">/</span> <span class="fl">1e6</span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>val_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(agreed_m <span class="sc">~</span> claimed_m, <span class="at">data =</span> vals)</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a><span class="fu">unname</span>(<span class="dv">2</span> <span class="sc">-</span> <span class="fu">predict</span>(val_model, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">claimed_m =</span> <span class="dv">4</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] -0.5269735</code></pre>
 </div>
@@ -1326,11 +1377,11 @@ Check your answers
 </ol>
 <p>The R check for task 4:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>vals <span class="ot">&lt;-</span> <span class="fu">subset</span>(sharks, deal_on_show <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> deal_equity_pct <span class="sc">&gt;</span> <span class="dv">0</span>)</span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>vals<span class="sc">$</span>claimed_k <span class="ot">&lt;-</span> vals<span class="sc">$</span>requested_valuation_usd <span class="sc">/</span> <span class="fl">1e3</span>   <span class="co"># in $1,000s</span></span>
-<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>vals<span class="sc">$</span>agreed_m <span class="ot">&lt;-</span> vals<span class="sc">$</span>deal_valuation_usd <span class="sc">/</span> <span class="fl">1e6</span>         <span class="co"># in $ millions</span></span>
-<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(<span class="fu">lm</span>(agreed_m <span class="sc">~</span> claimed_k, <span class="at">data =</span> vals))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>vals <span class="ot">&lt;-</span> <span class="fu">subset</span>(sharks, deal_on_show <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> deal_equity_pct <span class="sc">&gt;</span> <span class="dv">0</span>)</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>vals<span class="sc">$</span>claimed_k <span class="ot">&lt;-</span> vals<span class="sc">$</span>requested_valuation_usd <span class="sc">/</span> <span class="fl">1e3</span>   <span class="co"># in $1,000s</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>vals<span class="sc">$</span>agreed_m <span class="ot">&lt;-</span> vals<span class="sc">$</span>deal_valuation_usd <span class="sc">/</span> <span class="fl">1e6</span>         <span class="co"># in $ millions</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(<span class="fu">lm</span>(agreed_m <span class="sc">~</span> claimed_k, <span class="at">data =</span> vals))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  (Intercept)     claimed_k 
 -0.0679898584  0.0006487408 </code></pre>
@@ -1356,21 +1407,21 @@ Check your answers
 <div id="callout-8" class="callout-8-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(<span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> season, <span class="at">data =</span> sharks))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(<span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> season, <span class="at">data =</span> sharks))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>(Intercept)      season 
  20.4565874  -0.8241241 </code></pre>
 </div>
 </div>
-<p>The fitted intercept is about 20.46 percentage points and the slope about <span class="math inline">\(-0.824\)</span> percentage points per season. Later seasons are associated with smaller initial equity offers on average. The outcome and the intercept are in percentage points. The predictor is in seasons. The slope is in percentage points per season. The intercept is the fitted value at Season 0, which is outside the data (Seasons 1 to 16), so it has no useful meaning of its own.</p>
+<p>The fitted intercept is about 20.46% and the slope about <span class="math inline">\(-0.824\)</span> percentage points per season. Among all 1,441 pitches, a season that is one later is associated with an initial equity offer that is on average 0.824 percentage points smaller. The outcome and the intercept are in percent. The predictor is in seasons. The slope is a difference between two percentages, so it is in percentage points per season. The intercept is the fitted value at Season 0, which is outside the data (Seasons 1 to 16), so it has no useful meaning of its own.</p>
 </div>
 </div>
 </div>
 </section>
 <section id="review-one-question-from-qm-basic" class="level3">
 <h3 class="anchored" data-anchor-id="review-one-question-from-qm-basic">Review: one question from QM Basic</h3>
-<p>An invented example. A market survey of <span class="math inline">\(n = 400\)</span> customers gives an average willingness to pay of €24.60 with standard error €1.10. Write down the t value for testing a benchmark of €22 and the 95% confidence interval, and say in one sentence what the interval estimates.</p>
+<p>An invented example. A market survey of <span class="math inline">\(n = 400\)</span> customers gives an average willingness to pay of €24.60 with standard error €1.10. Write down the t statistic for testing a benchmark of €22 and the 95% confidence interval, and say in one sentence what the interval estimates.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">

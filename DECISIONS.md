@@ -210,6 +210,20 @@ These points supersede earlier entries where they differ.
   full marking guides are kept internally in `Assessment/`. Video boxes say
   that the videos can use another notation and that the lecture material
   comes first.
+- **Formal terms in QM Intermediate** (9 October, Valentina). The book uses
+  standard econometric terms (perfect multicollinearity, reference category,
+  heteroskedasticity, control variables, jointly significant, quadratic term,
+  error term). A common informal name appears once in brackets at first use.
+- **Regression assumptions (Intermediate Lectures 2 and 4)** (9 October,
+  Valentina). Listed as in Wooldridge: variation in X / no perfect
+  multicollinearity, linearity, independence (random sampling),
+  homoskedasticity, normality of errors in small samples, and last zero
+  conditional mean, which a causal reading needs (no omitted confounder).
+  The dummy variable trap is named as a common name for perfect
+  multicollinearity with dummies.
+- **A/B test in Intermediate Lecture 5** (9 October, Valentina). Introduced
+  properly as a randomised controlled experiment with treatment and control
+  group, analysed with a regression on one dummy. Not in QM Basic.
 - **Model answers contain only the expected student answer** (9 October,
   Valentina). No alternatives, notes for markers, or explanations of the
   answer. QM Intermediate: per question **Code** (the code the student

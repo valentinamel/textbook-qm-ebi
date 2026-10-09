@@ -13,10 +13,11 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 <span class="label">By the end of Lecture 5, you can</span>
 
 - use dummy variables to put a categorical predictor into a regression
-- interpret dummy coefficients as differences from a named reference group
-- test whether a group of terms is jointly useful, and whether group means
+- interpret dummy coefficients as differences from a named reference category
+- test whether a group of terms is jointly significant, and whether group means
   differ in a one-way ANOVA
-- tell an adjusted comparison between groups apart from a causal claim
+- tell an adjusted comparison between groups apart from the effect that an
+  A/B test estimates
 :::
 
 ::: {.driving-question}
@@ -88,8 +89,8 @@ If indicators and reference categories are unfamiliar, review
 ## Lecture material
 
 This section first compares the groups of teams with plain averages. It then
-shows how a regression uses a variable made of categories, and how to test
-several coefficients at once.
+shows how a regression uses a variable made of categories, how to analyse
+an A/B test, and how to test several coefficients at once.
 
 ### Start with a founder's question
 
@@ -109,8 +110,8 @@ table(known$pitcher_gender_group)
 ```
 
 All-men teams offered 13.20% on average, all-women teams 14.02%, and mixed
-teams 12.17%. The gap between all-women and all-men teams is 0.82 percentage
-points, about 6% of the all-men average. Three questions follow. Is this gap
+teams 12.17%. The difference between all-women and all-men teams is 0.82 percentage
+points, about 6% of the all-men average. Three questions follow. Is this difference
 larger than chance alone would produce? Does it remain when we compare teams from the same season
 that asked for the same amount? And how can `lm()` use a variable that
 contains words, not numbers?
@@ -137,8 +138,8 @@ when an observation belongs to a category and 0 when it does not. Another
 name is indicator.
 
 **Reference category.** The category for which all dummies are 0. Every
-dummy coefficient is a comparison with this category. Another name is
-reference group.
+dummy coefficient is a comparison with this category. Other names are
+reference group and base group.
 :::
 
 For a dummy variable $D_i\in\{0,1\}$,
@@ -156,15 +157,8 @@ E[Y_i\mid D_i=1]=\beta_0+\beta_1.
 $$
 
 So $\beta_1$ is the expected difference between the group with $D=1$ and
-the reference group with $D=0$. A regression on one dummy is the same
+the reference category with $D=0$. A regression on one dummy is the same
 as a comparison of two group means.
-
-You analyse an A/B test in the same way. In an A/B test you show two
-versions of a page, a price, or an offer to customers, and chance decides who
-sees which version. Code the version as a dummy and read its coefficient.
-Because chance decided who saw which version, nothing else differs between
-the two groups on average. In that case, and only in that case, the
-coefficient can be read as the effect of the change.
 
 ::: {#exm-i05-two-ticks}
 ## Worked example: two group means from two coefficients
@@ -189,7 +183,8 @@ Read the two coefficients as two marks on the equity axis
 (@fig-i05-two-ticks). The intercept $\hat\beta_0\approx 13.20$ is the mean
 of the all-men teams. The sum $\hat\beta_0+\hat\beta_1\approx 13.20+0.82=14.02$
 is the mean of the all-women teams. The coefficient $\hat\beta_1\approx 0.82$
-is the gap between the two marks.
+is the distance between the two marks: the difference between the two
+group means.
 :::
 
 ```{r}
@@ -197,7 +192,7 @@ is the gap between the two marks.
 #| code-fold: true
 #| code-summary: "See the R code for this figure"
 #| fig-height: 2.2
-#| fig-cap: "The model with one dummy places the two group means as two marks on the axis of the equity offered. The intercept is the mean of the reference group (all-men teams), and the dummy coefficient is the distance between the marks."
+#| fig-cap: "The model with one dummy places the two group means as two marks on the axis of the equity offered. The intercept is the mean of the reference category (all-men teams), and the dummy coefficient is the distance between the marks."
 old_par <- par(no.readonly = TRUE)
 par(mar = c(3.5, 1, 1, 1))
 plot(NA, xlim = c(12.6, 14.6), ylim = c(0, 1), axes = FALSE,
@@ -213,12 +208,157 @@ text(13.61, 0.25, expression(hat(beta)[1] == 0.82), col = "#17324D", cex = 0.9)
 par(old_par)
 ```
 
+### Comparing two versions: the A/B test {#i05-ab-test}
+
+An invented example. A student venture sells meal-prep boxes through its
+website. The team has designed a new checkout page that suggests a drink
+with every box. Should the venture switch to the new page? The founders
+want to know whether the new page raises the order value, and by how much.
+
+One idea is to compare the orders of last month (old page) with the orders
+of this month (new page). But other things also change from one month to
+the next: exams, the weather, the prices of competitors. The difference
+would mix the effect of the page with all of these. An A/B test avoids this
+problem.
+
+::: {.definition-box}
+<span class="label">Definition</span>
+
+**A/B test.** A randomised controlled experiment (randomised experiment)
+with two groups. The **treatment group** gets the new version (B), and the
+**control group** gets the current version (A). With **random assignment**,
+chance decides which customer gets which version. The **outcome** $Y_i$ is
+what you measure for each customer, such as the order value. The
+**treatment dummy** $D_i$ is 1 for the treatment group and 0 for the control
+group.
+:::
+
+Random assignment is the key step. Chance decides who sees the new page.
+So the budget, the taste, or the device of a customer cannot decide it. On
+average, the two groups are then alike in everything else, in what you
+measure and in what you do not measure. The only systematic difference
+between them is the page. So the difference in the mean outcomes estimates
+the average effect of the new page on the order value. This is called the
+**average treatment effect**.
+
+Compare this with the Shark Tank comparisons of this lecture. Nobody
+assigned the gender of a team by chance. Teams of different composition can
+also differ in industry, experience, or product. The regression holds season
+and requested amount fixed, but not these other differences. That is why
+the coefficients of this lecture are adjusted comparisons, not effects. You
+met the same contrast in
+[QM Basic Lecture 7](../basic/b07-samples-estimators.qmd): random sampling
+lets a sample represent a population, and random assignment supports claims
+about cause. An A/B test uses random assignment.
+
+Analyse an A/B test with the regression on one dummy from the previous
+section:
+
+$$
+Y_i=\beta_0+\beta_1D_i+\varepsilon_i.
+$$
+
+As shown above, $\hat\beta_0$ is the mean outcome of the control group, and
+$\hat\beta_0+\hat\beta_1$ is the mean outcome of the treatment group. So
+$\hat\beta_1$ is the difference in means: treatment group minus control
+group. Two tools from the
+[exam procedure of Lecture 3](i03-inference-fit-ftest.qmd#i03-exam-procedure)
+answer the two questions of the founders:
+
+- Does the new version have an effect? Test $H_0:\beta_1=0$ against
+  $H_1:\beta_1\ne0$ with the t-test in five steps.
+- How large is the effect? Give the 95% confidence interval for $\beta_1$.
+
+This is the comparison of two means that
+[QM Basic Lecture 10](../basic/b10-testing-errors-power.qmd) only previewed.
+The regression gives the same estimate, the difference between the two
+group means, and it adds the standard error, the test, and the interval in
+one table.
+
+::: {#exm-i05-ab-test}
+## Worked example: an A/B test of a checkout page
+
+An invented example. The venture runs the test with 200 new customers.
+Chance puts 100 customers in each group. The code below builds the invented
+data. It sets a true effect of 2 euros, which a real founder never knows.
+
+```{r}
+#| label: i05-ab-data
+set.seed(12)
+# random assignment: 100 zeros (old page) and 100 ones (new page),
+# shuffled by chance
+new_page <- sample(rep(c(0, 1), each = 100))
+# invented order values in euros, with a true effect of 2 euros
+order_value <- round(25 + 2 * new_page + rnorm(200, mean = 0, sd = 6), 2)
+ab_test <- data.frame(new_page, order_value)
+head(ab_test)
+table(ab_test$new_page)
+```
+
+Now regress the order value on the treatment dummy `new_page`:
+
+```{r}
+#| label: i05-ab-fit
+ab_model <- lm(order_value ~ new_page, data = ab_test)
+summary(ab_model)$coefficients
+confint(ab_model)
+tapply(ab_test$order_value, ab_test$new_page, mean)
+qt(0.975, df = 198)
+```
+
+The intercept $\hat\beta_0\approx 24.83$ euros is the mean order value of
+the control group. The treatment group has a mean of 26.87 euros. The
+coefficient $\hat\beta_1\approx 2.04$ euros is the difference, with a
+standard error of 0.80.
+
+The test in five steps.
+
+1. **Hypotheses.** $H_0:\beta_1=0$, the new page has no effect on the mean
+   order value. $H_1:\beta_1\ne0$. The significance level is 5%.
+2. **Test statistic.** $T=\hat\beta_1/\operatorname{SE}(\hat\beta_1)$, with
+   $df=n-k-1=200-1-1=198$.
+3. **Critical value and rejection region.** The critical value is 1.972,
+   from `qt(0.975, df = 198)`. Reject $H_0$ if $|t_{obs}|\ge 1.972$.
+4. **Observed value.** $t_{obs}=2.042/0.799\approx 2.56$.
+5. **Conclusion.** $2.56\ge1.972$, so reject $H_0$ (p $\approx$ 0.011). At
+   the 5% level, the new page raises the mean order value.
+
+The interval is $2.04\pm1.972\times0.80$, from about 0.47 to 3.62 euros. It
+contains the true effect of 2 euros that the code built in. To judge the
+size, compare it with the mean of the control group:
+
+```{r}
+#| label: i05-ab-share
+ab_coef <- coef(ab_model)
+round(100 * ab_coef["new_page"] / ab_coef["(Intercept)"], 1)  # effect, % of control mean
+round(100 * confint(ab_model)["new_page", ] / ab_coef["(Intercept)"], 1)
+```
+
+The new page raises the order value by about 8.2% of the control mean. The
+interval runs from about 1.9% to 14.6%. Even the lower end is a gain. If the
+new page costs nothing extra to run, the decision is to switch to it.
+:::
+
+An A/B test also has limits.
+
+- The result holds for the customers and the period of the test. Customers
+  in another season, or another kind of customer, may react differently.
+- Each group needs enough customers. With few customers per group, the
+  interval is wide, and a real effect can go unnoticed.
+- Each customer must see only one version. A customer who sees both
+  versions belongs to neither group.
+- Testing many versions or many outcomes needs care. With many tests at the
+  5% level, some will reject by chance alone, even if no version has an
+  effect.
+
 ### More than two categories
 
 [Shark Tank data]{.shark-tag} With $G$ categories and an intercept, use $G-1$ dummies. With all $G$
-dummies and an intercept, the dummies sum to 1 in every row. This is the
-exact dependence from Lecture 4, and R cannot estimate all the coefficients.
-This mistake is called the **dummy-variable trap**.
+dummies and an intercept, the dummies sum to 1 in every row, which is the
+same as the intercept column. This is perfect multicollinearity from
+Lecture 4: one column can be calculated exactly from the others, so R cannot
+estimate all the coefficients. With dummies, this situation is sometimes
+called the dummy variable trap.
 
 R creates the dummies itself when a predictor is a factor. Choose the
 reference category yourself and check it. This is the code of the R warm-up:
@@ -240,10 +380,10 @@ categories need two dummies.
 ::: {.callout-note collapse="true"}
 ## Check: four industries and an intercept, how many dummies?
 
-Three. One industry is the reference group, and the intercept belongs to
-this group. Each
+Three. One industry is the reference category, and the intercept belongs to
+this category. Each
 of the three dummy coefficients compares one of the other industries with
-it. Four dummies and an intercept would be the dummy-variable trap.
+it. Four dummies and an intercept would give perfect multicollinearity.
 :::
 
 ::: {.callout-caution collapse="true"}
@@ -261,14 +401,14 @@ two dummies. The campus stand has no dummy. Its mean is the intercept.
 channels.
 
 *Step 3 (you).* By how much does the fitted order value in the app differ
-from the fitted order value on the website? Neither is the reference group.
+from the fitted order value on the website? Neither is the reference category.
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
 Campus stand: 9.0 euros. App: 9.0 + 6.0 = 15.0 euros. Website: 9.0 + 2.5 =
 11.5 euros. App minus website: 6.0 - 2.5 = 3.5 euros. You can subtract two
-coefficients that share a reference group from each other. The result
+coefficients that share a reference category from each other. The result
 compares their two categories directly.
 :::
 :::
@@ -320,14 +460,14 @@ records it is about:
 
 The first sentence answers the prediction
 question from before class: all-women
-teams offer more. The adjusted gap between all-women and all-men teams (1.28
-points) is larger than the raw gap from the worked example (0.82 points). Holding season and
+teams offer more. The adjusted difference between all-women and all-men teams (1.28
+points) is larger than the unadjusted difference from the worked example (0.82 points). Holding season and
 requested amount fixed changed the comparison. This is why the sentence must
 name what is held fixed. Both coefficients are comparisons with the
-reference group. They do not show that the gender of a team causes the
+reference category. They do not show that the gender of a team causes the
 offer.
 
-Changing the reference group changes the names and values of the
+Changing the reference category changes the names and values of the
 coefficients. It does not change the fitted values or the overall fit. Check
 this in R:
 
@@ -340,7 +480,7 @@ coef(lm(equity_offered_pct ~ season + ask_1k + gender_women_ref,
 ```
 
 The same three fitted group means are now described as comparisons with the
-all-women teams. The all-men coefficient is $-1.28$, the same gap as before
+all-women teams. The all-men coefficient is $-1.28$, the same difference as before
 with the opposite sign, and the fitted values are identical.
 
 ### Are the category terms worth having at all?
@@ -352,9 +492,11 @@ together add information beyond season and requested amount?
 ::: {.definition-box}
 <span class="label">Definition</span>
 
-**Partial F-test.** A test of whether several coefficients are all zero at
-the same time. It compares a complete model with a reduced model that leaves
-out the tested terms. Both models are fitted on the same observations.
+**Partial F-test** (F-test for joint significance). A test of whether
+several coefficients are all zero at the same time. It compares a complete
+model with a reduced model that leaves out the tested terms. Econometrics
+textbooks call these two models the unrestricted and the restricted model.
+Both models are fitted on the same observations.
 
 $$
 F=\dfrac{(\text{SSE}_R-\text{SSE}_C)/q}{\text{SSE}_C/(n-k_C-1)},
@@ -431,9 +573,9 @@ really zero, the ratio would be close to 1. Here it is about 3.8, and the
 p-value is about 0.023.
 :::
 
-At 5%, the two category terms are jointly useful in this model. Compare
+At 5%, the two category terms are jointly significant in this model. Compare
 this with the single results: the p-value of the joint test is $0.023$, and
-the p-value of the mixed dummy alone is $0.823$. Joint usefulness is not the
+the p-value of the mixed dummy alone is $0.823$. Joint significance is not the
 same as individual significance. The F-test asks whether the two terms
 together improve the model. It does not ask whether each term is significant
 on its own. The overall F-test in `summary(gender_model)` is about 84.5, with a
@@ -458,8 +600,8 @@ group means are equal, against the alternative that at least one differs.
 In this model each fitted value is the mean of the group of the
 observation. Write $\bar y_g$ for the mean of group $g$, $n_g$ for its
 number of observations, and $\bar y$ for the overall mean. The intercept is
-the mean of the reference group. Each dummy coefficient is the difference
-between the mean of its group and the mean of the reference group.
+the mean of the reference category. Each dummy coefficient is the difference
+between the mean of its group and the mean of the reference category.
 
 The variation splits as in Lecture 3, $\text{SST}=\text{SSR}+\text{SSE}$.
 Put the group mean $\bar y_g$ in place of the fitted value $\widehat y_i$.
@@ -543,7 +685,7 @@ c(mean = mean(y), sd = sd(y))
 ```
 
 At the 5% level, the three groups of teams do not all offer the same mean
-equity (F $\approx$ 3.87, p $\approx$ 0.021). The largest gap, between
+equity (F $\approx$ 3.87, p $\approx$ 0.021). The largest difference, between
 all-women teams (14.02%) and mixed teams (12.17%), is 1.85 percentage
 points. That is about 14% of the overall mean of 13.22% and about 0.22
 standard deviations of the equity offered. The groups explain only about
@@ -586,7 +728,7 @@ Now the test in five steps.
 5. **Conclusion.** $F_{obs}=4.0$ lies in the rejection region, so reject
    $H_0$ (p $\approx$ 0.030). At the 5% level, the mean order value differs
    between at least two of the channels. The test does not say which ones.
-   The largest gap, 4 euros between the app and the campus stand, is a
+   The largest difference, 4 euros between the app and the campus stand, is a
    third of the overall mean.
 :::
 
@@ -671,14 +813,15 @@ classified records only.
 - The categories are a broad description of the people who presented. They
   do not record shares of women, and they do not describe the full founding
   team.
-- Each coefficient compares one group with the reference group, at the same
+- Each coefficient compares one group with the reference category, at the same
   season and requested amount.
 - The model says that offers differ between the coded groups. It does not say
   that the composition of a team makes anyone offer differently.
 
-**What you can do with it:** for groups that you can assign yourself, such as
-two versions of a page, run an A/B test. Then the group coefficient is the
-effect.
+**What you can do with it:** when you can decide who gets which version,
+run an A/B test with random assignment ([Comparing two versions: the A/B
+test](#i05-ab-test)). Then the coefficient of the treatment dummy estimates
+the average treatment effect.
 :::
 
 ### Answering the driving question
@@ -687,21 +830,21 @@ At the same season and requested amount, all-women presenting teams are
 fitted to offer about 1.28 equity percentage points more than all-men teams
 (p $\approx$ 0.008). That is about one tenth of the average equity offered by
 all-men teams (13.20%). The estimate for mixed teams is not statistically
-different from all-men teams. The two category terms are jointly useful (partial F $\approx$ 3.76,
+different from all-men teams. The two category terms are jointly significant (partial F $\approx$ 3.76,
 p $\approx$ 0.023), so they belong in the model. The result is an adjusted
 association among these recorded pitches, not an effect of gender.
 
 ::: {.founder-box}
 <span class="label">A founder's decision (invented example)</span>
 
-You test two checkout pages. Each new customer sees the old or the new page by chance, 100 customers each. You regress the order value in euros on a dummy for the new page. The coefficient is 1.20 with a standard error of 0.50, so the 95% interval runs from about 0.20 to 2.20 euros. Chance decided who saw which page, so the two groups differ in nothing else on average. Here the coefficient is the effect of the page. The decision: switch to the new page. This is an A/B test. Founders can run one themselves to move from an association to an effect.
+You want to know whether free delivery raises the order value in your web shop. Do not compare towns with free delivery against towns without it. Such towns differ in more than delivery, just as the Shark Tank teams differ in more than gender. Run an A/B test instead, as in [Comparing two versions: the A/B test](#i05-ab-test). Offer free delivery to a treatment group of new customers chosen by chance, and keep a control group without it. Regress the order value on the treatment dummy. Switch to free delivery if the whole 95% interval for $\beta_1$ lies above zero and the gain per order is larger than the delivery cost per order.
 :::
 
 **Next:** You can now compare categories at fixed values of the other
 predictors. So far every group has the same slope, and every trend is a
 straight line. Both are choices of the model, not facts. Lecture 6 removes
 these two restrictions. An interaction lets the season trend differ between
-groups of teams, and a squared term lets the trend curve.
+groups of teams, and a quadratic term lets the trend curve.
 
 :::
 
@@ -723,11 +866,12 @@ assistant.
 
 1. Why are only $G-1$ dummies used with an intercept?
 2. What does a dummy coefficient compare?
-3. What changes when the reference group changes?
+3. What changes when the reference category changes?
 4. What does a partial F-test evaluate?
 5. Why can a joint F-test reject when one individual t-test does not?
-6. How do you analyse an A/B test with a regression, and why can you read
-   its coefficient as an effect?
+6. In an A/B test, what do $\hat\beta_0$ and $\hat\beta_1$ of the
+   regression on the treatment dummy measure, and why can you read
+   $\hat\beta_1$ as an effect?
 7. What does the F-test of a one-way ANOVA test, and how is it related to
    the regression on the dummies of one categorical variable?
 
@@ -735,8 +879,8 @@ assistant.
 ## Check your answers
 
 1. All $G$ dummies sum to 1 in every row, which is the same as the intercept
-   column. This is an exact dependence, so R could not estimate all the
-   coefficients.
+   column. This is perfect multicollinearity, so R could not estimate all
+   the coefficients.
 2. It compares a category with the named reference category, holding the
    other included predictors fixed.
 3. The names and values of the coefficients change, because they now compare
@@ -745,12 +889,14 @@ assistant.
 4. Whether several coefficients are all zero at the same time. It compares
    two nested models on the same observations.
 5. The F-test evaluates the terms together. Each t-test asks a narrower
-   question about one comparison with the reference group, and it can miss
+   question about one comparison with the reference category, and it can miss
    what the terms explain together.
-6. Code the version (A or B) as a dummy and regress the outcome on it. The
-   coefficient is the difference between the two group means. Chance decided
-   who saw which version, so the groups differ in nothing else on average,
-   and the difference is the effect of the version.
+6. $\hat\beta_0$ is the mean outcome of the control group, and
+   $\hat\beta_1$ is the difference in means, treatment group minus control
+   group. Random assignment makes the two groups alike on average in
+   everything else, measured or not. So $\hat\beta_1$ estimates the average
+   treatment effect. In the Shark Tank file nobody assigned team gender, so
+   the coefficients there are adjusted comparisons only.
 7. It tests whether all group means are equal, against the alternative
    that at least one differs. It is the overall F-test of the regression on
    the $G-1$ dummies, with nothing else in the model. A rejection says that
@@ -784,22 +930,26 @@ conclusion at 5% in one sentence.
 
 $F=(643.43/2)/(84{,}003/1{,}430)=321.7/58.7\approx 5.48$, matching the
 table, with p $\approx$ 0.004. At 5%, the two category terms are jointly
-useful even in the model that adjusts only for season.
+significant even in the model that adjusts only for season.
 :::
 
 ### Practice: relevelling, hypotheses, an A/B test, and an ANOVA table
 
-1. [Shark Tank data]{.shark-tag} Relevel `gender` so that `mixed` is the reference group, and interpret
+1. [Shark Tank data]{.shark-tag} Relevel `gender` so that `mixed` is the reference category, and interpret
    both dummy coefficients. Save the relevelled model as `relevelled_model`.
 2. [Shark Tank data]{.shark-tag} Check that the fitted values are unchanged after relevelling by comparing
    them with those of `gender_model`.
 3. State the hypotheses for the partial F-test of both gender dummies.
-4. An invented A/B test. 200 new customers see the old or the new checkout
-   page by chance, 100 each. A regression of the order value (euros) on the
-   dummy `new_page` reports an intercept of 18.40 and a coefficient of 1.20
-   with standard error 0.50. Give the mean order value of each group and a
-   95% interval for the difference. The critical value is
-   $t_{0.975,\,198}$ = `qt(0.975, 198)` = 1.972. Why can the coefficient be read as an effect here?
+4. An invented A/B test, analysed as in
+   [Comparing two versions: the A/B test](#i05-ab-test). Random assignment
+   puts 200 new customers in a control group (old checkout page) and a
+   treatment group (new page), 100 each. A regression of the order value
+   (euros) on the treatment dummy `new_page` reports an intercept of 18.40
+   and a coefficient of 1.20 with standard error 0.50. Give the mean order
+   value of each group. Test at 5% whether the new page has an effect, in
+   five steps. Give a 95% interval for $\beta_1$, and the effect as a share
+   of the control mean. The critical value is
+   $t_{0.975,\,198}$ = `qt(0.975, 198)` = 1.972.
 5. [Shark Tank data]{.shark-tag} Explain why "the all-women coefficient is 1.28%" is ambiguous, then
    rewrite it precisely.
 6. An invented example. A franchise compares the weekly revenue (in
@@ -835,12 +985,17 @@ useful even in the model that adjusts only for season.
 2. `all.equal(fitted(gender_model), fitted(relevelled_model))` returns
    `TRUE`.
 3. $H_0:\beta_{\text{all\_women}}=\beta_{\text{mixed}}=0$ against the alternative that at
-   least one of the two is not zero, with all-men as the reference group.
-4. Old page: 18.40 euros. New page: $18.40+1.20=19.60$ euros. The model has
-   $200-2=198$ residual degrees of freedom. Interval:
-   $1.20\pm1.972\times0.50=1.20\pm0.986$, about 0.2 to 2.2 euros. Chance
-   decided who saw which page, so the two groups differ in nothing else on
-   average, and the coefficient is the effect of the page.
+   least one of the two is not zero, with all-men as the reference category.
+4. Control group (old page): 18.40 euros. Treatment group (new page):
+   $18.40+1.20=19.60$ euros. Test: $H_0:\beta_1=0$ against
+   $H_1:\beta_1\ne0$ at 5%. $T=\hat\beta_1/\operatorname{SE}(\hat\beta_1)$
+   with $200-1-1=198$ degrees of freedom. Reject $H_0$ if
+   $|t_{obs}|\ge1.972$. $t_{obs}=1.20/0.50=2.40$, so reject $H_0$: the new
+   page raises the mean order value. Interval:
+   $1.20\pm1.972\times0.50=1.20\pm0.986$, about 0.21 to 2.19 euros. The
+   effect is $1.20/18.40\approx6.5\%$ of the control mean. Random
+   assignment makes the two groups alike on average in everything else, so
+   the coefficient estimates the average treatment effect of the page.
 5. It confuses percent with percentage points, and it does not name the
    comparison group or what is held fixed. A precise version: "At the same
    season and requested amount, all-women presenting teams are fitted to
@@ -869,7 +1024,7 @@ fixed: all-women teams are fitted 1.28 percentage points above all-men
 teams and mixed teams 0.12 points above, at the same season and requested
 amount. Third, the uncertainty: p $\approx$ 0.008 and 0.823 for the two
 coefficients, and p $\approx$ 0.023 for the partial F-test, so the terms are
-jointly useful. Fourth, the limits of the measurement: the categories
+jointly significant. Fourth, the limits of the measurement: the categories
 describe the people who presented, not shares of women or the full team.
 Fifth, the scope: these are adjusted associations among the recorded
 pitches, not causal effects.
@@ -906,7 +1061,7 @@ a relative 1.9%. Comparison and what is held fixed: technology pitches are
 fitted 1.9 points above Food and Beverage pitches at the same season and
 requested amount, among the recorded pitches. Scope: nothing here is causal.
 "Entering tech makes founders more generous" treats a comparison with the
-reference group as an effect of choosing an industry.
+reference category as an effect of choosing an industry.
 :::
 
 ### Check the AI
@@ -921,7 +1076,7 @@ step of Attempt → Ask → Verify → Explain.
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-Three errors. The unit is percentage points, not percent. The comparison is with the reference group, all-men teams, not with the average team. And the answer leaves out that the comparison is at the same season and requested amount. Correct: at the same season and requested amount, all-women teams are fitted to offer 1.28 percentage points more equity than all-men teams.
+Three errors. The unit is percentage points, not percent. The comparison is with the reference category, all-men teams, not with the average team. And the answer leaves out that the comparison is at the same season and requested amount. Correct: at the same season and requested amount, all-women teams are fitted to offer 1.28 percentage points more equity than all-men teams.
 :::
 
 ### Make it yours
@@ -932,21 +1087,21 @@ Three errors. The unit is percentage points, not percent. The comparison is with
 Think of your EiA3 venture, or any business you know well. Name one
 categorical feature of your customers or products (segment, channel, region,
 plan tier). Then write two sentences. Which category would you set as the
-reference group, and why? Suppose the F-test for the whole set of categories
-shows that they are jointly useful. How would this change the way you
+reference category, and why? Suppose the F-test for the whole set of categories
+shows that they are jointly significant. How would this change the way you
 describe your market?
 There is no wrong answer.
 
 ::: {.callout-note collapse="true"}
 ## See an example, then write your own
 
-Take a student-run venture that sells meal-prep boxes on campus. "My channels are the campus stand, the app, and the website. I would set the campus stand as the reference, because it is the first channel and every decision is compared with it. If the F-test shows that the channel dummies are jointly useful, it makes sense to describe my market by channel. The p-values of the single dummies, some small and some large, could not answer that question."
+Take a student-run venture that sells meal-prep boxes on campus. "My channels are the campus stand, the app, and the website. I would set the campus stand as the reference, because it is the first channel and every decision is compared with it. If the F-test shows that the channel dummies are jointly significant, it makes sense to describe my market by channel. The p-values of the single dummies, some small and some large, could not answer that question."
 :::
 
 You can discuss this task, and any other task in this chapter, with
 **Tilly**, the course AI assistant. Ask it to check whether your two
 sentences confuse percent with percentage points, or to ask you questions
-about the dummy-variable trap with your own categories.
+about perfect multicollinearity with your own categories.
 ::::
 
 [Continue to Lecture 6: Interactions and curvature](i06-interactions-curvature.qmd).

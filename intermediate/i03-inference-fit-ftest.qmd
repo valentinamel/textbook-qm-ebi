@@ -21,7 +21,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 ::: {.driving-question}
 <span class="label">Driving question</span>
 
-<p class="dq-context">A slope is an estimate, not a fact. Before you put a number into a pitch deck or a report, you need to know how precise it is. You also need to know whether the model behind it is of any use.</p>
+<p class="dq-context">A slope from one sample is one estimate. Another sample would give a somewhat different number. Before you base a decision on it, or put it into a pitch deck or a report, you need to know how precise it is. You also need to know whether the model behind it is of any use.</p>
 
 The valuation slope is about 0.65. How precisely do we know that number, how
 much of the outcome does the line explain, and is the model useful at all?
@@ -115,7 +115,7 @@ and [degrees of freedom and t critical values](../resources/math-refresher.html#
 ## Lecture material
 
 This section reads the coefficient table of the valuation model: the
-standard error, the t value, the p-value, and the confidence interval of the
+standard error, the t statistic, the p-value, and the confidence interval of the
 slope. It then measures how well the line fits, with $R^2$, and tests whether
 the model is useful at all, with the F-test.
 
@@ -126,8 +126,8 @@ the model is useful at all, with the F-test.
 
 [Shark Tank data]{.shark-tag} The slope says 65 cents per claimed dollar. Would another set of deals give
 50 cents, or 80? A founder who negotiates with this number wants to know how
-far the number can be from the true value. R and every AI assistant answer with a table of standard
-errors, t values, and p-values. This lecture shows how to read that table
+far the number can be from the true value. R and AI assistants usually answer with a table of standard
+errors, t statistics, and p-values. This lecture shows how to read that table
 and how to check what R or an AI assistant says about it.
 
 ### How precisely do we know the slope?
@@ -158,7 +158,7 @@ estimated: a slope.
 |---|---|---:|
 | estimate | `Estimate` column | $\hat\beta_1 = 0.649$ |
 | standard error | `Std. Error` column | $\operatorname{SE}(\hat\beta_1) = 0.0111$ |
-| t value | `t value` column | $t = 58.6$ |
+| t statistic | `t value` column | $t = 58.6$ |
 | p-value | `Pr(>|t|)` column | $< 0.001$ |
 | confidence interval | `confint()` | computed below |
 
@@ -231,7 +231,7 @@ population slope between about 63 and 67 cents of agreed valuation per dollar
 of claimed valuation. A slope of 1, which would mean that the sharks accept
 the claimed valuation, is far outside this range. The endpoints of the
 interval have the units of the slope. The estimate, its standard error, and
-the interval have the same units. The t value and the p-value have no units.
+the interval have the same units. The t statistic and the p-value have no units.
 
 R agrees:
 
@@ -267,7 +267,7 @@ By hand: $t_{obs} = 0.6487 / 0.01107 \approx 58.6$. The estimate lies about
 Decision with the critical value: reject $H_0$ if
 $|t_{obs}|\ge t_{0.975,\,872}=1.963$. Here $58.6\ge1.963$, so we reject
 $H_0$ at the 5% level. The p-value below gives the same decision in a
-second way. The p-value is the probability of a t value at least this far
+second way. The p-value is the probability of a t statistic at least this far
 from zero in either direction, if the population slope is zero. The code below calculates it
 as in QM Basic:
 
@@ -288,8 +288,8 @@ never occur. This is strong evidence against a zero slope among these deals.
 
 What it does not say:
 
-- It does not say that the model is correct. The fan and the influential
-  deals of Lecture 2 limit how much you can trust every number in this table.
+- It does not say that the model is correct. The heteroskedasticity and the
+  influential deals of Lecture 2 limit how much you can trust every number in this table.
 - It does not say that the association is large or important. With 874
   observations, even a very small slope can have a tiny p-value.
 - It does not say that claiming more causes a higher agreed valuation. No
@@ -300,8 +300,8 @@ What it does not say:
 
 No. The p-value measures the distance from zero in standard errors. R
 calculated the standard error under the model assumptions. Two of these
-assumptions are constant error variance and independent rows. Lecture 2
-showed the fan in the residuals and the few deals that strongly affect the
+assumptions are homoskedasticity and independent rows. Lecture 2
+showed heteroskedasticity in the residuals and the few deals that strongly affect the
 fit, so this standard error is doubtful. "Significant" means that the data are not consistent with a
 zero slope. It does not mean that 0.0111 is the right standard error.
 :::
@@ -465,8 +465,8 @@ ggplot(decomp_df, aes(x = x, y = y)) +
 
 Now square each of the three pieces and add up over all observations. This
 gives three sums of squares. SST is the total sum of squares, SSR is the
-sum of squares explained by the regression, and SSE is the sum of squared
-residuals from Lecture 1. For a least-squares line with an intercept, the
+regression sum of squares (the part explained by the regression), and SSE is
+the sum of squared residuals from Lecture 1. For a least-squares line with an intercept, the
 same split holds for the sums:
 
 $$
@@ -521,7 +521,8 @@ sample. The other 25% remains as residual variation around the line.
 ::: {.definition-box}
 <span class="label">Definition</span>
 
-**$R^2$** (R squared). The share of the variation of the outcome in the
+**$R^2$** (R-squared, also called the coefficient of determination). The
+share of the variation of the outcome in the
 sample that the fitted line explains:
 
 $$
@@ -564,7 +565,7 @@ deviation of the residuals is about \$1.66 million, as the output of
 **Not proof that the assumptions hold.**
 *Wrong:* "With $R^2$ this high, the model is clearly correct."
 *Corrected:* $R^2$ measures fit. It does not check the assumptions. Lecture 2
-found a fan in the residuals and influential deals in this same model, and
+found heteroskedasticity and influential deals in this same model, and
 the value 0.798 says nothing about either problem.
 
 ::: {.callout-caution collapse="true"}
@@ -623,7 +624,7 @@ together help to explain the outcome.
 All numbers of this lecture appear together in the output of `summary()`.
 Read it from top to bottom in this order: (1) the formula and the data, (2)
 the coefficient estimates and their units, (3) the standard errors, t
-values, and p-values, (4) the residual standard error, (5) $R^2$ and adjusted
+statistics, and p-values, (4) the residual standard error, (5) $R^2$ and adjusted
 $R^2$, (6) the overall F-test. Then remember (7), which the output does not
 print: the assumptions and the limits of the data.
 
@@ -635,7 +636,7 @@ summary(val_model)
 Two lines of this output are new. The **residual standard error**, 1.664, is
 the standard deviation of the residuals in the units of the outcome:
 $s=\sqrt{\text{SSE}/(n-2)}$, here about \$1.66 million. This number is large
-mainly because of a few very large misses: Lecture 2 showed that half of the
+mainly because of a few very large residuals: Lecture 2 showed that half of the
 residuals lie between $-0.40$ and $0.17$. Still, it is large compared with
 the mean agreed valuation of \$2.22 million. So single deals can lie far from
 the line even though $R^2$ is high. **Adjusted $R^2$** is $R^2$ with a small
@@ -702,10 +703,10 @@ decision.
 ### Robust standard errors: what they fix {#i03-robust}
 
 [Shark Tank data]{.shark-tag} Heteroskedasticity-consistent standard errors, called **robust** standard
-errors for short, do not need the constant-variance assumption. The fitted
+errors for short, do not need the homoskedasticity assumption. The fitted
 coefficients stay the ordinary least-squares values. Only the standard
-errors change, and with them the t values, p-values, and intervals. Lecture 2
-found a fan in the residuals of this model, so robust standard errors are a
+errors change, and with them the t statistics, p-values, and intervals. Lecture 2
+found heteroskedasticity in the residuals of this model, so robust standard errors are a
 sensible choice here:
 
 ```{r}
@@ -725,8 +726,8 @@ the slope is 0.034, about three times the usual 0.0111. The robust 95%
 interval runs from about 0.58 to 0.72. It is three times as wide as the
 usual interval and still lies far below 1.
 
-Robust standard errors fix exactly one problem: an error variance that is
-not constant. They
+Robust standard errors fix exactly one problem: heteroskedasticity, an error
+variance that is not constant. They
 do not repair a curved relationship, confounding, dependence between rows,
 influential data errors, or a selected sample. If the slope itself is
 biased, a robust standard error only says how precisely the wrong number is
@@ -737,7 +738,7 @@ calculate robust standard errors by hand. You should know what they are for.
 <span class="label">What a precise slope and a high R² can and cannot say</span>
 
 - Every number of this lecture is calculated under the assumptions of
-  Lecture 2. The fan makes the usual standard error doubtful, and a few
+  Lecture 2. Heteroskedasticity makes the usual standard error doubtful, and a few
   deals strongly affect the fit.
 - The data are deals on a television show, not a random sample of
   companies. This selection affects every estimate.
@@ -745,7 +746,8 @@ calculate robust standard errors by hand. You should know what they are for.
 
 **What you can do with it:** use the slope and its interval for the decision.
 Use the residual standard error to judge how far single cases lie from the
-line. Prefer robust standard errors when the residual plot shows a fan.
+line. Prefer robust standard errors when the residual plot shows
+heteroskedasticity.
 :::
 
 ### Answering the driving question
@@ -758,7 +760,7 @@ from 0.58 to 0.72. The t-test clearly rejects a zero slope
 ($t \approx 58.6$). The line explains about 80% of the variation in agreed
 valuations, and the overall F-test ($F \approx 3435$) confirms that the
 model fits better than the mean alone. All of these statements depend on the
-assumptions checked in Lecture 2, where the residuals showed a fan and a few
+assumptions checked in Lecture 2, where the residuals showed heteroskedasticity and a few
 influential deals.
 
 ::: {.founder-box}
@@ -789,7 +791,7 @@ unclear and bring it to the next tutorial, or ask Tilly.
 ### Recall questions
 
 1. Why are the residual degrees of freedom $n-2$ in simple regression?
-2. Which of the five quantities (estimate, standard error, t value,
+2. Which of the five quantities (estimate, standard error, t statistic,
    p-value, interval) share the slope's units, and which are unit-free?
 3. What do SST, SSR, and SSE measure, and how are they related?
 4. Why is $R^2$ between 0 and 1 in an OLS model with an intercept?
@@ -810,7 +812,8 @@ unclear and bring it to the next tutorial, or ask Tilly.
    lies between 0 and 1.
 5. All population slope coefficients are zero. With one predictor that is
    the same hypothesis as the two-sided slope t-test, and $F=t^2$.
-6. An error variance that is not constant, and nothing else.
+6. Heteroskedasticity, an error variance that is not constant, and nothing
+   else.
 :::
 
 ### Finish a half-worked example: an interval for a new row
@@ -900,16 +903,16 @@ the season, and the standard errors depend on the assumptions of Lecture 2.
 ### Review: one diagnostics question from Lecture 2
 
 The residual-versus-fitted plot of the valuation model shows unequal spread,
-the fan of Lecture 2. Which numbers of the coefficient table in this lecture
+the heteroskedasticity of Lecture 2. Which numbers of the coefficient table in this lecture
 does this pattern make most doubtful, and why?
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-The standard error 0.0111, and with it the t value, the p-value, and the
+The standard error 0.0111, and with it the t statistic, the p-value, and the
 confidence interval that are built from it. The usual formula for the
-standard error assumes one common error variance $\sigma^2$. A fan says that
-the variance is not constant, so the stated precision is doubtful. Robust
+standard error assumes one common error variance $\sigma^2$. Heteroskedasticity
+means that the variance is not constant, so the stated precision is doubtful. Robust
 standard errors address exactly this one problem. They repair nothing else.
 :::
 
@@ -939,7 +942,7 @@ the association is not zero.
 
 ### Check the AI
 
-[Shark Tank data]{.shark-tag} You asked an AI assistant: "R squared is 0.80 and the p-value is below 0.001. Is my model good?" It answered:
+[Shark Tank data]{.shark-tag} You asked an AI assistant: "R-squared is 0.80 and the p-value is below 0.001. Is my model good?" It answered:
 
 > "Yes. The model predicts 80% of the valuations correctly, and the tiny p-value proves that the model assumptions hold."
 
@@ -949,7 +952,7 @@ step of Attempt → Ask → Verify → Explain.
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-Two errors. R squared is the share of the variation that the line explains, not a share of correct predictions. Single predictions can still miss by millions of dollars (the residual standard error is about 1.7 million). And the p-value is calculated under the assumptions. It cannot prove them. Lecture 2 showed a fan in the residuals, so the standard error behind this p-value is doubtful.
+Two errors. R-squared is the share of the variation that the line explains, not a share of correct predictions. Single predictions can still miss by millions of dollars (the residual standard error is about 1.7 million). And the p-value is calculated under the assumptions. It cannot prove them. Lecture 2 showed heteroskedasticity in the residuals, so the standard error behind this p-value is doubtful.
 :::
 
 ### Make it yours

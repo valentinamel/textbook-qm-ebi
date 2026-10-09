@@ -41,7 +41,8 @@ Watch Stanford Statistical Learning
 Extensions of the Linear Model</a> and
 <a href="https://www.youtube.com/watch?v=F-D3lZzYn50&list=PLoROMvodv4rOzrYsAxzQyHb8n_RWNuS1e&index=48">7.1
 Polynomials and Step Functions</a>. Focus on why an interaction changes a
-slope, and why a model with a squared term is still a linear regression. All
+slope, and why a model with a quadratic term (a squared predictor) is still a
+linear regression. All
 links are also listed in the
 <a href="../resources/video-guide.html">External Video Guide</a>.
 The videos explain key ideas in another way and can use a different
@@ -106,9 +107,9 @@ and [polynomial terms](../resources/math-refresher.html#polynomial-terms).
 
 ## Lecture material
 
-This section adds two terms to the regression model. An interaction lets a
-slope differ between two groups. A squared term lets a slope change along
-the predictor itself.
+This section adds two terms to the regression model. An interaction term
+lets a slope differ between two groups. A quadratic term lets a slope change
+along the predictor itself.
 
 <p class="concept-video"><strong>Stanford explanations (review):</strong>
 <a href="https://www.youtube.com/watch?v=dEBQmiXv9fk">3.5 Extensions of the Linear Model</a> and
@@ -176,8 +177,8 @@ model of Lecture 5 with one common slope.
 ::: {.definition-box}
 <span class="label">Definition</span>
 
-**Interaction.** A term that is the product of two predictors, for example
-$X\times D$. It lets the slope of one predictor depend on the value of the
+**Interaction term.** A term that is the product of two predictors, for
+example $X\times D$. It lets the slope of one predictor depend on the value of the
 other. Its coefficient is a difference in slopes.
 :::
 
@@ -190,10 +191,10 @@ $$
 $$
 
 So $\beta_3$ is the difference between the slope of the group with $D=1$ and
-the slope of the reference group. It is not an effect on its own. Its unit
+the slope of the reference category ($D=0$). It is not an effect on its own. Its unit
 combines the two variables. If $X$ is measured in seasons and $D$ is a
 dummy, $\beta_3$ is in outcome units per season: here, equity percentage
-points per season, one group minus the reference group. The same algebra
+points per season, the group with $D=1$ minus the reference category. The same algebra
 works when the second variable is a number $Z$ and not a dummy. The slope of
 $X$ is then $\beta_1+\beta_3Z$, a slope that changes with $Z$.
 
@@ -208,11 +209,11 @@ $$
 moves that comparison to the average season (about 8.8). Centring changes
 some results and cannot change others:
 
-- It changes the meaning and the value of the intercept and of the group
+- It changes the meaning and the value of the intercept and of the dummy
   coefficient. Both now refer to the average season.
 - It cannot change the fitted values, the residuals, $R^2$, or the
   interaction coefficient. The lines are the same lines. Only the place
-  where we read the vertical gap between them has moved.
+  where we compare the two groups has moved.
 
 ::: {.callout-note collapse="true"}
 ## Check: which printed numbers change when season is centred?
@@ -297,7 +298,7 @@ not proof of no difference.
 #| label: fig-i06-interaction
 #| code-fold: true
 #| code-summary: "See the R code for this figure"
-#| fig-cap: "Fitted equity offered by season for all-men teams and for teams with women, at the average requested amount. The two lines are almost parallel. The slope of a line is the fitted change per season for that group, and the vertical gap is the fitted difference between the groups in a given season."
+#| fig-cap: "Fitted equity offered by season for all-men teams and for teams with women, at the average requested amount. The two lines are almost parallel. The slope of a line is the fitted change per season for that group, and the vertical distance between the lines is the fitted difference between the groups in a given season."
 library(ggplot2)
 sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
 sharks$ask_1k <- sharks$ask_amount_usd / 1000
@@ -367,8 +368,8 @@ you:
 lm(y ~ x * z, data = df)  # x * z expands to x + z + x:z
 ```
 
-An interaction lets the slope differ by group. A squared term lets the slope
-change as $x$ itself changes. Both add one new column to the data, a product or a
+An interaction term lets the slope differ by group. A quadratic term lets the
+slope change as $x$ itself changes. Both add one new column to the data, a product or a
 square. In both, you read two coefficients together.
 
 ### Curvature: polynomials are still linear regression
@@ -588,7 +589,7 @@ assistant.
    predictor. Here its
    unit is equity percentage points per season, as a difference between the
    two groups.
-2. So that the intercept and the group coefficient refer to a useful value,
+2. So that the intercept and the dummy coefficient refer to a useful value,
    such as the sample mean, and not to zero. Centring never changes the
    fitted values, the residuals, $R^2$, or the interaction coefficient.
 3. Keep $X$ and $D$ in the model whenever their interaction $XD$ is in it,
@@ -634,7 +635,7 @@ The fitted values agree, and both interaction estimates are about $-0.061$.
 The `women` coefficient changes from about $1.35$ (a comparison at Season 0,
 which does not exist) to about $0.81$ (a comparison at the average season,
 about 8.8). The intercept changes as well. Centring moved the place where
-we read the gap. It did not move the lines.
+we compare the two groups. It did not move the lines.
 :::
 
 ### Finish a half-worked example: a quadratic change
@@ -722,7 +723,7 @@ F statistic and state the 5% conclusion.
 ## Check your answer
 
 $F=(436.25/2)/(82{,}792/1{,}429)=218.1/57.9\approx3.76$, with
-p $\approx$ 0.023. At 5%, the two category terms are jointly useful in that
+p $\approx$ 0.023. At 5%, the two category terms are jointly significant in that
 model, even though the t-test of the mixed dummy alone is far from
 significant. Joint tests and individual tests answer different questions.
 :::

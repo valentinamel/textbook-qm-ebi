@@ -21,7 +21,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 ::: {.driving-question}
 <span class="label">Driving question</span>
 
-<p class="dq-context">R draws a fitted line in the same way through good data and through bad data. Whether you can trust the line depends on assumptions that no software checks for you.</p>
+<p class="dq-context">Linear regression is a model with assumptions. The estimates, standard errors, tests, and intervals of Lectures 1 and 3 are reliable only when these assumptions hold, at least approximately. R fits the line and prints the output in any case. It does not check the assumptions for you automatically. You check them yourself, with plots and with knowledge of how the data were collected.</p>
 
 The fitted line from Lecture 1 looks convincing. Under what conditions
 should we trust it, and what do its residuals reveal?
@@ -137,8 +137,8 @@ ggplot(resid_df, aes(x = fitted, y = residual)) +
 
 **Residual plot** (residual-versus-fitted plot). A scatterplot with the
 fitted values $\widehat Y_i$ on the horizontal axis and the residuals $e_i$
-on the vertical axis. It shows how the misses of the line (the residuals) change from the
-left to the right of the plot.
+on the vertical axis. It shows how the residuals change from the left to
+the right of the plot.
 :::
 
 In @fig-i02-warmup-residuals, both axes are in the units of the outcome,
@@ -155,38 +155,53 @@ $$
 Y_i=\beta_0+\beta_1X_i+\varepsilon_i.
 $$
 
-The model depends on several separate assumptions. Each assumption supports
-a different part of the analysis.
+Least squares gives a line for any data. Whether the numbers that come with
+the line are reliable depends on a few assumptions.
 
 ::: {.definition-box}
 <span class="label">Definition</span>
 
-**Model assumptions.** The conditions under which we can trust the fitted
-line and its standard errors:
-
-- **Linearity.** The average of $Y$ at each value of $X$ lies on a straight
-  line.
-- **Independence.** The observations do not depend on each other. Every row
-  brings new information.
-- **Constant variance.** The errors spread equally at every value of $X$.
-- **Normal errors.** At each value of $X$, the errors follow a normal
-  distribution. This assumption matters only in small samples.
+**Model assumptions.** Conditions on the data and on the error terms
+$\varepsilon_i$ under which the estimates, standard errors, tests, and
+intervals of least squares are reliable.
 :::
 
-The table repeats these four assumptions in symbols and adds two more
-conditions. Without variation in $X$, we cannot calculate a slope. And to read
-the slope as an effect, we need one more condition: no confounding. A
-**confounder** is a variable that is not in the model and that affects both
-$X$ and $Y$.
+The assumptions are about the error terms $\varepsilon_i$ of the model. We
+never observe the error terms. The plots in this lecture therefore use the
+residuals $e_i$, which are our estimates of the error terms
+(Lecture 1). The table lists each assumption, says how to check it, and
+says what goes wrong if it fails.
 
-| Condition | Meaning | What it supports |
-|---|---|---|
-| Linear conditional mean | $E[Y\mid X=x]=\beta_0+\beta_1x$ over the range of the data | One constant slope summarises how the average of $Y$ changes with $X$ |
-| No confounding (for a causal reading only) | Nothing that is missing from the data affects both $X$ and $Y$ | Reading the slope as the effect of changing $X$. Describing how average outcomes differ across values of $X$ does not need it |
-| Independent observations | The errors of different rows are unrelated, so no row repeats the information of another | The usual standard-error formula |
-| Variation in $X$ | Not all observations have the same predictor value | A slope can be calculated |
-| Constant conditional variance | $\operatorname{Var}(\varepsilon\mid X)=\sigma^2$, the same at every value of $X$ | The usual standard-error formula |
-| Conditional normality | At each value of $X$, $\varepsilon$ follows a normal distribution | Exact t and F distributions in small samples |
+| Assumption | What it says in plain words | How to check it | What goes wrong if it fails |
+|---|---|---|---|
+| Variation in $X$ | Not all observations have the same value of $X$ | Look at the values of $X$, for example with `summary()` | R cannot calculate a slope |
+| Linearity | The average of $Y$ at each value of $X$ lies on a straight line: $E[Y\mid X=x]=\beta_0+\beta_1x$ | Residual plot: look for a curve | One slope misses part of the pattern, and the line is wrong in some parts of the range |
+| Independence (random sampling) | The observations are drawn independently: the error of one row says nothing about the error of another row | Knowledge of how the data were collected | The usual standard errors are often too small, so intervals are too narrow. A sample that is not random can also bias the line |
+| Homoskedasticity (constant variance) | The errors have the same variance at every value of $X$: $\operatorname{Var}(\varepsilon_i\mid X_i)=\sigma^2$ | Residual plot: look for a fan shape | The slope stays unbiased, but the usual standard errors, tests, and intervals are wrong |
+| Normality of the errors | At each value of $X$, the errors follow a normal distribution | Normal Q--Q plot of the standardised residuals | In small samples the t and F distributions of Lecture 3 are no longer exact. In large samples this matters little |
+| Zero conditional mean (exogeneity): no omitted confounder | The error averages zero at every value of $X$: $E[\varepsilon_i\mid X_i]=0$. For a causal reading: no other cause of $Y$ that is missing from the model is related to $X$ | Knowledge of how $X$ came about. No plot can show it | The slope is not the effect of changing $X$. It still describes how average outcomes differ across values of $X$ |
+
+The rows fall into groups. Variation in $X$ is needed before R can
+calculate a slope at all. In multiple regression (Lecture 4) this condition
+becomes no perfect multicollinearity. Variation in $X$, linearity,
+independent observations, and zero conditional mean together make the
+estimated slope $\hat\beta_1$ unbiased: across many samples, it is correct
+on average. Homoskedasticity and independence are needed for the usual
+standard errors, and so for the t-tests and intervals of Lecture 3.
+Normality of the errors makes these tests and intervals exact in small
+samples. In large samples they hold approximately without it, because of the
+central limit theorem.
+
+The last row matters for how you read the slope. A **confounder** is
+a variable that is not in the model and that affects both $X$ and $Y$. If you
+read the slope only as a description of how average outcomes differ across
+values of $X$, the error is just the distance from the line of averages.
+Linearity then already makes the errors average zero at every value of $X$.
+If you read the slope as the effect of changing $X$, the error term contains
+all other causes of $Y$. Zero conditional mean then says that these other
+causes are unrelated to $X$. An omitted confounder breaks this assumption.
+This is common with observational data such as the Shark Tank deals, where
+nobody sets $X$ at random.
 
 No row of the table says that the data are normal. This answers the prediction
 question from before class: the outcome does not need to be normally
@@ -202,12 +217,13 @@ Individual outcomes do not have to lie on a line. Linearity says that the
 average outcome at each predictor value follows a line. If the residual
 plot shows a curve, one constant slope misses part of that average pattern.
 
-Constant variance is about the vertical spread. It says that the variance of
+Homoskedasticity is about the vertical spread. It says that the variance of
 the errors is the same at each predictor value. It does not say that all
-residuals have the same size. The technical name for constant variance is
-**homoskedasticity**, and for changing variance **heteroskedasticity**. In a
-residual plot, changing variance looks like a fan: the vertical band of points
-widens or narrows from left to right. @fig-i02-assumption-panels shows both
+residuals have the same size. When the variance changes with the predictor,
+this is called **heteroskedasticity**. In a residual plot,
+heteroskedasticity often looks like
+a fan shape: the vertical band of points widens or narrows from left to
+right. @fig-i02-assumption-panels shows both
 problems.
 
 ```{r}
@@ -215,7 +231,7 @@ problems.
 #| code-fold: true
 #| code-summary: "See the R code for this figure"
 #| fig-height: 6
-#| fig-cap: "Four simulated situations. Top row: a linear mean fits (left, outcome against predictor), a curved mean leaves a U-shaped residual pattern (right). Bottom row: constant vertical spread (left), spread growing with the fitted value, a fan (right). The three residual panels share the gold dashed line at residual zero."
+#| fig-cap: "Four simulated situations. Top row: a linear mean fits (left, outcome against predictor), a curved mean leaves a U-shaped residual pattern (right). Bottom row: constant vertical spread, homoskedasticity (left), spread growing with the fitted value, heteroskedasticity with a fan shape (right). The three residual panels share the gold dashed line at residual zero."
 library(ggplot2)
 set.seed(802)
 n_demo <- 90
@@ -227,8 +243,10 @@ m_curved <- lm(y_curved ~ x_demo)
 m_linear <- lm(y_linear ~ x_demo)
 
 fit_demo <- seq(1, 9, length.out = n_demo)
-res_constant <- rnorm(n_demo, 0, 0.75)
-res_fan <- rnorm(n_demo, 0, 0.18 + 0.13 * fit_demo)
+# Residual panels drawn as clear textbook cases: an even band for constant
+# spread, and a band that widens steadily for changing spread.
+res_constant <- runif(n_demo, -1, 1)
+res_fan <- runif(n_demo, -1, 1) * (0.1 + 0.22 * fit_demo)
 
 panel_names <- c("Linear mean (outcome)", "Curved mean (residuals)",
                  "Constant spread (residuals)", "Changing spread (residuals)")
@@ -276,16 +294,16 @@ ggplot(demo_df, aes(x = x, y = y)) +
 ::: {.callout-note collapse="true"}
 ## Check: match each residual pattern to the assumption it challenges
 
-A U-shaped (curved) residual pattern challenges the linear
-conditional mean: the average residual is not zero everywhere, so a
-straight line misses part of the mean relationship. A fan challenges
-constant conditional variance: the vertical spread of residuals changes
+A U-shaped (curved) residual pattern challenges linearity:
+the average residual is not zero everywhere, so a
+straight line misses part of the mean relationship. A fan shape challenges
+homoskedasticity: the vertical spread of residuals changes
 with the fitted value. A real plot can show both problems at once.
 :::
 
 ### Reading the valuation model's vertical spread
 
-[Shark Tank data]{.shark-tag} Now look for a fan in @fig-i02-warmup-residuals. At small fitted values the
+[Shark Tank data]{.shark-tag} Now look for heteroskedasticity in @fig-i02-warmup-residuals. At small fitted values the
 residuals stay close to the zero line. At larger fitted values they spread
 over several million dollars. A short calculation confirms what the plot
 shows. The code sorts the deals by the claimed valuation into five groups.
@@ -305,10 +323,11 @@ of deals with the smallest claimed valuations and about \$3.6 million in the
 fifth with the largest, about 25 times as much. The spread of agreed
 valuations grows with the size of the claim. This makes economic sense: founders
 and sharks can disagree by much more money about a \$20 million company than
-about a \$200,000 company. This pattern is a fan. The usual standard errors
+about a \$200,000 company. This pattern is heteroskedasticity. The usual standard errors
 assume one common variance $\sigma^2$, so here they depend on an assumption
-that probably does not hold. Lecture 3 returns to
-this point.
+that probably does not hold. The slope itself stays unbiased, because
+heteroskedasticity is not part of the conditions for an unbiased slope.
+Lecture 3 returns to this point.
 
 ::: {.callout-caution collapse="true"}
 ## Try it: annotate a residual plot
@@ -334,10 +353,10 @@ moves away from zero in some part of the plot.
 
 The band between the two curves widens strongly from left to right. Deals
 with small fitted valuations lie within a few hundred thousand dollars of the
-line. Deals with large fitted valuations lie within several million. That fan challenges
-constant conditional variance. The
+line. Deals with large fitted valuations lie within several million. This fan
+shape shows heteroskedasticity, so it challenges homoskedasticity. The
 average residual stays near zero across the range, so the plot does not
-show a clear violation of the linear conditional mean. You read the same
+show a clear violation of linearity. You read the same
 plot twice, once for each assumption.
 :::
 :::
@@ -346,16 +365,18 @@ plot twice, once for each assumption.
 
 Two rows of the assumptions table never appear in any residual plot.
 
-**No confounding.** A curve in the residual plot can show that a straight
-line misses the average pattern. No plot can show whether a confounder
-exists, that is, whether something that is missing from the data affects
-both the predictor and the outcome. Least squares always gives residuals with a mean of zero and no
-straight-line relation to $X$. So the residual plot looks clean even when a
-confounder exists. Ask how the observations were produced.
+**Zero conditional mean (no omitted confounder).** A curve in the residual
+plot can show that a straight line misses the average pattern. No plot can
+show whether a confounder exists, that is, whether something that is
+missing from the data affects both the predictor and the outcome. The
+reason is the difference between errors and residuals. Least squares always
+gives residuals with a mean of zero and no straight-line relation to $X$,
+even when the error terms are related to $X$. So the residual plot looks
+clean even when a confounder exists. Ask how the observations were produced.
 Which common causes of $X$ and $Y$ are plausible but missing from the data?
 
-**Independence.** Whether rows share information is a fact about how the
-data were collected, not about the residuals. Suppose that rows are related
+**Independence.** Whether the errors of different rows are related is a
+fact about how the data were collected. The residual plot does not show it. Suppose that rows are related
 but you treat them as independent. Then the data seem to contain more
 information than they really do, and the standard errors are too small.
 
@@ -369,8 +390,9 @@ Two examples from Shark Tank:
 - **Network ties.** Suppose founders with strong investor networks both
   claim higher valuations (they know the market) and get better deals (the
   sharks know them). Network strength is not recorded in the data. It is related to
-  the predictor, and it affects the outcome. This is a **confounding** problem.
-  The slope still describes how average agreed valuations differ across
+  the predictor, and it affects the outcome. This is a **confounding** problem:
+  network strength is an omitted confounder, so zero conditional mean fails
+  for a causal reading. The slope still describes how average agreed valuations differ across
   claims. But you cannot read the slope as what a higher claim would achieve.
 
 Neither problem is visible in @fig-i02-warmup-residuals. You can find both
@@ -404,16 +426,16 @@ summary(residuals(val_model))
   above.
 
 The mean is zero, as it always is when the model has an intercept. If no
-deal were extreme, the largest misses would be a few times the width of the
-middle half. Here they are 14 to 24 times as large. A few deals miss the line
+deal were extreme, the largest residuals would be a few times the width of
+the middle half. Here they are 14 to 24 times as large. A few deals miss the line
 by far more than the typical deal does, and such deals can strongly change
 the fitted line. The same numbers, without the mean, appear at the top of
 `summary(val_model)`. Lecture 3 explains this output.
 :::
 
 Two standard tools make this check precise. A **standardised residual**,
-`rstandard()`, is a residual divided by its standard deviation, so it counts
-the miss in standard deviations. Values beyond about $\pm 3$ are large by any
+`rstandard()`, is a residual divided by its standard deviation, so it
+measures the residual in standard deviations. Values beyond about $\pm 3$ are large by any
 common standard. **Cook's distance**, `cooks.distance()`, measures how much the
 whole fitted line would move if one observation were removed. A common
 threshold is $4/n$: you look more closely at observations above it.
@@ -446,14 +468,16 @@ model uses, here 874. Twenty-five deals have standardised residuals beyond
 $\pm 3$, and 64 have a Cook's distance above $4/n$. These are 3% and 7% of
 the 874 deals. The most
 influential deal claimed a valuation of \$50 million and closed at
-\$25 million, half of the claim. @fig-i02-influence marks the 64 deals in the
-scatterplot.
+\$25 million, half of the claim. Its claimed valuation lies far from the
+claimed valuations of the other deals. Such an observation has high
+leverage: like a long lever, it can pull the fitted line towards itself.
+@fig-i02-influence marks the 64 deals in the scatterplot.
 
 ```{r}
 #| label: fig-i02-influence
 #| code-fold: true
 #| code-summary: "See the R code for this figure"
-#| fig-cap: "The 874 deals with the fitted line, full range shown. Orange points have a Cook's distance above 4/n. The labelled deal (claimed $50 million, agreed $25 million) moves the fitted line most: it sits far to the right, so it pulls on the line like a lever."
+#| fig-cap: "The 874 deals with the fitted line, full range shown. Orange points have a Cook's distance above 4/n. The labelled deal (claimed $50 million, agreed $25 million) moves the fitted line most: it sits far to the right (high leverage), so it pulls on the line like a lever."
 library(ggplot2)
 sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
 vals <- subset(sharks, deal_on_show == 1 & deal_equity_pct > 0)
@@ -499,7 +523,7 @@ order:
 
 ### Q--Q plots: how to read them, when normality matters
 
-[Shark Tank data]{.shark-tag} The last assumption in the table is conditional normality of the errors. A
+[Shark Tank data]{.shark-tag} The fifth row of the table is normality of the errors. A
 **normal Q--Q plot** (quantile-quantile plot) puts the standardised residuals
 in order and compares them with the values that a normal distribution would
 give. If the residuals are close to normal, the points lie along the
@@ -550,7 +574,8 @@ qqline(rstandard(val_model))
 When does this matter? Normal errors are needed for exact t and F
 distributions in small samples. With 874 observations the tests and
 intervals of Lecture 3 still hold approximately without normal errors,
-because averages over many observations are close to normal. The
+because of the central limit theorem: averages over many observations are
+close to normal, and the estimated slope is such an average. The
 approximation is weaker when a few extreme deals decide where the line lies.
 Very extreme outliers distort both the line and its
 standard errors, in samples of any size.
@@ -559,8 +584,9 @@ standard errors, in samples of any size.
 <span class="label">What a residual check can and cannot show</span>
 
 - A residual plot without patterns agrees with the assumptions. It does not
-  prove them. Confounders and dependent rows do not show up in a plot.
-- A fan or an influential deal is a finding to look into and to report. It is
+  prove them. An omitted confounder and dependent errors do not show up in a
+  plot.
+- Heteroskedasticity or an influential deal is a finding to look into and to report. It is
   not a final judgement on the model.
 - Keeping or dropping an unusual observation is a decision that you make from
   knowledge of the data and that you state openly.
@@ -573,12 +599,15 @@ without them, say so.
 ### Answering the driving question
 
 You can trust the Lecture 1 line only under certain conditions. Its
-residuals reveal two problems. The vertical spread grows with the size of the claim (the
-fan). And a few extreme deals, flagged by standardised residuals beyond
+residuals reveal two problems. The vertical spread grows with the size of the claim
+(heteroskedasticity). And a few extreme deals, flagged by standardised residuals beyond
 $\pm3$ and Cook's distances above $4/n$, strongly affect both the line and
-its standard errors. Nothing in the plots contradicts a linear conditional mean.
-Independence and the absence of confounding cannot be seen in any plot. They
-depend on how the show works. Lecture 3 calculates standard errors,
+its standard errors. Heteroskedasticity does not bias the slope, but it makes
+the usual standard errors doubtful. Nothing in the plots contradicts
+linearity. Independence and zero conditional mean (no omitted confounder)
+cannot be seen in any plot. They depend on how the show works. Without zero
+conditional mean, the slope describes how agreed valuations differ across
+claims, but it is not the effect of claiming more. Lecture 3 calculates standard errors,
 intervals, and tests for this model. These two problems limit how much you
 can trust those results.
 
@@ -611,27 +640,36 @@ unclear and bring it to the next tutorial, or ask Tilly.
 
 ### Recall questions
 
-1. Which assumption concerns the conditional mean?
+1. Which assumption says that the average of $Y$ at each value of $X$ lies
+   on a straight line?
 2. Must the outcome variable be normally distributed? Why or why not?
 3. What does a fan shape in a residual-versus-fitted plot suggest?
 4. Which assumptions can you not check with a residual plot alone?
 5. What do a standardised residual and Cook's distance each measure?
 6. What are the three steps for handling a flagged observation?
+7. Which assumptions make the slope unbiased, and which assumptions do the
+   usual standard errors need?
 
 ::: {.callout-note collapse="true"}
 ## Check your answers
 
-1. The linear conditional mean, $E[Y\mid X=x]=\beta_0+\beta_1x$.
+1. Linearity, $E[Y\mid X=x]=\beta_0+\beta_1x$.
 2. No. The assumptions are about the errors at each value of the predictor
    and about how the data were produced. They are not about the
    distribution of $Y$ or of $X$ on its own.
-3. Non-constant conditional variance (heteroskedasticity).
-4. Independence and the absence of confounding. They require knowledge of
-   how the data were collected.
-5. A standardised residual measures how unusual one observation's vertical
-   miss is, in standard-deviation units. Cook's distance measures how much
+3. Heteroskedasticity: the variance of the errors is not constant.
+4. Independence and zero conditional mean (no omitted confounder). They
+   require knowledge of how the data were collected. A residual plot cannot
+   show them, because least squares makes the residuals unrelated to $X$
+   even when the error terms are related to it.
+5. A standardised residual measures how unusual one observation's residual
+   is, in standard-deviation units. Cook's distance measures how much
    the whole fitted line moves if that observation is removed.
 6. Investigate, report, never silently delete.
+7. Unbiased slope: variation in $X$, linearity, independent observations,
+   and zero conditional mean. Usual standard errors: homoskedasticity and
+   independence. Normality of the errors is needed only for exact tests in
+   small samples.
 :::
 
 ### Finish a half-worked example: diagnose three residual plots
@@ -640,8 +678,8 @@ For each panel of @fig-i02-three-plots, write one sentence: which
 assumption, if any, does the plot challenge?
 
 Plot A (given). The residuals follow a U shape. The average residual is
-negative in the middle and positive at the ends, so the plot challenges the
-linear conditional mean.
+negative in the middle and positive at the ends, so the plot challenges
+linearity.
 
 Plot B and Plot C (you). Write the sentence for each of them in the same
 way.
@@ -693,9 +731,9 @@ ggplot(plots_df, aes(x = fitted, y = residual)) +
 ## Check your answers
 
 Plot B: the vertical band widens with the fitted
-value. This fan challenges constant conditional variance. Plot C: no
-visible pattern. The plot agrees with linearity and constant variance, the
-two assumptions it can show. This result is not proof that all assumptions hold.
+value. This fan shape shows heteroskedasticity, so it challenges
+homoskedasticity. Plot C: no visible pattern. The plot agrees with
+linearity and homoskedasticity, the two assumptions it can show. This result is not proof that all assumptions hold.
 :::
 
 ### Practice: diagnostics for your own model
@@ -734,7 +772,8 @@ c(big_rstandard = sum(abs(rstandard(equity_model)) > 3),
 The residual plot shows sixteen vertical stripes. The season
 (`season`) takes only whole-number values, so only sixteen fitted values
 exist. That is a feature of the predictor, not a violation. The vertical
-spread is broadly similar across the stripes, so there is no strong fan. The
+spread is broadly similar across the stripes, so there is no strong
+heteroskedasticity. The
 Q--Q plot bends upwards at the right end: some pitches offered far more
 equity than the fitted trend. The largest residual is about 83 percentage
 points, from founders who offered almost the whole company. So the normality
@@ -770,9 +809,9 @@ assumption the plot cannot assess and what information would assess it.
 ::: {.callout-note collapse="true"}
 ## Check a model answer
 
-The pattern is a fan: the spread of the residuals grows with the fitted
-value. This pattern challenges constant conditional variance
-(homoskedasticity). The plot cannot assess independence of observations. To
+The pattern is a fan shape: the spread of the residuals grows with the
+fitted value. This is heteroskedasticity, so the pattern challenges
+homoskedasticity. The plot cannot assess independence of observations. To
 assess it, you need knowledge of the data collection, for example whether some cafés appear in several rows or
 belong to the same chain.
 :::
@@ -807,7 +846,7 @@ what you would do about it. Investigate and report, do not delete.
 ::: {.callout-note collapse="true"}
 ## See an example, then write your own
 
-Take a student venture that sells boxes of prepared meals on campus. "For orders-on-price data I would worry most about confounding. I cut prices exactly in the weeks when demand is already weak. So weak demand affects both my price and my orders. One catering order of 200 meal boxes would dominate any fit. I would report the model with and without it and investigate whether catering is a different business, not delete the row."
+Take a student venture that sells boxes of prepared meals on campus. "For orders-on-price data I would worry most about zero conditional mean. I cut prices exactly in the weeks when demand is already weak. So weak demand affects both my price and my orders. It is an omitted confounder, and the price slope is not the effect of a price cut. One catering order of 200 meal boxes would dominate any fit. I would report the model with and without it and investigate whether catering is a different business, not delete the row."
 :::
 
 You can discuss this task, and any other task in this chapter, with
