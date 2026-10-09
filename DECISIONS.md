@@ -206,7 +206,7 @@ These points supersede earlier entries where they differ.
   October, Valentina, to avoid grounds for appeals). Removed: must-know boxes
   (be able to do yourself, enough to recognise), minimum and full paths,
   all time estimates for students, and the marking guides of the mock exams.
-  The mock exams keep answer indications (R&R article 3.3, paragraph 6). The
+  The mock exams keep model answers without marking information or point splits (R&R article 3.3, paragraph 6). The
   full marking guides are kept internally in `Assessment/`. Video boxes say
   that the videos can use another notation and that the lecture material
   comes first.
