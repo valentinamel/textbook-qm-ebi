@@ -1412,3 +1412,4 @@ group.
 - Widget homework added to Intermediate Lecture 1 (least-squares lab) and
   Basic Lecture 7 (sampling lab).
 - Review sections in all lectures renamed "Review questions from past lectures", without naming the lectures.
+- Omitted variable bias defined in Intermediate Lecture 2, where the confounder is first defined. Lecture 4 refers back to it.
