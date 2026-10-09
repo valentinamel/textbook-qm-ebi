@@ -197,6 +197,11 @@ These points supersede earlier entries where they differ.
   Tasks outside the core carry "(N minutes, extra practice for home)". One
   total for the core tasks under "In the tutorial", and time-budget lines for
   Before class and After class as in the lectures.
+- **Mock exam pages without internal material** (9 October, Valentina).
+  The planning table (topics, lectures, suggested minutes) and the marking
+  rules with the verb definitions are internal. They are kept in
+  `Assessment/Mock exams - planning tables and marking rules (internal)`,
+  outside the repository.
 - **No Wooclap in the textbook** (9 October, Valentina). Wooclap is only an
   optional tool for interaction in the lectures and on the slides. The online
   textbook never mentions it. The prediction questions before class are
