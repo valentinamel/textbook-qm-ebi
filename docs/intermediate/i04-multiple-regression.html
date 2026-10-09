@@ -491,77 +491,97 @@ E[Y_i\mid X_{i1}=x_1,\ldots,X_{ik}=x_k]
 </section>
 <section id="why-coefficients-change-an-invented-example" class="level3">
 <h3 class="anchored" data-anchor-id="why-coefficients-change-an-invented-example">Why coefficients change: an invented example</h3>
-<p>Start with an invented example. We build the data ourselves, so we know the true relationships. Imagine 200 small firms. One background variable, the size of the firm (<code>size</code>), influences both advertising spend (<code>adspend</code>) and revenue (<code>revenue</code>). Advertising itself adds nothing to revenue: the line of code that builds <code>revenue</code> contains <code>size</code> but not <code>adspend</code>.</p>
+<p>Start with an invented example. We build the data ourselves, so we know the true relationships. Imagine 180 small firms in three size classes: 60 small, 60 medium, and 60 large firms. The size of the firm (<code>size</code>, with the values 6, 10, and 14 in invented units) influences both advertising spend (<code>adspend</code>) and revenue (<code>revenue</code>). Advertising itself adds nothing to revenue: the line of code that builds <code>revenue</code> contains <code>size</code> but not <code>adspend</code>.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">200</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>size    <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="dv">10</span>, <span class="at">sd =</span> <span class="dv">2</span>)          <span class="co"># Z: firm size (drives both)</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">180</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>size    <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="dv">6</span>, <span class="dv">10</span>, <span class="dv">14</span>), <span class="at">each =</span> n <span class="sc">/</span> <span class="dv">3</span>)      <span class="co"># Z: firm size (drives both)</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>adspend <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="sc">+</span> <span class="fl">0.8</span> <span class="sc">*</span> size <span class="sc">+</span> <span class="fu">rnorm</span>(n, <span class="at">sd =</span> <span class="dv">1</span>)    <span class="co"># X: bigger firms spend more</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>revenue <span class="ot">&lt;-</span> <span class="dv">5</span> <span class="sc">+</span> <span class="fl">1.5</span> <span class="sc">*</span> size <span class="sc">+</span> <span class="fu">rnorm</span>(n, <span class="at">sd =</span> <span class="fl">1.5</span>)  <span class="co"># Y: size drives revenue,</span></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>demo <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(revenue, adspend, size)      <span class="co">#    adspend does not</span></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(<span class="fu">lm</span>(revenue <span class="sc">~</span> adspend, <span class="at">data =</span> demo))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>(Intercept)     adspend 
-   5.957361    1.391909 </code></pre>
+   3.362729    1.663479 </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(<span class="fu">lm</span>(revenue <span class="sc">~</span> adspend <span class="sc">+</span> size, <span class="at">data =</span> demo))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>(Intercept)     adspend        size 
-  5.0975426   0.1007622   1.3804961 </code></pre>
+ 4.97573838 -0.01861263  1.51629070 </code></pre>
 </div>
 </div>
-<p>The simple slope of <code>adspend</code> is about <span class="math inline">\(1.39\)</span>, clearly positive. Yet we know that advertising does nothing in these data. Once <code>size</code> is in the model, the slope of <code>adspend</code> falls to about <span class="math inline">\(0.10\)</span>, close to the zero that we built in. The simple slope counted the effect of differences in size as an effect of <code>adspend</code>. As a description the simple slope is correct: firms that advertise more do have higher revenue on average. As an answer to the question of what advertising does, it is wrong.</p>
+<p>The simple slope of <code>adspend</code> is about <span class="math inline">\(1.66\)</span>, clearly positive. Yet we know that advertising does nothing in these data. Once <code>size</code> is in the model, the slope of <code>adspend</code> falls to about <span class="math inline">\(-0.02\)</span>, close to the zero that we built in. The simple slope counted the effect of differences in size as an effect of <code>adspend</code>. As a description the simple slope is correct: firms that advertise more do have higher revenue on average. As an answer to the question of what advertising does, it is wrong.</p>
 <div class="definition-box">
 <p><span class="label">Definition</span></p>
 <p><strong>Omitted variable.</strong> A variable that is related to the outcome but is left out of the model.</p>
 <p><strong>Confounder.</strong> An omitted variable that is related to both a predictor and the outcome. The slope of that predictor then also picks up the relationship between the confounder and the outcome. This distortion is the omitted variable bias of Lecture 2. In the invented example, <code>size</code> is the confounder of <code>adspend</code>.</p>
 </div>
-<p><a href="#fig-i04-ovb-scatter" class="quarto-xref">Figure&nbsp;<span>14.1</span></a> shows why. Larger firms (orange) are high on both axes. Smaller firms (blue) are low on both. If you move from left to right through the whole cloud of points, you move from small firms to large firms. So the simple slope compares different kinds of firms. Within each colour the points form a nearly flat cloud: at a given size, more advertising does not go with more revenue.</p>
+<p><a href="#fig-i04-ovb-scatter" class="quarto-xref">Figure&nbsp;<span>4.1</span></a> shows why. Large firms are high on both axes, and small firms are low on both. If you move from left to right through the whole cloud of points, you move from small firms to large firms. So the simple slope compares different kinds of firms. Within each size class the points form a flat cloud. The dashed lines show the fitted lines of the model with <code>size</code> at each of the three sizes, and they are flat: at a given size, more advertising does not go with more revenue.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>See the R code for this figure</summary>
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">200</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>size    <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="dv">10</span>, <span class="at">sd =</span> <span class="dv">2</span>)          <span class="co"># Z: firm size (drives both)</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">180</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>size    <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="dv">6</span>, <span class="dv">10</span>, <span class="dv">14</span>), <span class="at">each =</span> n <span class="sc">/</span> <span class="dv">3</span>)      <span class="co"># Z: firm size (drives both)</span></span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>adspend <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="sc">+</span> <span class="fl">0.8</span> <span class="sc">*</span> size <span class="sc">+</span> <span class="fu">rnorm</span>(n, <span class="at">sd =</span> <span class="dv">1</span>)    <span class="co"># X: bigger firms spend more</span></span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>revenue <span class="ot">&lt;-</span> <span class="dv">5</span> <span class="sc">+</span> <span class="fl">1.5</span> <span class="sc">*</span> size <span class="sc">+</span> <span class="fu">rnorm</span>(n, <span class="at">sd =</span> <span class="fl">1.5</span>)  <span class="co"># Y: size drives revenue,</span></span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>demo <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(revenue, adspend, size)      <span class="co">#    adspend does not</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>demo<span class="sc">$</span>group <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(demo<span class="sc">$</span>size <span class="sc">&gt;</span> <span class="fu">median</span>(demo<span class="sc">$</span>size),</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>                     <span class="st">"Larger firms (size above median)"</span>,</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>                     <span class="st">"Smaller firms (size below median)"</span>)</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>simple_fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(revenue <span class="sc">~</span> adspend, <span class="at">data =</span> demo)</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(demo, <span class="fu">aes</span>(<span class="at">x =</span> adspend, <span class="at">y =</span> revenue,</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>                 <span class="at">colour =</span> group, <span class="at">shape =</span> group)) <span class="sc">+</span></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">intercept =</span> <span class="fu">coef</span>(simple_fit)[<span class="dv">1</span>],</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>              <span class="at">slope =</span> <span class="fu">coef</span>(simple_fit)[<span class="dv">2</span>],</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>              <span class="at">colour =</span> <span class="st">"#17324D"</span>, <span class="at">linewidth =</span> <span class="fl">1.1</span>) <span class="sc">+</span></span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.75</span>, <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="fu">max</span>(demo<span class="sc">$</span>adspend) <span class="sc">-</span> <span class="fl">0.2</span>,</span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>           <span class="at">y =</span> <span class="fu">coef</span>(simple_fit)[<span class="dv">1</span>] <span class="sc">+</span> <span class="fu">coef</span>(simple_fit)[<span class="dv">2</span>] <span class="sc">*</span></span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>             (<span class="fu">max</span>(demo<span class="sc">$</span>adspend) <span class="sc">-</span> <span class="fl">0.2</span>) <span class="sc">-</span> <span class="fl">2.4</span>,</span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>           <span class="at">label =</span> <span class="st">"simple regression line"</span>,</span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>           <span class="at">hjust =</span> <span class="dv">1</span>, <span class="at">colour =</span> <span class="st">"#17324D"</span>, <span class="at">size =</span> <span class="fl">3.4</span>) <span class="sc">+</span></span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(</span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Larger firms (size above median)"</span> <span class="ot">=</span> <span class="st">"#D55E00"</span>,</span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Smaller firms (size below median)"</span> <span class="ot">=</span> <span class="st">"#0072B2"</span></span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">+</span></span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_shape_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(</span>
-<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Larger firms (size above median)"</span> <span class="ot">=</span> <span class="dv">17</span>,</span>
-<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Smaller firms (size below median)"</span> <span class="ot">=</span> <span class="dv">16</span></span>
-<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">+</span></span>
-<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Advertising spend (invented units)"</span>,</span>
-<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Revenue (invented units)"</span>,</span>
-<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>       <span class="at">colour =</span> <span class="cn">NULL</span>, <span class="at">shape =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
-<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
-<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.x =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#5B6976"</span>),</span>
-<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>),</span>
-<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"top"</span></span>
-<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>demo<span class="sc">$</span>group <span class="ot">&lt;-</span> <span class="fu">factor</span>(demo<span class="sc">$</span>size, <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">6</span>, <span class="dv">10</span>, <span class="dv">14</span>),</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Small firms (size 6)"</span>,</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Medium firms (size 10)"</span>,</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Large firms (size 14)"</span>))</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>simple_fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(revenue <span class="sc">~</span> adspend, <span class="at">data =</span> demo)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>size_fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(revenue <span class="sc">~</span> adspend <span class="sc">+</span> size, <span class="at">data =</span> demo)</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co"># one fitted line of the model with size for each size class</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>within_lines <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">group =</span> <span class="fu">levels</span>(demo<span class="sc">$</span>group),</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">intercept =</span> <span class="fu">coef</span>(size_fit)[<span class="dv">1</span>] <span class="sc">+</span> <span class="fu">coef</span>(size_fit)[<span class="dv">3</span>] <span class="sc">*</span> <span class="fu">c</span>(<span class="dv">6</span>, <span class="dv">10</span>, <span class="dv">14</span>),</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">slope =</span> <span class="fu">coef</span>(size_fit)[<span class="dv">2</span>],</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">x_from =</span> <span class="fu">tapply</span>(demo<span class="sc">$</span>adspend, demo<span class="sc">$</span>group, min),</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">x_to =</span> <span class="fu">tapply</span>(demo<span class="sc">$</span>adspend, demo<span class="sc">$</span>group, max)</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>within_lines<span class="sc">$</span>group <span class="ot">&lt;-</span> <span class="fu">factor</span>(within_lines<span class="sc">$</span>group, <span class="at">levels =</span> <span class="fu">levels</span>(demo<span class="sc">$</span>group))</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(demo, <span class="fu">aes</span>(<span class="at">x =</span> adspend, <span class="at">y =</span> revenue,</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>                 <span class="at">colour =</span> group, <span class="at">shape =</span> group)) <span class="sc">+</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">intercept =</span> <span class="fu">coef</span>(simple_fit)[<span class="dv">1</span>],</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>              <span class="at">slope =</span> <span class="fu">coef</span>(simple_fit)[<span class="dv">2</span>],</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>              <span class="at">colour =</span> <span class="st">"#17324D"</span>, <span class="at">linewidth =</span> <span class="fl">1.1</span>) <span class="sc">+</span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.75</span>, <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="at">data =</span> within_lines,</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>               <span class="fu">aes</span>(<span class="at">x =</span> x_from, <span class="at">xend =</span> x_to,</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>                   <span class="at">y =</span> intercept <span class="sc">+</span> slope <span class="sc">*</span> x_from,</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>                   <span class="at">yend =</span> intercept <span class="sc">+</span> slope <span class="sc">*</span> x_to,</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>                   <span class="at">colour =</span> group),</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>               <span class="at">inherit.aes =</span> <span class="cn">FALSE</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="fl">4.3</span>, <span class="at">y =</span> <span class="dv">23</span>, <span class="at">label =</span> <span class="st">"simple regression line"</span>,</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>           <span class="at">hjust =</span> <span class="dv">0</span>, <span class="at">colour =</span> <span class="st">"#17324D"</span>, <span class="at">size =</span> <span class="fl">3.6</span>) <span class="sc">+</span></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"segment"</span>, <span class="at">x =</span> <span class="fl">6.6</span>, <span class="at">y =</span> <span class="fl">22.4</span>, <span class="at">xend =</span> <span class="fl">9.4</span>,</span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>           <span class="at">yend =</span> <span class="fu">coef</span>(simple_fit)[<span class="dv">1</span>] <span class="sc">+</span> <span class="fu">coef</span>(simple_fit)[<span class="dv">2</span>] <span class="sc">*</span> <span class="fl">9.4</span> <span class="sc">+</span> <span class="fl">0.3</span>,</span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>           <span class="at">colour =</span> <span class="st">"#17324D"</span>, <span class="at">linewidth =</span> <span class="fl">0.5</span>,</span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>           <span class="at">arrow =</span> <span class="fu">arrow</span>(<span class="at">length =</span> <span class="fu">unit</span>(<span class="fl">0.18</span>, <span class="st">"cm"</span>))) <span class="sc">+</span></span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(</span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Small firms (size 6)"</span> <span class="ot">=</span> <span class="st">"#0072B2"</span>,</span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Medium firms (size 10)"</span> <span class="ot">=</span> <span class="st">"#009E73"</span>,</span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Large firms (size 14)"</span> <span class="ot">=</span> <span class="st">"#D55E00"</span></span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">+</span></span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_shape_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(</span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Small firms (size 6)"</span> <span class="ot">=</span> <span class="dv">16</span>,</span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Medium firms (size 10)"</span> <span class="ot">=</span> <span class="dv">15</span>,</span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Large firms (size 14)"</span> <span class="ot">=</span> <span class="dv">17</span></span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">+</span></span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Advertising spend (invented units)"</span>,</span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Revenue (invented units)"</span>,</span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a>       <span class="at">colour =</span> <span class="cn">NULL</span>, <span class="at">shape =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#5B6976"</span>),</span>
+<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>),</span>
+<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"top"</span></span>
+<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-i04-ovb-scatter" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -570,7 +590,7 @@ E[Y_i\mid X_{i1}=x_1,\ldots,X_{ik}=x_k]
 <img src="i04-multiple-regression_files/figure-html/fig-i04-ovb-scatter-1.png" class="img-fluid figure-img" width="672">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-i04-ovb-scatter-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;4.1: Invented data: revenue against advertising spend for 200 simulated firms, coloured by firm size. The upward direction of the whole cloud comes from size alone. Within a colour group the relationship is nearly flat.
+Figure&nbsp;4.1: Invented data: revenue against advertising spend for 180 simulated firms in three size classes. The solid line is the simple regression line. The dashed lines are the fitted lines of the model with size, one for each size class. The upward direction of the whole cloud comes from size alone. Within a size class the relationship is flat.
 </figcaption>
 </figure>
 </div>
@@ -962,7 +982,7 @@ Check: which of these four problems does adding <code>ask_1k</code> address?
 </section>
 <section id="a-coefficient-plot-keeps-units-visible" class="level3">
 <h3 class="anchored" data-anchor-id="a-coefficient-plot-keeps-units-visible">A coefficient plot keeps units visible</h3>
-<p><span class="shark-tag">Shark Tank data</span> <a href="#fig-i04-coefplot" class="quarto-xref">Figure&nbsp;<span>14.2</span></a> shows the three slope estimates of <code>equity_model</code> with their 95% confidence intervals.</p>
+<p><span class="shark-tag">Shark Tank data</span> <a href="#fig-i04-coefplot" class="quarto-xref">Figure&nbsp;<span>4.2</span></a> shows the three slope estimates of <code>equity_model</code> with their 95% confidence intervals.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>See the R code for this figure</summary>
@@ -1013,7 +1033,7 @@ Figure&nbsp;4.2: Coefficient estimates from the three-predictor model of the equ
 </div>
 </div>
 </div>
-<p>Read <a href="#fig-i04-coefplot" class="quarto-xref">Figure&nbsp;<span>14.2</span></a> with the <a href="../basic/overview.html#how-to-read-every-graph">five steps for reading a figure</a>:</p>
+<p>Read <a href="#fig-i04-coefplot" class="quarto-xref">Figure&nbsp;<span>4.2</span></a> with the <a href="../basic/overview.html#how-to-read-every-graph">five steps for reading a figure</a>:</p>
 <ol type="1">
 <li><strong>Unit and variables:</strong> the rows are the predictors. The horizontal axis is the estimated change in the equity offered, in percentage points.</li>
 <li><strong>Scales:</strong> each estimate is per one unit of its own predictor: per season, per $1,000, per word. The rows are not on a common scale.</li>
@@ -1106,7 +1126,7 @@ Check your answer
 </section>
 <section id="practice" class="level3">
 <h3 class="anchored" data-anchor-id="practice">Practice</h3>
-<p><span class="shark-tag">Shark Tank data</span> All items use the three-predictor model <code>equity_model</code>. It regresses the equity offered by the founder, in percent, on the season, the requested amount in thousands of dollars (<code>ask_1k</code>), and the number of words in the description (<code>description_words</code>), using all 1,441 pitches. Items 5 to 7 use the calculations of <a href="#exm-i04-scaling" class="quarto-xref">Example&nbsp;<span>14.1</span></a>. Item 8 is the task “Try it: three seasons later and $200,000 more”, now done from start to finish.</p>
+<p><span class="shark-tag">Shark Tank data</span> All items use the three-predictor model <code>equity_model</code>. It regresses the equity offered by the founder, in percent, on the season, the requested amount in thousands of dollars (<code>ask_1k</code>), and the number of words in the description (<code>description_words</code>), using all 1,441 pitches. Items 5 to 7 use the calculations of <a href="#exm-i04-scaling" class="quarto-xref">Example&nbsp;<span>4.1</span></a>. Item 8 is the task “Try it: three seasons later and $200,000 more”, now done from start to finish.</p>
 <ol type="1">
 <li>Calculate 95% confidence intervals with <code>confint(equity_model)</code>.</li>
 <li>Test each coefficient against zero. Explain how these three single tests differ from the one overall F-test of the model.</li>

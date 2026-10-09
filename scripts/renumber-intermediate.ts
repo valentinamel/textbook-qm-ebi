@@ -6,11 +6,13 @@
 // are left alone, so running the script twice changes nothing.
 const OFFSET = 10;
 const out = Deno.env.get("QUARTO_PROJECT_OUTPUT_DIR") ?? "docs";
-const re = /\b(Figure|Example|Table|Definition|Exercise|Equation)(&nbsp;| | )(\d+)\.(\d+)/g;
+// Matches "Figure 14.1", "Figure&nbsp;14.1" and the cross-reference form
+// "Figure&nbsp;<span>14.1" that Quarto writes for links such as @fig-...
+const re = /\b(Figure|Example|Table|Definition|Exercise|Equation)(&nbsp;| | )((?:<span[^>]*>)?)(\d+)\.(\d+)/g;
 const fix = (s: string) =>
-  s.replace(re, (m, w, sp, ch, n) => {
+  s.replace(re, (m, w, sp, tag, ch, n) => {
     const c = parseInt(ch, 10);
-    return c > OFFSET ? `${w}${sp}${c - OFFSET}.${n}` : m;
+    return c > OFFSET ? `${w}${sp}${tag}${c - OFFSET}.${n}` : m;
   });
 
 const dir = `${out}/intermediate`;
