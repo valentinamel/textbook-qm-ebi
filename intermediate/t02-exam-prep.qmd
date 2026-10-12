@@ -15,6 +15,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 - fit and interpret a multiple regression with dummies, interactions, and curves
 - compare nested models and test groups of terms with a partial F-test
 - read a regression table from a research paper and state its limits
+- check an AI answer about a regression and use a confidence interval for a decision
 :::
 
 Tutorials are exam preparation sessions. The tasks below are exam-style
@@ -59,6 +60,8 @@ Complete from memory:
 Try each task in R before you open the answer. Tasks 1 to 4 use the Shark
 Tank file, and money is measured in thousands of dollars (`ask_1k`). First
 build the data for the analysis. The code is the same as in Lectures 4--6.
+
+Tasks 1 to 7 belong to the tutorial. Task 8 is extra practice for home.
 
 ```{r}
 #| label: iep02-load
@@ -416,13 +419,11 @@ squares. Standard errors in parentheses.
 1. What do the numbers in parentheses and the stars mean? Check the stars
    of the self-efficacy coefficient with its t statistic. The critical
    value is $t_{0.975,\,260}=1.969$.
-2. Interpret the self-efficacy coefficient in column (2) in one complete
-   sentence.
-3. The coefficient of Female changes from $-0.21$ with a star in column (1)
+2. The coefficient of Female changes from $-0.21$ with a star in column (1)
    to $-0.15$ without a star in column (2). Explain what happened with the
    ideas of Lecture 4, and say what the missing star does and does not
    mean.
-4. $R^2$ rises from 0.03 to 0.19. What does that say, and which test would
+3. $R^2$ rises from 0.03 to 0.19. What does that say, and which test would
    show whether the two added predictors are jointly significant?
 
 Use (copy and paste) this structure:
@@ -431,7 +432,6 @@ Use (copy and paste) this structure:
 Numbers in parentheses:
 Stars:
 t statistic of self-efficacy, and check of its stars:
-Interpretation of the self-efficacy coefficient:
 What happened to the Female coefficient:
 What the missing star does and does not mean:
 What the rise in R-squared says:
@@ -446,23 +446,20 @@ Test of the two added predictors:
    self-efficacy, $t_{obs}=0.38/0.07\approx5.4$. This is far beyond the
    critical value $t_{0.975,\,260}$ = `qt(0.975, 260)` = 1.969, and p is
    below 0.001, so three stars are correct.
-2. Among the 265 surveyed students, a self-efficacy score that is one point
-   higher is associated with an entrepreneurial intention that is 0.38
-   points higher, holding age, gender, and prior experience fixed.
-3. Model (2) holds two more variables fixed than model (1). The Female
+2. Model (2) holds two more variables fixed than model (1). The Female
    coefficient now compares women and men with the same experience and
    self-efficacy. In column (1), at the same age, the difference between women
    and men was 0.21 points. Part of this difference went together with differences in experience and self-efficacy. The missing star says that the
    confidence interval around $-0.15$ includes zero. It does not show that
    the difference is zero.
-4. The two added predictors explain a further 16 percentage points of
+3. The two added predictors explain a further 16 percentage points of
    the variation in intentions in this sample. A partial F-test of the two
    nested models would show whether the two added predictors are jointly
    significant. It compares model (1) with model (2) on the same 265 students. If
    you have the data, `anova()` of the two fitted models gives this test.
 :::
 
-### Task 6: A/B test, one-way ANOVA, moderator and mediator (Lectures 5 and 6)
+### Task 6: A/B test, moderator and mediator (Lectures 5 and 6)
 
 &#40;a) An invented A/B test. An online shop for refurbished phones shows 120
 new visitors either its current product page (`new_page = 0`) or a new page
@@ -499,37 +496,7 @@ Why the coefficient estimates the average treatment effect:
 Size, as a percent of the mean order value with the old page:
 ```
 
-&#40;b) An invented one-way ANOVA. The same shop records the delivery time in
-hours of 20 orders for each of three couriers.
-
-```{r}
-#| label: iep02-anova
-set.seed(7)
-courier <- factor(rep(c("cycle", "post", "van"), each = 20))
-delivery_hours <- round(c(rnorm(20, 20, 6), rnorm(20, 26, 6),
-                          rnorm(20, 22, 6)), 1)
-deliveries <- data.frame(courier, delivery_hours)
-```
-
-Fit the regression of `delivery_hours` on `courier` and make its ANOVA
-table. Which dummies does this regression use? What do its two dummy
-coefficients say? Test in five steps, with the critical value approach at
-the 5% level, whether the mean delivery time is the same for the three
-couriers. The critical value of this F-test is 3.16. Use (copy and paste)
-this structure:
-
-```text
-R code:
-Dummies in the regression:
-Meaning of the two dummy coefficients:
-Hypotheses:
-Test statistic, with both degrees of freedom:
-Critical value and rejection region:
-Observed value:
-Conclusion:
-```
-
-&#40;c) A meal-kit start-up gives a discount coupon at random to half of its
+&#40;b) A meal-kit start-up gives a discount coupon at random to half of its
 customers. Customers with the coupon order more meal kits. The coupon raises
 orders more for students than for other customers. The coupon also brings
 customers to the website more often, and more visits go with more orders.
@@ -575,6 +542,157 @@ with the old page.
 
 &#40;b)
 
+- Student status is the moderator: it changes the slope of the coupon.
+  It enters as an interaction, `lm(orders ~ coupon * student)`, and the
+  coefficient of `coupon:student` is the difference in the coupon effect
+  between students and other customers.
+- Website visits are the mediator: they lie on the path from the coupon to
+  orders. Adding visits, `lm(orders ~ coupon + visits)`, shrinks the coupon
+  coefficient to the direct part. For the total effect of the coupon, leave
+  visits out of the model.
+:::
+
+### Task 7: Check the AI (Lectures 4 to 6)
+
+An invented example. Lisa runs a café on campus. On 150 days she recorded
+the daily sales in euros, the number of flyers that she handed out that day,
+the temperature, and whether the day was in an exam week. The data are
+observational: Lisa decided herself on which days she handed out how many
+flyers. She fitted a multiple regression and gave its output to an AI
+assistant:
+
+```text
+Outcome: daily sales (€), 150 days       Estimate  Std. Error
+Flyers handed out (100s)                     18.0         5.0
+Temperature (°C)                              6.5         1.2
+Exam week (1 = yes)                         -85.0        22.0
+Intercept                                   420.0        35.0
+```
+
+The reference category of the dummy is days outside exam weeks. The
+critical value for a 95% confidence interval and a 5% test is
+$t_{0.975,\,146}=1.976$.
+
+She asked: "Should I hand out more flyers?" The AI answered:
+
+> "Your model controls for the temperature and for exam weeks. So it shows
+> the causal effect of flyers: every 100 extra flyers will raise your daily
+> sales by €18. In exam weeks, your café sells on average €85 less per day
+> than on an average day. The 95% confidence interval of the flyer
+> coefficient does not include zero, so the coefficient is significantly
+> different from zero at the 5% level."
+
+1. The AI answer contains exactly two errors. Name each error and explain
+   it in one sentence.
+2. Rewrite the two wrong statements so that the output supports them, in
+   one sentence each.
+
+Printing 100 flyers costs €3, and Lisa hands them out herself. Of each euro
+of sales, 50 cents are left as margin after the direct costs.
+
+3. Calculate the 95% confidence interval of the flyer coefficient. Then
+   calculate the extra daily margin that goes with 100 more flyers, at the
+   lower and at the upper end of the interval.
+4. Decide whether Lisa should hand out 100 more flyers per day on the basis
+   of these numbers, and give your reason in one sentence. Then explain in
+   one sentence one reason why her true gain could differ from these
+   numbers.
+
+Use (copy and paste) this structure:
+
+```text
+First error:
+Second error:
+Correct sentence about the flyer coefficient:
+Correct sentence about the exam-week coefficient:
+Interval, calculation:
+Interval:
+Extra margin at both ends:
+Decision and reason:
+Why her true gain could differ:
+```
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+```{r}
+#| label: iep02-ai-check
+#| include: false
+# Checks the numbers of Task 7.
+qt(0.975, 150 - 3 - 1)
+ci_flyers <- 18 + c(-1, 1) * qt(0.975, 146) * 5
+ci_flyers
+0.5 * ci_flyers   # extra margin per day at both ends
+```
+
+1. Filled-in structure:
+   - First error: the controls hold fixed only the temperature and exam
+     weeks, and Lisa chose the flyer days herself, so other things on those
+     days, for example an event on campus, can raise sales as well and the
+     coefficient is not a causal effect.
+   - Second error: the exam-week coefficient compares exam-week days with
+     the reference category, days outside exam weeks, and not with an
+     average day.
+2. Filled-in structure:
+   - Correct sentence about the flyer coefficient: "On days with the same
+     temperature and exam-week status, 100 more flyers go with on average
+     €18 higher fitted daily sales."
+   - Correct sentence about the exam-week coefficient: "Days in an exam
+     week have on average €85 lower fitted daily sales than days outside
+     exam weeks with the same number of flyers and the same temperature."
+3. Filled-in structure:
+   - Interval, calculation: $18.0\pm1.976\times5.0=18.0\pm9.88$
+   - Interval: from €8.12 to €27.88 of daily sales per 100 flyers
+   - Extra margin at both ends: at 50 cents per euro,
+     $0.5\times\text{€}8.12=\text{€}4.06$ and
+     $0.5\times\text{€}27.88=\text{€}13.94$ per day.
+4. Filled-in structure:
+   - Decision and reason: hand out the extra flyers on this evidence. Even
+     at the lower end of the interval, the extra margin of €4.06 is above
+     the €3 that 100 flyers cost.
+   - Why her true gain could differ: the coefficient is an association in
+     observational data, and if Lisa handed out more flyers on days that
+     were busy anyway, the true effect of extra flyers can be smaller.
+
+The third sentence of the AI answer is correct: the interval from €8.12 to
+€27.88 does not include zero.
+:::
+
+### Task 8: A one-way ANOVA (extra practice for home)
+
+An invented one-way ANOVA. The online shop for refurbished phones of Task 6
+records the delivery time in hours of 20 orders for each of three couriers.
+
+```{r}
+#| label: iep02-anova
+set.seed(7)
+courier <- factor(rep(c("cycle", "post", "van"), each = 20))
+delivery_hours <- round(c(rnorm(20, 20, 6), rnorm(20, 26, 6),
+                          rnorm(20, 22, 6)), 1)
+deliveries <- data.frame(courier, delivery_hours)
+```
+
+Fit the regression of `delivery_hours` on `courier` and make its ANOVA
+table. Which dummies does this regression use? What do its two dummy
+coefficients say? Test in five steps, with the critical value approach at
+the 5% level, whether the mean delivery time is the same for the three
+couriers. The critical value of this F-test is 3.16. Use (copy and paste)
+this structure:
+
+```text
+R code:
+Dummies in the regression:
+Meaning of the two dummy coefficients:
+Hypotheses:
+Test statistic, with both degrees of freedom:
+Critical value and rejection region:
+Observed value:
+Conclusion:
+```
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
 ```{r}
 #| label: iep02-courier-fit
 courier_fit <- lm(delivery_hours ~ courier, data = deliveries)
@@ -604,17 +722,6 @@ takes on average 3.94 hours longer, and the van courier 0.02 hours less.
 
 The largest difference, 3.95 hours between the post and the van courier,
 is about 16% of the overall mean of 23.96 hours.
-
-&#40;c)
-
-- Student status is the moderator: it changes the slope of the coupon.
-  It enters as an interaction, `lm(orders ~ coupon * student)`, and the
-  coefficient of `coupon:student` is the difference in the coupon effect
-  between students and other customers.
-- Website visits are the mediator: they lie on the path from the coupon to
-  orders. Adding visits, `lm(orders ~ coupon + visits)`, shrinks the coupon
-  coefficient to the direct part. For the total effect of the coupon, leave
-  visits out of the model.
 :::
 
 :::

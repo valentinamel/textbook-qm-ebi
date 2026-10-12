@@ -427,6 +427,7 @@ window.Quarto = {
 <li>fit and interpret a multiple regression with dummies, interactions, and curves</li>
 <li>compare nested models and test groups of terms with a partial F-test</li>
 <li>read a regression table from a research paper and state its limits</li>
+<li>check an AI answer about a regression and use a confidence interval for a decision</li>
 </ul>
 </div>
 <p>Tutorials are exam preparation sessions. The tasks below are exam-style questions. You first try each task in pairs. You may use AI for this, following Attempt, Ask, Verify, Explain. Then the class discusses the solution together.</p>
@@ -465,6 +466,7 @@ Check your preparation
 <section id="in-the-tutorial" class="level2 course-phase phase-in-class">
 <h2 class="anchored" data-anchor-id="in-the-tutorial">In the tutorial</h2>
 <p>Try each task in R before you open the answer. Tasks 1 to 4 use the Shark Tank file, and money is measured in thousands of dollars (<code>ask_1k</code>). First build the data for the analysis. The code is the same as in Lectures 4–6.</p>
+<p>Tasks 1 to 7 belong to the tutorial. Task 8 is extra practice for home.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>sharks<span class="sc">$</span>ask_1k <span class="ot">&lt;-</span> sharks<span class="sc">$</span>ask_amount_usd <span class="sc">/</span> <span class="dv">1000</span></span>
@@ -1087,7 +1089,6 @@ F-statistic: 117.9 on 3 and 1430 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>Outcome: entrepreneurial intention (scale from 1 to 7). Ordinary least squares. Standard errors in parentheses. * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001.</p>
 <ol type="1">
 <li>What do the numbers in parentheses and the stars mean? Check the stars of the self-efficacy coefficient with its t statistic. The critical value is <span class="math inline">\(t_{0.975,\,260}=1.969\)</span>.</li>
-<li>Interpret the self-efficacy coefficient in column (2) in one complete sentence.</li>
 <li>The coefficient of Female changes from <span class="math inline">\(-0.21\)</span> with a star in column (1) to <span class="math inline">\(-0.15\)</span> without a star in column (2). Explain what happened with the ideas of Lecture 4, and say what the missing star does and does not mean.</li>
 <li><span class="math inline">\(R^2\)</span> rises from 0.03 to 0.19. What does that say, and which test would show whether the two added predictors are jointly significant?</li>
 </ol>
@@ -1095,7 +1096,6 @@ F-statistic: 117.9 on 3 and 1430 DF,  p-value: &lt; 2.2e-16</code></pre>
 <pre class="text"><code>Numbers in parentheses:
 Stars:
 t statistic of self-efficacy, and check of its stars:
-Interpretation of the self-efficacy coefficient:
 What happened to the Female coefficient:
 What the missing star does and does not mean:
 What the rise in R-squared says:
@@ -1114,7 +1114,6 @@ Check your answer
 <div class="callout-body-container callout-body">
 <ol type="1">
 <li>The numbers in parentheses are standard errors. The stars show the p-value of the two-sided t-test of each coefficient against zero. For self-efficacy, <span class="math inline">\(t_{obs}=0.38/0.07\approx5.4\)</span>. This is far beyond the critical value <span class="math inline">\(t_{0.975,\,260}\)</span> = <code>qt(0.975, 260)</code> = 1.969, and p is below 0.001, so three stars are correct.</li>
-<li>Among the 265 surveyed students, a self-efficacy score that is one point higher is associated with an entrepreneurial intention that is 0.38 points higher, holding age, gender, and prior experience fixed.</li>
 <li>Model (2) holds two more variables fixed than model (1). The Female coefficient now compares women and men with the same experience and self-efficacy. In column (1), at the same age, the difference between women and men was 0.21 points. Part of this difference went together with differences in experience and self-efficacy. The missing star says that the confidence interval around <span class="math inline">\(-0.15\)</span> includes zero. It does not show that the difference is zero.</li>
 <li>The two added predictors explain a further 16 percentage points of the variation in intentions in this sample. A partial F-test of the two nested models would show whether the two added predictors are jointly significant. It compares model (1) with model (2) on the same 265 students. If you have the data, <code>anova()</code> of the two fitted models gives this test.</li>
 </ol>
@@ -1122,8 +1121,8 @@ Check your answer
 </div>
 </div>
 </section>
-<section id="task-6-ab-test-one-way-anova-moderator-and-mediator-lectures-5-and-6" class="level3">
-<h3 class="anchored" data-anchor-id="task-6-ab-test-one-way-anova-moderator-and-mediator-lectures-5-and-6">Task 6: A/B test, one-way ANOVA, moderator and mediator (Lectures 5 and 6)</h3>
+<section id="task-6-ab-test-moderator-and-mediator-lectures-5-and-6" class="level3">
+<h3 class="anchored" data-anchor-id="task-6-ab-test-moderator-and-mediator-lectures-5-and-6">Task 6: A/B test, moderator and mediator (Lectures 5 and 6)</h3>
 <p>(a) An invented A/B test. An online shop for refurbished phones shows 120 new visitors either its current product page (<code>new_page = 0</code>) or a new page with customer videos (<code>new_page = 1</code>). Chance decides which page each visitor sees, 60 visitors per page. The outcome is the value of the first order in euros.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">21</span>)</span>
@@ -1142,24 +1141,7 @@ Observed value:
 Conclusion:
 Why the coefficient estimates the average treatment effect:
 Size, as a percent of the mean order value with the old page:</code></pre>
-<p>(b) An invented one-way ANOVA. The same shop records the delivery time in hours of 20 orders for each of three couriers.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">7</span>)</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>courier <span class="ot">&lt;-</span> <span class="fu">factor</span>(<span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"cycle"</span>, <span class="st">"post"</span>, <span class="st">"van"</span>), <span class="at">each =</span> <span class="dv">20</span>))</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>delivery_hours <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">c</span>(<span class="fu">rnorm</span>(<span class="dv">20</span>, <span class="dv">20</span>, <span class="dv">6</span>), <span class="fu">rnorm</span>(<span class="dv">20</span>, <span class="dv">26</span>, <span class="dv">6</span>),</span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>                          <span class="fu">rnorm</span>(<span class="dv">20</span>, <span class="dv">22</span>, <span class="dv">6</span>)), <span class="dv">1</span>)</span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>deliveries <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(courier, delivery_hours)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Fit the regression of <code>delivery_hours</code> on <code>courier</code> and make its ANOVA table. Which dummies does this regression use? What do its two dummy coefficients say? Test in five steps, with the critical value approach at the 5% level, whether the mean delivery time is the same for the three couriers. The critical value of this F-test is 3.16. Use (copy and paste) this structure:</p>
-<pre class="text"><code>R code:
-Dummies in the regression:
-Meaning of the two dummy coefficients:
-Hypotheses:
-Test statistic, with both degrees of freedom:
-Critical value and rejection region:
-Observed value:
-Conclusion:</code></pre>
-<p>(c) A meal-kit start-up gives a discount coupon at random to half of its customers. Customers with the coupon order more meal kits. The coupon raises orders more for students than for other customers. The coupon also brings customers to the website more often, and more visits go with more orders. Which variable is a moderator, and which is a mediator? How does each one appear in a regression of orders on the coupon dummy? Use (copy and paste) this structure:</p>
+<p>(b) A meal-kit start-up gives a discount coupon at random to half of its customers. Customers with the coupon order more meal kits. The coupon raises orders more for students than for other customers. The coupon also brings customers to the website more often, and more visits go with more orders. Which variable is a moderator, and which is a mediator? How does each one appear in a regression of orders on the coupon dummy? Use (copy and paste) this structure:</p>
 <pre class="text"><code>Moderator, and how it appears in the regression:
 Mediator, and how it appears in the regression:</code></pre>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -1176,14 +1158,14 @@ Check your answer
 <div class="callout-body-container callout-body">
 <p>(a)</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>ab_fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(order_value <span class="sc">~</span> new_page, <span class="at">data =</span> ab_shop)</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ab_fit)<span class="sc">$</span>coefficients</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>ab_fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(order_value <span class="sc">~</span> new_page, <span class="at">data =</span> ab_shop)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ab_fit)<span class="sc">$</span>coefficients</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>             Estimate Std. Error  t value     Pr(&gt;|t|)
 (Intercept) 39.086333  0.9480553 41.22790 6.427869e-72
 new_page     3.409333  1.3407527  2.54285 1.228932e-02</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qt</span>(<span class="fl">0.975</span>, <span class="at">df =</span> <span class="dv">118</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qt</span>(<span class="fl">0.975</span>, <span class="at">df =</span> <span class="dv">118</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 1.980272</code></pre>
 </div>
@@ -1198,14 +1180,125 @@ new_page     3.409333  1.3407527  2.54285 1.228932e-02</code></pre>
 </ol>
 <p>Chance decided who saw the new page. So the two groups are alike on average in everything else, measured or not, and the only systematic difference is the page. That is why <span class="math inline">\(\hat\beta_1\approx3.41\)</span> euros estimates the average treatment effect of the new page. It is about 8.7% of the mean order value with the old page.</p>
 <p>(b)</p>
+<ul>
+<li>Student status is the moderator: it changes the slope of the coupon. It enters as an interaction, <code>lm(orders ~ coupon * student)</code>, and the coefficient of <code>coupon:student</code> is the difference in the coupon effect between students and other customers.</li>
+<li>Website visits are the mediator: they lie on the path from the coupon to orders. Adding visits, <code>lm(orders ~ coupon + visits)</code>, shrinks the coupon coefficient to the direct part. For the total effect of the coupon, leave visits out of the model.</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<section id="task-7-check-the-ai-lectures-4-to-6" class="level3">
+<h3 class="anchored" data-anchor-id="task-7-check-the-ai-lectures-4-to-6">Task 7: Check the AI (Lectures 4 to 6)</h3>
+<p>An invented example. Lisa runs a café on campus. On 150 days she recorded the daily sales in euros, the number of flyers that she handed out that day, the temperature, and whether the day was in an exam week. The data are observational: Lisa decided herself on which days she handed out how many flyers. She fitted a multiple regression and gave its output to an AI assistant:</p>
+<pre class="text"><code>Outcome: daily sales (€), 150 days       Estimate  Std. Error
+Flyers handed out (100s)                     18.0         5.0
+Temperature (°C)                              6.5         1.2
+Exam week (1 = yes)                         -85.0        22.0
+Intercept                                   420.0        35.0</code></pre>
+<p>The reference category of the dummy is days outside exam weeks. The critical value for a 95% confidence interval and a 5% test is <span class="math inline">\(t_{0.975,\,146}=1.976\)</span>.</p>
+<p>She asked: “Should I hand out more flyers?” The AI answered:</p>
+<blockquote class="blockquote">
+<p>“Your model controls for the temperature and for exam weeks. So it shows the causal effect of flyers: every 100 extra flyers will raise your daily sales by €18. In exam weeks, your café sells on average €85 less per day than on an average day. The 95% confidence interval of the flyer coefficient does not include zero, so the coefficient is significantly different from zero at the 5% level.”</p>
+</blockquote>
+<ol type="1">
+<li>The AI answer contains exactly two errors. Name each error and explain it in one sentence.</li>
+<li>Rewrite the two wrong statements so that the output supports them, in one sentence each.</li>
+</ol>
+<p>Printing 100 flyers costs €3, and Lisa hands them out herself. Of each euro of sales, 50 cents are left as margin after the direct costs.</p>
+<ol start="3" type="1">
+<li>Calculate the 95% confidence interval of the flyer coefficient. Then calculate the extra daily margin that goes with 100 more flyers, at the lower and at the upper end of the interval.</li>
+<li>Decide whether Lisa should hand out 100 more flyers per day on the basis of these numbers, and give your reason in one sentence. Then explain in one sentence one reason why her true gain could differ from these numbers.</li>
+</ol>
+<p>Use (copy and paste) this structure:</p>
+<pre class="text"><code>First error:
+Second error:
+Correct sentence about the flyer coefficient:
+Correct sentence about the exam-week coefficient:
+Interval, calculation:
+Interval:
+Extra margin at both ends:
+Decision and reason:
+Why her true gain could differ:</code></pre>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check your answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>Filled-in structure:
+<ul>
+<li>First error: the controls hold fixed only the temperature and exam weeks, and Lisa chose the flyer days herself, so other things on those days, for example an event on campus, can raise sales as well and the coefficient is not a causal effect.</li>
+<li>Second error: the exam-week coefficient compares exam-week days with the reference category, days outside exam weeks, and not with an average day.</li>
+</ul></li>
+<li>Filled-in structure:
+<ul>
+<li>Correct sentence about the flyer coefficient: “On days with the same temperature and exam-week status, 100 more flyers go with on average €18 higher fitted daily sales.”</li>
+<li>Correct sentence about the exam-week coefficient: “Days in an exam week have on average €85 lower fitted daily sales than days outside exam weeks with the same number of flyers and the same temperature.”</li>
+</ul></li>
+<li>Filled-in structure:
+<ul>
+<li>Interval, calculation: <span class="math inline">\(18.0\pm1.976\times5.0=18.0\pm9.88\)</span></li>
+<li>Interval: from €8.12 to €27.88 of daily sales per 100 flyers</li>
+<li>Extra margin at both ends: at 50 cents per euro, <span class="math inline">\(0.5\times\text{€}8.12=\text{€}4.06\)</span> and <span class="math inline">\(0.5\times\text{€}27.88=\text{€}13.94\)</span> per day.</li>
+</ul></li>
+<li>Filled-in structure:
+<ul>
+<li>Decision and reason: hand out the extra flyers on this evidence. Even at the lower end of the interval, the extra margin of €4.06 is above the €3 that 100 flyers cost.</li>
+<li>Why her true gain could differ: the coefficient is an association in observational data, and if Lisa handed out more flyers on days that were busy anyway, the true effect of extra flyers can be smaller.</li>
+</ul></li>
+</ol>
+<p>The third sentence of the AI answer is correct: the interval from €8.12 to €27.88 does not include zero.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="task-8-a-one-way-anova-extra-practice-for-home" class="level3">
+<h3 class="anchored" data-anchor-id="task-8-a-one-way-anova-extra-practice-for-home">Task 8: A one-way ANOVA (extra practice for home)</h3>
+<p>An invented one-way ANOVA. The online shop for refurbished phones of Task 6 records the delivery time in hours of 20 orders for each of three couriers.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>courier_fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(delivery_hours <span class="sc">~</span> courier, <span class="at">data =</span> deliveries)</span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(courier_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">7</span>)</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>courier <span class="ot">&lt;-</span> <span class="fu">factor</span>(<span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"cycle"</span>, <span class="st">"post"</span>, <span class="st">"van"</span>), <span class="at">each =</span> <span class="dv">20</span>))</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>delivery_hours <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">c</span>(<span class="fu">rnorm</span>(<span class="dv">20</span>, <span class="dv">20</span>, <span class="dv">6</span>), <span class="fu">rnorm</span>(<span class="dv">20</span>, <span class="dv">26</span>, <span class="dv">6</span>),</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>                          <span class="fu">rnorm</span>(<span class="dv">20</span>, <span class="dv">22</span>, <span class="dv">6</span>)), <span class="dv">1</span>)</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>deliveries <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(courier, delivery_hours)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Fit the regression of <code>delivery_hours</code> on <code>courier</code> and make its ANOVA table. Which dummies does this regression use? What do its two dummy coefficients say? Test in five steps, with the critical value approach at the 5% level, whether the mean delivery time is the same for the three couriers. The critical value of this F-test is 3.16. Use (copy and paste) this structure:</p>
+<pre class="text"><code>R code:
+Dummies in the regression:
+Meaning of the two dummy coefficients:
+Hypotheses:
+Test statistic, with both degrees of freedom:
+Critical value and rejection region:
+Observed value:
+Conclusion:</code></pre>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check your answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>courier_fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(delivery_hours <span class="sc">~</span> courier, <span class="at">data =</span> deliveries)</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(courier_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>(Intercept) courierpost  couriervan 
      22.650       3.935      -0.015 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(courier_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(courier_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Analysis of Variance Table
 
@@ -1216,11 +1309,11 @@ Residuals 57 2001.40  35.112
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(deliveries<span class="sc">$</span>delivery_hours)   <span class="co"># overall mean</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(deliveries<span class="sc">$</span>delivery_hours)   <span class="co"># overall mean</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 23.95667</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qf</span>(<span class="fl">0.95</span>, <span class="dv">2</span>, <span class="dv">57</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qf</span>(<span class="fl">0.95</span>, <span class="dv">2</span>, <span class="dv">57</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 3.158843</code></pre>
 </div>
@@ -1234,11 +1327,6 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <li><strong>Conclusion.</strong> <span class="math inline">\(2.95&lt;3.16\)</span> (p <span class="math inline">\(\approx\)</span> 0.060), so do not reject <span class="math inline">\(H_0\)</span>. At the 5% level, the data do not show that the mean delivery time differs between the couriers. This does not prove that the means are equal.</li>
 </ol>
 <p>The largest difference, 3.95 hours between the post and the van courier, is about 16% of the overall mean of 23.96 hours.</p>
-<p>(c)</p>
-<ul>
-<li>Student status is the moderator: it changes the slope of the coupon. It enters as an interaction, <code>lm(orders ~ coupon * student)</code>, and the coefficient of <code>coupon:student</code> is the difference in the coupon effect between students and other customers.</li>
-<li>Website visits are the mediator: they lie on the path from the coupon to orders. Adding visits, <code>lm(orders ~ coupon + visits)</code>, shrinks the coupon coefficient to the direct part. For the total effect of the coupon, leave visits out of the model.</li>
-</ul>
 </div>
 </div>
 </div>
@@ -1262,7 +1350,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <li>a conclusion of 150 words that clearly separates three things: the association, its uncertainty, and the reasons why it is not causal.</li>
 </ol>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -1271,15 +1359,15 @@ Check a model structure
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>This model structure covers points 4 to 9.</p>
 <ol start="4" type="1">
 <li><p>A good solution could fit</p>
-<div class="sourceCode" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
-<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  equity_offered_pct <span class="sc">~</span> season_c <span class="sc">*</span> women <span class="sc">+</span> ask_1k,</span>
-<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> known_gender</span>
-<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  equity_offered_pct <span class="sc">~</span> season_c <span class="sc">*</span> women <span class="sc">+</span> ask_1k,</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> known_gender</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>or a model with a quadratic term for season and the group dummies. Keep <code>season_c</code> and <code>women</code> in the model next to their interaction (the hierarchy principle).</p></li>
 <li><p>Name the reference category. Interpret slopes that combine several coefficients, or differences between fitted values.</p></li>
 <li><p>Use <code>anova()</code> to compare the model with a nested reduced model.</p></li>
@@ -1302,7 +1390,7 @@ Check a model structure
 <li>In a model with <span class="math inline">\(x\)</span> and <span class="math inline">\(x^2\)</span>, the fitted change from <span class="math inline">\(x\)</span> to <span class="math inline">\(x+1\)</span> is …</li>
 </ol>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -1311,7 +1399,7 @@ Check your answers
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ol type="1">
 <li>Differ in that predictor and have the same values of the other included predictors.</li>
@@ -1330,7 +1418,7 @@ Check your answers
 <p><span class="label">Two sentences about your own venture</span></p>
 <p>Think of your EiA3 venture, or any business you know well. Describe in two sentences the full analysis that you would run on its data. First, name the outcome, two predictors, and one extension (a set of dummies, an interaction, or a quadratic term) that answers a real question. Second, say which limit you would mention first in your conclusion: selection, measurement, or omitted variables. There is no wrong answer.</p>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -1339,7 +1427,7 @@ See an example, then write your own
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div id="callout-12" class="callout-12-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>Take a student-run venture that sells meal-prep boxes on campus. “Outcome: weekly orders. Predictors: advertising spend and price, plus a dummy for exam weeks and its interaction with advertising spend, because I believe advertising works mainly when students are on campus. The first limit is omitted variables: the weather affects both how many flyers I hand out and how many people are on campus, and nothing in my data measures it.”</p>
 </div>

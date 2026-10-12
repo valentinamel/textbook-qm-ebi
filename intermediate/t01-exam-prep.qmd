@@ -15,6 +15,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 - fit a simple regression in R and interpret its results with units
 - check the assumptions of a model with residual plots and influence measures
 - judge a model with its coefficient table, $R^2$, and the F-test
+- check an AI reading of a regression output and correct its errors
 :::
 
 Tutorials are exam preparation sessions. The tasks below are exam-style
@@ -63,6 +64,9 @@ Try each task in R before you open the answer. A complete written answer
 does five things. It names the sample, shows the calculation, and reports
 values with units. It interprets the values in context. And it states one
 important limit of the model or of the data.
+
+Tasks 1 to 7 belong to the tutorial. There is no extra task for home in
+this tutorial.
 
 All tasks use the Shark Tank teaching file and the valuations of Lectures 1
 to 3, in **millions of dollars**: the valuation agreed on air (`agreed_m`)
@@ -405,6 +409,80 @@ summary(equity_model)$r.squared
    deals that happened on a television show. They describe what founders who
    agreed a deal on air gave up, not what would happen to you if you offered
    a different share.
+:::
+
+### Task 7: Check the AI (Lectures 1 to 3)
+
+[Shark Tank data]{.shark-tag} Tom prepares a pitch. He gave the output of
+the Task 1 model of the agreed valuation on the claimed valuation to an AI
+assistant. Here is the output:
+
+```text
+Outcome: agreed valuation ($ millions), 874 deals   Estimate  Std. Error  p-value
+Claimed valuation ($ millions)                         0.649       0.011   <0.001
+Intercept                                             -0.068       0.068    0.321
+R-squared: 0.798
+```
+
+He asked: "How good is this model?" The AI answered:
+
+> "Great model. The claimed valuation predicts the agreed valuation
+> correctly for about 80% of the deals, because $R^2$ is 0.798. A deal with
+> a claimed valuation that is \$1 million higher has, on average, an agreed
+> valuation that is about \$0.65 million higher. And the p-value of the
+> slope is below 0.001, which proves that the assumptions of the model
+> hold."
+
+1. The AI answer contains exactly two errors. Name each error and explain
+   it in one sentence.
+2. Write one correct sentence about the $R^2$ of 0.798.
+3. State in one sentence what the small p-value of the slope does show.
+   Then name in one sentence one result from Task 3 that Tom should know
+   before he trusts this p-value.
+
+Use (copy and paste) this structure:
+
+```text
+First error:
+Second error:
+Correct sentence about the R-squared:
+What the small p-value does show:
+A result from Task 3 to know before trusting the p-value:
+```
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+```{r}
+#| label: iep01-ai-check
+#| include: false
+# Checks the numbers of Task 7.
+val_model <- lm(agreed_m ~ claimed_m, data = vals)
+summary(val_model)$coefficients
+summary(val_model)$r.squared
+mean(abs(residuals(val_model)) < 0.01)   # share within $10,000 of the fitted value
+```
+
+1. Filled-in structure:
+   - First error: $R^2$ is the share of the variation in the agreed
+     valuations that the fitted values explain, not a share of deals that
+     the model predicts correctly, and only about 2% of the deals lie
+     within \$10,000 of their fitted value.
+   - Second error: a p-value is calculated under the assumptions of the
+     model, so it cannot prove that they hold.
+2. Filled-in structure:
+   - Correct sentence about the R-squared: "Among these 874 deals, the
+     claimed valuation explains about 80% of the variation in the agreed
+     valuations."
+3. Filled-in structure:
+   - What the small p-value does show: it is strong evidence against a
+     slope of zero, if the assumptions of the model hold.
+   - A result from Task 3 to know before trusting the p-value: the residual
+     plot shows a fan shape, so the homoskedasticity assumption fails and
+     the usual standard error and p-value may be wrong.
+
+The second sentence of the AI answer is correct. It is the interpretation
+of the slope from Task 1.
 :::
 
 :::
