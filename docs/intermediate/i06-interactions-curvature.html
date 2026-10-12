@@ -461,7 +461,13 @@ Where these videos differ from this book
 </details>
 <p>The videos explain key ideas in another way. The lecture material and its notation always come first.</p>
 </div>
-<p><strong>Derive the two lines.</strong> In the model <span class="math inline">\(Y=\beta_0+\beta_1X+\beta_2D+\beta_3XD+\varepsilon\)</span> with a dummy variable <span class="math inline">\(D\in\{0,1\}\)</span>, write the line for <span class="math inline">\(D=0\)</span> and the line for <span class="math inline">\(D=1\)</span>.</p>
+<p><strong>From one equation to two lines.</strong> An invented example. A café models its daily sales in euros with the temperature in degrees Celsius and a dummy <code>weekend</code>, which is 1 on Saturdays and Sundays and 0 on other days:</p>
+<p>sales = 200 + 3 × temperature + 50 × weekend + 2 × temperature × weekend.</p>
+<ol type="1">
+<li>Set weekend = 0 and simplify. Write the result as intercept + slope × temperature.</li>
+<li>Set weekend = 1 and simplify in the same way.</li>
+<li>Which numbers differ between the two lines?</li>
+</ol>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -474,11 +480,16 @@ Check your preparation
 </div>
 <div id="callout-1" class="callout-1-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>For <span class="math inline">\(D=0\)</span>: <span class="math inline">\(E[Y\mid X,D=0]=\beta_0+\beta_1X\)</span>. For <span class="math inline">\(D=1\)</span>: <span class="math inline">\(E[Y\mid X,D=1]=(\beta_0+\beta_2)+(\beta_1+\beta_3)X\)</span>. Setting <span class="math inline">\(D=1\)</span> shifts the intercept by <span class="math inline">\(\beta_2\)</span> and the slope by <span class="math inline">\(\beta_3\)</span>.</p>
+<ol type="1">
+<li>Weekdays: sales = 200 + 3 × temperature.</li>
+<li>Weekends: sales = (200 + 50) + (3 + 2) × temperature = 250 + 5 × temperature.</li>
+<li>Both numbers differ. At the weekend the line starts 50 euros higher, and each extra degree goes with 2 euros more in sales than on a weekday: 5 euros instead of 3.</li>
+</ol>
+<p>The same steps work for the general model <span class="math inline">\(Y=\beta_0+\beta_1X+\beta_2D+\beta_3XD+\varepsilon\)</span> with a dummy <span class="math inline">\(D\in\{0,1\}\)</span>. For <span class="math inline">\(D=0\)</span>: <span class="math inline">\(E[Y\mid X,D=0]=\beta_0+\beta_1X\)</span>. For <span class="math inline">\(D=1\)</span>: <span class="math inline">\(E[Y\mid X,D=1]=(\beta_0+\beta_2)+(\beta_1+\beta_3)X\)</span>. Setting <span class="math inline">\(D=1\)</span> shifts the intercept by <span class="math inline">\(\beta_2\)</span> and the slope by <span class="math inline">\(\beta_3\)</span>.</p>
 </div>
 </div>
 </div>
-<p><strong>Predict.</strong> Answer this question before you come to class: how many separate numbers do you need to fully describe a picture of two straight lines with different slopes? Choose one answer. You will find the answer in the lecture material.</p>
+<p><strong>Predict.</strong> Answer this question before you run the R warm-up below. Over the 16 seasons, the equity offered to all-men teams fell by about 0.8 percentage points per season. For teams with at least one woman, did it fall (a) clearly faster, (b) clearly slower, or (c) at about the same speed? Choose one answer. Your plot from the R warm-up and the lecture material show the answer.</p>
 <p><span class="shark-tag">Shark Tank data</span> <strong>R warm-up.</strong> Build the variables for the analysis. The code uses the same <code>known_gender</code> subset as Lecture 5: the 1,434 pitches with a known team classification. It adds a dummy <code>women</code> and a centred season <code>season_c</code>, which is the season minus the mean season. It then fits one line of equity offered on season for each group and draws both lines. Bring the plot:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
@@ -555,7 +566,7 @@ Figure&nbsp;6.1: Fitted weekly orders against advertising spend in ordinary week
 </div>
 </div>
 <p>Read the left panel first. Exam weeks have 15 more orders at every level of advertising. The gap between the lines is the same everywhere, so the lines are parallel. Each extra euro of advertising goes with 0.10 more orders in both kinds of weeks. In the right panel the gap grows, from 21 orders at 50 euros to 57 orders at 350 euros. Each extra euro goes with 0.10 more orders in ordinary weeks, but with 0.22 more orders in exam weeks. This is an interaction: the slope of advertising depends on the kind of week. You can also say it the other way round: the gap between the two kinds of week depends on advertising. Both sentences describe the same picture. The preparation video shows the same idea with plant food and feeding frequency. Any lines that are not parallel show an interaction. They do not need to cross.</p>
-<p>This answers the prediction question from before class: four numbers, an intercept and a slope for each line. In the right panel these are 100 and 0.10 for ordinary weeks, and 115 and 0.22 for exam weeks. The interaction model writes the same four numbers in a different way:</p>
+<p>Four numbers describe the right panel: an intercept and a slope for each line. These are 100 and 0.10 for ordinary weeks, and 115 and 0.22 for exam weeks. The interaction model writes the same four numbers in a different way:</p>
 <p><span class="math display">\[
 E[Y\mid X,D]
 =\beta_0+\beta_1X+\beta_2D+\beta_3XD.
@@ -567,7 +578,7 @@ E[Y\mid X,D]
 <li><span class="math inline">\(\beta_2\)</span>: how much higher the <span class="math inline">\(D=1\)</span> line starts</li>
 <li><span class="math inline">\(\beta_3\)</span>: how much steeper the <span class="math inline">\(D=1\)</span> line is.</li>
 </ul>
-<p>The same in a table with one row per group, as you derived it before class:</p>
+<p>The same in a table with one row per group, as in the café example before class:</p>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -751,7 +762,7 @@ F-statistic: 83.47 on 4 and 1429 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>Step 3: how large is it? In the average season, all-men teams are fitted to offer 12.87% and teams with women 13.67%. The gap is 0.81 percentage points. Measured as a percent of the all-men level, the same gap is about 6%. So “0.81 percent more” would be wrong. The coefficient is a difference in percentage points.</p>
 <p>Why does the model use <code>season_c</code> and not <code>season</code>? The dummy coefficient always compares the groups at <span class="math inline">\(X=0\)</span>. Without <a href="#i06-centring">centring</a>, <span class="math inline">\(X=0\)</span> would be Season 0, a season outside the data. Centring moves the comparison to the average season, where there are many pitches.</p>
 </div>
-<p>The interaction estimate is <span class="math inline">\(-0.061\)</span> equity percentage points per season, with a p-value of about 0.520. The difference is small, about 8% of the all-men slope (<a href="#exm-i06-reading-interaction" class="quarto-xref">Example&nbsp;<span>6.1</span></a>). Draw two conclusions from this result. First, the model gives no evidence that the season trend differs between the two groups. Second, the model does not prove that the two slopes are equal. The estimate is imprecise (standard error about 0.096), so the data are consistent with a somewhat steeper trend and also with a somewhat flatter trend for teams with women. No evidence of a difference is not proof of no difference.</p>
+<p>This answers the prediction question from before class: (c), at about the same speed. The fitted slopes are about <span class="math inline">\(-0.80\)</span> points per season for all-men teams and <span class="math inline">\(-0.86\)</span> for teams with women. The interaction estimate is <span class="math inline">\(-0.061\)</span> equity percentage points per season, with a p-value of about 0.520. The difference is small, about 8% of the all-men slope (<a href="#exm-i06-reading-interaction" class="quarto-xref">Example&nbsp;<span>6.1</span></a>). Draw two conclusions from this result. First, the model gives no evidence that the season trend differs between the two groups. Second, the model does not prove that the two slopes are equal. The estimate is imprecise (standard error about 0.096), so the data are consistent with a somewhat steeper trend and also with a somewhat flatter trend for teams with women. No evidence of a difference is not proof of no difference.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>See the R code for this figure</summary>
