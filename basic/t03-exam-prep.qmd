@@ -1,4 +1,4 @@
-# Tutorial 3: Normal models, sampling, and confidence intervals {#b-ep03 .unnumbered}
+# Tutorial 3: Sampling and confidence intervals {#b-ep03 .unnumbered}
 
 ```{r}
 #| label: bep03-setup
@@ -12,7 +12,6 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 ::: {.outcomes}
 <span class="label">By the end of Tutorial 3, you can</span>
 
-- calculate probabilities and values from uniform and normal models
 - calculate standard errors and probabilities for sample means and proportions
 - construct confidence intervals and qualify conclusions when the sampling design is limited
 :::
@@ -25,7 +24,7 @@ Attempt, Ask, Verify, Explain. Then the class discusses the solution together.
 
 ## Before class
 
-Bring your after-class work from Lectures 6--9. If you find the algebra
+Bring your after-class work from Lectures 7 to 9. If you find the algebra
 difficult, review [Mathematics Refresher: sums, fractions, and
 roots](../resources/math-refresher.html).
 
@@ -33,42 +32,38 @@ Use the formula sheet with all formulas up to and including Lecture 9.
 
 Complete from memory:
 
-1. Standardising an observation $x$ from $N(\mu,\sigma^2)$ means
-   calculating ...
-2. A parameter describes ...
-3. An estimator is ...
-4. The standard deviation of the sample mean $\bar X$ is ... The standard
+1. A parameter describes ...
+2. An estimator is ...
+3. The standard deviation of the sample mean $\bar X$ is ... The standard
    error of the sample mean is ...
-5. The CLT describes ...
-6. A written answer for a confidence interval has five parts, in this
+4. The CLT describes ...
+5. A written answer for a confidence interval has five parts, in this
    order: ...
-7. The confidence interval for a mean with $s$ has the formula ... It may
+6. The confidence interval for a mean with $s$ has the formula ... It may
    be used when ...
-8. The confidence interval for a proportion has the formula ... It may be
+7. The confidence interval for a proportion has the formula ... It may be
    used when ...
 
 ::: {.callout-note collapse="true"}
 ## Check your preparation
 
-1. $z=(x-\mu)/\sigma$: the number of population SDs between $x$ and the
-   mean.
-2. A parameter describes a population.
-3. An estimator is a rule that estimates a parameter from a sample. Its
+1. A parameter describes a population.
+2. An estimator is a rule that estimates a parameter from a sample. Its
    value is random, because the sample is random.
-4. The standard deviation of the sample mean is
+3. The standard deviation of the sample mean is
    $\operatorname{SD}(\bar X)=\sigma/\sqrt n$. The standard error is
    $\operatorname{SE}(\bar X)=S/\sqrt n$, with the value $s/\sqrt n$. It is
    the estimated standard deviation of $\bar X$, used when $\sigma$ is
    unknown.
-5. The distribution of the sample mean across random samples. It is
+4. The distribution of the sample mean across random samples. It is
    approximately normal for a large random sample, also when the population
    is not normal.
-6. Formula, with the reason why it may be used. Given values. Calculations:
+5. Formula, with the reason why it may be used. Given values. Calculations:
    the standard error, then the margin of error. Interval, with the unit.
    Conclusion in the words of the question.
-7. $\bar X\pm t_{1-\alpha/2,\,n-1}\,S/\sqrt n$. The population is normal, or
+6. $\bar X\pm t_{1-\alpha/2,\,n-1}\,S/\sqrt n$. The population is normal, or
    $n$ is large.
-8. $\widehat P\pm z_{1-\alpha/2}\sqrt{\widehat P(1-\widehat P)/n}$. The
+7. $\widehat P\pm z_{1-\alpha/2}\sqrt{\widehat P(1-\widehat P)/n}$. The
    condition is $n\hat p\ge10$ and $n(1-\hat p)\ge10$.
 :::
 
@@ -83,67 +78,14 @@ names the quantity and shows the calculation. It reports the value with its
 unit and interprets this value in context. It also states one important
 limit of the model or the data.
 
-Tasks 1 to 9 belong to the tutorial. Tasks 10 to 12 are extra practice for
+Tasks 1 to 8 belong to the tutorial. Tasks 9 and 10 are extra practice for
 home.
 
 In practice $\sigma$ is unknown, so an interval for a mean uses $s$ and a t
 value. In this book, the values you need are given in the task or on the
 formula sheet.
 
-### Task 1: A normal model in both directions
-
-An invented example. A founder runs an escape room. The time that a team
-needs to solve the room, $Y$, is modelled as $Y\sim N(45,5^2)$, in minutes.
-The standard deviation is 5 minutes.
-
-Supplied values: $P(Z\le0.8)=0.7881$, $P(Z\le1.2)=0.8849$, and the 0.95
-quantile $z_{0.95}=1.645$.
-
-1. Calculate the probability that a team needs at most 49 minutes.
-2. Calculate the probability that a team needs between 39 and 49 minutes.
-3. The founder wants a time limit that 5% of the teams exceed. Calculate
-   this limit.
-4. Say in one sentence what the supplied quantile 1.645 means for a
-   standard normal variable $Z$.
-
-::: {.callout-note collapse="true"}
-## Check your answer
-
-1. Standardise: $z=(49-45)/5=0.8$. So
-   $P(Y\le49)=P(Z\le0.8)=0.7881$. About 79% of the teams need at most 49
-   minutes.
-2. The two z values are $(39-45)/5=-1.2$ and $0.8$. The supplied values
-   contain only positive z values, so use the symmetry rule and then the
-   complement rule: $P(Z\le-1.2)=P(Z>1.2)=1-0.8849=0.1151$. Then
-
-   $$
-   P(39\le Y\le49)=P(Z\le0.8)-P(Z\le-1.2)=0.7881-0.1151=0.6730.
-   $$
-
-   About 67% of the teams need between 39 and 49 minutes.
-3. If 5% of the teams exceed the limit, 95% are at or below it. The limit
-   is the 0.95 quantile of $Y$:
-   $y=\mu+z\sigma=45+1.645\times5=53.23$ minutes. A limit of about 53
-   minutes fits.
-4. 95% of the values of $Z$ are at or below 1.645, and 5% are above it.
-
-Parts 1 and 2 go from a value to a probability. Part 3 goes from a
-probability to a value. One limit: the normal curve is a model. The answers
-are only as good as the fit of this model to the recorded times.
-
-Verification in R:
-
-```{r}
-#| label: bep03-normal-check
-c(p_at_most_49 = pnorm(49, mean = 45, sd = 5),
-  p_39_to_49 = pnorm(49, mean = 45, sd = 5) - pnorm(39, mean = 45, sd = 5),
-  by_hand = 0.7881 - (1 - 0.8849),
-  limit = qnorm(0.95, mean = 45, sd = 5),
-  limit_by_hand = 45 + 1.645 * 5)
-```
-:::
-
-### Task 2: Population, frame, and claim
+### Task 1: Population, frame, and claim
 
 A student randomly selects 100 rows from the Shark Tank file and estimates
 the mean equity offered (`equity_offered_pct`).
@@ -167,7 +109,7 @@ the mean equity offered (`equity_offered_pct`).
    sampling frame and a random selection from that frame.
 :::
 
-### Task 3: Reproduce the realised sample
+### Task 2: Reproduce the realised sample
 
 [Shark Tank data]{.shark-tag} The code below draws the sample with seed 123, exactly as in Lecture 7.
 So you get the same 100 rows when you run it:
@@ -230,9 +172,9 @@ sort(pitch_sample$equity_offered_pct)[c(25, 26, 75, 76)]
 ```
 :::
 
-### Task 4: Standard errors and a larger sample
+### Task 3: Standard errors and a larger sample
 
-[Shark Tank data]{.shark-tag} Use the R output of Task 3 for the seed-123 sample of 100
+[Shark Tank data]{.shark-tag} Use the R output of Task 2 for the seed-123 sample of 100
 pitches: the sample SD of the equity offered is $s=7.71$ percentage
 points, and the sample deal proportion is $\hat p=0.64$.
 
@@ -252,19 +194,21 @@ points, and the sample deal proportion is $\hat p=0.64$.
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-1. The standard error of the mean:
+1. The standard error of the mean is $\operatorname{SE}(\bar X)=S/\sqrt n$.
+   Its value in this sample is
 
    $$
-   \operatorname{SE}(\bar X)=\frac{s}{\sqrt n}=\frac{7.7079}{\sqrt{100}}=0.7708.
+   \frac{s}{\sqrt n}=\frac{7.7079}{\sqrt{100}}=0.7708.
    $$
 
    The standard error of the mean is about 0.77 percentage points of
    equity.
-2. The standard error of the proportion:
+2. The standard error of the proportion is
+   $\operatorname{SE}(\widehat P)=\sqrt{\widehat P(1-\widehat P)/n}$. Its
+   value in this sample is
 
    $$
-   \operatorname{SE}(\widehat P)
-   =\sqrt{\frac{\hat p(1-\hat p)}{n}}
+   \sqrt{\frac{\hat p(1-\hat p)}{n}}
    =\sqrt{\frac{0.64(0.36)}{100}}=0.0480.
    $$
 
@@ -299,7 +243,7 @@ c(se_mean = s_equity / sqrt(100),
 ```
 :::
 
-### Task 5: One pitch versus one mean
+### Task 4: One pitch versus one mean
 
 [Shark Tank data]{.shark-tag} Suppose the population mean of the equity offered is $\mu=13.21$%, the
 population SD is $\sigma=8.44$ percentage points. You draw independent
@@ -356,7 +300,7 @@ c(sd_of_mean = sd_mean,
 ```
 :::
 
-### Task 6: The exact normal case and the CLT
+### Task 5: The exact normal case and the CLT
 
 An invented example. A founder makes scented candles. The burn time of one
 candle, $X$, is modelled as $X\sim N(40,6^2)$, in hours. A tester burns a
@@ -422,7 +366,7 @@ c(sd_mean_9 = 6 / sqrt(9),
 ```
 :::
 
-### Task 7: A proportion through the CLT
+### Task 6: A proportion through the CLT
 
 [Shark Tank data]{.shark-tag} The deal proportion (`deal_on_show`) in the Shark Tank file is $p=0.612$. A
 random sample of $n=100$ pitches is planned, with sample deal proportion
@@ -470,7 +414,7 @@ c(sd_of_phat = sd_phat,
 ```
 :::
 
-### Task 8: A confidence interval for a mean
+### Task 7: A confidence interval for a mean
 
 An invented example. A founder runs a bouldering gym. Her business plan
 assumes that a visit lasts 120 minutes on average. She draws a random sample
@@ -560,7 +504,7 @@ c(t_95 = qt(0.95, df = 15), t_975 = qt(0.975, df = 15),
 ```
 :::
 
-### Task 9: A confidence interval for a proportion
+### Task 8: A confidence interval for a proportion
 
 An invented example. A founder sells sneakers online. Her parcel service
 reports that customers return 15% of all sneaker orders. Last year her shop
@@ -573,7 +517,8 @@ $p$ be the proportion of returned orders among all 6,000 orders.
    condition. Check the 10% condition first. In part 5, say what the
    interval tells you about the 15% reported by the parcel service.
 2. The founder says: "My return rate is 10%, so I am 5 percentage points
-   below the 15%." Assess this sentence.
+   below the 15%." Say in at most four sentences what is wrong with this
+   sentence and what she can correctly say.
 3. State the formula of the standard deviation of $\widehat P$. Then
    explain why you cannot calculate it here.
 
@@ -624,56 +569,11 @@ c(p_hat = p_hat_returns,
 ```
 :::
 
-### Task 10: A uniform model (extra practice for home)
+### Task 9: A sample size for a target margin of error (extra practice for home)
 
-An invented example. A founder runs a studio that prints T-shirts for
-student associations. The time to print one order, $X$, is equally likely
-to be anywhere between 20 and 60 minutes: $X\sim U(20,60)$.
-
-1. A colleague sketches the density as a flat line at height 0.02 between
-   20 and 60 minutes, and zero elsewhere. Show that this is not a valid
-   density, and give the correct height.
-2. Calculate $P(30\le X\le45)$.
-3. Calculate $P(X>50)$.
-4. Calculate $P(10\le X\le30)$. Note that a part of this interval lies
-   outside the possible values of $X$.
-5. State $P(X=40)$. Then explain why the height of the density is not a
-   probability.
-
-::: {.callout-note collapse="true"}
-## Check your answer
-
-1. A valid density is never negative and has a total area of 1. The sketch
-   is never negative, but its area is $(60-20)\times0.02=0.8$, not 1. The
-   correct height is $1/(60-20)=0.025$ per minute. Then the area is
-   $40\times0.025=1$.
-2. A probability is an area: width times height. So
-   $P(30\le X\le45)=(45-30)\times0.025=0.375$.
-3. $P(X>50)=(60-50)\times0.025=0.25$.
-4. The density is zero below 20 minutes, so only the part from 20 to 30
-   counts: $P(10\le X\le30)=(30-20)\times0.025=0.25$. A calculation with
-   the full width of 20 minutes gives 0.5, which is wrong.
-5. $P(X=40)=0$. A single value has width zero, so the area above it is
-   zero. The height 0.025 is a probability per minute. It becomes a
-   probability only when you multiply it by a width in minutes.
-
-Verification in R:
-
-```{r}
-#| label: bep03-uniform-check
-c(area_of_sketch = (60 - 20) * 0.02,
-  correct_height = 1 / (60 - 20),
-  p_30_to_45 = punif(45, min = 20, max = 60) - punif(30, min = 20, max = 60),
-  p_above_50 = 1 - punif(50, min = 20, max = 60),
-  p_10_to_30 = punif(30, min = 20, max = 60) - punif(10, min = 20, max = 60))
-```
-:::
-
-### Task 11: A sample size for a target margin of error (extra practice for home)
-
-The founder of the bouldering gym in Task 8 plans a new and larger sample.
+The founder of the bouldering gym in Task 7 plans a new and larger sample.
 She wants to estimate the mean visit time with a margin of error of at most
-5 minutes. She uses the sample SD of Task 8 as a planning value:
+5 minutes. She uses the sample SD of Task 7 as a planning value:
 $\sigma=28$ minutes.
 
 1. Calculate the sample size that she needs at the 95% level
@@ -726,7 +626,7 @@ ceiling(n_needed)
 ```
 :::
 
-### Task 12: A value for a sample mean (extra practice for home)
+### Task 10: A value for a sample mean (extra practice for home)
 
 An invented example. A founder sells granola in bags of 250 grams. The
 filling machine puts $X\sim N(250,4^2)$ grams into one bag. Every hour she
@@ -909,6 +809,6 @@ For extra exercises on the lectures that this tutorial covers, with worked solut
 the course AI assistant. For example: "Give me an extra exercise for
 Tutorial 3. Show the solution only after I send my answer."
 
-[Continue to Lecture 10: Testing decisions, errors, power, and a first look at regression](b10-testing-errors-power.qmd).
+[Continue to Lecture 10: Testing decisions, errors, and power](b10-testing-errors-power.qmd).
 
 :::

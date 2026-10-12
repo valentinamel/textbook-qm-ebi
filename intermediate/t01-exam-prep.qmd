@@ -80,13 +80,24 @@ nrow(vals)   # deals for a share of the company
 
 ### Task 1: Fit and interpret (Lecture 1)
 
-[Shark Tank data]{.shark-tag} Fit `agreed_m ~ claimed_m` among the deals for a share of the company.
+[Shark Tank data]{.shark-tag} Fit the simple regression of the agreed valuation (`agreed_m`) on the
+claimed valuation (`claimed_m`), among the deals for a share of the company.
 Then report:
 
-1. the sample
+1. the sample, with its number of deals
 2. the fitted equation
-3. the interpretation of the slope with units
-4. the limit of the intercept's meaning.
+3. the interpretation of the slope with units, in one sentence
+4. the limit of the intercept's meaning, in one sentence.
+
+Use (copy and paste) this structure:
+
+```text
+R code:
+Sample:
+Fitted equation:
+Interpretation of the slope:
+Limit of the intercept's meaning:
+```
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
@@ -114,7 +125,16 @@ deal was agreed on air at a valuation of \$2.5 million.
 
 1. Calculate the fitted value of this deal.
 2. Calculate the residual of this deal.
-3. Interpret the sign of the residual.
+3. Interpret the sign of the residual in one sentence.
+
+Use (copy and paste) this structure:
+
+```text
+R code:
+Fitted value:
+Residual:
+Meaning of the sign:
+```
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
@@ -139,12 +159,25 @@ unname(2.5 - predict(val_model, newdata = data.frame(claimed_m = 5)))
 [Shark Tank data]{.shark-tag} Produce the residual-versus-fitted plot and the normal Q--Q plot for the
 Task 1 model of the agreed valuation on the claimed valuation.
 
-1. Name two problems with the assumptions that you can see in the plots.
+1. Name two problems with the assumptions that you can see in the plots,
+   and say for each one what in the plots shows it.
 2. Count the standardised residuals beyond $\pm 3$ and the observations
    with a Cook's distance above $4/n$.
 3. State the three-step rule for handling a flagged observation.
 4. Name one assumption that these plots cannot assess, and say what
    information would assess it.
+
+Use (copy and paste) this structure:
+
+```text
+R code:
+First problem, and what in the plots shows it:
+Second problem, and what in the plots shows it:
+Number with a standardised residual beyond ±3:
+Number with a Cook's distance above 4/n:
+Rule for flagged observations:
+Assumption the plots cannot assess, and what would assess it:
+```
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
@@ -187,14 +220,33 @@ c(big_rstandard = sum(abs(rstandard(val_model)) > 3),
 
 ### Task 4: Coefficient inference (Lecture 3)
 
-[Shark Tank data]{.shark-tag} Use `summary()` and `confint()` on the Task 1 model of the agreed
-valuation on the claimed valuation.
+[Shark Tank data]{.shark-tag} Use the coefficient table and the 95% confidence intervals of the Task 1
+model of the agreed valuation on the claimed valuation.
 
-1. Test $H_0:\beta_1=0$ against the two-sided alternative.
+1. Test $H_0:\beta_1=0$ against $H_1:\beta_1\ne0$ in five steps, with the
+   critical value approach at the 5% level.
 2. Report the 95% confidence interval for $\beta_1$, and verify it by hand
    from the estimate and the standard error.
 3. Would robust standard errors ([Lecture 3](i03-inference-fit-ftest.qmd#i03-robust)) fix both
-   problems with the assumptions that you named in Task 3?
+   problems with the assumptions that you named in Task 3? Answer yes or
+   no, and explain in one or two sentences.
+
+Use (copy and paste) this structure:
+
+```text
+R code:
+Test, hypotheses:
+Test, test statistic:
+Test, critical value and rejection region:
+Test, observed value:
+Test, conclusion:
+Interval, formula:
+Interval, given values:
+Interval, calculations:
+Interval:
+Interval, conclusion:
+Robust standard errors, yes or no, and why:
+```
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
@@ -233,12 +285,26 @@ confint(val_model)
 
 ### Task 5: R² and F (Lecture 3)
 
-Use the Task 1 model of the agreed valuation on the claimed valuation.
+[Shark Tank data]{.shark-tag} Use the Task 1 model of the agreed valuation on the claimed valuation.
 
-1. [Shark Tank data]{.shark-tag} Calculate SST, SSE, SSR, and $R^2$ manually.
-2. Verify them against `summary()`.
-3. Verify $F = t^2$, with $t$ the t statistic of the slope.
+1. Calculate SST, SSE, SSR, and $R^2$ from the observed and the fitted
+   values.
+2. Compare your $R^2$ with the R-squared in the regression output.
+3. Show that the overall F statistic equals $t^2$, with $t$ the t statistic
+   of the slope. Name the two models that the overall F-test compares.
 4. Write one concluding sentence that does not claim more than the data show.
+
+Use (copy and paste) this structure:
+
+```text
+R code:
+SST, SSE, and SSR:
+R-squared by hand:
+R-squared in the output:
+F and t squared:
+The two models that the overall F-test compares:
+Concluding sentence:
+```
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
@@ -251,17 +317,22 @@ yhat <- fitted(val_model)
 SST <- sum((y - mean(y))^2)
 SSE <- sum((y - yhat)^2)
 SSR <- sum((yhat - mean(y))^2)
+c(SST = SST, SSE = SSE, SSR = SSR)
 c(R2_manual = 1 - SSE / SST,
   R2_summary = summary(val_model)$r.squared,
   F_summary = unname(summary(val_model)$fstatistic["value"]),
   t_squared = summary(val_model)$coefficients["claimed_m", "t value"]^2)
 ```
 
-1. The sums (in squared \$ millions) satisfy
-   $\text{SST}=\text{SSR}+\text{SSE}$, and $R^2 \approx 0.798$.
+1. In squared \$ millions, $\text{SST}\approx11{,}926$,
+   $\text{SSE}\approx2{,}415$, and $\text{SSR}\approx9{,}512$, so
+   $\text{SST}=\text{SSR}+\text{SSE}$. Then
+   $R^2=1-2{,}415/11{,}926\approx0.798$.
 2. `R2_manual` and `R2_summary` give the same value.
 3. The overall F statistic is about 3435, equal to the squared slope t
-   statistic, as it must be in simple regression.
+   statistic, as it must be in simple regression. The overall F-test
+   compares the complete model with the intercept-only model, which
+   predicts the mean agreed valuation for every deal.
 4. A sentence that does not claim more than the data show: among these
    deals, the claimed valuation explains about 80% of the variation in the
    agreed valuations, but this is an association in a selected set of deals,
@@ -285,12 +356,26 @@ all_deals <- subset(sharks, deal_on_show == 1 & deal_equity_pct > 0)
 nrow(all_deals)
 ```
 
-1. Interpret the slope and the intercept with units.
+1. Interpret the slope and the intercept with units, in one sentence each.
 2. A founder offers 10% of the company. Which agreed share does the model
    give as the fitted value?
 3. Compare the $R^2$ with that of the valuation model of Task 1 (about
-   0.798). What does the difference tell a founder?
+   0.798). What does the difference tell a founder? Answer in one or two
+   sentences.
 4. Advise the founder in two sentences.
+
+Use (copy and paste) this structure:
+
+```text
+R code:
+Coefficients with their 95% intervals:
+R-squared:
+Interpretation of the slope:
+Interpretation of the intercept:
+Fitted agreed share for an offer of 10%:
+What the difference in R-squared tells a founder:
+Advice in two sentences:
+```
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
@@ -305,7 +390,8 @@ summary(equity_model)$r.squared
 
 1. The slope is about 1.21 percentage points of agreed equity per
    percentage point offered, with a 95% interval of about 1.11 to 1.31. The
-   intercept is about 8.5%, the fitted agreed share for an offer of 0%. No
+   intercept is about 8.5%, with a 95% interval of about 7.1 to 10.0. It is
+   the fitted agreed share for an offer of 0%. No
    founder offers 0%, so the intercept has no business meaning of its own.
 2. For a founder who offers 10%, the fitted share that the founder gives up
    is $8.52 + 1.21\times10\approx20.6$% of the company, about twice the

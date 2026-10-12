@@ -1,4 +1,4 @@
-# Tutorial 2: Conditioning and relationships {#b-ep02 .unnumbered}
+# Tutorial 2: Conditioning, relationships, and the normal model {#b-ep02 .unnumbered}
 
 ```{r}
 #| label: bep02-setup
@@ -13,6 +13,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 - calculate conditional probabilities and apply Bayes' rule and independence
 - find covariance and correlation from a joint table and interpret them without causal claims
 - read a correlation table in a research paper and check an AI answer
+- calculate probabilities and values from uniform and normal models
 :::
 
 Tutorials are exam preparation sessions. The tasks below are exam-style
@@ -24,7 +25,7 @@ the solution together.
 
 ## Before class
 
-Bring your after-class work from Lectures 4 and 5. Complete these statements
+Bring your after-class work from Lectures 4 to 6. Complete these statements
 without looking at the chapters again:
 
 1. In $P(A\mid B)$, the reference class is ...
@@ -33,8 +34,10 @@ without looking at the chapters again:
 4. A joint PMF records ...
 5. Covariance averages ...
 6. Random variables $X$ and $Y$ are independent when ...
+7. Standardising an observation $x$ from $N(\mu,\sigma^2)$ means
+   calculating ...
 
-Use the [formula sheet](formula-sheet.qmd) up to and including Lecture 5.
+Use the [formula sheet](formula-sheet.qmd) up to and including Lecture 6.
 
 Review [Mathematics Refresher: fractions and rearranging
 equations](../resources/math-refresher.html#fractions-and-rearranging-equations)
@@ -50,6 +53,8 @@ if needed.
 4. A joint PMF records the probability of every possible pair of values.
 5. Covariance averages products of deviations from the two means.
 6. $p_{X,Y}(x,y)=p_X(x)\,p_Y(y)$ in every cell of the joint table.
+7. $z=(x-\mu)/\sigma$: the number of population SDs between $x$ and the
+   mean.
 :::
 
 :::
@@ -62,8 +67,8 @@ Try each task before you open its answer. In every answer, name the formula
 and the reference class, check the value, interpret it in context, and say
 what the result does not show.
 
-Tasks 1 and 3 to 8 belong to the tutorial. Tasks 2, 9, and 10 are extra
-practice for home.
+Tasks 1 and 3 to 9 belong to the tutorial. Tasks 2, 10, 11, and 12 are
+extra practice for home.
 
 Tasks 1 to 3 and Task 5 use the Shark Tank file and the two events from
 Lectures 4 and 5, defined in the same way:
@@ -304,8 +309,9 @@ indicator $Y$ of Task 3. It answered:
 > almost independent. The correlation of 0.16 shows that a late season
 > causes a deal for 16% of the pitches."
 
-Check the answer sentence by sentence. Find what is wrong and write the
-corrected answer.
+The answer contains two errors. Check it sentence by sentence and name each
+error and explain it in at most three sentences. Then write the corrected answer in at most
+two sentences.
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
@@ -322,9 +328,9 @@ the season causes deals.
 
 ### More calculation practice {#b-ep02-calculation}
 
-Tasks 6 to 10 practise the calculations of Lectures 4 and 5 by hand. Tasks
-6, 7, and 8 belong to the tutorial. Tasks 9 and 10 are extra practice for
-home. All five tasks use invented examples.
+Tasks 6 to 12 practise the calculations of Lectures 4 to 6 by hand. Tasks
+6 to 9 belong to the tutorial. Tasks 10 to 12 are extra practice for home.
+All seven tasks use invented examples.
 You need a simple calculator and the formula sheet.
 
 ### Task 6: Total probability and Bayes' rule from given rates
@@ -543,7 +549,60 @@ c(E_X = mean_plants, E_Y = mean_pots,
 ```
 :::
 
-### Task 9: Two independent variables (extra practice for home)
+### Task 9: A normal model in both directions
+
+An invented example. A founder runs an escape room. The time that a team
+needs to solve the room, $Y$, is modelled as $Y\sim N(45,5^2)$, in minutes.
+The standard deviation is 5 minutes.
+
+Supplied values: $P(Z\le0.8)=0.7881$, $P(Z\le1.2)=0.8849$, and the 0.95
+quantile $z_{0.95}=1.645$.
+
+1. Calculate the probability that a team needs at most 49 minutes.
+2. Calculate the probability that a team needs between 39 and 49 minutes.
+3. The founder wants a time limit that 5% of the teams exceed. Calculate
+   this limit.
+4. Say in one sentence what the supplied quantile 1.645 means for a
+   standard normal variable $Z$.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+1. Standardise: $z=(49-45)/5=0.8$. So
+   $P(Y\le49)=P(Z\le0.8)=0.7881$. About 79% of the teams need at most 49
+   minutes.
+2. The two z values are $(39-45)/5=-1.2$ and $0.8$. The supplied values
+   contain only positive z values, so use the symmetry rule and then the
+   complement rule: $P(Z\le-1.2)=P(Z>1.2)=1-0.8849=0.1151$. Then
+
+   $$
+   P(39\le Y\le49)=P(Z\le0.8)-P(Z\le-1.2)=0.7881-0.1151=0.6730.
+   $$
+
+   About 67% of the teams need between 39 and 49 minutes.
+3. If 5% of the teams exceed the limit, 95% are at or below it. The limit
+   is the 0.95 quantile of $Y$:
+   $y=\mu+z\sigma=45+1.645\times5=53.23$ minutes. A limit of about 53
+   minutes fits.
+4. 95% of the values of $Z$ are at or below 1.645, and 5% are above it.
+
+Parts 1 and 2 go from a value to a probability. Part 3 goes from a
+probability to a value. One limit: the normal curve is a model. The answers
+are only as good as the fit of this model to the recorded times.
+
+Verification in R:
+
+```{r}
+#| label: bep02-normal-check
+c(p_at_most_49 = pnorm(49, mean = 45, sd = 5),
+  p_39_to_49 = pnorm(49, mean = 45, sd = 5) - pnorm(39, mean = 45, sd = 5),
+  by_hand = 0.7881 - (1 - 0.8849),
+  limit = qnorm(0.95, mean = 45, sd = 5),
+  limit_by_hand = 45 + 1.645 * 5)
+```
+:::
+
+### Task 10: Two independent variables (extra practice for home)
 
 An invented example. A founder makes soap and sells it in gift sets through
 two shops: a concept store in Tilburg and a museum shop in Groningen. $X$ is
@@ -621,7 +680,7 @@ round(c(total = sum(soap_joint), E_X = mean_tilburg, E_Y = mean_groningen,
 ```
 :::
 
-### Task 10: The sum of two variables, with positive and negative covariance (extra practice for home)
+### Task 11: The sum of two variables, with positive and negative covariance (extra practice for home)
 
 An invented example. A founder sells ice cream from a cart in the park. Her
 daily revenue from ice cream, $X$, has a mean of 320 euros and a standard
@@ -681,6 +740,51 @@ c(var_icecream = var_icecream, var_second = var_second,
   var_chocolate = var_chocolate, sd_chocolate = sqrt(var_chocolate),
   corr_lemonade = 600 / (50 * 30), corr_chocolate = -600 / (50 * 30),
   sd_reduction = 1 - sqrt(var_chocolate) / sqrt(var_lemonade))
+```
+:::
+
+### Task 12: A uniform model (extra practice for home)
+
+An invented example. A founder runs a studio that prints T-shirts for
+student associations. The time to print one order, $X$, is equally likely
+to be anywhere between 20 and 60 minutes: $X\sim U(20,60)$.
+
+1. A colleague sketches the density as a flat line at height 0.02 between
+   20 and 60 minutes, and zero elsewhere. Show that this is not a valid
+   density, and give the correct height.
+2. Calculate $P(30\le X\le45)$.
+3. Calculate $P(X>50)$.
+4. Calculate $P(10\le X\le30)$. Note that a part of this interval lies
+   outside the possible values of $X$.
+5. State $P(X=40)$. Then explain why the height of the density is not a
+   probability.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+1. A valid density is never negative and has a total area of 1. The sketch
+   is never negative, but its area is $(60-20)\times0.02=0.8$, not 1. The
+   correct height is $1/(60-20)=0.025$ per minute. Then the area is
+   $40\times0.025=1$.
+2. A probability is an area: width times height. So
+   $P(30\le X\le45)=(45-30)\times0.025=0.375$.
+3. $P(X>50)=(60-50)\times0.025=0.25$.
+4. The density is zero below 20 minutes, so only the part from 20 to 30
+   counts: $P(10\le X\le30)=(30-20)\times0.025=0.25$. A calculation with
+   the full width of 20 minutes gives 0.5, which is wrong.
+5. $P(X=40)=0$. A single value has width zero, so the area above it is
+   zero. The height 0.025 is a probability per minute. It becomes a
+   probability only when you multiply it by a width in minutes.
+
+Verification in R:
+
+```{r}
+#| label: bep02-uniform-check
+c(area_of_sketch = (60 - 20) * 0.02,
+  correct_height = 1 / (60 - 20),
+  p_30_to_45 = punif(45, min = 20, max = 60) - punif(30, min = 20, max = 60),
+  p_above_50 = 1 - punif(50, min = 20, max = 60),
+  p_10_to_30 = punif(30, min = 20, max = 60) - punif(10, min = 20, max = 60))
 ```
 :::
 :::

@@ -83,10 +83,27 @@ number of words in the description (`description_words`).
 Then answer these questions.
 
 1. Interpret all three slopes with units and with the predictors that are
-   held fixed.
-2. Find out which 95% confidence interval of a coefficient includes zero.
-3. Interpret adjusted $R^2$ and the overall F-test.
+   held fixed, in one sentence each.
+2. Say which 95% confidence interval of a slope includes zero, and report
+   that interval.
+3. Interpret $R^2$ and adjusted $R^2$ in one sentence each. Then name the
+   two models that the overall F-test compares, and state its conclusion
+   at the 5% level.
 4. Give two reasons why the coefficients cannot be read as causal effects.
+
+Use (copy and paste) this structure:
+
+```text
+R code:
+Interpretation of the season slope:
+Interpretation of the requested-amount slope:
+Interpretation of the description-words slope:
+Interval that includes zero:
+R-squared:
+Adjusted R-squared:
+Overall F-test, the two models it compares, and its conclusion:
+Two reasons why the coefficients are not causal effects:
+```
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
@@ -98,6 +115,7 @@ m1 <- lm(
   data = sharks
 )
 summary(m1)
+confint(m1)
 ```
 
 1. Among the 1,441 recorded pitches, at fixed values of the other included
@@ -108,13 +126,15 @@ summary(m1)
      points less (about 0.29 points per \$100,000), on average
    - one additional description word is associated with about 0.128
      percentage points less, on average.
-2. `confint(m1)` shows that the interval for the description words, about
-   $(-0.351, 0.095)$, includes zero.
+2. The interval for the description words, about $(-0.351, 0.095)$
+   percentage points per word, includes zero.
 3. $R^2\approx0.188$: the model explains about 19% of the variation in the
-   equity offered. Adjusted $R^2\approx0.186$ is almost the same, so the
-   fit does not come from extra predictors that only fit chance variation.
-   The overall F-test ($F\approx110.6$ on 3 and 1437 df) rejects the null
-   hypothesis that all three slopes are zero.
+   equity offered among these pitches. Adjusted $R^2\approx0.186$ is almost
+   the same, because the penalty for three predictors is small with 1,441
+   pitches. The overall F-test compares the model with the intercept-only
+   model. It gives $F\approx110.6$ on 3 and 1437 degrees of freedom, with a
+   p-value below 0.001, so it rejects the null hypothesis that all three
+   slopes are zero.
 4. Any two of these: only selected pitches reach the show, the quality of
    the venture is not measured, the equity offered may influence the amount
    requested, and the variables may be measured with error.
@@ -122,17 +142,33 @@ summary(m1)
 
 ### Task 2: Dummy variables and a partial F-test (Lecture 5)
 
-Use the 1,434 pitches with a known team classification (`known_gender`).
+[Shark Tank data]{.shark-tag} Use the 1,434 pitches with a known team classification (`known_gender`).
 Fit a reduced model of the equity offered (`equity_offered_pct`) on the
 season and the requested amount (`ask_1k`). Fit a complete model that adds
-the team category `gender` (all-men, all-women, or mixed). Compare the two
-models with `anova()`.
+the team category `gender` (all-men, all-women, or mixed).
 
-1. [Shark Tank data]{.shark-tag} Name the reference category.
-2. Interpret both dummy coefficients.
-3. State the hypotheses of the partial F-test and decide.
-4. Explain why the partial F-test and the individual t-tests answer
-   different questions.
+1. Name the reference category.
+2. Interpret both dummy coefficients, in one sentence each.
+3. Test with a partial F-test at the 5% level, with the p-value approach,
+   whether the two dummy coefficients are jointly zero.
+4. Explain in one or two sentences why the partial F-test and the
+   individual t-tests answer different questions.
+
+Use (copy and paste) this structure:
+
+```text
+R code:
+Reference category:
+Interpretation of the all-women coefficient:
+Interpretation of the mixed coefficient:
+Null hypothesis H0:          and alternative hypothesis H1:
+Test statistic formula:
+Values in the formula:
+Value of the test statistic:
+P-value:
+Conclusion:
+Why the F-test and the t-tests answer different questions:
+```
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
@@ -155,8 +191,13 @@ anova(reduced, complete)
    from an experiment, so the result does not show a causal effect of
    gender.
 3. $H_0$: both dummy coefficients are zero. $H_1$: at least one of them is
-   not zero. $F\approx3.76$ and p $\approx$ 0.023, so reject $H_0$ at the
-   5% level. The two terms are jointly significant.
+   not zero. The test statistic is
+   $F=\dfrac{(\text{SSE}_R-\text{SSE}_C)/q}{\text{SSE}_C/(n-k_C-1)}$, with
+   $\text{SSE}_R=83{,}228$, $\text{SSE}_C=82{,}792$, $q=2$, and
+   $n-k_C-1=1{,}429$. So
+   $F=\dfrac{436.25/2}{82{,}792/1{,}429}\approx3.76$, with a p-value of
+   about 0.023. Since $0.023\le0.05$, reject $H_0$ at the 5% level. The two
+   terms are jointly significant.
 4. The t-test of the mixed dummy alone (p $\approx$ 0.82) is far from
    significant, but the F-test rejects. The F-test asks whether the two
    terms together improve the model. Each t-test asks about one comparison
@@ -165,17 +206,30 @@ anova(reduced, complete)
 
 ### Task 3: Interaction (Lecture 6)
 
-With the 1,434 pitches with a known team classification (`known_gender`),
+[Shark Tank data]{.shark-tag} With the 1,434 pitches with a known team classification (`known_gender`),
 fit a regression of the equity offered (`equity_offered_pct`) on the
 centred season `season_c`, the dummy `women` (1 for all-women and mixed
 teams), their interaction, and the requested amount (`ask_1k`).
 
-1. [Shark Tank data]{.shark-tag} Write the fitted line for `women = 0` and for `women = 1` at the
+1. Write the fitted line for `women = 0` and for `women = 1` at the
    average requested amount.
 2. Calculate both season slopes.
-3. Interpret the interaction estimate and its p-value without claiming too
-   much in either direction.
-4. Explain what centring does.
+3. Interpret the interaction estimate and its p-value in one or two
+   sentences, without claiming too much in either direction.
+4. Explain in one or two sentences what centring the season changes and
+   what it does not change.
+
+Use (copy and paste) this structure:
+
+```text
+R code:
+Fitted line for women = 0:
+Fitted line for women = 1:
+Season slope for all-men teams:
+Season slope for teams with women:
+Interpretation of the interaction estimate and its p-value:
+What centring changes and what it does not change:
+```
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
@@ -208,15 +262,31 @@ summary(m_interaction)
 
 ### Task 4: Polynomial term (Lecture 6)
 
-With all 1,441 pitches (`sharks`), fit a linear model of the equity offered
-(`equity_offered_pct`) on the season and the requested amount (`ask_1k`), and a quadratic model that adds the square of
-`season`, written `I(season^2)`. Compare the two models with `anova()`.
+[Shark Tank data]{.shark-tag} With all 1,441 pitches (`sharks`), fit a linear model of the equity
+offered (`equity_offered_pct`) on the season and the requested amount
+(`ask_1k`), and a quadratic model that adds the square of the season.
 
-1. [Shark Tank data]{.shark-tag} Why must you write `I(season^2)` in the R formula?
-2. Decide with the partial F-test whether the quadratic term improves the
-   model.
-3. Calculate the fitted change from Season 10 to Season 11.
-4. State why you should not extrapolate the curve beyond Season 16.
+1. In an R formula, the square of `season` is written `I(season^2)`. Why
+   is `I()` needed? Answer in one sentence.
+2. Decide with a partial F-test at the 5% level whether the quadratic term
+   improves the model.
+3. Calculate the fitted change from Season 10 to Season 11, at the same
+   requested amount.
+4. State in one or two sentences why you should not extrapolate the curve
+   beyond Season 16.
+
+Use (copy and paste) this structure:
+
+```text
+R code:
+Why I() is needed:
+Null hypothesis H0:          and alternative hypothesis H1:
+Value of the test statistic:
+P-value:
+Conclusion:
+Fitted change from Season 10 to Season 11:
+Why not to extrapolate beyond Season 16:
+```
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
@@ -234,8 +304,9 @@ anova(m_linear, m_quadratic)
 
 1. `I()` tells R to calculate the square. Without `I()`, R would read `^`
    as part of the formula syntax and not as a square.
-2. $H_0$: the coefficient of the quadratic term is zero. The partial F-test
-   gives $F\approx20.1$ with p $<$ 0.001, so reject $H_0$ at the 5% level.
+2. $H_0$: the coefficient of the quadratic term is zero. $H_1$: it is not
+   zero. The partial F-test gives $F\approx20.1$ with p $<$ 0.001, so
+   reject $H_0$ at the 5% level.
    The quadratic term improves the model.
 3. With $\hat\beta_1\approx-1.713$ and $\hat\beta_2\approx0.051$, the
    change from Season 10 to 11 is
@@ -344,7 +415,7 @@ squares. Standard errors in parentheses.
 
 1. What do the numbers in parentheses and the stars mean? Check the stars
    of the self-efficacy coefficient with its t statistic. The critical
-   value is $t_{0.975,\,260}$ = `qt(0.975, 260)` = 1.969.
+   value is $t_{0.975,\,260}=1.969$.
 2. Interpret the self-efficacy coefficient in column (2) in one complete
    sentence.
 3. The coefficient of Female changes from $-0.21$ with a star in column (1)
@@ -353,6 +424,19 @@ squares. Standard errors in parentheses.
    mean.
 4. $R^2$ rises from 0.03 to 0.19. What does that say, and which test would
    show whether the two added predictors are jointly significant?
+
+Use (copy and paste) this structure:
+
+```text
+Numbers in parentheses:
+Stars:
+t statistic of self-efficacy, and check of its stars:
+Interpretation of the self-efficacy coefficient:
+What happened to the Female coefficient:
+What the missing star does and does not mean:
+What the rise in R-squared says:
+Test of the two added predictors:
+```
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
@@ -396,11 +480,24 @@ order_value <- round(40 + 3 * new_page + rnorm(120, mean = 0, sd = 8), 2)
 ab_shop <- data.frame(new_page, order_value)
 ```
 
-Regress `order_value` on the treatment dummy `new_page`. Test in five steps
-whether the new page changes the mean order value. The critical value is
-$t_{0.975,\,118}$ = `qt(0.975, 118)` = 1.980.
-Explain why $\hat\beta_1$ estimates the average treatment effect of the new
-page, and judge its size.
+Regress `order_value` on the treatment dummy `new_page`. Test in five steps,
+with the critical value approach at the 5% level, whether the new page
+changes the mean order value. The critical value is
+$t_{0.975,\,118}=1.980$.
+Explain in one or two sentences why $\hat\beta_1$ estimates the average
+treatment effect of the new page. Judge its size as a percent of the mean
+order value with the old page. Use (copy and paste) this structure:
+
+```text
+R code:
+Hypotheses:
+Test statistic:
+Critical value and rejection region:
+Observed value:
+Conclusion:
+Why the coefficient estimates the average treatment effect:
+Size, as a percent of the mean order value with the old page:
+```
 
 &#40;b) An invented one-way ANOVA. The same shop records the delivery time in
 hours of 20 orders for each of three couriers.
@@ -414,18 +511,36 @@ delivery_hours <- round(c(rnorm(20, 20, 6), rnorm(20, 26, 6),
 deliveries <- data.frame(courier, delivery_hours)
 ```
 
-Fit the regression of `delivery_hours` on `courier` and make its ANOVA table
-with `anova()`. Which dummies does this regression use? What do its two
-dummy coefficients say? Test at 5% whether the mean delivery time is the
-same for the three couriers. Give $H_0$, $F$, both degrees of freedom, and
-the conclusion. The critical value is `qf(0.95, 2, 57)` = 3.16.
+Fit the regression of `delivery_hours` on `courier` and make its ANOVA
+table. Which dummies does this regression use? What do its two dummy
+coefficients say? Test in five steps, with the critical value approach at
+the 5% level, whether the mean delivery time is the same for the three
+couriers. The critical value of this F-test is 3.16. Use (copy and paste)
+this structure:
+
+```text
+R code:
+Dummies in the regression:
+Meaning of the two dummy coefficients:
+Hypotheses:
+Test statistic, with both degrees of freedom:
+Critical value and rejection region:
+Observed value:
+Conclusion:
+```
 
 &#40;c) A meal-kit start-up gives a discount coupon at random to half of its
 customers. Customers with the coupon order more meal kits. The coupon raises
 orders more for students than for other customers. The coupon also brings
 customers to the website more often, and more visits go with more orders.
 Which variable is a moderator, and which is a mediator? How does each one
-appear in a regression of orders on the coupon dummy?
+appear in a regression of orders on the coupon dummy? Use (copy and paste)
+this structure:
+
+```text
+Moderator, and how it appears in the regression:
+Mediator, and how it appears in the regression:
+```
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
