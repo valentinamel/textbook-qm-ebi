@@ -1418,3 +1418,6 @@ group.
 - Basic Lecture 2: new prediction (the 112% mistake), answered under "Answer by counting" and in the answer to the driving question. Basic Lecture 1: why AI answers can be wrong (probabilistic language model).
 - Basic Lecture 3: PMF, CDF, expectation and variance examples now use the number of sharks in a deal instead of the season, with new Figures 3.1 and 3.2 and updated practice.
 - Basic Lecture 3: founder decision on meal boxes is now a try-it task with a step-by-step solution.
+- Basic Lecture 4: driving question now shows the two sentences and asks which one answers a founder; the AI classifier is introduced separately as a venture fund that screens pitches by email.
+- All lectures: "A founder's decision" boxes are now practical tasks with step-by-step questions and a hidden solution ("See the solution").
+- Introductions of the driving questions rewritten from a founder's point of view (all lectures except Basic L4). Basic L5 driving question in plain words.

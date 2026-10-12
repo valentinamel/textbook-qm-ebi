@@ -19,11 +19,13 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 ::: {.driving-question}
 <span class="label">Driving question</span>
 
-<p class="dq-context">An investor who learns that a pitch is from a late season updates their expectations. A bank that sees a fraud warning on a payment does the same. Updating chances after new information is a core probability skill in business. It is also easy to turn the question around by mistake.</p>
+<p class="dq-context">New information changes chances. If you know that a pitch comes from a late season, the chance of a deal changes. The difficulty is to read such a chance the right way round. "Deals among late-season pitches" and "late-season pitches among deals" are different numbers.</p>
 
-Late-season pitches reach deals more often. Two sentences about these pitches
-give the numbers 68.8% and 57.3%. What exactly does each sentence claim, and
-what does a positive flag from an AI tool that predicts deals really tell us?
+You will pitch in a late season. Which of these two sentences tells you how
+likely a deal is?
+
+- A. 68.8% of late-season pitches reached an on-air deal.
+- B. 57.3% of the pitches that reached a deal came from the late seasons.
 :::
 
 ::: {.course-phase .phase-before}
@@ -66,11 +68,13 @@ Then compare, in words only:
 Both questions use the same cell of your table. Decide before class which
 part of the table each question looks at.
 
-**Predict.** Answer this question before you come to class. An AI classifier flags (marks) the
-pitches that are likely to get a deal. Of the pitches that it checks, only
-10% reach a deal. The classifier flags 80% of the actual deals and also 20%
-of the non-deals. Of the flagged pitches, what share are deals: near 80%,
-near 50%, or near 30%? Choose one answer. You find the answer in the lecture material.
+**Predict.** Answer this question before you come to class. A venture fund receives many
+pitches by email, and only 10% of them end in a deal with the fund. An AI
+tool flags (marks) the pitches that it considers likely to reach a deal. It
+flags 80% of the pitches that do reach a deal, and also 20% of the pitches
+that do not. Of the flagged pitches, what share reach a deal: near 80%, near
+50%, or near 30%? Choose one answer. You find the answer in the section
+"Bayes' rule: count first, formula second".
 
 If fractions or event notation are unfamiliar, review
 [Mathematics Refresher: sets and event
@@ -101,9 +105,9 @@ the Shark Tank file:
 
 Both sentences use the same 505 records: the late-season pitches that
 reached a deal. But they answer different questions and give different
-numbers. This lecture shows what each sentence claims. It also answers a
-harder question of the same kind: when an AI classifier flags a pitch as a
-likely deal, how much should that flag change what you believe?
+numbers. This lecture shows what each sentence claims. Later, the lecture
+uses the same idea in another situation: a venture fund that screens the
+pitches it receives with an AI tool.
 
 ### One table, five probabilities
 
@@ -437,12 +441,15 @@ ggplot() +
 <p class="concept-video"><strong>MIT explanation (review):</strong>
 <a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/bayes-rule/">02.8 Bayes' Rule</a>.</p>
 
-[Shark Tank data]{.shark-tag} Return to the prediction question from before class. An AI classifier reads
-the transcripts of pitches (the written text of what was said) and flags
-(marks) the pitches that it considers likely to reach a deal.
-Three numbers describe an invented classifier of this kind:
+Return to the prediction question from before class. It is about another
+situation than the Shark Tank show, with invented numbers. A venture fund
+receives many pitches from founders by email. Most of them never lead to an
+investment: only 10% end in a deal with the fund. To save time, the fund
+uses an AI tool that reads each pitch and flags (marks) the pitches that it
+considers likely to reach a deal. A tool that sorts cases into two groups in
+this way is called a classifier. Three numbers describe it:
 
-- the **base rate**: 10% of the pitches that it checks reach a deal.
+- the **base rate**: 10% of the pitches that the fund receives reach a deal.
 - the **sensitivity**: among actual deals, 80% get flagged,
   $P(\text{flag}\mid\text{deal})=0.80$.
 - the **false-positive rate**: among non-deals, 20% still get flagged,
@@ -735,20 +742,56 @@ false alarms, so a cheap second check is worth its cost.
 
 ### Answering the driving question
 
-The two sentences make different claims about the same 505 records.
-"68.8% of late-season pitches reached a deal" is $P(D\mid L)=505/734$, with
-the late seasons as reference class. "57.3% of deal pitches came from late
-seasons" is $P(L\mid D)=505/882$, with the deals as reference class. Both are
-correct. The typical error is to use the number of one sentence in the
-other. A positive flag from the AI classifier tells us less than its 80%
-sensitivity suggests. With a 10% base rate and a 20% false-positive rate,
-only $80/260\approx 31\%$ of flagged pitches are deals. The flag raises the
-probability of a deal from 10% to 31%, and not more.
+Sentence A answers your question. It is $P(D\mid L)=505/734\approx0.688$,
+with the late-season pitches as reference class: about 69% of them reached a
+deal. Sentence B is $P(L\mid D)=505/882\approx0.573$, with the deals as
+reference class. Both sentences are correct and use the same 505 records,
+but they answer different questions. The typical error is to use the number
+of one sentence in the other.
+
+The venture fund example shows the same trap with a signal. A flag from the
+fund's AI tool tells less than its 80% sensitivity suggests. With a 10%
+base rate and a 20% false-positive rate, only $80/260\approx 31\%$ of
+flagged pitches reach a deal. The flag raises the probability of a deal from
+10% to 31%, and not more.
 
 ::: {.founder-box}
 <span class="label">A founder's decision (invented example)</span>
 
-Your venture sells boxes of prepared meals by subscription, and you give away free trial boxes. One in ten trial customers becomes a subscriber. You notice a signal: 80% of later subscribers open your follow-up email, and 20% of the others open it too. Count with 1,000 trial customers. 100 become subscribers, and 80 of them open the email. Of the other 900, 180 open it. So 80 of 260 openers become subscribers, about 31%. A phone call costs you 2 euros of time, and a subscriber is worth 30 euros. A call to an opener is worth 0.31 × 30 = 9.30 euros on average, so you call the openers. Among the 740 who did not open, only 20 become subscribers, under 3%. A call to one of them is worth about 0.80 euros on average. The decision: call the openers and nobody else.
+Your venture sells boxes of prepared meals by subscription, and you give away
+free trial boxes. One in ten trial customers becomes a subscriber. You notice
+a signal: 80% of later subscribers open your follow-up email, and 20% of the
+others open it too. You could call trial customers to convince them. A phone
+call costs you 2 euros of your time, and a subscriber is worth 30 euros to
+you. Whom should you call: the customers who opened the email, the others,
+or everybody?
+
+Try it yourself first.
+
+1. Draw a tree of counts for 1,000 trial customers: subscribers or not, then
+   opened the email or not.
+2. Calculate the share of subscribers among the customers who opened the
+   email, and among those who did not.
+3. Calculate the expected value of one call in each group, and compare it
+   with the cost of 2 euros.
+
+::: {.callout-note collapse="true"}
+## See the solution
+
+1. Of 1,000 trial customers, 100 become subscribers and 900 do not. Of the
+   100 subscribers, $0.80\times100=80$ open the email. Of the 900 others,
+   $0.20\times900=180$ open it. So $80+180=260$ customers open the email
+   and 740 do not.
+2. Among the openers, $80/260\approx0.31$ become subscribers. Among the 740
+   who did not open, $100-80=20$ become subscribers: $20/740\approx0.03$.
+3. A call to an opener is worth $(80/260)\times30\approx9.23$ euros on
+   average, more than the 2 euros that it costs. A call to a customer who
+   did not open is worth $(20/740)\times30\approx0.81$ euros on average, less
+   than the 2 euros.
+
+The decision: call the openers and nobody else. This is Bayes' rule at
+work: the signal moves the chance of a subscriber from 10% to 31%.
+:::
 :::
 
 **Next:** You can now update the probability of one event when another
