@@ -1417,3 +1417,4 @@ group.
 - Intermediate Lecture 4: the cost of a control variable explained, with the standard errors of the invented example.
 - Basic Lecture 2: new prediction (the 112% mistake), answered under "Answer by counting" and in the answer to the driving question. Basic Lecture 1: why AI answers can be wrong (probabilistic language model).
 - Basic Lecture 3: PMF, CDF, expectation and variance examples now use the number of sharks in a deal instead of the season, with new Figures 3.1 and 3.2 and updated practice.
+- Basic Lecture 3: founder decision on meal boxes is now a try-it task with a step-by-step solution.
