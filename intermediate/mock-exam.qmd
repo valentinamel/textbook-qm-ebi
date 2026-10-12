@@ -50,18 +50,20 @@ collapsed box at the end of this page. It is there only so that anyone can
 check how we made the data. It is not part of the exam.
 
 A part that starts with "In R:" needs code that you write and run yourself.
-Its answer is not printed in the question. For these parts, copy the R code
+Its answer is not printed in the question. For these parts, paste the R code
 that you used into your answer, and type the numbers that the part asks
-for. You can
-answer all other parts from your own results, from printed output, or with a
-short calculation. You may use R as a calculator everywhere.
+for. You can answer all other parts from your own results, from printed
+output, or with a short calculation. You may use R as a calculator
+everywhere.
+
+Most parts give a structure for your answer. Copy it into the answer field
+and fill in each line.
 
 Question 3 shows an R output of a colleague, and Question 4 shows a
 regression table in the layout of a research paper. You interpret them.
 Question 6 shows an answer of an AI assistant. You assess it.
 
-All tests in this course are two-sided. Use a 5% significance level. Some parts that build
-on an "In R:" part print stand-in values. Use them if your code does not run.
+All tests in this course are two-sided. Use a 5% significance level.
 
 ## Dataset used throughout
 
@@ -101,18 +103,39 @@ ventures$digital <- factor(ventures$digital, levels = c("No", "Yes"))
 A founder asks whether ventures that spend more on marketing grow faster.
 The outcome is `growth_pct` and the predictor is `marketing_10k`.
 
-1. In R: load the data and check that the file has 320 rows. Report the
-   mean and the largest value of `growth_pct`. **(2 points)**
-2. In R: fit the simple regression of `growth_pct` on `marketing_10k`.
-   Report the intercept and the slope. **(2 points)**
+1. In R: load the data and check the number of rows. Report the mean and
+   the largest value of `growth_pct`. Use (copy and paste) this structure:
+   **(2 points)**
 
-   Stand-in values, if your code does not run: intercept 6.6 and slope 1.4.
-   Use them in parts 3 and 4.
-3. Interpret the slope in one sentence. **(4 points)**
-4. In R: use `predict()` to calculate the fitted growth of a venture that
-   spends €50,000 on marketing. The actual sales growth of this venture is 11%.
-   Calculate its residual. State what the sign of the residual means.
-   **(5 points)**
+   ```text
+   R code:
+   Number of rows:
+   Mean of growth_pct:
+   Largest value of growth_pct:
+   ```
+
+2. In R: fit the simple regression of `growth_pct` on `marketing_10k`.
+   Report the intercept and the slope, and interpret the slope in one
+   sentence. Use (copy and paste) this structure: **(6 points)**
+
+   ```text
+   R code:
+   Intercept:
+   Slope:
+   Interpretation of the slope:
+   ```
+
+3. In R: use the model of part 2 to calculate the fitted growth of a
+   venture that spends €50,000 on marketing. The actual sales growth of this
+   venture is 11%. Calculate its residual, and state what the sign of the
+   residual means. Use (copy and paste) this structure: **(5 points)**
+
+   ```text
+   R code:
+   Fitted growth:
+   Residual:
+   Meaning of the sign:
+   ```
 
 ::: {.callout-note collapse="true"}
 ## Model answer
@@ -132,7 +155,7 @@ max(ventures$growth_pct)
 simple_model <- lm(growth_pct ~ marketing_10k, data = ventures)
 coef(simple_model)
 
-# Part 4
+# Part 3
 fit_50k <- predict(simple_model, newdata = data.frame(marketing_10k = 5))
 fit_50k
 11 - fit_50k
@@ -140,17 +163,17 @@ fit_50k
 
 **Answers**
 
-1. The file has 320 rows. The mean sales growth is 12.172%. The largest
-   sales growth is 31.94%.
-2. Intercept 6.598 and slope 1.378. The fitted line is
-   $\widehat{growth\_pct}=6.598+1.378\,marketing\_10k$.
-3. Among the 320 sampled ventures, a venture that spends €10,000 more on
-   marketing has on average 1.38 percentage points higher fitted sales
-   growth.
-4. €50,000 is `marketing_10k = 5`. The fitted growth is 13.49%. The
-   residual is $11-13.49=-2.49$ percentage points. The sign is negative:
-   this venture grew less than the fitted growth for ventures with the same
-   marketing spending.
+1. Number of rows: 320. Mean of `growth_pct`: 12.172%. Largest value:
+   31.94%.
+2. Intercept: 6.598. Slope: 1.378. The fitted line is
+   $\widehat{growth\_pct}=6.598+1.378\,marketing\_10k$. Interpretation of
+   the slope: among the 320 sampled ventures, a venture that spends €10,000
+   more on marketing has on average 1.38 percentage points higher fitted
+   sales growth.
+3. €50,000 is `marketing_10k = 5`. Fitted growth: 13.49%. Residual:
+   $11-13.49=-2.49$ percentage points. Meaning of the sign: the residual is
+   negative, so this venture grew less than the fitted growth for ventures
+   with the same marketing spending.
 :::
 
 ## Question 2: Assumptions and diagnostics (15 points)
@@ -158,20 +181,46 @@ fit_50k
 Check the model of Question 1, `growth_pct ~ marketing_10k`. Parts 1 and 4
 ask for two plots.
 
-1. In R: make the residual-versus-fitted plot of the model. Describe in one
-   sentence the pattern that you see. State the assumption that this pattern
-   challenges. **(5 points)**
+1. In R: make the residual-versus-fitted plot of the model. Discuss whether
+   the assumptions of linearity and homoskedasticity are likely to hold, and
+   explain what in the plot you base this on. Use (copy and paste) this
+   structure: **(5 points)**
+
+   ```text
+   R code:
+   Linearity:
+   Homoskedasticity:
+   ```
+
 2. In R: count the ventures with a standardised residual beyond $\pm3$.
-   Then count the ventures with a Cook's distance above $4/n$. Report both
-   counts. **(2 points)**
+   Then count the ventures with a Cook's distance above $4/n$. Use (copy and
+   paste) this structure: **(2 points)**
+
+   ```text
+   R code:
+   Number with a standardised residual beyond ±3:
+   Number with a Cook's distance above 4/n:
+   ```
+
 3. A colleague wants to delete all ventures that part 2 flags, "to get a
-   cleaner model". Respond to her plan in two or three sentences. State the
-   rule of Lecture 2 for flagged observations, and say what you would do
-   with these ventures. **(4 points)**
-4. In R: make the normal Q--Q plot of the standardised residuals. Describe
-   in one sentence how the points lie relative to the line. Then explain in
-   one sentence whether a departure from normality is a serious problem for
-   this model with 320 ventures. **(4 points)**
+   cleaner model". Respond to her plan in two or three sentences. Use (copy
+   and paste) this structure: **(4 points)**
+
+   ```text
+   Rule for flagged observations:
+   What I would do with these ventures:
+   ```
+
+4. In R: make the normal Q-Q plot of the standardised residuals. Describe
+   how the points lie relative to the line, and explain whether a departure
+   from normality is a serious problem for this model with 320 ventures. Use
+   (copy and paste) this structure: **(4 points)**
+
+   ```text
+   R code:
+   How the points lie relative to the line:
+   Serious problem for this model? Why:
+   ```
 
 ::: {.callout-note collapse="true"}
 ## Model answer
@@ -204,20 +253,22 @@ qqline(rstandard(simple_model))
 
 **Answers**
 
-1. The vertical spread of the residuals grows from left to right, that is,
-   with the fitted growth. The points form a fan shape. This is
-   heteroskedasticity, so it challenges the assumption of homoskedasticity
-   (constant variance of the errors).
-2. One venture has a standardised residual beyond $\pm3$. 19 ventures
-   have a Cook's distance above $4/n=4/320=0.0125$.
-3. The rule is: investigate, report, never silently delete. Investigate
-   means to look at the flagged ventures in the data and to ask whether a
-   value is an error or whether the venture is of a different kind. Report
-   means to fit the model with and without these ventures, to show both
-   results, and to say which one you use and why.
-4. The points follow the line in the middle. At the upper end they lie
-   above the line, and near the lower end slightly below it. This is not a
-   serious problem here. Normal errors matter in small samples. With 320
+1. Linearity: the residuals lie around zero along the whole range of fitted
+   values, with at most a slight bend at the ends. Linearity is roughly met.
+   Homoskedasticity: the vertical spread of the residuals grows from left to
+   right, with the fitted growth. The points form a fan shape. This is
+   heteroskedasticity, so homoskedasticity (constant variance of the errors)
+   is likely not met.
+2. Number with a standardised residual beyond $\pm3$: 1. Number with a
+   Cook's distance above $4/n=4/320=0.0125$: 19.
+3. Rule for flagged observations: investigate, report, never silently
+   delete. What I would do: look at the flagged ventures in the data and ask
+   whether a value is an error or whether the venture is of a different
+   kind. Then fit the model with and without these ventures, show both
+   results, and say which one I use and why.
+4. How the points lie: they follow the line in the middle. At the upper end
+   they lie above the line, and near the lower end slightly below it.
+   Serious problem: no. Normal errors matter in small samples. With 320
    ventures the tests and intervals still hold approximately.
 :::
 
@@ -265,41 +316,52 @@ F-statistic: 60.38 on 3 and 196 DF,  p-value: < 2.2e-16
 
 For this model, SSE = 3212.85 and SST = 6181.93. The critical value for a
 95% confidence interval and a 5% test with 196 degrees of freedom is
-$t_{0.975,\,196}=1.972$. In R, `qt(0.975, 196)` gives it.
+$t_{0.975,\,196}=1.972$.
 
-1. &#40;a) Show with a calculation how the Multiple R-squared follows from SSE
-   and SST. (b) State in one sentence what this number says about the model
-   for these 200 ventures. **(4 points)**
-2. &#40;a) Calculate the 95% confidence interval for the coefficient of
-   `marketing_10k`. Write the five parts of the
-   [exam procedure of Lecture 3](i03-inference-fit-ftest.qmd#i03-exam-procedure). (b)
-   State whether the 5% test rejects a coefficient of zero, and explain how the
-   interval shows this. **(6 points)**
+1. Show with a calculation how the Multiple R-squared follows from SSE and
+   SST. Then state in one sentence what this number says about the model
+   for these 200 ventures. Use (copy and paste) this structure:
+   **(4 points)**
+
+   ```text
+   Calculation of R-squared:
+   What it says about the model:
+   ```
+
+2. Calculate the 95% confidence interval for the coefficient of
+   `marketing_10k`. Then state whether the 5% two-sided test rejects a
+   coefficient of zero, and explain how the interval shows this. Use (copy
+   and paste) this structure: **(6 points)**
+
+   ```text
+   Formula:
+   Values used:
+   Margin of error:
+   Lower bound:
+   Upper bound:
+   Conclusion of the test, and how the interval shows it:
+   ```
 
 ::: {.callout-note collapse="true"}
 ## Model answer
 
 **Answers**
 
-1. &#40;a) $R^2=1-\text{SSE}/\text{SST}=1-3212.85/6181.93=0.48$. (b) Among
-   these 200 ventures, the model explains about 48% of the variation in
+1. Calculation of R-squared:
+   $R^2=1-\text{SSE}/\text{SST}=1-3212.85/6181.93=0.48$. What it says:
+   among these 200 ventures, the model explains about 48% of the variation
+   in sales growth.
+2. Formula: $\hat\beta_j\pm t_{0.975,\,df}\,\operatorname{SE}(\hat\beta_j)$,
+   with $df=n-k-1=200-3-1=196$. Values used: $\hat\beta_j=1.35473$,
+   $\operatorname{SE}(\hat\beta_j)=0.12868$, and $t_{0.975,\,196}=1.972$.
+   Margin of error: $1.972\times0.12868=0.254$. Lower bound:
+   $1.355-0.254=1.10$. Upper bound: $1.355+0.254=1.61$ percentage points per
+   €10,000. Conclusion: zero lies outside the interval. The interval
+   contains the values of the coefficient that the two-sided 5% test does
+   not reject, so the test rejects a coefficient of zero. At the 5% level we
+   can conclude the following for all ventures in the registry: at the same
+   experience and offering type, more marketing spending goes with higher
    sales growth.
-2. &#40;a) The five parts of the interval:
-   1. **Formula.** $\hat\beta_j\pm t_{0.975,\,df}\,\operatorname{SE}(\hat\beta_j)$,
-      with $df=n-k-1=200-3-1=196$.
-   2. **Given values.** $\hat\beta_j=1.35473$,
-      $\operatorname{SE}(\hat\beta_j)=0.12868$, and
-      $t_{0.975,\,196}=1.972$.
-   3. **Calculations.** The margin of error is $1.972\times0.12868=0.254$.
-   4. **Interval.** $(1.355-0.254,\ 1.355+0.254)=(1.10,\ 1.61)$ percentage
-      points per €10,000.
-   5. **Conclusion.** See (b).
-
-   &#40;b) Zero lies outside the interval. The interval contains the values
-   of the coefficient that the two-sided 5% test does not reject, so the
-   test rejects a coefficient of zero. At the 5% level we can conclude the
-   following for all ventures in the registry: at the same experience and
-   offering type, more marketing spending goes with higher sales growth.
 :::
 
 ```{r}
@@ -352,34 +414,60 @@ category of the dummy is ventures with a mainly physical offering.
 \* p < 0.05, \*\* p < 0.01, \*\*\* p < 0.001.
 
 The critical value for a 95% confidence interval and a 5% test is
-$t_{0.975,\,df}=1.967$ in all three columns. For column (3), with
-$df=320-4-1=315$, R gives it with `qt(0.975, 315)`.
+$t_{0.975,\,df}=1.967$ in all three columns.
 
-1. Team size has no star in column (3). Calculate its t statistic. Then state
-   what the missing star means and what it does not mean.
-   **(4 points)**
+1. Perform a 5-step test of whether team size is individually significant
+   in column (3), with the critical value approach at the 5% level. Then
+   state in one sentence what the missing star of team size means. Use
+   (copy and paste) this structure: **(4 points)**
+
+   ```text
+   Null hypothesis H0:          and alternative hypothesis H1:
+   Test statistic formula:
+   Rejection rule:
+   Value of the test statistic:
+   Conclusion:
+   Meaning of the missing star:
+   ```
+
 2. Venture B spends €30,000 more on marketing than venture A. Its lead
    founder has 4 more years of experience. B has a digital offering and A a
    physical one. Both have the same team size. Calculate the fitted growth
-   of B minus the fitted growth of A with column (3). **(5 points)**
-3. Founder experience has three stars in column (2). Still, adding it moves
-   the marketing coefficient only from 1.340 to 1.338. Explain in one or two
-   sentences what this says about experience and marketing spending in this
-   sample. Then state one problem that the stable coefficient does not
-   exclude. **(5 points)**
-4. In R: test whether founder experience and team size together improve the
-   model of column (1). Fit the models of columns (1) and (3) and compare
-   them with `anova()`. Report the F statistic. Then show how F follows from
-   the two residual sums of squares in your output.
-   **(4 points)**
+   of B minus the fitted growth of A with column (3). Use (copy and paste)
+   this structure: **(5 points)**
 
-   Stand-in values, if your code does not run: the residual sum of squares
-   is about 5950 on 317 degrees of freedom for column (1). It is about
-   5270 on 315 degrees of freedom for column (3). Calculate F from them.
-   For part 5, use a p-value below 0.001.
-5. State the null hypothesis of the test in part 4 and your conclusion at
-   the 5% level. Then explain in one sentence how this conclusion and the
-   missing star of team size can both be true. **(5 points)**
+   ```text
+   Calculation:
+   Fitted growth of B minus fitted growth of A:
+   ```
+
+3. Founder experience has three stars in column (2). Still, adding it moves
+   the marketing coefficient only from 1.340 to 1.338. Explain what this
+   says about experience and marketing spending in this sample, and state
+   one problem that the stable coefficient does not exclude. Use (copy and
+   paste) this structure: **(5 points)**
+
+   ```text
+   What the stable coefficient says:
+   A problem it does not exclude:
+   ```
+
+4. In R: test whether founder experience and team size are jointly useful
+   in the model of column (3), compared with the model of column (1), with
+   the p-value approach at the 5% level. Then explain in one sentence how
+   your conclusion and the missing star of team size can both be true. Use
+   (copy and paste) this structure: **(9 points)**
+
+   ```text
+   R code:
+   Null hypothesis H0:          and alternative hypothesis H1:
+   Test statistic formula:
+   Values in the formula:
+   Value of the test statistic:
+   P-value:
+   Conclusion:
+   Why the conclusion and the missing star can both be true:
+   ```
 
 ::: {.callout-note collapse="true"}
 ## Model answer
@@ -399,46 +487,51 @@ anova(col_1, col_3)
 
 **Answers**
 
-1. $t=0.168/0.103=1.63$. The test in five steps:
-   1. **Hypotheses.** $H_0:\beta_{team}=0$ versus $H_1:\beta_{team}\ne0$,
-      where $\beta_{team}$ is the coefficient of team size in the model of
-      column (3) for all ventures of the registry. The significance level is
-      $\alpha=0.05$.
-   2. **Test statistic.** $T=\hat\beta_{team}/\operatorname{SE}(\hat\beta_{team})$,
-      which has the $t_{315}$ distribution if $H_0$ is true.
-   3. **Critical value and rejection region.** $t_{0.975,\,315}=1.967$.
-      Reject $H_0$ if $t\le-1.967$ or $t\ge1.967$.
-   4. **Observed value.** The numbers in parentheses are standard errors, so
-      $t=0.168/0.103=1.63$.
-   5. **Conclusion.** 1.63 lies between $-1.967$ and 1.967, so do not
-      reject $H_0$. The p-value is above 0.05, and so there is no star. At
-      the 5% level we cannot conclude that team size goes with growth at
-      fixed marketing spending, offering type, and experience.
-
-   What the missing star does not mean: it does not show that the
-   coefficient is zero. The 95% interval, $0.168\pm1.967\times0.103$, runs
-   from $-0.035$ to 0.371 percentage points per team member. It contains
-   zero and also clearly positive values.
-2. Marketing: €30,000 is 3 steps, so $3\times1.341=4.023$. Experience:
-   $4\times0.258=1.032$. Digital offering: 3.084. Sum:
+1. The test in five steps:
+   - Null hypothesis $H_0:\beta_{team}=0$ and alternative hypothesis
+     $H_1:\beta_{team}\ne0$, where $\beta_{team}$ is the coefficient of team
+     size in the model of column (3) for all ventures of the registry.
+   - Test statistic formula:
+     $T=\hat\beta_{team}/\operatorname{SE}(\hat\beta_{team})$, which has the
+     $t_{315}$ distribution if $H_0$ is true.
+   - Rejection rule: reject $H_0$ if $|t_{obs}|\ge t_{0.975,\,315}=1.967$.
+   - Value of the test statistic: the numbers in parentheses are standard
+     errors, so $t_{obs}=0.168/0.103=1.63$.
+   - Conclusion: $|1.63|<1.967$, so do not reject $H_0$. At the 5% level
+     we cannot conclude that team size goes with growth at fixed marketing
+     spending, offering type, and experience.
+   - Meaning of the missing star: the p-value of team size is above 0.05,
+     so its coefficient is not significantly different from zero at the 5%
+     level.
+2. Calculation: marketing, €30,000 is 3 steps of €10,000, so
+   $3\times1.341=4.023$. Experience: $4\times0.258=1.032$. Digital
+   offering: 3.084. Fitted growth of B minus A:
    $4.023+1.032+3.084=8.14$ percentage points.
-3. A coefficient changes when the added predictor is related to the outcome
-   and also to the predictor of interest. Experience is related to growth,
-   but in this sample it is almost unrelated to marketing spending. So
-   holding it fixed changes the marketing comparison very little. The
-   stable coefficient does not exclude a variable that is not in the data
-   and that is related to both marketing spending and growth, for example
-   the quality of the product.
-4. $F=20.216$. From the output, with the partial F statistic, $q=2$, and
-   $df=315$:
-   $F=\dfrac{(5949.3-5272.6)/2}{5272.6/315}=\dfrac{338.35}{16.74}=20.21$.
-5. $H_0$: the coefficients of founder experience and team size are both
-   zero. The p-value in the `anova()` output is 5.491e-09, that is
-   0.000000005, far below 0.05. So reject $H_0$. At the 5% level we can
-   conclude that the two predictors together improve the model of column
-   (1). The F-test asks about the two terms together, and the t-test asks
-   about team size alone. The joint result comes from experience. A set of
-   terms can be jointly significant while one of its terms is not significant.
+3. What the stable coefficient says: a coefficient changes when the added
+   predictor is related to the outcome and also to the predictor of
+   interest. Experience is related to growth, but in this sample it is
+   almost unrelated to marketing spending. So holding it fixed changes the
+   marketing comparison very little. A problem it does not exclude: a
+   variable that is not in the data and that is related to both marketing
+   spending and growth, for example the quality of the product.
+4. The test:
+   - Null hypothesis $H_0$: the coefficients of founder experience and team
+     size are both zero. Alternative hypothesis $H_1$: at least one of them
+     is not zero.
+   - Test statistic formula:
+     $F=\dfrac{(\text{SSE}_R-\text{SSE}_C)/q}{\text{SSE}_C/(n-k_C-1)}$.
+   - Values in the formula: $\text{SSE}_R=5949.3$ (column 1),
+     $\text{SSE}_C=5272.6$ (column 3), $q=2$, $n-k_C-1=315$.
+   - Value of the test statistic:
+     $F=\dfrac{(5949.3-5272.6)/2}{5272.6/315}=\dfrac{338.35}{16.74}=20.2$.
+   - P-value: 5.491e-09, that is 0.000000005.
+   - Conclusion: the p-value is far below 0.05, so reject $H_0$. At the 5%
+     level we can conclude that the two predictors together improve the
+     model of column (1).
+   - Why both can be true: the F-test asks about the two terms together,
+     and the t-test asks about team size alone. The joint result comes
+     from experience. A set of terms can be jointly significant while one
+     of its terms is not significant.
 :::
 
 ```{r}
@@ -461,43 +554,50 @@ cor(ventures$marketing_10k, ventures$experience_years)
 
 ## Question 5: Interactions and curvature (19 points)
 
-Parts 1 to 3 ask whether marketing spending goes with more growth for
-digital ventures than for physical ventures. Parts 4 to 6 use a model in
-which the relation between marketing spending and growth can be curved.
+Part 1 asks whether marketing spending goes with more growth for digital
+ventures than for physical ventures. Parts 2 and 3 use a model in which the
+relation between marketing spending and growth can be curved.
 
 1. In R: fit a model of sales growth (`growth_pct`) with marketing
    spending centred at €40,000 (`spend_c`), the offering type (`digital`),
    the interaction of the two, and founder experience
-   (`experience_years`). Report the coefficients
-   of `spend_c`, `digitalYes`, and the interaction.
-   **(3 points)**
+   (`experience_years`). Report the coefficients of `spend_c`, `digitalYes`,
+   and the interaction. Then state the marketing slope for physical
+   ventures, calculate the marketing slope for digital ventures, and
+   interpret the interaction coefficient in one sentence. Use (copy and
+   paste) this structure: **(10 points)**
 
-   Stand-in values, if your code does not run: 1.0 for `spend_c`, 3.0 for
-   `digitalYes`, and 0.7 for the interaction. Use them in parts 2 and 3.
-2. State the marketing slope for physical ventures. Calculate the
-   marketing slope for digital ventures. **(3 points)**
-3. Interpret the interaction coefficient in one sentence. **(4 points)**
-4. In R: run the model below, which has no interaction and adds the square
-   of marketing spending. Report the coefficients of `marketing_10k` and
-   `I(marketing_10k^2)`. **(2 points)**
-
-   ```r
-   curve_model <- lm(
-     growth_pct ~ marketing_10k + I(marketing_10k^2) + digital +
-       experience_years,
-     data = ventures
-   )
+   ```text
+   R code:
+   Coefficient of spend_c:
+   Coefficient of digitalYes:
+   Coefficient of the interaction:
+   Marketing slope for physical ventures:
+   Marketing slope for digital ventures:
+   Interpretation of the interaction coefficient:
    ```
 
-   Stand-in values, if your code does not run: 2.2 for `marketing_10k` and
-   $-0.10$ for `I(marketing_10k^2)`. Use them in part 5.
-5. Use the model of part 4. Calculate the fitted change in growth when
-   marketing spending rises from €20,000 to €30,000, and when it rises from
-   €60,000 to €70,000. Offering type and experience stay fixed. Then state
-   in one sentence what the two results show together.
-   **(4 points)**
-6. A founder plans to spend €150,000 on marketing. She wants to use the
-   model of part 4 to calculate her fitted growth. Explain in one or two
+2. In R: fit a model of sales growth (`growth_pct`) with marketing spending
+   (`marketing_10k`), the square of marketing spending, the offering type
+   (`digital`), and founder experience (`experience_years`), without an
+   interaction. Report the coefficients of marketing spending and of its
+   square. Then calculate the fitted change in growth when marketing
+   spending rises from €20,000 to €30,000, and when it rises from €60,000
+   to €70,000. Offering type and experience stay fixed. State in one
+   sentence what the two results show together. Use (copy and paste) this
+   structure: **(6 points)**
+
+   ```text
+   R code:
+   Coefficient of marketing spending:
+   Coefficient of its square:
+   Fitted change from €20,000 to €30,000:
+   Fitted change from €60,000 to €70,000:
+   What the two results show together:
+   ```
+
+3. A founder plans to spend €150,000 on marketing. She wants to use the
+   model of part 2 to calculate her fitted growth. Explain in one or two
    sentences why she should not do this. **(3 points)**
 
 ::: {.callout-note collapse="true"}
@@ -517,7 +617,7 @@ coef(interaction_model)
 
 ```{r}
 #| label: imock-q5-quadratic
-# Part 4
+# Part 2
 curve_model <- lm(
   growth_pct ~ marketing_10k + I(marketing_10k^2) + digital +
     experience_years,
@@ -528,21 +628,22 @@ coef(curve_model)
 
 **Answers**
 
-1. `spend_c` 1.044, `digitalYes` 2.967, interaction `spend_c:digitalYes`
-   0.660.
-2. Physical ventures (`digital = No`): 1.044 percentage points per €10,000.
-   Digital ventures: $1.044+0.660=1.704$ percentage points per €10,000.
-3. Among the 320 sampled ventures and at the same founder experience, each
-   additional €10,000 of marketing spending goes with 0.66 percentage points
-   more sales growth for digital ventures than for physical ventures.
-4. `marketing_10k` 2.179 and `I(marketing_10k^2)` $-0.105$.
-5. The fitted change from $x$ to $x+1$ is
+1. Coefficient of `spend_c`: 1.044. Coefficient of `digitalYes`: 2.967.
+   Coefficient of the interaction `spend_c:digitalYes`: 0.660. Marketing
+   slope for physical ventures (`digital = No`): 1.044 percentage points per
+   €10,000. Marketing slope for digital ventures: $1.044+0.660=1.704$
+   percentage points per €10,000. Interpretation: among the 320 sampled
+   ventures and at the same founder experience, each additional €10,000 of
+   marketing spending goes with 0.66 percentage points more sales growth for
+   digital ventures than for physical ventures.
+2. Coefficient of marketing spending: 2.179. Coefficient of its square:
+   $-0.105$. The fitted change from $x$ to $x+1$ is
    $\hat\beta_1+\hat\beta_2(2x+1)$. From €20,000 to €30,000, $x=2$:
    $2.1794-0.1046\times5=1.66$ percentage points. From €60,000 to €70,000,
    $x=6$: $2.1794-0.1046\times13=0.82$ percentage points. Together: the
    same extra €10,000 goes with about half as much extra growth at the
    higher level of spending. The fitted curve becomes flatter.
-6. €150,000 is far outside the range of the data. The largest spending in
+3. €150,000 is far outside the range of the data. The largest spending in
    the sample is €79,900. No venture in the data supports the curve there.
    A quadratic curve does not stop curving. This one turns downward at
    about €104,000 of spending, and no data show such a turn.
@@ -551,7 +652,7 @@ coef(curve_model)
 ```{r}
 #| label: imock-q5-check
 #| include: false
-# Checks the answers to parts 1, 2, 5 and 6 of Question 5.
+# Checks the answers to parts 1 to 3 of Question 5.
 summary(interaction_model)$coefficients
 b5 <- coef(interaction_model)
 c(slope_physical = unname(b5["spend_c"]),
