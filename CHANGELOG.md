@@ -1421,3 +1421,5 @@ group.
 - Basic Lecture 4: driving question now shows the two sentences and asks which one answers a founder; the AI classifier is introduced separately as a venture fund that screens pitches by email.
 - All lectures: "A founder's decision" boxes are now practical tasks with step-by-step questions and a hidden solution ("See the solution").
 - Introductions of the driving questions rewritten from a founder's point of view (all lectures except Basic L4). Basic L5 driving question in plain words.
+- Intermediate L6: stronger moderation in the invented franchise example (interaction 0.497), lines fan out clearly. Intermediate L4: coefficient plot shows the requested amount per $100,000.
+- Fixed two list breaks (a line starting with a number) in Intermediate L4 and Basic Tutorial 4.

@@ -462,8 +462,8 @@ set.seed(606)
 n_regions <- 150
 stores <- sample(1:12, n_regions, replace = TRUE)
 marketing <- round(runif(n_regions, min = 2, max = 20), 1)
-sales <- round(30 + 1.0 * marketing + 6 * stores +
-               0.25 * marketing * stores + rnorm(n_regions, sd = 12), 1)
+sales <- round(40 + 0.5 * marketing + 2 * stores +
+               0.6 * marketing * stores + rnorm(n_regions, sd = 12), 1)
 franchise <- data.frame(sales, marketing, stores)
 summary(franchise)
 
@@ -475,7 +475,7 @@ Step 1: the slope of marketing as a function of stores. With the
 coefficients from the output,
 
 $$
-\widehat{\text{slope of marketing}} = 1.745 + 0.147\times\text{stores}.
+\widehat{\text{slope of marketing}} = 1.245 + 0.497\times\text{stores}.
 $$
 
 Step 2: the slope at three meaningful values of the moderator. Take the
@@ -492,21 +492,21 @@ marketing_slopes[3] / marketing_slopes[1]
 ```
 
 In a region with 3 stores (the lower quartile), €1,000 more marketing is
-associated with about €2,190 more monthly sales on average. With 6 stores
-(the median) it is about €2,630, and with 10 stores (the upper quartile)
-about €3,220. The slope at the upper quartile is about 1.47 times the slope
+associated with about €2,740 more monthly sales on average. With 6 stores
+(the median) it is about €4,230, and with 10 stores (the upper quartile)
+about €6,220. The slope at the upper quartile is about 2.3 times the slope
 at the lower quartile.
 
 Step 3: one sentence per coefficient.
 
-- `marketing:stores` ($0.147$). A region with one more store has a
-  marketing slope that is 0.147 higher: €147 more monthly sales per €1,000
-  of marketing. Read the other way round, a region that spends €1,000 more
-  on marketing has a stores slope that is €147 per store higher.
-- `marketing` ($1.745$). This is the slope of marketing in a region with 0
+- `marketing:stores` ($0.497$). A region with one more store has a
+  marketing slope that is 0.497 higher: about €500 more monthly sales per
+  €1,000 of marketing. Read the other way round, a region that spends €1,000
+  more on marketing has a stores slope that is about €500 per store higher.
+- `marketing` ($1.245$). This is the slope of marketing in a region with 0
   stores. No region has 0 stores (the minimum is 1), so this number does not
   describe the marketing slope of any region.
-- `stores` ($6.768$). This is the slope of stores at €0 of marketing. The
+- `stores` ($2.766$). This is the slope of stores at €0 of marketing. The
   smallest spending in the data is €2,300, so this number also lies outside
   the data.
 
@@ -520,9 +520,9 @@ franchise$stores_c <- franchise$stores - mean(franchise$stores)
 coef(lm(sales ~ marketing * stores_c, data = franchise))
 ```
 
-The marketing coefficient is now 2.676: at the average number of stores,
-€1,000 more marketing is associated with about €2,680 more monthly sales.
-The interaction coefficient stays 0.147. As with the dummy, centring moves
+The marketing coefficient is now 4.385: at the average number of stores,
+€1,000 more marketing is associated with about €4,390 more monthly sales.
+The interaction coefficient stays 0.497. As with the dummy, centring moves
 the place of the comparison and not the fitted lines.
 :::
 
@@ -539,8 +539,8 @@ set.seed(606)
 n_regions <- 150
 stores <- sample(1:12, n_regions, replace = TRUE)
 marketing <- round(runif(n_regions, min = 2, max = 20), 1)
-sales <- round(30 + 1.0 * marketing + 6 * stores +
-               0.25 * marketing * stores + rnorm(n_regions, sd = 12), 1)
+sales <- round(40 + 0.5 * marketing + 2 * stores +
+               0.6 * marketing * stores + rnorm(n_regions, sd = 12), 1)
 franchise <- data.frame(sales, marketing, stores)
 moderator_model <- lm(sales ~ marketing * stores, data = franchise)
 
@@ -977,9 +977,9 @@ assistant.
    extrapolate it?
 6. In the invented franchise model of @exm-i06-moderator, monthly sales
    are regressed on marketing, the number of stores, and their
-   interaction. The coefficient of `marketing` is 1.745 and that of
-   `marketing:stores` is 0.147, with sales and marketing in €1,000s. What
-   is the slope of marketing in a region with 6 stores? Why does 1.745
+   interaction. The coefficient of `marketing` is 1.245 and that of
+   `marketing:stores` is 0.497, with sales and marketing in €1,000s. What
+   is the slope of marketing in a region with 6 stores? Why does 1.245
    alone not describe any region?
 7. A researcher finds that training is related to productivity, and that
    the relationship is stronger in large firms. A second researcher finds
@@ -1004,9 +1004,9 @@ assistant.
 5. No single coefficient is the slope, so only fitted values or the curve
    show what the model says. Outside the observed range the curve can turn
    sharply, and no data support that turn.
-6. $1.745+0.147\times6\approx2.63$: in a region with 6 stores, €1,000 more
-   marketing is associated with about €2,630 more monthly sales on average.
-   The number 1.745 is the slope at 0 stores. No region has 0 stores, so it
+6. $1.245+0.497\times6\approx4.23$: in a region with 6 stores, €1,000 more
+   marketing is associated with about €4,230 more monthly sales on average.
+   The number 1.245 is the slope at 0 stores. No region has 0 stores, so it
    is a conditional effect at a value outside the data.
 7. Firm size is a moderator: it changes the slope of training. It appears
    as an interaction term of training and firm size. Skills are a mediator:

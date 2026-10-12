@@ -1012,31 +1012,34 @@ Check: which of these four problems does adding <code>ask_1k</code> address?
 <span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> sharks</span>
 <span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>ci <span class="ot">&lt;-</span> <span class="fu">confint</span>(equity_model)[<span class="sc">-</span><span class="dv">1</span>, , drop <span class="ot">=</span> <span class="cn">FALSE</span>]</span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>term_labels <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Season"</span>, <span class="st">"Amount requested ($1,000s)"</span>,</span>
-<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"Description length (words)"</span>)</span>
-<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>coef_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">term =</span> <span class="fu">factor</span>(term_labels, <span class="at">levels =</span> term_labels),</span>
-<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">estimate =</span> <span class="fu">coef</span>(equity_model)[<span class="sc">-</span><span class="dv">1</span>],</span>
-<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">lower =</span> ci[, <span class="dv">1</span>],</span>
-<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">upper =</span> ci[, <span class="dv">2</span>]</span>
-<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(coef_df, <span class="fu">aes</span>(<span class="at">x =</span> estimate, <span class="at">y =</span> term)) <span class="sc">+</span></span>
-<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">colour =</span> <span class="st">"#C98B2E"</span>,</span>
-<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>             <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
-<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_pointrange</span>(<span class="fu">aes</span>(<span class="at">xmin =</span> lower, <span class="at">xmax =</span> upper),</span>
-<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>                  <span class="at">colour =</span> <span class="st">"#009E73"</span>, <span class="at">linewidth =</span> <span class="fl">0.7</span>, <span class="at">fatten =</span> <span class="fl">2.6</span>) <span class="sc">+</span></span>
-<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="sc">-</span><span class="fl">0.02</span>, <span class="at">y =</span> <span class="fl">3.35</span>, <span class="at">label =</span> <span class="st">"no change = 0"</span>,</span>
-<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>           <span class="at">hjust =</span> <span class="dv">1</span>, <span class="at">colour =</span> <span class="st">"#17324D"</span>, <span class="at">size =</span> <span class="fl">3.4</span>) <span class="sc">+</span></span>
-<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Estimated change in equity offered (percentage points)"</span>,</span>
-<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
-<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
-<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb24-30"><a href="#cb24-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.y =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb24-31"><a href="#cb24-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#5B6976"</span>),</span>
-<span id="cb24-32"><a href="#cb24-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>)</span>
-<span id="cb24-33"><a href="#cb24-33" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Show the requested amount per $100,000 instead of per $1,000 (x 100),</span></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a><span class="co"># so that its estimate and interval are visible on the same axis</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>unit_factor <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">100</span>, <span class="dv">1</span>)</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>term_labels <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Season (per season)"</span>, <span class="st">"Amount requested (per $100,000)"</span>,</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"Description length (per word)"</span>)</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>coef_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">term =</span> <span class="fu">factor</span>(term_labels, <span class="at">levels =</span> term_labels),</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">estimate =</span> <span class="fu">coef</span>(equity_model)[<span class="sc">-</span><span class="dv">1</span>] <span class="sc">*</span> unit_factor,</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">lower =</span> ci[, <span class="dv">1</span>] <span class="sc">*</span> unit_factor,</span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">upper =</span> ci[, <span class="dv">2</span>] <span class="sc">*</span> unit_factor</span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(coef_df, <span class="fu">aes</span>(<span class="at">x =</span> estimate, <span class="at">y =</span> term)) <span class="sc">+</span></span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">colour =</span> <span class="st">"#C98B2E"</span>,</span>
+<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>             <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_pointrange</span>(<span class="fu">aes</span>(<span class="at">xmin =</span> lower, <span class="at">xmax =</span> upper),</span>
+<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a>                  <span class="at">colour =</span> <span class="st">"#009E73"</span>, <span class="at">linewidth =</span> <span class="fl">0.7</span>, <span class="at">fatten =</span> <span class="fl">2.6</span>) <span class="sc">+</span></span>
+<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="sc">-</span><span class="fl">0.02</span>, <span class="at">y =</span> <span class="fl">3.35</span>, <span class="at">label =</span> <span class="st">"no change = 0"</span>,</span>
+<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a>           <span class="at">hjust =</span> <span class="dv">1</span>, <span class="at">colour =</span> <span class="st">"#17324D"</span>, <span class="at">size =</span> <span class="fl">3.4</span>) <span class="sc">+</span></span>
+<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Estimated change in equity offered (percentage points)"</span>,</span>
+<span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb24-30"><a href="#cb24-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
+<span id="cb24-31"><a href="#cb24-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb24-32"><a href="#cb24-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb24-33"><a href="#cb24-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.y =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb24-34"><a href="#cb24-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#5B6976"</span>),</span>
+<span id="cb24-35"><a href="#cb24-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>)</span>
+<span id="cb24-36"><a href="#cb24-36" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-i04-coefplot" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1045,7 +1048,7 @@ Check: which of these four problems does adding <code>ask_1k</code> address?
 <img src="i04-multiple-regression_files/figure-html/fig-i04-coefplot-1.png" class="img-fluid figure-img" width="672">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-i04-coefplot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;4.2: Coefficient estimates from the three-predictor model of the equity offered, with 95% confidence intervals. Each row uses a different predictor unit, so the sizes cannot be compared across rows without the table of units.
+Figure&nbsp;4.2: Coefficient estimates from the three-predictor model of the equity offered, with 95% confidence intervals. Each row uses its own predictor unit: per season, per $100,000 requested, and per word. The sizes cannot be compared across rows without these units.
 </figcaption>
 </figure>
 </div>
@@ -1054,9 +1057,9 @@ Figure&nbsp;4.2: Coefficient estimates from the three-predictor model of the equ
 <p>Read <a href="#fig-i04-coefplot" class="quarto-xref">Figure&nbsp;<span>4.2</span></a> with the <a href="../basic/overview.html#how-to-read-every-graph">five steps for reading a figure</a>:</p>
 <ol type="1">
 <li><strong>Unit and variables:</strong> the rows are the predictors. The horizontal axis is the estimated change in the equity offered, in percentage points.</li>
-<li><strong>Scales:</strong> each estimate is per one unit of its own predictor: per season, per $1,000, per word. The rows are not on a common scale.</li>
+<li><strong>Scales:</strong> each estimate is per one unit of its own predictor: per season, per $100,000 requested, per word. The rows are not on a common scale. The model uses <code>ask_1k</code>, in $1,000s, so its coefficient is about <span class="math inline">\(-0.0029\)</span>. Per $1,000 that change is so small that its dot and interval would sit on the zero line. The plot therefore shows it per $100,000: <span class="math inline">\(100\times(-0.0029)\approx-0.29\)</span> percentage points.</li>
 <li><strong>One element:</strong> a dot is a coefficient estimate, and its horizontal line is the 95% confidence interval. The dashed line marks zero.</li>
-<li><strong>Pattern:</strong> the season interval lies clearly left of zero. The interval for the description length crosses zero. The <code>ask_1k</code> row lies almost on the zero line only because its unit step ($1,000) is tiny: its t statistic is about <span class="math inline">\(-5\)</span>. The distance from zero in this plot depends on the unit. It does not show how strong the evidence is.</li>
+<li><strong>Pattern:</strong> the intervals for the season and for the requested amount lie clearly left of zero. The interval for the description length crosses zero. The distance from zero in this plot depends on the unit that you choose. It does not show how strong the evidence is: for that, look at the t statistic or at whether the interval contains zero.</li>
 <li><strong>Limits:</strong> the intervals show sampling uncertainty under the model, among these recorded pitches.</li>
 </ol>
 <div class="caveat-box">
@@ -1098,10 +1101,7 @@ See the solution
 <li>The slope with the control variable, 25 orders per euro. The simple slope also counts the higher demand in exam weeks as an effect of the price.</li>
 <li><span class="math inline">\(150\times1=150\)</span> euros per week.</li>
 <li>With the simple slope: <span class="math inline">\(60\times3=180\)</span> euros. With the adjusted slope: <span class="math inline">\(25\times3=75\)</span> euros.</li>
-<li>With the simple slope the cut would look profitable, because 180 is more than 150. With the adjusted slope it is not, because 75 is less than
-<ol start="150" type="1">
-<li>The decision: keep the price. The control variable changed the decision.</li>
-</ol></li>
+<li>With the simple slope the cut would look profitable, because 180 is more than 150. With the adjusted slope it is not, because 75 is less than 150. The decision: keep the price. The control variable changed the decision.</li>
 </ol>
 </div>
 </div>

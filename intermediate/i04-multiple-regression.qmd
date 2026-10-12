@@ -620,7 +620,7 @@ their 95% confidence intervals.
 #| label: fig-i04-coefplot
 #| code-fold: true
 #| code-summary: "See the R code for this figure"
-#| fig-cap: "Coefficient estimates from the three-predictor model of the equity offered, with 95% confidence intervals. Each row uses a different predictor unit, so the sizes cannot be compared across rows without the table of units."
+#| fig-cap: "Coefficient estimates from the three-predictor model of the equity offered, with 95% confidence intervals. Each row uses its own predictor unit: per season, per $100,000 requested, and per word. The sizes cannot be compared across rows without these units."
 library(ggplot2)
 sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
 sharks$ask_1k <- sharks$ask_amount_usd / 1000
@@ -629,13 +629,16 @@ equity_model <- lm(
   data = sharks
 )
 ci <- confint(equity_model)[-1, , drop = FALSE]
-term_labels <- c("Season", "Amount requested ($1,000s)",
-                 "Description length (words)")
+# Show the requested amount per $100,000 instead of per $1,000 (x 100),
+# so that its estimate and interval are visible on the same axis
+unit_factor <- c(1, 100, 1)
+term_labels <- c("Season (per season)", "Amount requested (per $100,000)",
+                 "Description length (per word)")
 coef_df <- data.frame(
   term = factor(term_labels, levels = term_labels),
-  estimate = coef(equity_model)[-1],
-  lower = ci[, 1],
-  upper = ci[, 2]
+  estimate = coef(equity_model)[-1] * unit_factor,
+  lower = ci[, 1] * unit_factor,
+  upper = ci[, 2] * unit_factor
 )
 
 ggplot(coef_df, aes(x = estimate, y = term)) +
@@ -662,14 +665,18 @@ Read @fig-i04-coefplot with the
 1. **Unit and variables:** the rows are the predictors. The horizontal axis
    is the estimated change in the equity offered, in percentage points.
 2. **Scales:** each estimate is per one unit of its own predictor: per
-   season, per \$1,000, per word. The rows are not on a common scale.
+   season, per \$100,000 requested, per word. The rows are not on a common
+   scale. The model uses `ask_1k`, in \$1,000s, so its coefficient is about
+   $-0.0029$. Per \$1,000 that change is so small that its dot and interval
+   would sit on the zero line. The plot therefore shows it per \$100,000:
+   $100\times(-0.0029)\approx-0.29$ percentage points.
 3. **One element:** a dot is a coefficient estimate, and its horizontal line
    is the 95% confidence interval. The dashed line marks zero.
-4. **Pattern:** the season interval lies clearly left of zero. The interval
-   for the description length crosses zero. The `ask_1k` row lies almost on
-   the zero line only because its unit step (\$1,000) is tiny: its t
-   statistic is about $-5$. The distance from zero in this plot depends on
-   the unit. It does not show how strong the evidence is.
+4. **Pattern:** the intervals for the season and for the requested amount
+   lie clearly left of zero. The interval for the description length
+   crosses zero. The distance from zero in this plot depends on the unit
+   that you choose. It does not show how strong the evidence is: for that,
+   look at the t statistic or at whether the interval contains zero.
 5. **Limits:** the intervals show sampling uncertainty under the model,
    among these recorded pitches.
 
@@ -727,9 +734,8 @@ Try it yourself first.
 3. With the simple slope: $60\times3=180$ euros. With the adjusted slope:
    $25\times3=75$ euros.
 4. With the simple slope the cut would look profitable, because 180 is more
-   than 150. With the adjusted slope it is not, because 75 is less than
-   150. The decision: keep the price. The control variable changed the
-   decision.
+   than 150. With the adjusted slope it is not, because 75 is less than 150.
+   The decision: keep the price. The control variable changed the decision.
 :::
 :::
 
