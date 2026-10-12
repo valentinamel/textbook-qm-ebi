@@ -449,9 +449,9 @@ Anyone preparing a pitch wants to know what to expect: the typical outcome, and 
 <div class="video-prep">
 <p><span class="label">Video preparation</span><br> Watch <a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/probability-mass-functions/">Probability Mass Functions</a> and <a href="https://www.youtube.com/watch?v=_yJsO5955ZE">Expectation</a>. Be ready to explain what <span class="math inline">\(p_X(x)\)</span> measures and why an expected value does not have to be a possible realised value. All links are also listed in the <a href="../resources/video-guide.html">External Video Guide</a>. The videos explain key ideas in another way and can use a different notation. The lecture material and its notation always come first.</p>
 </div>
-<p><span class="shark-tag">Shark Tank data</span> <strong>Warm up.</strong> Lecture 2 ended with random variables for the experiment that selects one record uniformly at random. Define <span class="math inline">\(X=1\)</span> if the selected pitch reached an on-air deal and <span class="math inline">\(X=0\)</span> otherwise. Define <span class="math inline">\(S\)</span> as the season number of the selected pitch.</p>
+<p><span class="shark-tag">Shark Tank data</span> <strong>Warm up.</strong> Lecture 2 ended with random variables for the experiment that selects one record uniformly at random. Define <span class="math inline">\(X=1\)</span> if the selected pitch reached an on-air deal and <span class="math inline">\(X=0\)</span> otherwise. Now select one of the 882 deals at random instead. Define <span class="math inline">\(K\)</span> as the number of sharks in the selected deal (<code>number_sharks_in_deal</code>).</p>
 <ol type="1">
-<li>What are the possible values of <span class="math inline">\(X\)</span> and of <span class="math inline">\(S\)</span>?</li>
+<li>What are the possible values of <span class="math inline">\(X\)</span> and of <span class="math inline">\(K\)</span>?</li>
 <li>Do these possible values tell us how likely each value is?</li>
 </ol>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -467,13 +467,13 @@ Check your preparation
 <div id="callout-1" class="callout-1-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ol type="1">
-<li><span class="math inline">\(X\)</span> can take the values 0 and 1. <span class="math inline">\(S\)</span> can take the values <span class="math inline">\(1,2,\ldots,16\)</span>.</li>
+<li><span class="math inline">\(X\)</span> can take the values 0 and 1. <span class="math inline">\(K\)</span> can take the values 1, 2, 3, 4, and 5: every deal has at least one shark, and the panel has five.</li>
 <li>No.&nbsp;The support lists the possible values. A probability distribution must also give a probability to each value. This lecture adds that step.</li>
 </ol>
 </div>
 </div>
 </div>
-<p><span class="shark-tag">Shark Tank data</span> <strong>Predict.</strong> Answer this question before you come to class: can the expected season be a number that is not a whole season, yes or no? Choose one answer. You find the answer in the lecture material.</p>
+<p><span class="shark-tag">Shark Tank data</span> <strong>Predict.</strong> Answer this question before you come to class: can the expected number of sharks in a deal be a number that is not a whole number, yes or no? Choose one answer. You find the answer in the section on expectation in the lecture material.</p>
 <p>If functions, support, or summation notation are unfamiliar, review <a href="../resources/math-refresher.html#summation-notation">Mathematics Refresher: summation notation</a>.</p>
 </section>
 <section id="lecture-material" class="level2 course-phase phase-in-class">
@@ -584,18 +584,16 @@ p_X(1)=\frac{882}{1441}\approx 0.612.
 <pre><code>[1] 1</code></pre>
 </div>
 </div>
-<p>For the season <span class="math inline">\(S\)</span> (<code>season</code> in the Shark Tank file), the PMF in the uniform selection experiment gives each season its share of the 1,441 records:</p>
+<p>For the number of sharks <span class="math inline">\(K\)</span> in a randomly selected deal, the PMF gives each number its share of the 882 deals. These are the shares from the opening section:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>season_pmf <span class="ot">&lt;-</span> <span class="fu">prop.table</span>(<span class="fu">table</span>(sharks<span class="sc">$</span>season))</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(season_pmf, <span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>sharks_pmf <span class="ot">&lt;-</span> <span class="fu">prop.table</span>(<span class="fu">table</span>(deals<span class="sc">$</span>number_sharks_in_deal))</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(sharks_pmf, <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
-     1      2      3      4      5      6      7      8      9     10     11 
-0.0444 0.0250 0.0416 0.0715 0.0805 0.0805 0.0805 0.0666 0.0666 0.0638 0.0666 
-    12     13     14     15     16 
-0.0694 0.0666 0.0604 0.0604 0.0555 </code></pre>
+    1     2     3     4     5 
+0.735 0.230 0.025 0.003 0.007 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(season_pmf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(sharks_pmf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 1</code></pre>
 </div>
@@ -605,41 +603,45 @@ p_X(1)=\frac{882}{1441}\approx 0.612.
 <summary>See the R code for this figure</summary>
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>season_pmf <span class="ot">&lt;-</span> <span class="fu">prop.table</span>(<span class="fu">table</span>(sharks<span class="sc">$</span>season))</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>pmf_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">season =</span> <span class="fu">as.numeric</span>(<span class="fu">names</span>(season_pmf)),</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">probability =</span> <span class="fu">as.numeric</span>(season_pmf)</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(pmf_df, <span class="fu">aes</span>(<span class="at">x =</span> season, <span class="at">y =</span> probability)) <span class="sc">+</span></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="fu">aes</span>(<span class="at">xend =</span> season, <span class="at">yend =</span> <span class="dv">0</span>),</span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>               <span class="at">linewidth =</span> <span class="fl">1.1</span>, <span class="at">colour =</span> <span class="st">"#009E73"</span>) <span class="sc">+</span></span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="fl">2.6</span>, <span class="at">colour =</span> <span class="st">"#009E73"</span>) <span class="sc">+</span></span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">16</span>) <span class="sc">+</span></span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">expand =</span> <span class="fu">expansion</span>(<span class="at">mult =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.05</span>))) <span class="sc">+</span></span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Season s"</span>, <span class="at">y =</span> <span class="fu">expression</span>(p[S](s))) <span class="sc">+</span></span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
-<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.x =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#5B6976"</span>),</span>
-<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>)</span>
-<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>deals <span class="ot">&lt;-</span> <span class="fu">subset</span>(sharks, deal_on_show <span class="sc">==</span> <span class="dv">1</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>sharks_pmf <span class="ot">&lt;-</span> <span class="fu">prop.table</span>(<span class="fu">table</span>(deals<span class="sc">$</span>number_sharks_in_deal))</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>pmf_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">k =</span> <span class="fu">as.numeric</span>(<span class="fu">names</span>(sharks_pmf)),</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">probability =</span> <span class="fu">as.numeric</span>(sharks_pmf)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(pmf_df, <span class="fu">aes</span>(<span class="at">x =</span> k, <span class="at">y =</span> probability)) <span class="sc">+</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="fu">aes</span>(<span class="at">xend =</span> k, <span class="at">yend =</span> <span class="dv">0</span>),</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>               <span class="at">linewidth =</span> <span class="fl">1.3</span>, <span class="at">colour =</span> <span class="st">"#009E73"</span>) <span class="sc">+</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>, <span class="at">colour =</span> <span class="st">"#009E73"</span>) <span class="sc">+</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, probability)), <span class="at">vjust =</span> <span class="sc">-</span><span class="dv">1</span>,</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>            <span class="at">size =</span> <span class="fl">3.6</span>, <span class="at">colour =</span> <span class="st">"#17324D"</span>) <span class="sc">+</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>) <span class="sc">+</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.85</span>),</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>                     <span class="at">expand =</span> <span class="fu">expansion</span>(<span class="at">mult =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.02</span>))) <span class="sc">+</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Number of sharks k"</span>, <span class="at">y =</span> <span class="fu">expression</span>(p[K](k))) <span class="sc">+</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#5B6976"</span>),</span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>)</span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div id="fig-b03-season-pmf" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-b03-sharks-pmf" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-b03-season-pmf-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="b03-discrete-distributions_files/figure-html/fig-b03-season-pmf-1.png" class="img-fluid figure-img" width="672">
+<div aria-describedby="fig-b03-sharks-pmf-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="b03-discrete-distributions_files/figure-html/fig-b03-sharks-pmf-1.png" class="img-fluid figure-img" width="672">
 </div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-b03-season-pmf-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;3.1: The PMF of season under uniform record selection: sixteen separated probability masses, one per possible value.
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-b03-sharks-pmf-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.1: The PMF of the number of sharks in a randomly selected deal: five separated probability masses, one per possible value.
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
-<p>The probability mass above season 5 in <a href="#fig-b03-season-pmf" class="quarto-xref">Figure&nbsp;<span>3.1</span></a> has height <span class="math display">\[p_S(5)=P(S=5)=\frac{116}{1441}\approx0.080.\]</span> The graph shows the PMF as separate probability masses, because <span class="math inline">\(S\)</span> can take only the listed discrete values. The term probability density function (PDF) is used only for continuous random variables. Lecture 6 introduces it.</p>
+<p>The probability mass above 1 in <a href="#fig-b03-sharks-pmf" class="quarto-xref">Figure&nbsp;<span>3.1</span></a> has height <span class="math display">\[p_K(1)=P(K=1)=\frac{648}{882}\approx0.735.\]</span> Almost three quarters of the probability sits on one value. The masses for three, four, and five sharks are so small that their bars are hard to see. The numbers above the bars show their sizes. The graph shows the PMF as separate probability masses, because <span class="math inline">\(K\)</span> can take only the listed discrete values. The term probability density function (PDF) is used only for continuous random variables. Lecture 6 introduces it.</p>
 </section>
 <section id="a-cdf-accumulates-probability-up-to-a-threshold" class="level3">
 <h3 class="anchored" data-anchor-id="a-cdf-accumulates-probability-up-to-a-threshold">A CDF accumulates probability up to a threshold</h3>
@@ -653,42 +655,32 @@ Figure&nbsp;3.1: The PMF of season under uniform record selection: sixteen separ
 <p><strong>Probability mass function (PMF)</strong> and <strong>cumulative distribution function (CDF).</strong> The PMF, <span class="math inline">\(p_X(x)=P(X=x)\)</span>, gives the probability that <span class="math inline">\(X\)</span> equals exactly the value <span class="math inline">\(x\)</span>. The CDF, <span class="math inline">\(F_X(a)=P(X\le a)\)</span>, gives the probability that <span class="math inline">\(X\)</span> is at or below the threshold <span class="math inline">\(a\)</span>.</p>
 </div>
 <div id="exm-b03-cdf-hand" class="theorem example">
-<p><span class="theorem-title"><strong>Example 3.2 (Worked example: F(3) for season, by hand)</strong></span> “<span class="math inline">\(S\le 3\)</span>” contains the first three seasons, so add the first three probability masses of the PMF. The season counts are 64, 36, and 60:</p>
+<p><span class="theorem-title"><strong>Example 3.2 (Worked example: F(2) for the number of sharks, by hand)</strong></span> “<span class="math inline">\(K\le 2\)</span>” contains the deals with one or two sharks, so add the first two probability masses of the PMF. Of the 882 deals, 648 have one shark and 203 have two:</p>
 <p><span class="math display">\[
-F_S(3)=p_S(1)+p_S(2)+p_S(3)
-=\frac{64}{1441}+\frac{36}{1441}+\frac{60}{1441}
-=\frac{160}{1441}\approx0.111.
+F_K(2)=p_K(1)+p_K(2)
+=\frac{648}{882}+\frac{203}{882}
+=\frac{851}{882}\approx0.965.
 \]</span></p>
-<p>About 11% of the probability lies at or below season 3.</p>
+<p>About 96.5% of the deals have at most two sharks. This is the running total from question 2 of the opening section.</p>
 </div>
 <p>The code below builds the full running total in R. Each CDF value is the current PMF value plus all earlier PMF values:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>s_values <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">names</span>(season_pmf))</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>p_values <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(season_pmf)</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>season_distribution <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">season =</span> s_values,</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">pmf =</span> <span class="fu">round</span>(p_values, <span class="dv">4</span>),</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">cdf =</span> <span class="fu">round</span>(<span class="fu">cumsum</span>(p_values), <span class="dv">4</span>)</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>season_distribution</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>k_values <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">names</span>(sharks_pmf))</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>p_values <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(sharks_pmf)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>sharks_distribution <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">sharks =</span> k_values,</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">count =</span> <span class="fu">as.numeric</span>(<span class="fu">table</span>(deals<span class="sc">$</span>number_sharks_in_deal)),</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">pmf =</span> <span class="fu">round</span>(p_values, <span class="dv">3</span>),</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">cdf =</span> <span class="fu">round</span>(<span class="fu">cumsum</span>(p_values), <span class="dv">3</span>)</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>sharks_distribution</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>   season    pmf    cdf
-1       1 0.0444 0.0444
-2       2 0.0250 0.0694
-3       3 0.0416 0.1110
-4       4 0.0715 0.1825
-5       5 0.0805 0.2630
-6       6 0.0805 0.3435
-7       7 0.0805 0.4240
-8       8 0.0666 0.4906
-9       9 0.0666 0.5573
-10     10 0.0638 0.6211
-11     11 0.0666 0.6877
-12     12 0.0694 0.7571
-13     13 0.0666 0.8237
-14     14 0.0604 0.8841
-15     15 0.0604 0.9445
-16     16 0.0555 1.0000</code></pre>
+<pre><code>  sharks count   pmf   cdf
+1      1   648 0.735 0.735
+2      2   203 0.230 0.965
+3      3    22 0.025 0.990
+4      4     3 0.003 0.993
+5      5     6 0.007 1.000</code></pre>
 </div>
 </div>
 <div class="cell">
@@ -696,46 +688,50 @@ F_S(3)=p_S(1)+p_S(2)+p_S(3)
 <summary>See the R code for this figure</summary>
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>season_pmf <span class="ot">&lt;-</span> <span class="fu">prop.table</span>(<span class="fu">table</span>(sharks<span class="sc">$</span>season))</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>cdf_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">threshold =</span> <span class="fu">as.numeric</span>(<span class="fu">names</span>(season_pmf)),</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">cdf =</span> <span class="fu">cumsum</span>(<span class="fu">as.numeric</span>(season_pmf))</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="co"># For the line only: a flat part at 0 before Season 1 and at 1 after Season 16</span></span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>step_df <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(<span class="at">threshold =</span> <span class="dv">0</span>, <span class="at">cdf =</span> <span class="dv">0</span>),</span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  cdf_df,</span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(<span class="at">threshold =</span> <span class="dv">17</span>, <span class="at">cdf =</span> <span class="dv">1</span>)</span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(cdf_df, <span class="fu">aes</span>(<span class="at">x =</span> threshold, <span class="at">y =</span> cdf)) <span class="sc">+</span></span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_step</span>(<span class="at">data =</span> step_df, <span class="at">linewidth =</span> <span class="fl">0.9</span>, <span class="at">colour =</span> <span class="st">"#009E73"</span>) <span class="sc">+</span></span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="fl">1.9</span>, <span class="at">colour =</span> <span class="st">"#17324D"</span>) <span class="sc">+</span></span>
-<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">16</span>) <span class="sc">+</span></span>
-<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>)) <span class="sc">+</span></span>
-<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Threshold a"</span>, <span class="at">y =</span> <span class="fu">expression</span>(F[S](a))) <span class="sc">+</span></span>
-<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
-<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.x =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#5B6976"</span>),</span>
-<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>)</span>
-<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>deals <span class="ot">&lt;-</span> <span class="fu">subset</span>(sharks, deal_on_show <span class="sc">==</span> <span class="dv">1</span>)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>sharks_pmf <span class="ot">&lt;-</span> <span class="fu">prop.table</span>(<span class="fu">table</span>(deals<span class="sc">$</span>number_sharks_in_deal))</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>cdf_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">threshold =</span> <span class="fu">as.numeric</span>(<span class="fu">names</span>(sharks_pmf)),</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">cdf =</span> <span class="fu">cumsum</span>(<span class="fu">as.numeric</span>(sharks_pmf))</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="co"># For the line only: a flat part at 0 before one shark and at 1 after five</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>step_df <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(<span class="at">threshold =</span> <span class="dv">0</span>, <span class="at">cdf =</span> <span class="dv">0</span>),</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  cdf_df,</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(<span class="at">threshold =</span> <span class="dv">6</span>, <span class="at">cdf =</span> <span class="dv">1</span>)</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(cdf_df, <span class="fu">aes</span>(<span class="at">x =</span> threshold, <span class="at">y =</span> cdf)) <span class="sc">+</span></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_step</span>(<span class="at">data =</span> step_df, <span class="at">linewidth =</span> <span class="dv">1</span>, <span class="at">colour =</span> <span class="st">"#009E73"</span>) <span class="sc">+</span></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="fl">2.6</span>, <span class="at">colour =</span> <span class="st">"#17324D"</span>) <span class="sc">+</span></span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, cdf)), <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.9</span>, <span class="at">hjust =</span> <span class="fl">0.9</span>,</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>            <span class="at">size =</span> <span class="fl">3.6</span>, <span class="at">colour =</span> <span class="st">"#17324D"</span>) <span class="sc">+</span></span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">6</span>) <span class="sc">+</span></span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">1.08</span>), <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="fl">0.25</span>)) <span class="sc">+</span></span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Threshold a (number of sharks)"</span>, <span class="at">y =</span> <span class="fu">expression</span>(F[K](a))) <span class="sc">+</span></span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#5B6976"</span>),</span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>)</span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div id="fig-b03-season-cdf" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-b03-sharks-cdf" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-b03-season-cdf-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="b03-discrete-distributions_files/figure-html/fig-b03-season-cdf-1.png" class="img-fluid figure-img" width="672">
+<div aria-describedby="fig-b03-sharks-cdf-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="b03-discrete-distributions_files/figure-html/fig-b03-sharks-cdf-1.png" class="img-fluid figure-img" width="672">
 </div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-b03-season-cdf-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;3.2: The CDF of season: a step graph that never falls. It is 0 to the left of Season 1, jumps at each possible value by that value’s probability mass, and stays at 1 from Season 16 on.
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-b03-sharks-cdf-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.2: The CDF of the number of sharks in a deal: a step graph that never falls. It is 0 below one shark, jumps at each possible value by that value’s probability mass, and stays at 1 from five sharks on.
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
-<p>A CDF adds up probability as the threshold moves from left to right. It can stay flat or rise, but it cannot fall. It equals 0 below the smallest possible value and reaches 1 once it includes all possible values. In <a href="#fig-b03-season-cdf" class="quarto-xref">Figure&nbsp;<span>3.2</span></a> the line is flat at 0 to the left of Season 1 and flat at 1 to the right of Season 16.</p>
+<p>Read <a href="#fig-b03-sharks-cdf" class="quarto-xref">Figure&nbsp;<span>3.2</span></a> from left to right. Below one shark the line is flat at 0, because no deal has fewer than one shark. At one shark it jumps by 0.735, the share of deals with one shark. At two sharks it jumps by 0.230 to 0.965. The jumps at three, four, and five sharks are small: 0.025, 0.003, and 0.007. After five sharks the line stays at 1, because every deal has at most five sharks.</p>
+<p>A CDF adds up probability as the threshold moves from left to right. It can stay flat or rise, but it cannot fall. It equals 0 below the smallest possible value and reaches 1 once it includes all possible values. In <a href="#fig-b03-sharks-cdf" class="quarto-xref">Figure&nbsp;<span>3.2</span></a> the line is flat at 0 to the left of one shark and flat at 1 to the right of five sharks.</p>
 <p>For a discrete variable, the CDF is a step graph. It stays flat between possible values and jumps at each value that has positive probability. A larger jump means that this value has more probability.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
@@ -743,19 +739,19 @@ Figure&nbsp;3.2: The CDF of season: a step graph that never falls. It is 0 to th
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Check: read F(8) from the step graph
+Check: read F(3) from the step graph
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
 <div id="callout-2" class="callout-2-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p><span class="math inline">\(F_S(8)=P(S\le 8)\)</span> is the height of the step graph at threshold 8: the first eight seasons contain <span class="math inline">\(64+36+60+103+116+116+116+96=707\)</span> records, so <span class="math inline">\(F_S(8)=707/1441\approx0.491\)</span>. Just under half of the probability lies in Seasons 1–8. This agrees with Lecture 2, where the early-period event <span class="math inline">\(L^c\)</span> had probability <span class="math inline">\(707/1441\)</span>.</p>
+<p><span class="math inline">\(F_K(3)=P(K\le 3)\)</span> is the height of the step graph at threshold 3. The deals with one, two, or three sharks number <span class="math inline">\(648+203+22=873\)</span>, so <span class="math inline">\(F_K(3)=873/882\approx0.990\)</span>. Only 1% of the deals have four or five sharks.</p>
 </div>
 </div>
 </div>
 <p>The probability of an interval is a difference of two CDF values:</p>
 <p><span class="math display">\[P(a&lt;X\le b)=F_X(b)-F_X(a).\]</span></p>
-<p>For example, <span class="math display">\[P(3&lt;S\le 8)=F_S(8)-F_S(3)=\frac{707-160}{1441}=\frac{547}{1441}\approx0.380.\]</span> So 38.0% of the probability lies in Seasons 4 to 8.</p>
+<p>For example, the probability that a deal has two or three sharks is <span class="math display">\[P(1&lt;K\le 3)=F_K(3)-F_K(1)=\frac{873-648}{882}=\frac{225}{882}\approx0.255.\]</span> So 25.5% of the deals have two or three sharks.</p>
 <p>For the deal indicator:</p>
 <p><span class="math display">\[
 F_X(a)=
@@ -796,22 +792,22 @@ E[Y]
 <p>Now apply the same steps to the Shark Tank distributions. For the deal indicator,</p>
 <p><span class="math display">\[E[X]=0\times(1-p)+1\times p=p.\]</span></p>
 <p>This result explains why the mean of a 0/1 variable equals its proportion of 1s. Here <span class="math inline">\(E[X]=882/1441\approx0.612\)</span>.</p>
-<p>For the season, the sum has sixteen products instead of two:</p>
+<p>For the number of sharks, the sum has five products instead of two. This is the calculation of question 3 in the opening section:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>s <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">names</span>(season_pmf))</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>p_s <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(season_pmf)</span>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>k <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">names</span>(sharks_pmf))</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>p_k <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(sharks_pmf)</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(</span>
 <span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">E_X =</span> <span class="dv">0</span> <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> p_hat) <span class="sc">+</span> <span class="dv">1</span> <span class="sc">*</span> p_hat,</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">E_S_from_pmf =</span> <span class="fu">sum</span>(s <span class="sc">*</span> p_s),</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">observed_mean_season =</span> <span class="fu">mean</span>(sharks<span class="sc">$</span>season)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">E_K_from_pmf =</span> <span class="fu">sum</span>(k <span class="sc">*</span> p_k),</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">observed_mean_sharks =</span> <span class="fu">mean</span>(deals<span class="sc">$</span>number_sharks_in_deal)</span>
 <span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                 E_X         E_S_from_pmf observed_mean_season 
-           0.6120749            8.7959750            8.7959750 </code></pre>
+<pre><code>                 E_X         E_K_from_pmf observed_mean_sharks 
+           0.6120749            1.3174603            1.3174603 </code></pre>
 </div>
 </div>
-<p>The expected season is about 8.8, and there is no Season 8.8. This answers the prediction question from before class: an expectation is a probability-weighted average, so it need not be a possible value of the random variable.</p>
+<p>The expected number of sharks is about 1.32, and no deal has 1.32 sharks. This answers the prediction question from before class: an expectation is a probability-weighted average, so it need not be a possible value of the random variable. The value 1.32 lies close to 1, because most of the probability sits at one shark.</p>
 </section>
 <section id="expectation-after-transforming-a-variable" class="level3">
 <h3 class="anchored" data-anchor-id="expectation-after-transforming-a-variable">Expectation after transforming a variable</h3>
@@ -857,15 +853,15 @@ E[Y^2]=0\times0.2+1\times0.5+4\times0.3=0+0.5+1.2=1.7.
 </div>
 </div>
 </div>
-<p>The same rule for season in R:</p>
+<p>The same rule for the number of sharks in R:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">E_S =</span> <span class="fu">sum</span>(s <span class="sc">*</span> p_s),</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">E_S_squared =</span> <span class="fu">sum</span>(s<span class="sc">^</span><span class="dv">2</span> <span class="sc">*</span> p_s)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">E_K =</span> <span class="fu">sum</span>(k <span class="sc">*</span> p_k),</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">E_K_squared =</span> <span class="fu">sum</span>(k<span class="sc">^</span><span class="dv">2</span> <span class="sc">*</span> p_k)</span>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>        E_S E_S_squared 
-   8.795975   95.505205 </code></pre>
+<pre><code>        E_K E_K_squared 
+   1.317460    2.104308 </code></pre>
 </div>
 </div>
 </section>
@@ -942,7 +938,7 @@ Figure&nbsp;3.3: Two distributions with the same expectation and very different 
 <p>It gives the same result, but the definition <span class="math inline">\(E[(X-\mu)^2]\)</span> is usually easier to interpret.</p>
 <p>The <strong>standard deviation</strong> is the square root of the variance. It is also written <span class="math inline">\(\sigma\)</span>:</p>
 <p><span class="math display">\[\operatorname{SD}(X)=\sqrt{\operatorname{Var}(X)}.\]</span></p>
-<p>Variance has squared units. Standard deviation returns to the units of <span class="math inline">\(X\)</span>. If <span class="math inline">\(X\)</span> is measured in seasons, <span class="math inline">\(\operatorname{Var}(X)\)</span> is in seasons squared, a unit that nobody can imagine, while <span class="math inline">\(\operatorname{SD}(X)\)</span> is back in seasons.</p>
+<p>Variance has squared units. Standard deviation returns to the units of <span class="math inline">\(X\)</span>. If <span class="math inline">\(X\)</span> is measured in sharks, <span class="math inline">\(\operatorname{Var}(X)\)</span> is in sharks squared, a unit that nobody can imagine, while <span class="math inline">\(\operatorname{SD}(X)\)</span> is back in sharks.</p>
 <div class="definition-box">
 <p><span class="label">Definition</span></p>
 <p><strong>Variance and standard deviation.</strong> The variance, <span class="math inline">\(\operatorname{Var}(X)\)</span> or <span class="math inline">\(\sigma^2\)</span>, is the probability-weighted average of the squared deviations of <span class="math inline">\(X\)</span> from its mean <span class="math inline">\(\mu\)</span>. The standard deviation, <span class="math inline">\(\operatorname{SD}(X)\)</span> or <span class="math inline">\(\sigma\)</span>, is the square root of the variance and has the same units as <span class="math inline">\(X\)</span>.</p>
@@ -975,38 +971,24 @@ Figure&nbsp;3.3: Two distributions with the same expectation and very different 
 \]</span></p>
 <p>The deal indicator is a Bernoulli variable with <span class="math inline">\(p=882/1441\approx0.612\)</span>. Its variance is <span class="math inline">\(0.612\times0.388\approx0.237\)</span> and its standard deviation is about 0.49.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>mu_s <span class="ot">&lt;-</span> <span class="fu">sum</span>(s <span class="sc">*</span> p_s)</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>var_s <span class="ot">&lt;-</span> <span class="fu">sum</span>((s <span class="sc">-</span> mu_s)<span class="sc">^</span><span class="dv">2</span> <span class="sc">*</span> p_s)</span>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>mu_k <span class="ot">&lt;-</span> <span class="fu">sum</span>(k <span class="sc">*</span> p_k)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>var_k <span class="ot">&lt;-</span> <span class="fu">sum</span>((k <span class="sc">-</span> mu_k)<span class="sc">^</span><span class="dv">2</span> <span class="sc">*</span> p_k)</span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(</span>
 <span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">Var_X =</span> p_hat <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> p_hat),</span>
 <span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">SD_X =</span> <span class="fu">sqrt</span>(p_hat <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> p_hat)),</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">Var_S =</span> var_s,</span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">SD_S =</span> <span class="fu">sqrt</span>(var_s),</span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">average_distance_S =</span> <span class="fu">sum</span>(<span class="fu">abs</span>(s <span class="sc">-</span> mu_s) <span class="sc">*</span> p_s)</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">Var_K =</span> var_k,</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">SD_K =</span> <span class="fu">sqrt</span>(var_k),</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">average_distance_K =</span> <span class="fu">sum</span>(<span class="fu">abs</span>(k <span class="sc">-</span> mu_k) <span class="sc">*</span> p_k)</span>
 <span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>             Var_X               SD_X              Var_S               SD_S 
-         0.2374392          0.4872773         18.1360282          4.2586416 
-average_distance_S 
-         3.6568416 </code></pre>
+<pre><code>             Var_X               SD_X              Var_K               SD_K 
+         0.2374392          0.4872773          0.3686067          0.6071299 
+average_distance_K 
+         0.4664723 </code></pre>
 </div>
 </div>
-<p>The season has a variance of about 18.1 seasons squared and a standard deviation of about 4.3 seasons. The season of a randomly selected pitch typically lies about four seasons away from the expected season 8.8. Four seasons are a quarter of the 16 seasons. The standard deviation is somewhat larger than the plain average distance (about 3.7 seasons here), because squaring gives large deviations more weight.</p>
-<p>The opening question asked how much deals differ in their number of sharks. The same two steps answer it:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>k <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">names</span>(shark_counts))</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>p_k <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">prop.table</span>(shark_counts))</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>mu_k <span class="ot">&lt;-</span> <span class="fu">sum</span>(k <span class="sc">*</span> p_k)</span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">expected_sharks =</span> mu_k,</span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">variance =</span> <span class="fu">sum</span>((k <span class="sc">-</span> mu_k)<span class="sc">^</span><span class="dv">2</span> <span class="sc">*</span> p_k),</span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">sd =</span> <span class="fu">sqrt</span>(<span class="fu">sum</span>((k <span class="sc">-</span> mu_k)<span class="sc">^</span><span class="dv">2</span> <span class="sc">*</span> p_k)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>expected_sharks        variance              sd 
-      1.3174603       0.3686067       0.6071299 </code></pre>
-</div>
-</div>
-<p>The expected number of sharks is 1.32 and the standard deviation is about 0.61 sharks, which is less than one shark. So the number of sharks differs little from deal to deal.</p>
+<p>The number of sharks has a variance of about 0.37 sharks squared and a standard deviation of about 0.61 sharks. The number of sharks in a deal typically lies about 0.6 sharks away from the expected 1.32, less than one shark. This answers the opening question: the number of sharks differs little from deal to deal. The standard deviation is somewhat larger than the plain average distance (about 0.47 sharks here), because squaring gives the few deals with four or five sharks more weight.</p>
 </section>
 <section id="b03-shift-rescale" class="level3">
 <h3 class="anchored" data-anchor-id="b03-shift-rescale">Shifting and rescaling a variable</h3>
@@ -1034,9 +1016,9 @@ E[aX+b]=aE[X]+b,
 <p>Its square root <span class="math inline">\(s\)</span> is the sample standard deviation. R’s <code>var()</code> and <code>sd()</code> divide by <span class="math inline">\(n-1\)</span>. <a href="../basic/b07-samples-estimators.html">Lecture 7</a> explains why we divide by <span class="math inline">\(n-1\)</span> when we estimate a population variance.</p>
 <p>An invented example shows the calculation by hand. A founder counts the orders on five days: 3, 5, 6, 8, and 8. The mean is <span class="math inline">\(\bar x=30/5=6\)</span> orders. The deviations from the mean are <span class="math inline">\(-3\)</span>, <span class="math inline">\(-1\)</span>, <span class="math inline">\(0\)</span>, <span class="math inline">\(2\)</span>, and <span class="math inline">\(2\)</span>. Their squares add up to <span class="math inline">\(9+1+0+4+4=18\)</span>. Divide by <span class="math inline">\(n-1=4\)</span>: <span class="math inline">\(s^2=18/4=4.5\)</span> orders squared, so <span class="math inline">\(s=\sqrt{4.5}\approx2.12\)</span> orders. A typical day lies about two orders, or about a third of the mean, away from the mean. Dividing by <span class="math inline">\(n=5\)</span> would give <span class="math inline">\(3.6\)</span> instead of <span class="math inline">\(4.5\)</span>. R gives the same numbers:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>orders <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">8</span>, <span class="dv">8</span>)</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">mean =</span> <span class="fu">mean</span>(orders), <span class="at">var =</span> <span class="fu">var</span>(orders), <span class="at">sd =</span> <span class="fu">sd</span>(orders),</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">var_divide_n =</span> <span class="fu">mean</span>((orders <span class="sc">-</span> <span class="fu">mean</span>(orders))<span class="sc">^</span><span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>orders <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">8</span>, <span class="dv">8</span>)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">mean =</span> <span class="fu">mean</span>(orders), <span class="at">var =</span> <span class="fu">var</span>(orders), <span class="at">sd =</span> <span class="fu">sd</span>(orders),</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">var_divide_n =</span> <span class="fu">mean</span>((orders <span class="sc">-</span> <span class="fu">mean</span>(orders))<span class="sc">^</span><span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>        mean          var           sd var_divide_n 
      6.00000      4.50000      2.12132      3.60000 </code></pre>
@@ -1044,14 +1026,14 @@ E[aX+b]=aE[X]+b,
 </div>
 <p>The code below computes both versions for the number of words in the written description (<code>description_words</code>) in the Shark Tank file:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>w <span class="ot">&lt;-</span> sharks<span class="sc">$</span>description_words</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(</span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">mean_words =</span> <span class="fu">mean</span>(w),</span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">empirical_expectation =</span> <span class="fu">sum</span>(w <span class="sc">*</span> <span class="fu">rep</span>(<span class="dv">1</span> <span class="sc">/</span> <span class="fu">length</span>(w), <span class="fu">length</span>(w))),</span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">empirical_variance_divide_n =</span> <span class="fu">mean</span>((w <span class="sc">-</span> <span class="fu">mean</span>(w))<span class="sc">^</span><span class="dv">2</span>),</span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">sample_variance_divide_n_minus_1 =</span> <span class="fu">var</span>(w),</span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">sample_sd =</span> <span class="fu">sd</span>(w)</span>
-<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>w <span class="ot">&lt;-</span> sharks<span class="sc">$</span>description_words</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">mean_words =</span> <span class="fu">mean</span>(w),</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">empirical_expectation =</span> <span class="fu">sum</span>(w <span class="sc">*</span> <span class="fu">rep</span>(<span class="dv">1</span> <span class="sc">/</span> <span class="fu">length</span>(w), <span class="fu">length</span>(w))),</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">empirical_variance_divide_n =</span> <span class="fu">mean</span>((w <span class="sc">-</span> <span class="fu">mean</span>(w))<span class="sc">^</span><span class="dv">2</span>),</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">sample_variance_divide_n_minus_1 =</span> <span class="fu">var</span>(w),</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">sample_sd =</span> <span class="fu">sd</span>(w)</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>                      mean_words            empirical_expectation 
                         4.995142                         4.995142 
@@ -1074,7 +1056,7 @@ E[aX+b]=aE[X]+b,
 </section>
 <section id="answering-the-driving-question" class="level3">
 <h3 class="anchored" data-anchor-id="answering-the-driving-question">Answering the driving question</h3>
-<p>If your pitch ends in a deal, expect to work with one shark. 73.5% of deals have exactly one shark and 96.5% have at most two. The expected number is 1.32, with a standard deviation of about 0.61. The same two numbers, centre and spread, describe the other variables of this lecture. The deal indicator is a Bernoulli variable: a recorded pitch reaches an on-air deal with probability 0.612, and the variance is about 0.24. The season has expected value <span class="math inline">\(E[S]\approx8.8\)</span> and a standard deviation of about 4.3 seasons. Centre and spread together describe a distribution. One of them alone can give a wrong picture.</p>
+<p>If your pitch ends in a deal, expect to work with one shark. 73.5% of deals have exactly one shark and 96.5% have at most two. The expected number is 1.32, with a standard deviation of about 0.61. The same two numbers, centre and spread, describe the other variables of this lecture. The deal indicator is a Bernoulli variable: a recorded pitch reaches an on-air deal with probability 0.612, and the variance is about 0.24. Centre and spread together describe a distribution. One of them alone can give a wrong picture.</p>
 <div class="founder-box">
 <p><span class="label">A founder’s decision (invented example)</span></p>
 <p>Your lunch startup sells boxes with prepared meals. Tomorrow you sell 20 meal boxes with probability 0.2, 30 with probability 0.5, and 40 with probability 0.3. The expected value is 31 meal boxes and the standard deviation is 7. A meal box that you prepare but do not sell costs you 3 euros of ingredients. A customer you cannot serve costs you 5 euros of margin. Compare the expected cost of three plans: preparing 20 meal boxes costs 55 euros a day on average, preparing 30 costs 21 euros, and preparing 40 costs 27 euros. The decision: prepare 30. The expected value told you where to aim. The spread and the two costs told you how much a wrong guess costs.</p>
@@ -1149,13 +1131,13 @@ Check your answer
 </section>
 <section id="practice" class="level3">
 <h3 class="anchored" data-anchor-id="practice">Practice</h3>
-<p><span class="shark-tag">Shark Tank data</span> Tasks 1 to 5 use the Shark Tank distributions of the lecture material. Task 6 uses an invented example. In tasks 1, 2, 4, and 5, one of the 1,441 recorded pitches is selected at random. <span class="math inline">\(X\)</span> is the deal indicator: <span class="math inline">\(X=1\)</span> if the pitch reached an on-air deal and <span class="math inline">\(X=0\)</span> otherwise. <span class="math inline">\(S\)</span> is the season of the pitch (<code>season</code>).</p>
+<p><span class="shark-tag">Shark Tank data</span> Tasks 1 to 5 use the Shark Tank distributions of the lecture material. Task 6 uses an invented example. In task 1, one of the 1,441 recorded pitches is selected at random. <span class="math inline">\(X\)</span> is the deal indicator: <span class="math inline">\(X=1\)</span> if the pitch reached an on-air deal and <span class="math inline">\(X=0\)</span> otherwise. In tasks 2, 4, and 5, one of the 882 deals is selected at random. <span class="math inline">\(K\)</span> is the number of sharks in that deal (<code>number_sharks_in_deal</code>).</p>
 <ol type="1">
 <li>The deal indicator has <span class="math inline">\(p=P(X=1)=882/1441\)</span>. Calculate <span class="math inline">\(F_X(0.4)\)</span>.</li>
-<li>Calculate <span class="math inline">\(P(3&lt;S\le6)\)</span>. Use the season CDF table: the R output <code>season_distribution</code> in the section “A CDF accumulates probability up to a threshold”.</li>
+<li>Calculate <span class="math inline">\(P(1&lt;K\le4)\)</span>, the probability that a deal has two, three, or four sharks. Use the CDF table: the R output <code>sharks_distribution</code> in the section “A CDF accumulates probability up to a threshold”.</li>
 <li>A Bernoulli variable has <span class="math inline">\(p=0.25\)</span>. Calculate its variance and standard deviation.</li>
-<li>The standard deviation of the season <span class="math inline">\(S\)</span> is about 4.3. Write one sentence that interprets this number and names its units.</li>
-<li>Why is <span class="math inline">\(\operatorname{Var}(S)\approx18.1\)</span> harder to interpret than <span class="math inline">\(\operatorname{SD}(S)\approx4.3\)</span>?</li>
+<li>The standard deviation of the number of sharks <span class="math inline">\(K\)</span> is about 0.61. Write one sentence that interprets this number and names its units.</li>
+<li>Why is <span class="math inline">\(\operatorname{Var}(K)\approx0.37\)</span> harder to interpret than <span class="math inline">\(\operatorname{SD}(K)\approx0.61\)</span>?</li>
 <li>An invented example. A founder sells phone cases at a weekend market. The number of cases sold on one day, <span class="math inline">\(X\)</span>, has <span class="math inline">\(E[X]=12\)</span> and <span class="math inline">\(\operatorname{SD}(X)=4\)</span>. Each case brings in 15 euros and the stall costs 60 euros per day, so the profit of one day is <span class="math inline">\(15X-60\)</span> euros. Calculate the expected value, the variance, and the standard deviation of the profit.</li>
 </ol>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -1172,10 +1154,10 @@ Check your answers
 <div class="callout-body-container callout-body">
 <ol type="1">
 <li>Because <span class="math inline">\(0\le0.4&lt;1\)</span>, <span class="math inline">\(F_X(0.4)=P(X=0)=559/1441\approx0.388\)</span>.</li>
-<li><span class="math inline">\(P(3&lt;S\le6)=F_S(6)-F_S(3)=(495-160)/1441=335/1441\approx0.232\)</span>.</li>
+<li><span class="math inline">\(P(1&lt;K\le4)=F_K(4)-F_K(1)=(876-648)/882=228/882\approx0.259\)</span>. About 26% of the deals have two, three, or four sharks.</li>
 <li><span class="math inline">\(\operatorname{Var}=0.25\times0.75=0.1875\)</span>. <span class="math inline">\(\operatorname{SD}=\sqrt{0.1875}\approx0.43\)</span>.</li>
-<li>The season of a randomly selected pitch typically differs from the expected season (about 8.8) by roughly 4.3 seasons.</li>
-<li>Variance is measured in seasons squared, a unit that is hard to imagine. The standard deviation is back in seasons.</li>
+<li>The number of sharks in a randomly selected deal typically differs from the expected number (about 1.32) by roughly 0.6 sharks.</li>
+<li>Variance is measured in sharks squared, a unit that is hard to imagine. The standard deviation is back in sharks.</li>
 <li>Use the rules for <span class="math inline">\(aX+b\)</span> with <span class="math inline">\(a=15\)</span> and <span class="math inline">\(b=-60\)</span>. The expected profit is <span class="math inline">\(15\times12-60=120\)</span> euros. <span class="math inline">\(\operatorname{Var}(X)=4^2=16\)</span>, so the variance of the profit is <span class="math inline">\(15^2\times16=3600\)</span> euros squared. The standard deviation of the profit is <span class="math inline">\(15\times4=60\)</span> euros, half of the expected profit. The stall cost of 60 euros lowers the expected profit and leaves the spread unchanged.</li>
 </ol>
 </div>

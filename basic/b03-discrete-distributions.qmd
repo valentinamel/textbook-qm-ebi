@@ -44,25 +44,27 @@ The videos explain key ideas in another way and can use a different notation. Th
 
 [Shark Tank data]{.shark-tag} **Warm up.** Lecture 2 ended with random variables for the
 experiment that selects one record uniformly at random. Define $X=1$ if the
-selected pitch reached an on-air deal and $X=0$ otherwise. Define $S$ as the
-season number of the selected pitch.
+selected pitch reached an on-air deal and $X=0$ otherwise. Now select one of
+the 882 deals at random instead. Define $K$ as the number of sharks in the
+selected deal (`number_sharks_in_deal`).
 
-1. What are the possible values of $X$ and of $S$?
+1. What are the possible values of $X$ and of $K$?
 2. Do these possible values tell us how likely each value is?
 
 ::: {.callout-note collapse="true"}
 ## Check your preparation
 
-1. $X$ can take the values 0 and 1. $S$ can take the values
-   $1,2,\ldots,16$.
+1. $X$ can take the values 0 and 1. $K$ can take the values 1, 2, 3, 4,
+   and 5: every deal has at least one shark, and the panel has five.
 2. No. The support lists the possible values. A probability distribution
    must also give a probability to each value. This lecture adds that
    step.
 :::
 
-[Shark Tank data]{.shark-tag} **Predict.** Answer this question before you come to class: can the expected season be a
-number that is not a whole season, yes or no? Choose one answer. You find the
-answer in the lecture material.
+[Shark Tank data]{.shark-tag} **Predict.** Answer this question before you come to class: can the expected number of
+sharks in a deal be a number that is not a whole number, yes or no? Choose
+one answer. You find the answer in the section on expectation in the lecture
+material.
 
 If functions, support, or summation notation are unfamiliar, review
 [Mathematics Refresher: summation notation](../resources/math-refresher.html#summation-notation).
@@ -184,37 +186,41 @@ deal_pmf
 sum(deal_pmf)
 ```
 
-For the season $S$ (`season` in the Shark Tank file), the PMF in the
-uniform selection experiment gives each season its share of the 1,441
-records:
+For the number of sharks $K$ in a randomly selected deal, the PMF gives each
+number its share of the 882 deals. These are the shares from the opening
+section:
 
 ```{r}
-#| label: b03-season-pmf
-season_pmf <- prop.table(table(sharks$season))
-round(season_pmf, 4)
-sum(season_pmf)
+#| label: b03-sharks-pmf
+sharks_pmf <- prop.table(table(deals$number_sharks_in_deal))
+round(sharks_pmf, 3)
+sum(sharks_pmf)
 ```
 
 ```{r}
-#| label: fig-b03-season-pmf
+#| label: fig-b03-sharks-pmf
 #| code-fold: true
 #| code-summary: "See the R code for this figure"
-#| fig-cap: "The PMF of season under uniform record selection: sixteen separated probability masses, one per possible value."
+#| fig-cap: "The PMF of the number of sharks in a randomly selected deal: five separated probability masses, one per possible value."
 library(ggplot2)
 sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
-season_pmf <- prop.table(table(sharks$season))
+deals <- subset(sharks, deal_on_show == 1)
+sharks_pmf <- prop.table(table(deals$number_sharks_in_deal))
 pmf_df <- data.frame(
-  season = as.numeric(names(season_pmf)),
-  probability = as.numeric(season_pmf)
+  k = as.numeric(names(sharks_pmf)),
+  probability = as.numeric(sharks_pmf)
 )
 
-ggplot(pmf_df, aes(x = season, y = probability)) +
-  geom_segment(aes(xend = season, yend = 0),
-               linewidth = 1.1, colour = "#009E73") +
-  geom_point(size = 2.6, colour = "#009E73") +
-  scale_x_continuous(breaks = 1:16) +
-  scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
-  labs(x = "Season s", y = expression(p[S](s))) +
+ggplot(pmf_df, aes(x = k, y = probability)) +
+  geom_segment(aes(xend = k, yend = 0),
+               linewidth = 1.3, colour = "#009E73") +
+  geom_point(size = 3, colour = "#009E73") +
+  geom_text(aes(label = sprintf("%.3f", probability)), vjust = -1,
+            size = 3.6, colour = "#17324D") +
+  scale_x_continuous(breaks = 1:5) +
+  scale_y_continuous(limits = c(0, 0.85),
+                     expand = expansion(mult = c(0, 0.02))) +
+  labs(x = "Number of sharks k", y = expression(p[K](k))) +
   theme_minimal(base_size = 13) +
   theme(
     panel.grid.minor = element_blank(),
@@ -224,12 +230,14 @@ ggplot(pmf_df, aes(x = season, y = probability)) +
   )
 ```
 
-The probability mass above season 5 in @fig-b03-season-pmf has height
-$$p_S(5)=P(S=5)=\frac{116}{1441}\approx0.080.$$
-The graph shows the PMF as separate
-probability masses, because $S$ can take only the listed discrete values.
-The term probability density function (PDF) is used only for continuous
-random variables. Lecture 6 introduces it.
+The probability mass above 1 in @fig-b03-sharks-pmf has height
+$$p_K(1)=P(K=1)=\frac{648}{882}\approx0.735.$$
+Almost three quarters of the probability sits on one value. The masses for
+three, four, and five sharks are so small that their bars are hard to see.
+The numbers above the bars show their sizes. The
+graph shows the PMF as separate probability masses, because $K$ can take
+only the listed discrete values. The term probability density function
+(PDF) is used only for continuous random variables. Lecture 6 introduces it.
 
 ### A CDF accumulates probability up to a threshold
 
@@ -257,60 +265,66 @@ that $X$ is at or below the threshold $a$.
 :::
 
 ::: {#exm-b03-cdf-hand}
-## Worked example: F(3) for season, by hand
+## Worked example: F(2) for the number of sharks, by hand
 
-"$S\le 3$" contains the first three seasons, so add the first three
-probability masses of the PMF. The season counts are 64, 36, and 60:
+"$K\le 2$" contains the deals with one or two sharks, so add the first two
+probability masses of the PMF. Of the 882 deals, 648 have one shark and 203
+have two:
 
 $$
-F_S(3)=p_S(1)+p_S(2)+p_S(3)
-=\frac{64}{1441}+\frac{36}{1441}+\frac{60}{1441}
-=\frac{160}{1441}\approx0.111.
+F_K(2)=p_K(1)+p_K(2)
+=\frac{648}{882}+\frac{203}{882}
+=\frac{851}{882}\approx0.965.
 $$
 
-About 11% of the probability lies at or below season 3.
+About 96.5% of the deals have at most two sharks. This is the running total
+from question 2 of the opening section.
 :::
 
 The code below builds the full running total in R. Each CDF value is the
 current PMF value plus all earlier PMF values:
 
 ```{r}
-#| label: b03-season-distribution
-s_values <- as.numeric(names(season_pmf))
-p_values <- as.numeric(season_pmf)
-season_distribution <- data.frame(
-  season = s_values,
-  pmf = round(p_values, 4),
-  cdf = round(cumsum(p_values), 4)
+#| label: b03-sharks-distribution
+k_values <- as.numeric(names(sharks_pmf))
+p_values <- as.numeric(sharks_pmf)
+sharks_distribution <- data.frame(
+  sharks = k_values,
+  count = as.numeric(table(deals$number_sharks_in_deal)),
+  pmf = round(p_values, 3),
+  cdf = round(cumsum(p_values), 3)
 )
-season_distribution
+sharks_distribution
 ```
 
 ```{r}
-#| label: fig-b03-season-cdf
+#| label: fig-b03-sharks-cdf
 #| code-fold: true
 #| code-summary: "See the R code for this figure"
-#| fig-cap: "The CDF of season: a step graph that never falls. It is 0 to the left of Season 1, jumps at each possible value by that value's probability mass, and stays at 1 from Season 16 on."
+#| fig-cap: "The CDF of the number of sharks in a deal: a step graph that never falls. It is 0 below one shark, jumps at each possible value by that value's probability mass, and stays at 1 from five sharks on."
 library(ggplot2)
 sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
-season_pmf <- prop.table(table(sharks$season))
+deals <- subset(sharks, deal_on_show == 1)
+sharks_pmf <- prop.table(table(deals$number_sharks_in_deal))
 cdf_df <- data.frame(
-  threshold = as.numeric(names(season_pmf)),
-  cdf = cumsum(as.numeric(season_pmf))
+  threshold = as.numeric(names(sharks_pmf)),
+  cdf = cumsum(as.numeric(sharks_pmf))
 )
-# For the line only: a flat part at 0 before Season 1 and at 1 after Season 16
+# For the line only: a flat part at 0 before one shark and at 1 after five
 step_df <- rbind(
   data.frame(threshold = 0, cdf = 0),
   cdf_df,
-  data.frame(threshold = 17, cdf = 1)
+  data.frame(threshold = 6, cdf = 1)
 )
 
 ggplot(cdf_df, aes(x = threshold, y = cdf)) +
-  geom_step(data = step_df, linewidth = 0.9, colour = "#009E73") +
-  geom_point(size = 1.9, colour = "#17324D") +
-  scale_x_continuous(breaks = 1:16) +
-  scale_y_continuous(limits = c(0, 1)) +
-  labs(x = "Threshold a", y = expression(F[S](a))) +
+  geom_step(data = step_df, linewidth = 1, colour = "#009E73") +
+  geom_point(size = 2.6, colour = "#17324D") +
+  geom_text(aes(label = sprintf("%.3f", cdf)), vjust = -0.9, hjust = 0.9,
+            size = 3.6, colour = "#17324D") +
+  scale_x_continuous(breaks = 0:6) +
+  scale_y_continuous(limits = c(0, 1.08), breaks = seq(0, 1, 0.25)) +
+  labs(x = "Threshold a (number of sharks)", y = expression(F[K](a))) +
   theme_minimal(base_size = 13) +
   theme(
     panel.grid.minor = element_blank(),
@@ -320,33 +334,39 @@ ggplot(cdf_df, aes(x = threshold, y = cdf)) +
   )
 ```
 
+Read @fig-b03-sharks-cdf from left to right. Below one shark the line is
+flat at 0, because no deal has fewer than one shark. At one shark it jumps
+by 0.735, the share of deals with one shark. At two sharks it jumps by
+0.230 to 0.965. The jumps at three, four, and five sharks are small: 0.025,
+0.003, and 0.007. After five sharks the line stays at 1, because every deal
+has at most five sharks.
+
 A CDF adds up probability as the threshold moves from left to right. It
 can stay flat or rise, but it cannot fall. It equals 0 below the smallest
 possible value and reaches 1 once it includes all possible values.
-In @fig-b03-season-cdf the line is flat at 0 to the left of Season 1 and
-flat at 1 to the right of Season 16.
+In @fig-b03-sharks-cdf the line is flat at 0 to the left of one shark and
+flat at 1 to the right of five sharks.
 
 For a discrete variable, the CDF is a step graph. It stays flat between
 possible values and jumps at each value that has positive probability. A
 larger jump means that this value has more probability.
 
 ::: {.callout-note collapse="true"}
-## Check: read F(8) from the step graph
+## Check: read F(3) from the step graph
 
-$F_S(8)=P(S\le 8)$ is the height of the step graph at threshold 8: the
-first eight seasons contain $64+36+60+103+116+116+116+96=707$ records, so
-$F_S(8)=707/1441\approx0.491$. Just under half of the probability lies in
-Seasons 1--8. This agrees with Lecture 2, where the early-period event
-$L^c$ had probability $707/1441$.
+$F_K(3)=P(K\le 3)$ is the height of the step graph at threshold 3. The
+deals with one, two, or three sharks number $648+203+22=873$, so
+$F_K(3)=873/882\approx0.990$. Only 1% of the deals have four or five
+sharks.
 :::
 
 The probability of an interval is a difference of two CDF values:
 
 $$P(a<X\le b)=F_X(b)-F_X(a).$$
 
-For example,
-$$P(3<S\le 8)=F_S(8)-F_S(3)=\frac{707-160}{1441}=\frac{547}{1441}\approx0.380.$$
-So 38.0% of the probability lies in Seasons 4 to 8.
+For example, the probability that a deal has two or three sharks is
+$$P(1<K\le 3)=F_K(3)-F_K(1)=\frac{873-648}{882}=\frac{225}{882}\approx0.255.$$
+So 25.5% of the deals have two or three sharks.
 
 For the deal indicator:
 
@@ -428,24 +448,26 @@ $$E[X]=0\times(1-p)+1\times p=p.$$
 This result explains why the mean of a 0/1 variable equals its proportion
 of 1s. Here $E[X]=882/1441\approx0.612$.
 
-For the season, the sum has sixteen products instead of two:
+For the number of sharks, the sum has five products instead of two. This is
+the calculation of question 3 in the opening section:
 
 ```{r}
 #| label: b03-expectation
-s <- as.numeric(names(season_pmf))
-p_s <- as.numeric(season_pmf)
+k <- as.numeric(names(sharks_pmf))
+p_k <- as.numeric(sharks_pmf)
 
 c(
   E_X = 0 * (1 - p_hat) + 1 * p_hat,
-  E_S_from_pmf = sum(s * p_s),
-  observed_mean_season = mean(sharks$season)
+  E_K_from_pmf = sum(k * p_k),
+  observed_mean_sharks = mean(deals$number_sharks_in_deal)
 )
 ```
 
-The expected season is about 8.8, and there is no Season 8.8. This
-answers the prediction question from before class: an expectation is a
+The expected number of sharks is about 1.32, and no deal has 1.32 sharks.
+This answers the prediction question from before class: an expectation is a
 probability-weighted average, so it need not be a possible value of the
-random variable.
+random variable. The value 1.32 lies close to 1, because most of the
+probability sits at one shark.
 
 ### Expectation after transforming a variable
 
@@ -490,13 +512,13 @@ $1.7-1.21=0.49$. The section on variance gives this gap a name.
 :::
 :::
 
-The same rule for season in R:
+The same rule for the number of sharks in R:
 
 ```{r}
 #| label: b03-transformed-expectation
 c(
-  E_S = sum(s * p_s),
-  E_S_squared = sum(s^2 * p_s)
+  E_K = sum(k * p_k),
+  E_K_squared = sum(k^2 * p_k)
 )
 ```
 
@@ -591,9 +613,9 @@ written $\sigma$:
 $$\operatorname{SD}(X)=\sqrt{\operatorname{Var}(X)}.$$
 
 Variance has squared units. Standard deviation returns to the units of $X$.
-If $X$ is measured in seasons, $\operatorname{Var}(X)$ is in seasons
+If $X$ is measured in sharks, $\operatorname{Var}(X)$ is in sharks
 squared, a unit that nobody can imagine, while $\operatorname{SD}(X)$ is
-back in seasons.
+back in sharks.
 
 ::: {.definition-box}
 <span class="label">Definition</span>
@@ -658,41 +680,25 @@ about 0.49.
 
 ```{r}
 #| label: b03-variance
-mu_s <- sum(s * p_s)
-var_s <- sum((s - mu_s)^2 * p_s)
+mu_k <- sum(k * p_k)
+var_k <- sum((k - mu_k)^2 * p_k)
 
 c(
   Var_X = p_hat * (1 - p_hat),
   SD_X = sqrt(p_hat * (1 - p_hat)),
-  Var_S = var_s,
-  SD_S = sqrt(var_s),
-  average_distance_S = sum(abs(s - mu_s) * p_s)
+  Var_K = var_k,
+  SD_K = sqrt(var_k),
+  average_distance_K = sum(abs(k - mu_k) * p_k)
 )
 ```
 
-The season has a variance of about 18.1 seasons squared and a standard
-deviation of about 4.3 seasons. The season of a randomly selected pitch
-typically lies about four seasons away from the expected season 8.8. Four
-seasons are a quarter of the 16 seasons. The standard deviation is somewhat
-larger than the plain average distance (about 3.7 seasons here), because
-squaring gives large deviations more weight.
-
-The opening question asked how much deals differ in their number of sharks.
-The same two steps answer it:
-
-```{r}
-#| label: b03-sharks-spread
-k <- as.numeric(names(shark_counts))
-p_k <- as.numeric(prop.table(shark_counts))
-mu_k <- sum(k * p_k)
-c(expected_sharks = mu_k,
-  variance = sum((k - mu_k)^2 * p_k),
-  sd = sqrt(sum((k - mu_k)^2 * p_k)))
-```
-
-The expected number of sharks is 1.32 and the standard deviation is about
-0.61 sharks, which is less than one shark. So the number of sharks differs
-little from deal to deal.
+The number of sharks has a variance of about 0.37 sharks squared and a
+standard deviation of about 0.61 sharks. The number of sharks in a deal
+typically lies about 0.6 sharks away from the expected 1.32, less than one
+shark. This answers the opening question: the number of sharks differs
+little from deal to deal. The standard deviation is somewhat larger than the
+plain average distance (about 0.47 sharks here), because squaring gives the
+few deals with four or five sharks more weight.
 
 ### Shifting and rescaling a variable {#b03-shift-rescale}
 
@@ -814,10 +820,9 @@ have exactly one shark and 96.5% have at most two. The expected number is
 1.32, with a standard deviation of about 0.61. The same two numbers, centre
 and spread, describe the other variables of this lecture. The deal indicator
 is a Bernoulli variable: a recorded pitch reaches an on-air deal with
-probability 0.612, and the variance is about 0.24. The season has expected
-value $E[S]\approx8.8$ and a standard deviation of about 4.3 seasons. Centre
-and spread together describe a distribution. One of them alone can give a
-wrong picture.
+probability 0.612, and the variance is about 0.24. Centre and spread
+together describe a distribution. One of them alone can give a wrong
+picture.
 
 ::: {.founder-box}
 <span class="label">A founder's decision (invented example)</span>
@@ -910,21 +915,22 @@ more of its probability lies at the two ends, 0 and 2.
 ### Practice
 
 [Shark Tank data]{.shark-tag} Tasks 1 to 5 use the Shark Tank distributions of the lecture material.
-Task 6 uses an invented example. In tasks 1, 2, 4, and 5, one of the 1,441
+Task 6 uses an invented example. In task 1, one of the 1,441
 recorded pitches is selected at random. $X$ is the deal indicator: $X=1$ if
-the pitch reached an on-air deal and $X=0$ otherwise. $S$ is the season of
-the pitch (`season`).
+the pitch reached an on-air deal and $X=0$ otherwise. In tasks 2, 4, and 5,
+one of the 882 deals is selected at random. $K$ is the number of sharks in
+that deal (`number_sharks_in_deal`).
 
 1. The deal indicator has $p=P(X=1)=882/1441$. Calculate $F_X(0.4)$.
-2. Calculate $P(3<S\le6)$. Use the season CDF table: the R output
-   `season_distribution` in the section "A CDF accumulates probability up to
-   a threshold".
+2. Calculate $P(1<K\le4)$, the probability that a deal has two, three, or
+   four sharks. Use the CDF table: the R output `sharks_distribution` in the
+   section "A CDF accumulates probability up to a threshold".
 3. A Bernoulli variable has $p=0.25$. Calculate its variance and standard
    deviation.
-4. The standard deviation of the season $S$ is about 4.3. Write one sentence that
-   interprets this number and names its units.
-5. Why is $\operatorname{Var}(S)\approx18.1$ harder to interpret than
-   $\operatorname{SD}(S)\approx4.3$?
+4. The standard deviation of the number of sharks $K$ is about 0.61. Write
+   one sentence that interprets this number and names its units.
+5. Why is $\operatorname{Var}(K)\approx0.37$ harder to interpret than
+   $\operatorname{SD}(K)\approx0.61$?
 6. An invented example. A founder sells phone cases at a weekend market.
    The number of cases sold on one day, $X$, has $E[X]=12$ and
    $\operatorname{SD}(X)=4$. Each case brings in 15 euros and the stall
@@ -936,13 +942,14 @@ the pitch (`season`).
 ## Check your answers
 
 1. Because $0\le0.4<1$, $F_X(0.4)=P(X=0)=559/1441\approx0.388$.
-2. $P(3<S\le6)=F_S(6)-F_S(3)=(495-160)/1441=335/1441\approx0.232$.
+2. $P(1<K\le4)=F_K(4)-F_K(1)=(876-648)/882=228/882\approx0.259$. About 26%
+   of the deals have two, three, or four sharks.
 3. $\operatorname{Var}=0.25\times0.75=0.1875$.
    $\operatorname{SD}=\sqrt{0.1875}\approx0.43$.
-4. The season of a randomly selected pitch typically differs from the
-   expected season (about 8.8) by roughly 4.3 seasons.
-5. Variance is measured in seasons squared, a unit that is hard to
-   imagine. The standard deviation is back in seasons.
+4. The number of sharks in a randomly selected deal typically differs from
+   the expected number (about 1.32) by roughly 0.6 sharks.
+5. Variance is measured in sharks squared, a unit that is hard to imagine.
+   The standard deviation is back in sharks.
 6. Use the rules for $aX+b$ with $a=15$ and $b=-60$. The expected profit is
    $15\times12-60=120$ euros. $\operatorname{Var}(X)=4^2=16$, so the
    variance of the profit is $15^2\times16=3600$ euros squared. The standard
