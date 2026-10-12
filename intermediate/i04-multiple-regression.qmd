@@ -34,18 +34,24 @@ different amounts?
 
 Do all the preparation below before class.
 
-<div class="video-prep">
-<span class="label">Video preparation</span><br>
-Watch Stanford Statistical Learning
-<a href="https://www.youtube.com/watch?v=o9hoLdylWKo&list=PLoROMvodv4rOzrYsAxzQyHb8n_RWNuS1e&index=11">3.3
-Multiple Linear Regression</a>. Focus on how one coefficient is interpreted
-when the other predictors are held fixed, and on why several predictors are
-included together.
-All links are also listed in the
-<a href="../resources/video-guide.html">External Video Guide</a>.
-The videos explain key ideas in another way and can use a different
-notation. The lecture material and its notation always come first.
-</div>
+::: {.video-prep}
+[Video preparation]{.label}
+
+Watch these two parts of Brandon Foltz's Statistics 101 series before class.
+
+1. [Multiple Linear Regression, The Very Basics](https://www.youtube.com/watch?v=dQNpSa-bq4M&t=39s), from 0:39 to 20:08. Focus on what one coefficient means when the other predictors are held fixed.
+2. [Multiple Regression, Adjusted R-square](https://www.youtube.com/watch?v=CGQpi580sZM&t=53s), from 0:53 to 12:06. Focus on why $R^2$ rises with every added predictor and how adjusted $R^2$ corrects for this.
+
+<details class="video-notes">
+<summary>Where these videos differ from this book</summary>
+
+- Foltz calculates in Excel. This course uses R.
+- He writes $b$ for the coefficients. This book writes $\hat\beta$.
+
+</details>
+
+The videos explain key ideas in another way. The lecture material and its notation always come first.
+:::
 
 **Predict.** Answer this question before you come to class: once the requested amount is added, will the
 season coefficient move towards zero, away from zero, or barely
@@ -102,9 +108,6 @@ seasons. Multiple regression solves this problem by comparing pitches that asked
 the same amount.
 
 ### More than one predictor
-
-<p class="concept-video"><strong>Stanford explanation (review):</strong>
-<a href="https://www.youtube.com/watch?v=o9hoLdylWKo">3.3 Multiple Linear Regression</a>.</p>
 
 For predictors $X_{i1},\ldots,X_{ik}$, the model is
 
@@ -440,6 +443,31 @@ from 17.3%. Adjusted $R^2$ rises with it, from 0.172 to 0.186. Adding the
 description length leaves adjusted $R^2$ at 0.186: this predictor adds almost
 nothing to the fit.
 
+Why does adjusted $R^2$ need a penalty? Because $R^2$ rises with any added
+predictor, even one that has nothing to do with the outcome. The code below
+takes 50 random pitches and fits the model with season and the requested
+amount. It then adds ten columns of pure random numbers to the same model.
+
+```{r}
+#| label: i04-adjusted-r2-noise
+set.seed(42)
+small <- sharks[sample(nrow(sharks), 50),
+                c("equity_offered_pct", "season", "ask_1k")]
+for (j in 1:10) small[[paste0("noise", j)]] <- rnorm(50)
+fit_two   <- lm(equity_offered_pct ~ season + ask_1k, data = small)
+fit_noise <- lm(equity_offered_pct ~ ., data = small)
+round(c(r2_two = summary(fit_two)$r.squared,
+        adj_r2_two = summary(fit_two)$adj.r.squared,
+        r2_noise = summary(fit_noise)$r.squared,
+        adj_r2_noise = summary(fit_noise)$adj.r.squared), 3)
+```
+
+$R^2$ rises from 0.269 to 0.378. Ten useless predictors seem to explain 11
+percentage points more of the variation. Adjusted $R^2$ falls from 0.237 to
+0.176. It shows that the random columns add nothing real. With another
+random draw, adjusted $R^2$ can rise a little by chance. It is a correction,
+not a guarantee.
+
 R can build such a table for you with the package `modelsummary`:
 
 ```{r}
@@ -488,7 +516,7 @@ $-0.0000029$ would be correct but hard to read. Per \$1,000 is readable. Per
 ::: {.callout-caution collapse="true"}
 ## Try it: three seasons later and $200,000 more
 
-[Shark Tank data]{.shark-tag} Try this with your neighbour first. Two pitches have the same description
+[Shark Tank data]{.shark-tag} Two pitches have the same description
 length. One is three seasons later and requests $200,000 more. Complete the
 steps before opening the answer.
 

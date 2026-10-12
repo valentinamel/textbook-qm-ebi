@@ -34,20 +34,25 @@ pitch?
 
 Do all the preparation below before class.
 
-<div class="video-prep">
-<span class="label">Video preparation</span><br>
-Watch <a href="https://www.youtube.com/watch?v=8QFpZ3FndBc">Probability
-Density Functions</a>,
-<a href="https://www.youtube.com/watch?v=jPB9zI8F7rE">Uniform and
-Piecewise Constant PDFs</a>, and
-<a href="https://www.youtube.com/watch?v=6UMv4vb4y7c">Normal Random
-Variables</a>. Focus on the difference between density height and
-probability, and on the roles of the two normal parameters. All links are
-also listed in the
-<a href="../resources/video-guide.html">External Video Guide</a>.
-The videos explain key ideas in another way and can use a different
-notation. The lecture material and its notation always come first.
-</div>
+::: {.video-prep}
+[Video preparation]{.label}
+
+Watch these four short videos from the jbstatistics channel before class. Focus on the difference between density height and probability, and on the roles of the two normal parameters.
+
+1. [An Introduction to Continuous Probability Distributions](https://www.youtube.com/watch?v=OWSOhpS00_s)
+2. [Introduction to the Continuous Uniform Distribution](https://www.youtube.com/watch?v=izE1dXrH5JA)
+3. [An Introduction to the Normal Distribution](https://www.youtube.com/watch?v=iYiOVISWXS4)
+4. [Standardizing Normally Distributed Random Variables](https://www.youtube.com/watch?v=4R8xm19DmPM)
+
+<details class="video-notes">
+<summary>Where these videos differ from this book</summary>
+
+- The videos find normal probabilities with a table. This course uses R, for example `pnorm()`.
+
+</details>
+
+The videos explain key ideas in another way. The lecture material and its notation always come first.
+:::
 
 **Warm up.** A discrete random variable has separate
 possible values with gaps between them (Lecture 3 attached a PMF and a CDF to such variables). A
@@ -167,6 +172,74 @@ the axis. This is the shrinking window of the previous section, now for all
 bins at once. A histogram with the share in the bin as its height is not
 useful once the bins are narrow.
 
+The Shark Tank file records rounded percentages, so it cannot show what
+happens in very narrow bins. The two figures of this section therefore use
+100,000 invented offers. A computer drew them, without rounding, from a
+smooth model with the same mean and standard deviation as the equity offered
+in the file. @fig-b06-shrinking-bins shows the three histograms on the same
+vertical scale.
+
+```{r}
+#| label: fig-b06-shrinking-bins
+#| code-fold: true
+#| code-summary: "See the R code for this figure"
+#| fig-height: 3.8
+#| fig-cap: "The same 100,000 invented offers that are not rounded, in bins 5, 1 and 0.1 points wide. The height of a bar is the share of offers in the bin. All three panels use the same vertical scale. With narrower bins every bar holds less, and the histogram sinks towards the axis."
+#| fig-alt: "Three histograms of the same invented offers side by side, with the share of offers in the bin on the vertical axis from 0% to 30%. With bins 5 points wide the tallest bar is 28.3%. With bins 1 point wide it is 5.9%. With bins 0.1 points wide it is 0.6%, and the histogram is almost flat on the axis."
+library(ggplot2)
+
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+mean_equity <- mean(sharks$equity_offered_pct)
+# sd() divides by n - 1. With 1,441 records the difference from dividing
+# by N is in the third decimal.
+sd_equity <- sd(sharks$equity_offered_pct)
+
+# 100,000 invented offers that are not rounded. They come from a smooth,
+# right-skewed model (a gamma distribution) with the mean and the standard
+# deviation of the equity offered in the Shark Tank file.
+model_shape <- (mean_equity / sd_equity)^2
+model_rate <- mean_equity / sd_equity^2
+set.seed(206)
+exact_offers <- rgamma(100000, shape = model_shape, rate = model_rate)
+
+# Share of the offers in each bin, for three bin widths.
+bin_shares <- function(width) {
+  breaks <- seq(0, ceiling(max(exact_offers) / width) * width, by = width)
+  counts <- table(cut(exact_offers, breaks, right = FALSE))
+  data.frame(left = head(breaks, -1), width = width,
+             share = as.numeric(counts) / length(exact_offers))
+}
+panel_names <- c("Bins 5 points wide", "Bins 1 point wide",
+                 "Bins 0.1 points wide")
+bins <- rbind(bin_shares(5), bin_shares(1), bin_shares(0.1))
+bins$panel <- factor(panel_names[match(bins$width, c(5, 1, 0.1))],
+                     levels = panel_names)
+
+# The height of the tallest bar in each panel, as a direct label.
+tallest <- aggregate(share ~ panel, data = bins, FUN = max)
+tallest$label <- paste0("Tallest bar: ", round(100 * tallest$share, 1), "%")
+ggplot(bins) +
+  geom_rect(aes(xmin = left, xmax = left + width, ymin = 0, ymax = share),
+            fill = "#009E73", colour = NA) +
+  geom_text(data = tallest, aes(x = 50, y = 0.31, label = label),
+            hjust = 1, colour = "#17324D", size = 3.6) +
+  facet_wrap(~panel) +
+  coord_cartesian(xlim = c(0, 50)) +
+  scale_x_continuous(breaks = seq(0, 50, by = 10)) +
+  scale_y_continuous(limits = c(0, 0.32),
+                     labels = function(v) paste0(100 * v, "%"),
+                     expand = expansion(mult = c(0, 0.02))) +
+  labs(x = "Equity offered (%), invented offers without rounding",
+       y = "Share of offers in the bin") +
+  theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    axis.title = element_text(colour = "#17324D"),
+    strip.text = element_text(colour = "#17324D", hjust = 0)
+  )
+```
+
 There is a second way to draw the heights. Divide the share in each bin by
 the width of the bin. The height is then the share per percentage point. Now
 the picture does not sink when the bins get narrower. A bar 1 point wide
@@ -178,11 +251,6 @@ and 0.25 wide. This curve is the probability
 density, written $f_X(x)$. Its height at 30 is the share per percentage
 point near 30. The share in a bin is the height of the bar times its width,
 which is the area of the bar. Probability has become area.
-
-The Shark Tank file records rounded percentages, so it cannot show what
-happens in very narrow bins. The figure therefore uses 100,000 invented
-offers. A computer drew them, without rounding, from a smooth model with the
-same mean and standard deviation as the equity offered in the file.
 
 ```{r}
 #| label: fig-b06-density-bins
@@ -254,13 +322,6 @@ ggplot() +
     strip.text = element_text(colour = "#17324D", hjust = 0)
   )
 ```
-
-A metal rod gives the same picture without data. The rod has a weight per
-metre at each point, which is its density, and no single point of the rod
-has any weight. The weight of a piece is its density times its length. A
-probability density is read in the same way: no single value has
-probability, and the probability of an interval is the area under the curve
-over that interval.
 
 ::: {.definition-box}
 <span class="label">Definition</span>
@@ -520,7 +581,7 @@ ggplot() +
 ::: {.callout-caution collapse="true"}
 ## Try it: the final stretch of the session
 
-Try this with your neighbour first. Same model, $X\sim U(0,90)$. What is the
+Same model, $X\sim U(0,90)$. What is the
 probability that the pitch starts in the final 27 minutes of the session?
 
 *Step 1 (given).* The event is $63<X<90$, an interval of length
@@ -661,8 +722,13 @@ You do not have to know this formula by heart. R evaluates it with
 
 The two parameters have different roles, as @fig-b06-normal-parameters shows.
 A change in $\mu$ shifts the whole curve to the left or to the right, and
-the shape stays the same. A change in $\sigma$ makes the curve wider or
-narrower. A wider curve is also lower, because the total area stays 1.
+the shape stays the same. A change in $\sigma$ leaves the peak at $\mu$, but
+it changes how spread out the curve is around $\mu$. With a larger $\sigma$
+the bell is wider. The probability is spread over a wider band of values
+around $\mu$, and the peak is lower, because the total area must stay 1.
+With a smaller $\sigma$ the bell is narrower and its peak is higher. The set
+of possible values does not change. What changes is how likely the values
+far from $\mu$ are.
 
 ```{r}
 #| label: fig-b06-normal-parameters
@@ -1229,8 +1295,9 @@ and 2.576.
 
 #### Sums of normal variables {#b06-normal-sums}
 
-A sum of independent normal variables is again normal. Its mean and its
-variance follow from the sum rules of
+A sum, and more generally a linear combination such as $a+bX+cY$, of
+independent normal variables is again normal. Its mean and its variance
+follow from the sum rules of
 [Lecture 5](b05-joint-covariance-correlation.qmd#b05-sums). Lecture 8 uses
 this fact for the sample mean.
 

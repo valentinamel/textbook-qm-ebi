@@ -682,6 +682,9 @@ $\sigma=28$ minutes.
    Compare it with part 1.
 3. Calculate the sample size for a margin of 5 minutes at the 99% level
    ($z_{0.995}=2.576$).
+4. Her business partner asks for a 95% confidence interval whose total
+   width is at most 4 minutes, from the lower end to the upper end.
+   Calculate the sample size for this interval.
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
@@ -700,6 +703,11 @@ $$
 3. $n\ge(2.576\times28/5)^2=14.4256^2\approx208.1$, so 209 visits. More
    confidence with the same margin needs more observations: 209 in place
    of 121.
+4. The formula needs the margin of error, which is half the width. So
+   $m=4/2=2$ minutes, and $n\ge(1.960\times28/2)^2=27.44^2\approx752.95$.
+   She needs 753 visits. If you put the full width of 4 into the formula,
+   you get 189 visits, about a quarter of the correct number. The interval
+   from 189 visits would be about twice as wide as asked.
 
 The planning value is a guess. If the true $\sigma$ is larger than 28
 minutes, the margin of the new sample will be larger than planned.
@@ -710,7 +718,9 @@ Verification in R:
 #| label: bep03-sample-size-check
 n_needed <- c(margin_5_at_95 = (1.960 * 28 / 5)^2,
               margin_2.5_at_95 = (1.960 * 28 / 2.5)^2,
-              margin_5_at_99 = (2.576 * 28 / 5)^2)
+              margin_5_at_99 = (2.576 * 28 / 5)^2,
+              width_4_at_95 = (1.960 * 28 / 2)^2,
+              wrong_full_width = (1.960 * 28 / 4)^2)
 n_needed
 ceiling(n_needed)
 ```

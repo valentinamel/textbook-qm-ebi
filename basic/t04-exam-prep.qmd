@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 
 - carry out a two-sided test and link it to the confidence interval and p-value
 - write the conclusion in the words of the question, also when nothing is rejected
-- explain errors and power, and read a regression row without overclaiming
+- explain errors and power, and read test output from software without overclaiming
 :::
 
 Tutorials are exam preparation sessions. The tasks below are exam-style
@@ -315,59 +315,85 @@ c(standard_error = se_hat, margin = 1.960 * se_hat,
 ```
 :::
 
-### Task 3: Read a regression coefficient row
+### Task 3: Read a test from software output
 
-An invented example. Suppose that you regress the equity offered (in
-percentage points) on the amount requested, in a large sample of pitches.
-The regression output shows this row for the amount
-requested. The sample is large, so the critical
-value at the 5% level is about 1.96.
+An invented example. A coffee franchise states in its brochure that a
+franchise café sells 400 cups of coffee per day on average. A founder who
+thinks about opening a franchise café checks this figure. She draws a
+random sample of 64 of the 900 franchise cafés. For each café she records
+`cups_per_day`, the mean number of cups sold per day last month. Let $\mu$
+be the mean of `cups_per_day` among all 900 cafés. The sample has
+$\bar x=376$ cups and $s=48$ cups. R produced:
 
-| Predictor | Estimate | Std. Error | t value | p-value | 95% interval |
-|---|---:|---:|---:|---:|---:|
-| Amount requested, per \$100,000 | -0.290 | 0.058 | -5.00 | <0.001 | (-0.404, -0.176) |
+```text
+	One Sample t-test
+
+data:  cups_per_day
+t = -4, df = 63, p-value = 0.0001691
+alternative hypothesis: true mean is not equal to 400
+95 percent confidence interval:
+ 364.01 387.99
+sample estimates:
+mean of x 
+      376 
+```
+
+The degrees of freedom are 63. Use the closest value on the formula sheet:
+$t_{0.975,\,60}=2.000$.
 
 1. State the tested hypotheses.
-2. Explain every number in the row, with its units.
-3. Give the statistical conclusion at the 5% level.
-4. State two claims that the row cannot justify.
+2. Explain every number in the output, with its units. Check the value of
+   `t` by hand.
+3. Give the statistical conclusion at the 5% level. Show that the
+   critical value, the p-value, and the interval give the same decision.
+4. State two claims that the output cannot justify.
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-1. Write $\beta_1$ for the population coefficient of the amount
-   requested. The test is $H_0:\beta_1=0$ against $H_1:\beta_1\ne0$.
-2. The estimate $\hat\beta_1=-0.290$ says that each extra \$100,000
-   requested goes together with 0.290 percentage points less equity
-   offered. The standard error, 0.058, measures the sampling uncertainty of
-   the estimate in the same units. The observed value of the test statistic
-   is $t_{obs}=-0.290/0.058=-5.00$: the estimate lies five standard errors
-   below zero. The interval says that plausible values of the coefficient
-   run from $-0.404$ to $-0.176$ percentage points per \$100,000.
-3. The observed value $-5.00$ is far below $-1.96$, so it lies in the
-   rejection region. Reject $H_0$ at the 5% level: the coefficient differs
-   from zero, and the negative sign shows that it lies below zero. The
-   p-value below 0.001 and the 95% interval, which does not contain zero,
-   show the same decision.
-4. The row alone does not show that asking for more money causes lower
-   equity offers, and it does not show that the conditions of the model
-   hold.
+1. $H_0:\mu=400$ against $H_1:\mu\ne400$, where $\mu$ is the mean number
+   of cups sold per day last month among all 900 franchise cafés.
+2. `mean of x` is the estimate $\bar x=376$ cups per day. `t` is the
+   observed value of the test statistic. By hand, the standard error is
+   $s/\sqrt n=48/\sqrt{64}=6$ cups, so $t_{obs}=(376-400)/6=-4.00$, as in
+   the output. The sample mean lies four standard errors below 400. `df` is
+   $n-1=63$. The p-value, 0.0001691, is the probability of a sample mean at
+   least this far from 400, in either direction, if $\mu$ were 400. That
+   happens in fewer than 2 of 10,000 samples. The interval says that
+   plausible values of $\mu$ run from 364.01 to 387.99 cups per day.
+3. The observed value $-4.00$ is below $-2.000$, so it lies in the
+   rejection region. Reject $H_0$. At the 5% significance level we can
+   conclude that the mean daily sales of the 900 cafés differ from 400
+   cups. The negative sign shows that the mean lies below 400 cups. The
+   p-value is at most 0.05, and the interval does not contain 400, so both
+   give the same decision. The estimated difference is 24 cups, 6% of the
+   brochure figure. The interval puts it between about 12 and 36 cups, or
+   3% to 9% of 400.
+4. The output does not say why the cafés sell less than the brochure says.
+   It also does not say that a new café would sell 376 cups per day: single
+   cafés vary much more than the mean of 64 cafés, with $s=48$ cups. And
+   it describes last month only, not other months.
 
 Verification in R:
 
 ```{r}
-#| label: bep04-row-check
-c(t_obs = -0.290 / 0.058,
-  lower = -0.290 - 1.96 * 0.058, upper = -0.290 + 1.96 * 0.058,
-  p_value = 2 * pnorm(-5))
+#| label: bep04-cafe-check
+se_cups <- 48 / sqrt(64)
+c(se = se_cups, t_obs = (376 - 400) / se_cups,
+  critical_exact = qt(0.975, df = 63),
+  p_value = 2 * pt(-4, df = 63),
+  lower = 376 - qt(0.975, df = 63) * se_cups,
+  upper = 376 + qt(0.975, df = 63) * se_cups,
+  difference_in_percent = 100 * (400 - 376) / 400,
+  sample_share = 64 / 900)
 ```
 :::
 
 ### Task 4: Errors, power, and what changes a decision
 
-Parts 1 to 5 are about the test of Task 3. It tests $H_0:\beta_1=0$ for
-the coefficient of the amount requested. The estimate was $-0.290$
-percentage points per \$100,000, with $t_{obs}=-5.00$:
+Parts 1 to 5 are about the test of Task 3. It tests $H_0:\mu=400$ for the
+mean daily sales of the 900 franchise cafés. The sample mean was 376 cups,
+with $t_{obs}=-4.00$:
 
 1. describe a Type I error
 2. describe a Type II error
@@ -396,10 +422,10 @@ $t_{0.95,\,35}=1.690$ and $t_{0.995,\,35}=2.724$.
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-1. A Type I error is concluding that the population coefficient of the
-   amount requested differs from zero when it equals zero.
-2. A Type II error is not rejecting $H_0$ when the population coefficient
-   is in fact not zero.
+1. A Type I error is concluding that the mean daily sales of the 900 cafés
+   differ from 400 cups when they equal 400 cups.
+2. A Type II error is not rejecting $H_0$ when the mean daily sales of the
+   900 cafés in fact differ from 400 cups.
 3. A larger independent sample usually reduces the standard error and
    raises the power.
 4. Raising $\alpha$ also raises the power, but it raises the probability of
@@ -506,27 +532,28 @@ c(left_sided = pt(t_obs, df = 99), right_sided = 1 - pt(t_obs, df = 99))
 
 ### Task 6: Repair the conclusion
 
-The following conclusion is about the row of Task 3: the regression of the
-equity offered on the amount requested, with the estimate $-0.290$
-percentage points per \$100,000, 95% interval $(-0.404,\ -0.176)$, and
-p-value below 0.001. The conclusion contains two errors. Find them and
-write a better conclusion.
+The following conclusion is about the test of Task 3: the mean daily sales
+of the 900 franchise cafés, tested against the brochure figure of 400 cups.
+The sample mean was 376 cups, the 95% interval $(364.01,\ 387.99)$ cups,
+and the p-value below 0.001. The conclusion contains two errors. Find them
+and write a better conclusion.
 
-> The coefficient is significant, so asking for more money causes founders
-> to offer less equity, and there is less than a 0.1% chance that the null
-> hypothesis is true.
+> The result is significant, so the new coffee bars that opened near many
+> franchise cafés cause the lower sales, and there is less than a 0.1%
+> chance that the brochure figure of 400 cups is true.
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
 1. The two errors: the p-value is not the probability that the null
-   hypothesis is true, and a significant result does not show a cause.
-2. A better conclusion: "Each extra \$100,000 requested goes together with
-   about 0.29 percentage points less equity offered (95% interval from 0.18
-   to 0.40 points less). If the population coefficient were zero, an
-   estimate this far from zero would occur in fewer than 0.1% of samples.
-   Nobody assigned the requested amounts to the pitches at random, so this
-   is an association, not a causal effect."
+   hypothesis is true, and a significant result does not show a cause. The
+   test compares one mean with one number. It knows nothing about coffee
+   bars.
+2. A better conclusion: "Last month the franchise cafés sold about 376
+   cups per day on average, 24 cups or 6% below the brochure figure (95%
+   interval from 364 to 388 cups). If the mean of all 900 cafés were 400
+   cups, a sample mean this far from 400 would occur in fewer than 0.1% of
+   random samples. The test does not say why the sales are lower."
 :::
 
 ### Task 7: A test that does not reject
@@ -749,7 +776,7 @@ Complete from memory:
 4. "Do not reject $H_0$" is different from "accept $H_0$" because ...
 5. The test for a proportion divides by ... The interval for a proportion
    uses ...
-6. A regression coefficient row tests ...
+6. A very small p-value does not show that ...
 
 ::: {.callout-note collapse="true"}
 ## Check your answers
@@ -766,7 +793,9 @@ Complete from memory:
 5. The standard deviation of $\widehat P$ under $H_0$,
    $\sqrt{p_0(1-p_0)/n}$. The standard error,
    $\sqrt{\hat p(1-\hat p)/n}$.
-6. $H_0:\beta_j=0$ against $H_1:\beta_j\ne0$.
+6. The difference is large, or that something caused it. The size comes
+   from the estimate and its interval. A cause needs a study design that
+   rules out other explanations.
 :::
 
 ### Make it yours

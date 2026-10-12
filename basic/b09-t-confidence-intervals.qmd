@@ -12,7 +12,6 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 ::: {.outcomes}
 <span class="label">By the end of Lecture 9, you can</span>
 
-- explain why an estimated standard deviation leads to the t distribution
 - construct and interpret a confidence interval for a mean or a proportion
 - choose a sample size for a target margin of error
 - state the hypotheses of a two-sided test and calculate its test statistic
@@ -33,22 +32,34 @@ Tank pitches really different from 15%?
 
 Do all the preparation below before class.
 
-<div class="video-prep">
-<span class="label">Video preparation</span><br>
-Watch <a href="https://www.youtube.com/watch?v=NInNhFm046w">Confidence
-Intervals</a>,
-<a href="https://www.youtube.com/watch?v=MzvRQFYUEFU">Confidence Intervals
-When the Variance Is Unknown</a>, and
-<a href="https://www.youtube.com/watch?v=ti9NFdjf3sM">Introduction to
-Hypothesis Testing</a>. Focus on three points: what happens to an interval
-when the sample is drawn again and again, why a t distribution takes the
-place of the normal distribution, and which value a test compares the
-estimate with. The videos use $M_n$ for the sample mean, where this book
-uses $\bar X$, and $\hat\Theta$ for an estimator. All links are also listed in
-the <a href="../resources/video-guide.html">External Video Guide</a>.
-The videos explain key ideas in another way and can use a different
-notation. The lecture material and its notation always come first.
-</div>
+::: {.video-prep}
+[Video preparation]{.label}
+
+Watch these videos from the jbstatistics channel before class. Focus on what happens to an interval when the sample is drawn again and again, why a t distribution takes the place of the normal distribution, and which value a test compares the estimate with.
+
+1. [Introduction to Confidence Intervals](https://www.youtube.com/watch?v=27iSnzss2wM)
+2. [Deriving a Confidence Interval for the Mean](https://www.youtube.com/watch?v=-iYDu8flFXQ)
+3. [Intro to Confidence Intervals for One Mean (Sigma Known)](https://www.youtube.com/watch?v=KG921rfbTDw)
+4. [Confidence Intervals for One Mean: Interpreting the Interval](https://www.youtube.com/watch?v=JYP6gc--sGQ)
+5. [What Factors Affect the Margin of Error?](https://www.youtube.com/watch?v=NQtcGOhUWB4)
+6. [Intro to the t Distribution (non-technical)](https://www.youtube.com/watch?v=Uv6nGIgZMVw)
+7. [Confidence Intervals for One Mean: Sigma Not Known (t Method)](https://www.youtube.com/watch?v=bFefxSE5bmo). You can skip the part on quantile-quantile plots.
+8. [Confidence Intervals for One Mean: Determining the Required Sample Size](https://www.youtube.com/watch?v=7zcbVaVz_P8)
+9. [An Introduction to Hypothesis Testing](https://www.youtube.com/watch?v=tTeMYuS87oU)
+10. [Z Tests for One Mean: Introduction](https://www.youtube.com/watch?v=pGv13jvnjKc)
+
+<details class="video-notes">
+<summary>Where these videos differ from this book</summary>
+
+- The videos write $z_{\alpha/2}$ and $t_{\alpha/2}$ for the value with area $\alpha/2$ to its right. This book writes the same values as quantiles: $z_{0.975}=1.96$ and $t_{0.975,\,n-1}$, as R does with `qnorm(0.975)` and `qt(0.975, df)`.
+- The videos read critical values from tables. This course uses R.
+- If a video calls $\sigma/\sqrt n$ the standard error, read it as the standard deviation of the sample mean. This book keeps the name standard error for $S/\sqrt n$.
+- Some examples use one-sided tests. In this course all tests are two-sided.
+
+</details>
+
+The videos explain key ideas in another way. The lecture material and its notation always come first.
+:::
 
 [Shark Tank data]{.shark-tag} **Warm up.** A random sample of $n=100$ pitches from the
 Shark Tank file has a mean
@@ -58,6 +69,8 @@ SD of $s=7.71$ percentage points.
 1. Calculate the standard error of the sample mean.
 2. Between which two values does the central 95% of the standard normal
    distribution lie?
+3. Which distribution does $T=(\bar X-\mu)/(S/\sqrt n)$ have for this
+   sample, and which quantile cuts off its central 95%?
 
 ::: {.callout-note collapse="true"}
 ## Check your preparation
@@ -65,15 +78,14 @@ SD of $s=7.71$ percentage points.
 1. The standard error is $s/\sqrt n=7.71/\sqrt{100}=0.771$ percentage points
    (Lecture 8).
 2. Between $-1.96$ and $1.96$, because $z_{0.975}=1.96$ (Lecture 6).
+3. $T$ has the t distribution with $n-1=99$ degrees of freedom. The
+   population is not normal, but $n=100$ is large, so this holds
+   approximately. Its central 95% ends at the 0.975 quantile,
+   $t_{0.975,\,99}=1.984$ (Lecture 8).
 
 A confidence interval is built from these pieces: an estimate, its standard
 error, and a quantile of a known distribution.
 :::
-
-**Predict.** Answer this question before you come to class: in a real sample, the unknown population SD
-$\sigma$ must be replaced by the sample SD $S$. Does this replacement make a
-95% interval wider or narrower, or does it leave the width unchanged?
-Choose one answer. You find the correct answer in the lecture material.
 
 If you are not sure about intervals, standardisation, or degrees of freedom,
 review
@@ -86,9 +98,9 @@ freedom](../resources/math-refresher.html).
 
 ## Lecture material
 
-Lecture 8 gave a sample mean, which estimates the population mean, and its
-standard error. This lecture turns those two numbers into a confidence
-interval. That is an interval built by a method that captures the population
+Lecture 8 gave a sample mean, which estimates the population mean, its
+standard error, and the t distribution. This lecture turns these pieces into
+a confidence interval. That is an interval built by a method that captures the population
 parameter in a chosen share of all samples, for example 95%. The lecture ends with a test
 statistic, which measures how far an estimate lies from a proposed value of
 the parameter. Lecture 10 turns the test statistic into a decision.
@@ -123,203 +135,6 @@ To check that sentence, you need to know where the interval comes from, why
 it uses a t distribution with 99 degrees of freedom, and what the t value
 and the p-value say. This lecture explains the interval and sets up the
 test. Lecture 10 explains the decision and the p-value.
-
-### The price of estimating σ: the t distribution
-
-Lecture 8 gave the standardised sample mean
-
-$$
-Z=\frac{\bar X-\mu}{\sigma/\sqrt n}.
-$$
-
-Its distribution is known in two situations. If the population is normal,
-$Z$ is exactly standard normal for every sample size (Lecture 8). If the
-population is not normal but $n$ is large, $Z$ is approximately standard
-normal by the central limit theorem (CLT). In both situations the
-distribution of $Z$ is known, although $\mu$ is not. So we can use $Z$ to
-draw conclusions about $\mu$. This is the step from sample statistics to
-population parameters (Lecture 7).
-
-But $Z$ also contains the population SD $\sigma$, and in a real study nobody
-knows $\sigma$. The only replacement we have is the sample SD $S$. This
-gives
-
-$$
-T=\frac{\bar X-\mu}{S/\sqrt n}.
-$$
-
-#### Why $T$ has heavier tails than $Z$
-
-$S$ is itself a random variable. It changes from sample to sample, and in a
-small sample it can be far from $\sigma$. In a sample where $S$ comes out
-larger than $\sigma$, the denominator is too large and $T$ is pulled towards
-zero. In a sample where $S$ comes out smaller than $\sigma$, the denominator
-is too small and $T$ is pushed away from zero. When $S$ is far below
-$\sigma$, the push is large. The two effects do not cancel. A moderate value
-of $Z$ becomes an extreme value of $T$ whenever $S$ is much smaller than
-$\sigma$. So $T$ has two sources of variation, $\bar X$ and $S$. Its
-distribution is still symmetric around zero, but it puts more probability
-far from zero. This is what "heavier tails" means.
-
-#### The exact result for a normal population
-
-If the population is normal, the distribution of $T$ is known exactly, for
-every $n$:
-
-$$
-T=\frac{\bar X-\mu}{S/\sqrt n}
-\sim t_{n-1}.
-$$
-
-::: {.definition-box}
-<span class="label">Definition</span>
-
-**t distributions and degrees of freedom.** The t distributions are a family
-of distributions. There is one member for each value of a single number, the
-**degrees of freedom** ($df=1,2,3,\ldots$). Every member is symmetric around
-zero and has heavier tails than the standard normal. The smaller the degrees
-of freedom, the heavier the tails. As the degrees of freedom grow, the
-member approaches $N(0,1)$. For a random sample of size $n$ from a normal
-population, $T$ follows the member with $df=n-1$.
-:::
-
-```{r}
-#| label: fig-b09-t-curves
-#| code-fold: true
-#| code-summary: "See the R code for this figure"
-#| fig-cap: "The t distribution for 4 and 10 degrees of freedom against the standard normal. All three are symmetric around zero. The t curves put more probability in the tails, most visibly at low degrees of freedom."
-library(ggplot2)
-
-t_grid <- seq(-4, 4, length.out = 800)
-curve_levels <- c("t, df = 4", "t, df = 10", "standard normal")
-reference_curves <- rbind(
-  data.frame(x = t_grid, density = dt(t_grid, df = 4),
-             curve = curve_levels[1]),
-  data.frame(x = t_grid, density = dt(t_grid, df = 10),
-             curve = curve_levels[2]),
-  data.frame(x = t_grid, density = dnorm(t_grid),
-             curve = curve_levels[3])
-)
-reference_curves$curve <- factor(reference_curves$curve,
-                                 levels = curve_levels)
-curve_colours <- c("t, df = 4" = "#D55E00",
-                   "t, df = 10" = "#0072B2",
-                   "standard normal" = "#009E73")
-
-ggplot(reference_curves, aes(x, density,
-                             colour = curve, linetype = curve)) +
-  geom_line(linewidth = 0.9) +
-  annotate("text", x = 2.3, y = 0.375, label = "t, df = 4",
-           colour = "#D55E00", size = 3.4, hjust = 0) +
-  annotate("text", x = 2.3, y = 0.335, label = "t, df = 10",
-           colour = "#0072B2", size = 3.4, hjust = 0) +
-  annotate("text", x = 2.3, y = 0.295, label = "standard normal",
-           colour = "#009E73", size = 3.4, hjust = 0) +
-  scale_colour_manual(values = curve_colours, guide = "none") +
-  scale_linetype_manual(values = c("solid", "dashed", "dotted"),
-                        guide = "none") +
-  scale_y_continuous(limits = c(0, 0.41),
-                     expand = expansion(mult = c(0, 0.02))) +
-  labs(x = "Standardised value", y = "Density") +
-  theme_minimal(base_size = 13) +
-  theme(
-    panel.grid.minor = element_blank(),
-    panel.grid.major.x = element_blank(),
-    plot.caption = element_text(colour = "#5B6976"),
-    axis.title = element_text(colour = "#17324D")
-  )
-```
-
-@fig-b09-t-curves shows two members of the family and the standard normal.
-With $df=4$ the tails are clearly heavier. With $df=10$ the difference is
-much smaller. A probability or a quantile for $T$ always comes from the
-member with $df=n-1$. A different sample size means a different curve.
-
-The difference is most visible in the tails. The central 95% of the standard
-normal lies between $-1.96$ and $1.96$ (Lecture 6). A t curve must reach
-further out to include its central 95%. The point where the central 95% ends
-is the 0.975 quantile of the t distribution. We write it $t_{0.975,\,df}$
-and compute it in R with `qt(0.975, df)`. This number is called the 95%
-**critical value**. For small $df$ it is clearly larger than 1.96. Other
-levels work in the same way: the central 90% ends at the 0.95 quantile
-$t_{0.95,\,df}$, and the central 99% ends at the 0.995 quantile
-$t_{0.995,\,df}$.
-
-#### Why $n-1$
-
-The degrees of freedom measure how precisely $S$ estimates $\sigma$. With
-few degrees of freedom, $S$ is imprecise and the tails are heavy. With many
-degrees of freedom, $S$ is close to $\sigma$ in almost every sample, and $T$
-behaves like $Z$. The number is $n-1$ and not $n$ for the reason given in
-Lecture 7. Once $\bar X$ is fixed, the $n$ deviations $X_i-\bar X$ must sum
-to zero. So only $n-1$ of them can vary freely, and $S$ is built from those
-$n-1$ free deviations.
-
-#### The rule of this course {#b09-t-rule}
-
-What if the population is not normal? For a large sample, $T$ is then
-approximately standard normal, so a z value would be enough. The optional
-box at the end of this section shows why. The t value is still a safe
-choice, because $t_{n-1}$ comes closer and closer to $N(0,1)$ as $n$ grows.
-At $n\approx 30$ the two curves are already almost the same. At $n=100$
-the 95% critical values are $t_{0.975,\,99}=1.984$ and $z_{0.975}=1.96$. So
-using the t distribution costs almost nothing when $n$ is large, and it is
-exactly right when the population is normal. So this course uses one
-rule: $\sigma$ unknown means t with $n-1$ degrees of freedom, whatever the
-sample size.
-
-| | Population normal | Population not normal, $n$ large |
-|---|---|---|
-| $\sigma$ known | $Z\sim N(0,1)$ exactly, for every $n$ | $Z\ \dot\sim\ N(0,1)$ by the CLT |
-| $\sigma$ unknown | $T\sim t_{n-1}$ exactly, for every $n$ | $T\ \dot\sim\ N(0,1)$, and $t_{n-1}$ is almost the same, so we use $t_{n-1}$ |
-
-The table shows the distribution of the standardised sample mean in each
-situation. One case is missing: a small sample from a population that is not
-normal. No result covers it. This is one reason to check the conditions
-before calculating, as a later section of this lecture does.
-
-::: {.callout-note collapse="true"}
-## Check: which is larger, $t_{0.975,\,11}$ or $t_{0.975,\,99}$?
-
-$t_{0.975,\,11}=2.201$ is larger than $t_{0.975,\,99}=1.984$. With
-only 11 degrees of freedom, $S$ is an imprecise estimate of $\sigma$, so
-the t distribution has heavier tails and its 0.975 quantile lies further
-from zero. At $df=99$ the critical value is already close to the normal
-1.96. With a large sample, the t and normal answers are almost the same.
-Verify in R: `qt(0.975, df = 11)` and `qt(0.975, df = 99)`.
-:::
-
-::: {.callout-tip collapse="true"}
-## Optional: $T$ is $Z$ times a random factor
-
-The two standardised means differ by one factor:
-
-$$
-T=\frac{\bar X-\mu}{\sigma/\sqrt n}\times\frac{\sigma}{S}
-=Z\times\frac{\sigma}{S}.
-$$
-
-If $S$ were equal to $\sigma$, the factor would be 1 and $T$ would be $Z$.
-But $S$ is random, so the factor $\sigma/S$ is random too. When $S$ is
-larger than $\sigma$, the factor is below 1 and $T$ is closer to zero than
-$Z$. When $S$ is smaller than $\sigma$, the factor is above 1 and $T$ is
-further from zero than $Z$. Everything about $T$ follows from how far this
-factor moves away from 1.
-
-The factor also explains the large-sample case. If the population is not
-normal, $Z$ is approximately normal only for large $n$. The same large $n$
-makes $S$ a precise estimate of $\sigma$, because $S$ is a consistent
-estimator: with a larger and larger sample it comes closer and closer to
-$\sigma$ (Lecture 8). The factor $\sigma/S$ is then close to 1 in almost
-every sample, and
-
-$$
-T=Z\times\frac{\sigma}{S}\approx Z,\qquad\text{so}\qquad T\ \dot\sim\ N(0,1).
-$$
-
-Replacing $\sigma$ by a consistent estimate does not change the distribution
-in large samples.
-:::
 
 ### Confidence intervals
 
@@ -616,11 +431,6 @@ margin in advance, you can solve the formula for the sample size that gives
 this margin. The
 section [How many customers must I ask?](#b09-sample-size) does this.
 
-The formula also answers the prediction question from the preparation.
-Replacing $\sigma$ with $S$ makes the interval wider on average, because the
-t critical value is larger than the z value. The extra width is the price of
-estimating one more quantity from the same data.
-
 In this book, the critical value you need is given in the task or on the
 formula sheet. For a value of the degrees of freedom that is not on the
 sheet, use the closest one listed.
@@ -697,18 +507,18 @@ interval or test, go through this checklist:
 3. **Shape and sample size.** The equity offered (`equity_offered_pct`) is
    right-skewed, so the population is not normal. With $n=100$ the sample is
    large and the t interval for the mean is still reasonable. For a very
-   small sample it would not be: that is the missing case of the table
-   above. Also check for data errors and for single observations that have
+   small sample it would not be: that is the missing case of the table in
+   [Lecture 8](b08-sampling-distributions.qmd#b09-t-rule). Also check for data errors and for single observations that have
    a very large influence on the mean.
 
 These conditions support conclusions about the recorded pitches, the
-sampling frame. They do
+target population of this course. They do
 not make televised pitches representative of all entrepreneurs.
 
 ::: {.callout-caution collapse="true"}
 ## Try it: is the average order above break-even?
 
-Try this with your neighbour first. An invented example. A venture
+An invented example. A venture
 needs an average order of 20 euros to break even. A random sample of $n=36$
 orders has a mean of 21.50 euros and a standard deviation of 6 euros.
 Construct a 95% confidence interval for the mean order value. Supplied
@@ -960,7 +770,7 @@ more observations. A margin of 2 euros at the 99% level needs
 $(2.576\times 12/2)^2=15.456^2\approx 238.9$, so 239 customers.
 
 ```{r}
-#| label: b08-sample-size-calc
+#| label: b09-sample-size-calc
 sigma_plan <- 12
 n_needed <- c(margin_2_euros = (1.96 * sigma_plan / 2)^2,
               margin_1_euro  = (1.96 * sigma_plan / 1)^2,
@@ -1011,7 +821,8 @@ $$
 
 It has the general form of every interval in this course. The estimate is
 $\hat p$, the critical value is a z value, and the standard error is
-$\operatorname{SE}(\widehat P)=\sqrt{\hat p(1-\hat p)/n}$.
+$\operatorname{SE}(\widehat P)=\sqrt{\widehat P(1-\widehat P)/n}$, with the
+value $\sqrt{\hat p(1-\hat p)/n}$ in one sample.
 
 ::: {.callout-tip collapse="true"}
 ## Optional: the bounds that still contain $p$
@@ -1068,12 +879,15 @@ Write these five parts, in this order.
 4. **Interval.** $(\hat p-\text{margin},\ \hat p+\text{margin})$.
 5. **Conclusion.** One sentence in the words of the question. If the
    question is about a value $p_0$: say whether $p_0$ lies inside the
-   interval. If it lies outside, you can conclude at level $\alpha$ that
-   $p$ differs from $p_0$, and the interval shows on which side. If it lies
+   interval. If it lies outside, you can conclude, approximately at level
+   $\alpha$, that $p$ differs from $p_0$, and the interval shows on which
+   side. If it lies
    inside, you cannot conclude that $p$ differs from $p_0$.
 
 <p class="exam-note">The interval uses $\hat p$ in the standard error. The
-test of Lecture 10 uses $p_0$.</p>
+test of Lecture 10 uses $p_0$. So the verdict of the interval and the
+verdict of the test can differ in borderline cases. When the question asks
+for a test, do the test.</p>
 :::
 
 ::: {#exm-b09-proportion-interval}
@@ -1367,7 +1181,7 @@ practice, the interval has already answered the question.
 ::: {.callout-caution collapse="true"}
 ## Try it: state the hypotheses
 
-Try this with your neighbour first. For each question, write $H_0$ and
+For each question, write $H_0$ and
 $H_1$ for a two-sided test, and say which hypothesis is the claim to be
 established.
 
@@ -1400,13 +1214,19 @@ established.
 - A narrow interval does not correct a selection problem. It describes the
   recorded pitches, not founders in general.
 
-**What you can do with it:** treat both ends of the interval as possible
-true values, and ask whether your decision would be the same at each end.
+**What you can do with it:** treat every value in the interval as
+compatible with the sample, and ask whether your decision would be the same
+for all of them. For a decision with one cutoff, checking the two ends is
+enough. Take the interval $(11.23,\ 14.29)$ and the cutoff 15. Both ends
+lie below 15, so the sample is precise enough for that decision. With a
+cutoff of 12, the ends disagree. The sample is then not precise enough, and
+the [section on sample size](#b09-sample-size) shows how much more data you
+would need.
 :::
 
 ### Answering the driving question
 
-For the recorded pitches, the sampling frame, the evidence says yes. The random sample
+For the recorded pitches, the target population of this course, the evidence says yes. The random sample
 of 100 pitches gives a mean equity offered of 12.76% with a standard
 error of 0.771 percentage points. The 95% confidence interval is
 $(11.23,\ 14.29)$%. It does not contain 15, so at the 5% level we can
@@ -1478,40 +1298,31 @@ unclear and bring it to the next tutorial, or ask Tilly.
 
 ### Recall questions
 
-1. Why does replacing $\sigma$ with the sample SD $S$ require a t
-   distribution in place of the normal distribution?
-2. Why does the t distribution for one sample mean have $n-1$ degrees of
-   freedom?
-3. What are the three pieces of a confidence interval?
-4. What is the difference between the interval estimator $(L,U)$ and the
+1. What are the three pieces of a confidence interval?
+2. What is the difference between the interval estimator $(L,U)$ and the
    confidence interval $(l,u)$?
-5. Which critical value and which standard error does the interval for a
+3. Which critical value and which standard error does the interval for a
    proportion use?
-6. What do $H_0:\mu=15$ and $H_1:\mu\ne15$ say? Which of the two conclusions
+4. What do $H_0:\mu=15$ and $H_1:\mu\ne15$ say? Which of the two conclusions
    of a test is the strong one?
-7. What is the confidence level a property of: the interval you computed or
+5. What is the confidence level a property of: the interval you computed or
    the procedure?
 
 ::: {.callout-note collapse="true"}
 ## Check your answers
 
-1. $S$ is itself estimated and varies from sample to sample. The heavier
-   tails of the t distribution represent that extra uncertainty.
-2. Before we estimate the spread, we estimate the sample mean. This sets
-   one condition: the deviations must sum to zero. So only $n-1$ deviations
-   can vary freely.
-3. Estimate, critical value, and standard error.
-4. $(L,U)$ has random bounds. It captures the parameter with probability
+1. Estimate, critical value, and standard error.
+2. $(L,U)$ has random bounds. It captures the parameter with probability
    $1-\alpha$ before the data are drawn. $(l,u)$ is the pair of numbers
    calculated from one sample. It either contains the parameter or it does
    not.
-5. The critical value $z_{1-\alpha/2}$, for example 1.96 for 95%, and the
+3. The critical value $z_{1-\alpha/2}$, for example 1.96 for 95%, and the
    standard error $\sqrt{\hat p(1-\hat p)/n}$.
-6. The null hypothesis states that the population mean equals 15. The
+4. The null hypothesis states that the population mean equals 15. The
    alternative states that it differs from 15, in either direction. "Reject
    $H_0$" is the strong conclusion. "Do not reject $H_0$" does not show that
    $H_0$ is true.
-7. The procedure. With a 95% level, about 95% of intervals built this way
+5. The procedure. With a 95% level, about 95% of intervals built this way
    from repeated valid samples contain the fixed parameter.
 :::
 
@@ -1576,6 +1387,10 @@ parts.
    State $H_0$ and $H_1$ for a two-sided test of this benchmark.
 5. Explain why an interval that excludes a benchmark does not show that the
    difference is important in practice, or that it has a particular cause.
+6. A delivery start-up wants a 95% confidence interval for the mean delivery
+   time of its orders. The whole interval may be at most 1 minute wide. A
+   pilot survey gave an SD of about 4 minutes. How many orders must be
+   sampled? Use $z_{0.975}=1.96$.
 
 ::: {.callout-note collapse="true"}
 ## Check your answers
@@ -1605,8 +1420,8 @@ parts.
    planning value for $\sigma$.
 4. Part a. Step 1: $H_0:\mu=6$ versus $H_1:\mu\ne6$, where $\mu$ is the
    mean daily desk use of all members, in hours. Part b. Step 2:
-   $T=(\bar X-\mu_0)/(S/\sqrt n)$, which has the $t_{63}$ distribution if
-   $H_0$ is true ($n=64$ is large). Step 4: the standard error is
+   $T=(\bar X-\mu_0)/(S/\sqrt n)$, which, because $n=64$ is large, has
+   approximately the $t_{63}$ distribution if $H_0$ is true. Step 4: the standard error is
    $2.0/\sqrt{64}=0.25$ hours, so $t_{obs}=(5.4-6)/0.25=-2.40$. The sample
    mean lies 2.4 standard errors below the advertised value. Whether that is
    far enough to reject $H_0$ is decided in Lecture 10. Part c.
@@ -1616,6 +1431,11 @@ parts.
    enough to tell the parameter apart from the benchmark. Whether the difference
    is important depends on its size and on the decision. A causal claim
    needs a suitable study design. A narrow interval gives neither.
+6. The width of 1 minute is the whole interval, so the margin of error is
+   half of it: $m=0.5$ minutes. Then
+   $n\ge(1.96\times4/0.5)^2=15.68^2\approx245.9$, so 246 orders. The value
+   4 is a planning value for $\sigma$. Putting the full width $m=1$ into the
+   formula gives only 62 orders, about a quarter of the number needed.
 :::
 
 ### Worked exam interpretation: what 95% confidence means

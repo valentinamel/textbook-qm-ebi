@@ -74,7 +74,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-130a4d33f88b74c424d8c0f2e9cca01a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-9625fb8afdc25f0504cb337f379810a0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -381,12 +381,6 @@ window.Quarto = {
  <span class="menu-text">Mathematics Refresher</span></a>
   </div>
 </li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../resources/video-guide.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">External Video Guide</span></a>
-  </div>
-</li>
       </ul>
   </li>
     </ul>
@@ -447,7 +441,22 @@ Your sales rose after you cut the price. But it was also December. Was it the pr
 <h2 class="anchored" data-anchor-id="before-class">Before class</h2>
 <p>Do all the preparation below before class.</p>
 <div class="video-prep">
-<p><span class="label">Video preparation</span><br> Watch Stanford Statistical Learning <a href="https://www.youtube.com/watch?v=o9hoLdylWKo&amp;list=PLoROMvodv4rOzrYsAxzQyHb8n_RWNuS1e&amp;index=11">3.3 Multiple Linear Regression</a>. Focus on how one coefficient is interpreted when the other predictors are held fixed, and on why several predictors are included together. All links are also listed in the <a href="../resources/video-guide.html">External Video Guide</a>. The videos explain key ideas in another way and can use a different notation. The lecture material and its notation always come first.</p>
+<p><span class="label">Video preparation</span></p>
+<p>Watch these two parts of Brandon Foltz’s Statistics 101 series before class.</p>
+<ol type="1">
+<li><a href="https://www.youtube.com/watch?v=dQNpSa-bq4M&amp;t=39s">Multiple Linear Regression, The Very Basics</a>, from 0:39 to 20:08. Focus on what one coefficient means when the other predictors are held fixed.</li>
+<li><a href="https://www.youtube.com/watch?v=CGQpi580sZM&amp;t=53s">Multiple Regression, Adjusted R-square</a>, from 0:53 to 12:06. Focus on why <span class="math inline">\(R^2\)</span> rises with every added predictor and how adjusted <span class="math inline">\(R^2\)</span> corrects for this.</li>
+</ol>
+<details class="video-notes">
+<summary>
+Where these videos differ from this book
+</summary>
+<ul>
+<li>Foltz calculates in Excel. This course uses R.</li>
+<li>He writes <span class="math inline">\(b\)</span> for the coefficients. This book writes <span class="math inline">\(\hat\beta\)</span>.</li>
+</ul>
+</details>
+<p>The videos explain key ideas in another way. The lecture material and its notation always come first.</p>
 </div>
 <p><strong>Predict.</strong> Answer this question before you come to class: once the requested amount is added, will the season coefficient move towards zero, away from zero, or barely move? Think about why the slope might change at all. If the requested amount is related to both the season and the equity offered, the simple slope mixes the two relationships. Choose one answer. You will find the answer in the lecture material.</p>
 <p><span class="shark-tag">Shark Tank data</span> <strong>R warm-up.</strong> Make the prediction above first, then run this code. In Lecture 3 you fitted the simple model of the equity offered (<code>equity_offered_pct</code>) on season and tested its slope. Fit it again. Then fit the model with two predictors, which adds the requested amount in thousands of dollars (<code>ask_1k</code>). Write down both season coefficients and bring them to class:</p>
@@ -469,9 +478,6 @@ Your sales rose after you cut the price. But it was also December. Was it the pr
 </section>
 <section id="more-than-one-predictor" class="level3">
 <h3 class="anchored" data-anchor-id="more-than-one-predictor">More than one predictor</h3>
-<p class="concept-video">
-<strong>Stanford explanation (review):</strong> <a href="https://www.youtube.com/watch?v=o9hoLdylWKo">3.3 Multiple Linear Regression</a>.
-</p>
 <p>For predictors <span class="math inline">\(X_{i1},\ldots,X_{ik}\)</span>, the model is</p>
 <p><span class="math display">\[
 Y_i=\beta_0+\beta_1X_{i1}+\cdots+\beta_kX_{ik}+\varepsilon_i,
@@ -865,14 +871,32 @@ F-statistic: 165.3 on 2 and 1438 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p><strong>Adjusted <span class="math inline">\(R^2\)</span>.</strong> <span class="math inline">\(R^2\)</span> with a small penalty for every predictor in the model. <span class="math inline">\(R^2\)</span> never falls when a predictor is added. Adjusted <span class="math inline">\(R^2\)</span> can fall when the new predictor adds almost nothing. Use adjusted <span class="math inline">\(R^2\)</span> to compare models with different numbers of predictors.</p>
 </div>
 <p>The formula is on the <a href="../intermediate/code-sheet.html#lecture-3-coefficient-inference-fit-and-the-f-test">code sheet</a>. In the table, adding the requested amount raises <span class="math inline">\(R^2\)</span> from 0.173 to 0.187. The model then accounts for 18.7% of the variation in the equity offered, up from 17.3%. Adjusted <span class="math inline">\(R^2\)</span> rises with it, from 0.172 to 0.186. Adding the description length leaves adjusted <span class="math inline">\(R^2\)</span> at 0.186: this predictor adds almost nothing to the fit.</p>
+<p>Why does adjusted <span class="math inline">\(R^2\)</span> need a penalty? Because <span class="math inline">\(R^2\)</span> rises with any added predictor, even one that has nothing to do with the outcome. The code below takes 50 random pitches and fits the model with season and the requested amount. It then adds ten columns of pure random numbers to the same model.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>small <span class="ot">&lt;-</span> sharks[<span class="fu">sample</span>(<span class="fu">nrow</span>(sharks), <span class="dv">50</span>),</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>                <span class="fu">c</span>(<span class="st">"equity_offered_pct"</span>, <span class="st">"season"</span>, <span class="st">"ask_1k"</span>)]</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>) small[[<span class="fu">paste0</span>(<span class="st">"noise"</span>, j)]] <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">50</span>)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>fit_two   <span class="ot">&lt;-</span> <span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> ask_1k, <span class="at">data =</span> small)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>fit_noise <span class="ot">&lt;-</span> <span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> ., <span class="at">data =</span> small)</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">c</span>(<span class="at">r2_two =</span> <span class="fu">summary</span>(fit_two)<span class="sc">$</span>r.squared,</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">adj_r2_two =</span> <span class="fu">summary</span>(fit_two)<span class="sc">$</span>adj.r.squared,</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">r2_noise =</span> <span class="fu">summary</span>(fit_noise)<span class="sc">$</span>r.squared,</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">adj_r2_noise =</span> <span class="fu">summary</span>(fit_noise)<span class="sc">$</span>adj.r.squared), <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      r2_two   adj_r2_two     r2_noise adj_r2_noise 
+       0.269        0.237        0.378        0.176 </code></pre>
+</div>
+</div>
+<p><span class="math inline">\(R^2\)</span> rises from 0.269 to 0.378. Ten useless predictors seem to explain 11 percentage points more of the variation. Adjusted <span class="math inline">\(R^2\)</span> falls from 0.237 to 0.176. It shows that the random columns add nothing real. With another random draw, adjusted <span class="math inline">\(R^2\)</span> can rise a little by chance. It is a correction, not a guarantee.</p>
 <p>R can build such a table for you with the package <code>modelsummary</code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(modelsummary)</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">modelsummary</span>(</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="st">"(1)"</span> <span class="ot">=</span> m_simple, <span class="st">"(2)"</span> <span class="ot">=</span> m_adjusted, <span class="st">"(3)"</span> <span class="ot">=</span> equity_model),</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">stars =</span> <span class="fu">c</span>(<span class="st">"*"</span> <span class="ot">=</span> <span class="fl">0.05</span>, <span class="st">"**"</span> <span class="ot">=</span> <span class="fl">0.01</span>, <span class="st">"***"</span> <span class="ot">=</span> <span class="fl">0.001</span>),</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">gof_map =</span> <span class="fu">c</span>(<span class="st">"nobs"</span>, <span class="st">"r.squared"</span>, <span class="st">"adj.r.squared"</span>)</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(modelsummary)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">modelsummary</span>(</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="st">"(1)"</span> <span class="ot">=</span> m_simple, <span class="st">"(2)"</span> <span class="ot">=</span> m_adjusted, <span class="st">"(3)"</span> <span class="ot">=</span> equity_model),</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">stars =</span> <span class="fu">c</span>(<span class="st">"*"</span> <span class="ot">=</span> <span class="fl">0.05</span>, <span class="st">"**"</span> <span class="ot">=</span> <span class="fl">0.01</span>, <span class="st">"***"</span> <span class="ot">=</span> <span class="fl">0.001</span>),</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">gof_map =</span> <span class="fu">c</span>(<span class="st">"nobs"</span>, <span class="st">"r.squared"</span>, <span class="st">"adj.r.squared"</span>)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>You need to install the package once with <code>install.packages("modelsummary")</code>. It rounds to three decimals, so in its table the coefficient of the requested amount appears as −0.003.</p>
 </section>
@@ -900,7 +924,7 @@ Try it: three seasons later and $200,000 more
 </div>
 <div id="callout-3" class="callout-3-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p><span class="shark-tag">Shark Tank data</span> Try this with your neighbour first. Two pitches have the same description length. One is three seasons later and requests $200,000 more. Complete the steps before opening the answer.</p>
+<p><span class="shark-tag">Shark Tank data</span> Two pitches have the same description length. One is three seasons later and requests $200,000 more. Complete the steps before opening the answer.</p>
 <p><em>Step 1 (given).</em> Three seasons contribute <span class="math inline">\(3\times(-0.836)\)</span> fitted percentage points.</p>
 <p><em>Step 2 (you).</em> Convert $200,000 into <code>ask_1k</code> units (thousands of dollars). Multiply by the <code>ask_1k</code> coefficient, about <span class="math inline">\(-0.0029\)</span> percentage points per $1,000.</p>
 <p><em>Step 3 (you).</em> Add the two contributions. This is allowed because the model is additive: each predictor has its own term, and the terms are added up. State the combined fitted difference in one sentence that passes the five checks of the coefficient-interpretation protocol.</p>
@@ -918,8 +942,8 @@ Check your answer
 <div class="callout-body-container callout-body">
 <p><span class="math inline">\(200{,}000/1{,}000=200\)</span> units, so the request contributes <span class="math inline">\(200\times(-0.0029)\approx-0.58\)</span>. Combined: <span class="math inline">\(3(-0.836)+200(-0.0029)\approx-2.51-0.58=-3.09\)</span> percentage points. Sentence: among the recorded pitches, a pitch three seasons later that requests $200,000 more is fitted to offer about 3.1 percentage points less equity, holding description length fixed.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>b <span class="ot">&lt;-</span> <span class="fu">coef</span>(equity_model)</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span> <span class="sc">*</span> b[<span class="st">"season"</span>] <span class="sc">+</span> <span class="dv">200</span> <span class="sc">*</span> b[<span class="st">"ask_1k"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>b <span class="ot">&lt;-</span> <span class="fu">coef</span>(equity_model)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span> <span class="sc">*</span> b[<span class="st">"season"</span>] <span class="sc">+</span> <span class="dv">200</span> <span class="sc">*</span> b[<span class="st">"ask_1k"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   season 
 -3.087963 </code></pre>
@@ -942,17 +966,17 @@ Check your answer
 </ul>
 <p>A control variable also has a cost when it moves closely together with the predictor that you are interested in. Take the invented example of firm size and advertising. With <code>size</code> in the model, the advertising slope compares firms of the same size. But firms of the same size differ only a little in advertising spend. In <a href="#fig-i04-ovb-scatter" class="quarto-xref">Figure&nbsp;<span>4.1</span></a>, the points of one colour cover a much narrower range of advertising spend than all points together. With so little variation in advertising, the data say less about its slope. Its standard error grows, and its confidence interval gets wider. The numbers show this:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">cor</span>(demo<span class="sc">$</span>adspend, demo<span class="sc">$</span>size), <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">cor</span>(demo<span class="sc">$</span>adspend, demo<span class="sc">$</span>size), <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.93</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># slope of adspend and its standard error, without and with size</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">summary</span>(<span class="fu">lm</span>(revenue <span class="sc">~</span> adspend, <span class="at">data =</span> demo))<span class="sc">$</span>coefficients[<span class="st">"adspend"</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>], <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># slope of adspend and its standard error, without and with size</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">summary</span>(<span class="fu">lm</span>(revenue <span class="sc">~</span> adspend, <span class="at">data =</span> demo))<span class="sc">$</span>coefficients[<span class="st">"adspend"</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>], <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  Estimate Std. Error 
      1.663      0.061 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">summary</span>(<span class="fu">lm</span>(revenue <span class="sc">~</span> adspend <span class="sc">+</span> size, <span class="at">data =</span> demo))<span class="sc">$</span>coefficients[<span class="st">"adspend"</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>], <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">summary</span>(<span class="fu">lm</span>(revenue <span class="sc">~</span> adspend <span class="sc">+</span> size, <span class="at">data =</span> demo))<span class="sc">$</span>coefficients[<span class="st">"adspend"</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>], <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  Estimate Std. Error 
     -0.019      0.106 </code></pre>
@@ -1004,42 +1028,42 @@ Check: which of these four problems does adding <code>ask_1k</code> address?
 <div class="cell">
 <details class="code-fold">
 <summary>See the R code for this figure</summary>
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>sharks<span class="sc">$</span>ask_1k <span class="ot">&lt;-</span> sharks<span class="sc">$</span>ask_amount_usd <span class="sc">/</span> <span class="dv">1000</span></span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>equity_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> ask_1k <span class="sc">+</span> description_words,</span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> sharks</span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>ci <span class="ot">&lt;-</span> <span class="fu">confint</span>(equity_model)[<span class="sc">-</span><span class="dv">1</span>, , drop <span class="ot">=</span> <span class="cn">FALSE</span>]</span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Show the requested amount per $100,000 instead of per $1,000 (x 100),</span></span>
-<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a><span class="co"># so that its estimate and interval are visible on the same axis</span></span>
-<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>unit_factor <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">100</span>, <span class="dv">1</span>)</span>
-<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>term_labels <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Season (per season)"</span>, <span class="st">"Amount requested (per $100,000)"</span>,</span>
-<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"Description length (per word)"</span>)</span>
-<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>coef_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">term =</span> <span class="fu">factor</span>(term_labels, <span class="at">levels =</span> term_labels),</span>
-<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">estimate =</span> <span class="fu">coef</span>(equity_model)[<span class="sc">-</span><span class="dv">1</span>] <span class="sc">*</span> unit_factor,</span>
-<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">lower =</span> ci[, <span class="dv">1</span>] <span class="sc">*</span> unit_factor,</span>
-<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">upper =</span> ci[, <span class="dv">2</span>] <span class="sc">*</span> unit_factor</span>
-<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(coef_df, <span class="fu">aes</span>(<span class="at">x =</span> estimate, <span class="at">y =</span> term)) <span class="sc">+</span></span>
-<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">colour =</span> <span class="st">"#C98B2E"</span>,</span>
-<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>             <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
-<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_pointrange</span>(<span class="fu">aes</span>(<span class="at">xmin =</span> lower, <span class="at">xmax =</span> upper),</span>
-<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a>                  <span class="at">colour =</span> <span class="st">"#009E73"</span>, <span class="at">linewidth =</span> <span class="fl">0.7</span>, <span class="at">fatten =</span> <span class="fl">2.6</span>) <span class="sc">+</span></span>
-<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="sc">-</span><span class="fl">0.02</span>, <span class="at">y =</span> <span class="fl">3.35</span>, <span class="at">label =</span> <span class="st">"no change = 0"</span>,</span>
-<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a>           <span class="at">hjust =</span> <span class="dv">1</span>, <span class="at">colour =</span> <span class="st">"#17324D"</span>, <span class="at">size =</span> <span class="fl">3.4</span>) <span class="sc">+</span></span>
-<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Estimated change in equity offered (percentage points)"</span>,</span>
-<span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
-<span id="cb24-30"><a href="#cb24-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
-<span id="cb24-31"><a href="#cb24-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb24-32"><a href="#cb24-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb24-33"><a href="#cb24-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.y =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb24-34"><a href="#cb24-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#5B6976"</span>),</span>
-<span id="cb24-35"><a href="#cb24-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>)</span>
-<span id="cb24-36"><a href="#cb24-36" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>sharks<span class="sc">$</span>ask_1k <span class="ot">&lt;-</span> sharks<span class="sc">$</span>ask_amount_usd <span class="sc">/</span> <span class="dv">1000</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>equity_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> ask_1k <span class="sc">+</span> description_words,</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> sharks</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>ci <span class="ot">&lt;-</span> <span class="fu">confint</span>(equity_model)[<span class="sc">-</span><span class="dv">1</span>, , drop <span class="ot">=</span> <span class="cn">FALSE</span>]</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Show the requested amount per $100,000 instead of per $1,000 (x 100),</span></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a><span class="co"># so that its estimate and interval are visible on the same axis</span></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>unit_factor <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">100</span>, <span class="dv">1</span>)</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>term_labels <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Season (per season)"</span>, <span class="st">"Amount requested (per $100,000)"</span>,</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"Description length (per word)"</span>)</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>coef_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">term =</span> <span class="fu">factor</span>(term_labels, <span class="at">levels =</span> term_labels),</span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">estimate =</span> <span class="fu">coef</span>(equity_model)[<span class="sc">-</span><span class="dv">1</span>] <span class="sc">*</span> unit_factor,</span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">lower =</span> ci[, <span class="dv">1</span>] <span class="sc">*</span> unit_factor,</span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">upper =</span> ci[, <span class="dv">2</span>] <span class="sc">*</span> unit_factor</span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(coef_df, <span class="fu">aes</span>(<span class="at">x =</span> estimate, <span class="at">y =</span> term)) <span class="sc">+</span></span>
+<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">colour =</span> <span class="st">"#C98B2E"</span>,</span>
+<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a>             <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_pointrange</span>(<span class="fu">aes</span>(<span class="at">xmin =</span> lower, <span class="at">xmax =</span> upper),</span>
+<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a>                  <span class="at">colour =</span> <span class="st">"#009E73"</span>, <span class="at">linewidth =</span> <span class="fl">0.7</span>, <span class="at">fatten =</span> <span class="fl">2.6</span>) <span class="sc">+</span></span>
+<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="sc">-</span><span class="fl">0.02</span>, <span class="at">y =</span> <span class="fl">3.35</span>, <span class="at">label =</span> <span class="st">"no change = 0"</span>,</span>
+<span id="cb26-27"><a href="#cb26-27" aria-hidden="true" tabindex="-1"></a>           <span class="at">hjust =</span> <span class="dv">1</span>, <span class="at">colour =</span> <span class="st">"#17324D"</span>, <span class="at">size =</span> <span class="fl">3.4</span>) <span class="sc">+</span></span>
+<span id="cb26-28"><a href="#cb26-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Estimated change in equity offered (percentage points)"</span>,</span>
+<span id="cb26-29"><a href="#cb26-29" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb26-30"><a href="#cb26-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
+<span id="cb26-31"><a href="#cb26-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb26-32"><a href="#cb26-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb26-33"><a href="#cb26-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.y =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb26-34"><a href="#cb26-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#5B6976"</span>),</span>
+<span id="cb26-35"><a href="#cb26-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>)</span>
+<span id="cb26-36"><a href="#cb26-36" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-i04-coefplot" class="quarto-float quarto-figure quarto-figure-center anchored">

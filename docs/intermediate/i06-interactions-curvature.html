@@ -74,7 +74,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-130a4d33f88b74c424d8c0f2e9cca01a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-9625fb8afdc25f0504cb337f379810a0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -381,12 +381,6 @@ window.Quarto = {
  <span class="menu-text">Mathematics Refresher</span></a>
   </div>
 </li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../resources/video-guide.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">External Video Guide</span></a>
-  </div>
-</li>
       </ul>
   </li>
     </ul>
@@ -447,7 +441,25 @@ An average can hide what matters. Advertising may work much better in the weeks 
 <h2 class="anchored" data-anchor-id="before-class">Before class</h2>
 <p>Do all the preparation below before class.</p>
 <div class="video-prep">
-<p><span class="label">Video preparation</span><br> Watch Stanford Statistical Learning <a href="https://www.youtube.com/watch?v=dEBQmiXv9fk&amp;list=PLoROMvodv4rOzrYsAxzQyHb8n_RWNuS1e&amp;index=13">3.5 Extensions of the Linear Model</a> and <a href="https://www.youtube.com/watch?v=F-D3lZzYn50&amp;list=PLoROMvodv4rOzrYsAxzQyHb8n_RWNuS1e&amp;index=48">7.1 Polynomials and Step Functions</a>. Focus on why an interaction changes a slope, and why a model with a quadratic term (a squared predictor) is still a linear regression. All links are also listed in the <a href="../resources/video-guide.html">External Video Guide</a>. The videos explain key ideas in another way and can use a different notation. The lecture material and its notation always come first.</p>
+<p><span class="label">Video preparation</span></p>
+<p>Watch these parts of Brandon Foltz’s Statistics 101 series before class.</p>
+<ol type="1">
+<li><a href="https://www.youtube.com/watch?v=Rb8MnMEJTI4&amp;t=101s">Nonlinear Regression, The Very Basics</a>, from 1:41 to 20:31. Focus on how a residual plot reveals a curve and how a squared term fits it.</li>
+<li><a href="https://www.youtube.com/watch?v=UDHcn_1XneI&amp;t=273s">Nonlinear Regression, The Quadratic Model</a>, from 4:33 to 7:06. Focus on how the signs of the two coefficients decide the shape of the curve.</li>
+<li><a href="https://www.youtube.com/watch?v=g40D30YR6Fg&amp;t=205s">Two-way ANOVA with Replication, Interactions</a>, from 3:25 to 5:20, then <a href="https://www.youtube.com/watch?v=g40D30YR6Fg&amp;t=563s">from 9:23</a> to 16:35. Focus on what it means that the effect of one factor depends on another.</li>
+</ol>
+<details class="video-notes">
+<summary>
+Where these videos differ from this book
+</summary>
+<ul>
+<li>At about 8:10 in the first video Foltz calls the curved residual pattern “non-constant variance”. It is a curve, and it means that a straight line has the wrong shape.</li>
+<li>His rules for the shape of a quadratic curve hold when the predictor takes only positive values, as weeks on the job do.</li>
+<li>He says that an interaction shows when lines cross or would cross. In this book any lines that are not parallel show an interaction. They do not need to cross.</li>
+<li>The plant food study is an experiment with random assignment, so causal words fit there. The pitch data come from observation, not from an experiment.</li>
+</ul>
+</details>
+<p>The videos explain key ideas in another way. The lecture material and its notation always come first.</p>
 </div>
 <p><strong>Derive the two lines.</strong> In the model <span class="math inline">\(Y=\beta_0+\beta_1X+\beta_2D+\beta_3XD+\varepsilon\)</span> with a dummy variable <span class="math inline">\(D\in\{0,1\}\)</span>, write the line for <span class="math inline">\(D=0\)</span> and the line for <span class="math inline">\(D=1\)</span>.</p>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -492,9 +504,6 @@ Check your preparation
 <section id="lecture-material" class="level2 course-phase phase-in-class">
 <h2 class="anchored" data-anchor-id="lecture-material">Lecture material</h2>
 <p>This section adds two terms to the regression model. An interaction term lets a slope differ between two groups, or change with the value of another predictor. A quadratic term lets a slope change along the predictor itself.</p>
-<p class="concept-video">
-<strong>Stanford explanations (review):</strong> <a href="https://www.youtube.com/watch?v=dEBQmiXv9fk">3.5 Extensions of the Linear Model</a> and <a href="https://www.youtube.com/watch?v=F-D3lZzYn50">7.1 Polynomials and Step Functions</a>.
-</p>
 <section id="start-with-a-founders-question" class="level3">
 <h3 class="anchored" data-anchor-id="start-with-a-founders-question">Start with a founder’s question</h3>
 <p>Does advertising work equally well in every week? Does a trend go on in a straight line forever? Often the answer is “it depends”. The two tools of this lecture let you check this in the data. An interaction lets a slope differ between groups. A curve lets a slope change as the predictor grows.</p>
@@ -506,29 +515,47 @@ Check your preparation
 <details class="code-fold">
 <summary>See the R code for this figure</summary>
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>old_par <span class="ot">&lt;-</span> <span class="fu">par</span>(<span class="at">no.readonly =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="fl">4.2</span>, <span class="fl">4.2</span>, <span class="dv">1</span>, <span class="dv">1</span>), <span class="at">las =</span> <span class="dv">1</span>)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="cn">NA</span>, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">10</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">10</span>), <span class="at">bty =</span> <span class="st">"n"</span>,</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Predictor X"</span>, <span class="at">ylab =</span> <span class="st">"Outcome Y"</span>)</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">a =</span> <span class="dv">2</span>, <span class="at">b =</span> <span class="fl">0.75</span>, <span class="at">col =</span> <span class="st">"#009E73"</span>, <span class="at">lwd =</span> <span class="dv">3</span>)</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">a =</span> <span class="fl">4.5</span>, <span class="at">b =</span> <span class="fl">0.25</span>, <span class="at">col =</span> <span class="st">"#D55E00"</span>, <span class="at">lwd =</span> <span class="dv">3</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="fl">8.4</span>, <span class="dv">2</span> <span class="sc">+</span> <span class="fl">0.75</span> <span class="sc">*</span> <span class="fl">8.4</span> <span class="sc">+</span> <span class="fl">0.9</span>, <span class="st">"Group D = 0"</span>, <span class="at">col =</span> <span class="st">"#009E73"</span>)</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="fl">8.4</span>, <span class="fl">4.5</span> <span class="sc">+</span> <span class="fl">0.25</span> <span class="sc">*</span> <span class="fl">8.4</span> <span class="sc">-</span> <span class="fl">0.8</span>, <span class="st">"Group D = 1"</span>, <span class="at">col =</span> <span class="st">"#D55E00"</span>)</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(old_par)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="at">mar =</span> <span class="fu">c</span>(<span class="fl">4.2</span>, <span class="fl">4.4</span>, <span class="fl">2.6</span>, <span class="dv">1</span>), <span class="at">las =</span> <span class="dv">1</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>draw_panel <span class="ot">&lt;-</span> <span class="cf">function</span>(exam_slope, title) {</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>(<span class="cn">NA</span>, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">420</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">80</span>, <span class="dv">220</span>), <span class="at">bty =</span> <span class="st">"n"</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">xlab =</span> <span class="st">"Advertising spend per week (euros)"</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">ylab =</span> <span class="st">"Fitted orders per week"</span>, <span class="at">main =</span> title,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">font.main =</span> <span class="dv">1</span>, <span class="at">cex.main =</span> <span class="dv">1</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lines</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">400</span>), <span class="dv">100</span> <span class="sc">+</span> <span class="fl">0.10</span> <span class="sc">*</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">400</span>), <span class="at">col =</span> <span class="st">"#009E73"</span>, <span class="at">lwd =</span> <span class="dv">3</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lines</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">400</span>), <span class="dv">115</span> <span class="sc">+</span> exam_slope <span class="sc">*</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">400</span>), <span class="at">col =</span> <span class="st">"#D55E00"</span>,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">lwd =</span> <span class="dv">3</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (a <span class="cf">in</span> <span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">200</span>, <span class="dv">350</span>)) {</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    y_ordinary <span class="ot">&lt;-</span> <span class="dv">100</span> <span class="sc">+</span> <span class="fl">0.10</span> <span class="sc">*</span> a</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    y_exam <span class="ot">&lt;-</span> <span class="dv">115</span> <span class="sc">+</span> exam_slope <span class="sc">*</span> a</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrows</span>(a, y_ordinary, a, y_exam, <span class="at">length =</span> <span class="fl">0.05</span>, <span class="at">code =</span> <span class="dv">3</span>, <span class="at">col =</span> <span class="st">"grey40"</span>)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">text</span>(a <span class="sc">+</span> <span class="dv">6</span>, (y_ordinary <span class="sc">+</span> y_exam) <span class="sc">/</span> <span class="dv">2</span>,</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>         <span class="fu">paste0</span>(<span class="st">"gap "</span>, <span class="fu">round</span>(y_exam <span class="sc">-</span> y_ordinary)), <span class="at">pos =</span> <span class="dv">4</span>, <span class="at">cex =</span> <span class="fl">0.8</span>,</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">col =</span> <span class="st">"grey30"</span>)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">text</span>(<span class="dv">300</span>, <span class="dv">100</span> <span class="sc">+</span> <span class="fl">0.10</span> <span class="sc">*</span> <span class="dv">300</span> <span class="sc">-</span> <span class="dv">15</span>, <span class="st">"ordinary weeks"</span>, <span class="at">col =</span> <span class="st">"#009E73"</span>,</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>       <span class="at">cex =</span> <span class="fl">0.85</span>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">text</span>(<span class="dv">110</span>, <span class="dv">115</span> <span class="sc">+</span> exam_slope <span class="sc">*</span> <span class="dv">110</span> <span class="sc">+</span> <span class="dv">12</span>, <span class="st">"exam weeks"</span>, <span class="at">col =</span> <span class="st">"#D55E00"</span>,</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>       <span class="at">cex =</span> <span class="fl">0.85</span>)</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="fu">draw_panel</span>(<span class="fl">0.10</span>, <span class="st">"No interaction: parallel lines"</span>)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="fu">draw_panel</span>(<span class="fl">0.22</span>, <span class="st">"Interaction: the slopes differ"</span>)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(old_par)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div id="fig-i06-two-lines" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-i06-two-lines" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Two panels. Left: two parallel lines, the exam-week line 15 orders above the ordinary-week line at every advertising spend. Right: the exam-week line is steeper, and the gap between the lines grows from 21 orders at 50 euros to 57 orders at 350 euros.">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-i06-two-lines-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="i06-interactions-curvature_files/figure-html/fig-i06-two-lines-1.png" class="img-fluid figure-img" width="672">
+<img src="i06-interactions-curvature_files/figure-html/fig-i06-two-lines-1.png" class="img-fluid figure-img" alt="Two panels. Left: two parallel lines, the exam-week line 15 orders above the ordinary-week line at every advertising spend. Right: the exam-week line is steeper, and the gap between the lines grows from 21 orders at 50 euros to 57 orders at 350 euros." width="864">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-i06-two-lines-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;6.1: Two groups, two lines, different slopes (an invented picture). How many numbers do you need to describe this picture completely?
+Figure&nbsp;6.1: Fitted weekly orders against advertising spend in ordinary weeks and in exam weeks (an invented example). Left: no interaction. Right: with an interaction. How many numbers do you need to describe the right panel completely?
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
-<p>This answers the prediction question from before class: four numbers, an intercept and a slope for each line. The interaction model writes the same four numbers in a different way:</p>
+<p>Read the left panel first. Exam weeks have 15 more orders at every level of advertising. The gap between the lines is the same everywhere, so the lines are parallel. Each extra euro of advertising goes with 0.10 more orders in both kinds of weeks. In the right panel the gap grows, from 21 orders at 50 euros to 57 orders at 350 euros. Each extra euro goes with 0.10 more orders in ordinary weeks, but with 0.22 more orders in exam weeks. This is an interaction: the slope of advertising depends on the kind of week. You can also say it the other way round: the gap between the two kinds of week depends on advertising. Both sentences describe the same picture. The preparation video shows the same idea with plant food and feeding frequency. Any lines that are not parallel show an interaction. They do not need to cross.</p>
+<p>This answers the prediction question from before class: four numbers, an intercept and a slope for each line. In the right panel these are 100 and 0.10 for ordinary weeks, and 115 and 0.22 for exam weeks. The interaction model writes the same four numbers in a different way:</p>
 <p><span class="math display">\[
 E[Y\mid X,D]
 =\beta_0+\beta_1X+\beta_2D+\beta_3XD.
@@ -612,7 +639,7 @@ Try it: two lines from four coefficients
 </div>
 <div id="callout-4" class="callout-4-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>Try this with your neighbour first. In an invented example, a venture models weekly orders with advertising spend in euros, a dummy for exam weeks, and their interaction: fitted orders = 100 + 0.10 × ads + 15 × exam + 0.12 × ads × exam.</p>
+<p>In an invented example, a venture models weekly orders with advertising spend in euros, a dummy for exam weeks, and their interaction: fitted orders = 100 + 0.10 × ads + 15 × exam + 0.12 × ads × exam.</p>
 <p><em>Step 1 (given).</em> In ordinary weeks (exam = 0) the line is 100 + 0.10 × ads.</p>
 <p><em>Step 2 (you).</em> Write the line for exam weeks.</p>
 <p><em>Step 3 (you).</em> Compare the fitted orders at 200 euros of advertising in the two kinds of weeks, and say what the coefficient 0.12 means.</p>
@@ -798,6 +825,33 @@ Figure&nbsp;6.2: Fitted equity offered by season for all-men teams and for teams
 E[Y\mid X,Z]=\beta_0+\beta_1X+\beta_2Z+\beta_3XZ,
 \]</span></p>
 <p>and a one-unit increase in <span class="math inline">\(X\)</span> changes the conditional mean by <span class="math inline">\(\beta_1+\beta_3Z\)</span>. There are now not two lines but one line for every value of <span class="math inline">\(Z\)</span>.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Value of <span class="math inline">\(Z\)</span></th>
+<th>Slope of <span class="math inline">\(X\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(Z=0\)</span></td>
+<td><span class="math inline">\(\beta_1\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(Z=1\)</span></td>
+<td><span class="math inline">\(\beta_1+\beta_3\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(Z=2\)</span></td>
+<td><span class="math inline">\(\beta_1+2\beta_3\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(Z=3\)</span></td>
+<td><span class="math inline">\(\beta_1+3\beta_3\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>Each extra unit of <span class="math inline">\(Z\)</span> changes the slope of <span class="math inline">\(X\)</span> by <span class="math inline">\(\beta_3\)</span>.</p>
 <div class="definition-box">
 <p><span class="label">Definition</span></p>
 <p><strong>Moderator.</strong> A variable <span class="math inline">\(Z\)</span> that changes the slope of another predictor <span class="math inline">\(X\)</span> through the interaction term <span class="math inline">\(XZ\)</span>. The slope of <span class="math inline">\(X\)</span> at one value of <span class="math inline">\(Z\)</span>, <span class="math inline">\(\beta_1+\beta_3Z\)</span>, is called the conditional effect of <span class="math inline">\(X\)</span> at that value.</p>

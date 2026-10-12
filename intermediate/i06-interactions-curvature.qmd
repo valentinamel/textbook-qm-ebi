@@ -34,20 +34,27 @@ is it a straight line at all?
 
 Do all the preparation below before class.
 
-<div class="video-prep">
-<span class="label">Video preparation</span><br>
-Watch Stanford Statistical Learning
-<a href="https://www.youtube.com/watch?v=dEBQmiXv9fk&list=PLoROMvodv4rOzrYsAxzQyHb8n_RWNuS1e&index=13">3.5
-Extensions of the Linear Model</a> and
-<a href="https://www.youtube.com/watch?v=F-D3lZzYn50&list=PLoROMvodv4rOzrYsAxzQyHb8n_RWNuS1e&index=48">7.1
-Polynomials and Step Functions</a>. Focus on why an interaction changes a
-slope, and why a model with a quadratic term (a squared predictor) is still a
-linear regression. All
-links are also listed in the
-<a href="../resources/video-guide.html">External Video Guide</a>.
-The videos explain key ideas in another way and can use a different
-notation. The lecture material and its notation always come first.
-</div>
+::: {.video-prep}
+[Video preparation]{.label}
+
+Watch these parts of Brandon Foltz's Statistics 101 series before class.
+
+1. [Nonlinear Regression, The Very Basics](https://www.youtube.com/watch?v=Rb8MnMEJTI4&t=101s), from 1:41 to 20:31. Focus on how a residual plot reveals a curve and how a squared term fits it.
+2. [Nonlinear Regression, The Quadratic Model](https://www.youtube.com/watch?v=UDHcn_1XneI&t=273s), from 4:33 to 7:06. Focus on how the signs of the two coefficients decide the shape of the curve.
+3. [Two-way ANOVA with Replication, Interactions](https://www.youtube.com/watch?v=g40D30YR6Fg&t=205s), from 3:25 to 5:20, then [from 9:23](https://www.youtube.com/watch?v=g40D30YR6Fg&t=563s) to 16:35. Focus on what it means that the effect of one factor depends on another.
+
+<details class="video-notes">
+<summary>Where these videos differ from this book</summary>
+
+- At about 8:10 in the first video Foltz calls the curved residual pattern "non-constant variance". It is a curve, and it means that a straight line has the wrong shape.
+- His rules for the shape of a quadratic curve hold when the predictor takes only positive values, as weeks on the job do.
+- He says that an interaction shows when lines cross or would cross. In this book any lines that are not parallel show an interaction. They do not need to cross.
+- The plant food study is an experiment with random assignment, so causal words fit there. The pitch data come from observation, not from an experiment.
+
+</details>
+
+The videos explain key ideas in another way. The lecture material and its notation always come first.
+:::
 
 **Derive the two lines.** In the model
 $Y=\beta_0+\beta_1X+\beta_2D+\beta_3XD+\varepsilon$ with a dummy variable
@@ -112,10 +119,6 @@ This section adds two terms to the regression model. An interaction term
 lets a slope differ between two groups, or change with the value of another
 predictor. A quadratic term lets a slope change along the predictor itself.
 
-<p class="concept-video"><strong>Stanford explanations (review):</strong>
-<a href="https://www.youtube.com/watch?v=dEBQmiXv9fk">3.5 Extensions of the Linear Model</a> and
-<a href="https://www.youtube.com/watch?v=F-D3lZzYn50">7.1 Polynomials and Step Functions</a>.</p>
-
 ### Start with a founder's question
 
 Does advertising work equally well in every week? Does a trend go on in a
@@ -134,21 +137,53 @@ Start with the picture in @fig-i06-two-lines:
 #| code-fold: true
 #| code-summary: "See the R code for this figure"
 #| fig-height: 3.8
-#| fig-cap: "Two groups, two lines, different slopes (an invented picture). How many numbers do you need to describe this picture completely?"
+#| fig-width: 9
+#| fig-cap: "Fitted weekly orders against advertising spend in ordinary weeks and in exam weeks (an invented example). Left: no interaction. Right: with an interaction. How many numbers do you need to describe the right panel completely?"
+#| fig-alt: "Two panels. Left: two parallel lines, the exam-week line 15 orders above the ordinary-week line at every advertising spend. Right: the exam-week line is steeper, and the gap between the lines grows from 21 orders at 50 euros to 57 orders at 350 euros."
 old_par <- par(no.readonly = TRUE)
-par(mar = c(4.2, 4.2, 1, 1), las = 1)
-plot(NA, xlim = c(0, 10), ylim = c(0, 10), bty = "n",
-     xlab = "Predictor X", ylab = "Outcome Y")
-abline(a = 2, b = 0.75, col = "#009E73", lwd = 3)
-abline(a = 4.5, b = 0.25, col = "#D55E00", lwd = 3, lty = 2)
-text(8.4, 2 + 0.75 * 8.4 + 0.9, "Group D = 0", col = "#009E73")
-text(8.4, 4.5 + 0.25 * 8.4 - 0.8, "Group D = 1", col = "#D55E00")
+par(mfrow = c(1, 2), mar = c(4.2, 4.4, 2.6, 1), las = 1)
+draw_panel <- function(exam_slope, title) {
+  plot(NA, xlim = c(0, 420), ylim = c(80, 220), bty = "n",
+       xlab = "Advertising spend per week (euros)",
+       ylab = "Fitted orders per week", main = title,
+       font.main = 1, cex.main = 1)
+  lines(c(0, 400), 100 + 0.10 * c(0, 400), col = "#009E73", lwd = 3)
+  lines(c(0, 400), 115 + exam_slope * c(0, 400), col = "#D55E00",
+        lwd = 3, lty = 2)
+  for (a in c(50, 200, 350)) {
+    y_ordinary <- 100 + 0.10 * a
+    y_exam <- 115 + exam_slope * a
+    arrows(a, y_ordinary, a, y_exam, length = 0.05, code = 3, col = "grey40")
+    text(a + 6, (y_ordinary + y_exam) / 2,
+         paste0("gap ", round(y_exam - y_ordinary)), pos = 4, cex = 0.8,
+         col = "grey30")
+  }
+  text(300, 100 + 0.10 * 300 - 15, "ordinary weeks", col = "#009E73",
+       cex = 0.85)
+  text(110, 115 + exam_slope * 110 + 12, "exam weeks", col = "#D55E00",
+       cex = 0.85)
+}
+draw_panel(0.10, "No interaction: parallel lines")
+draw_panel(0.22, "Interaction: the slopes differ")
 par(old_par)
 ```
 
-This answers the prediction
-question from before class: four numbers, an
-intercept and a slope for each line. The interaction model writes the same
+Read the left panel first. Exam weeks have 15 more orders at every level of
+advertising. The gap between the lines is the same everywhere, so the lines
+are parallel. Each extra euro of advertising goes with 0.10 more orders in
+both kinds of weeks. In the right panel the gap grows, from 21 orders at 50
+euros to 57 orders at 350 euros. Each extra euro goes with 0.10 more orders
+in ordinary weeks, but with 0.22 more orders in exam weeks. This is an
+interaction: the slope of advertising depends on the kind of week. You can
+also say it the other way round: the gap between the two kinds of week
+depends on advertising. Both sentences describe the same picture. The
+preparation video shows the same idea with plant food and feeding frequency.
+Any lines that are not parallel show an interaction. They do not need to
+cross.
+
+This answers the prediction question from before class: four numbers, an
+intercept and a slope for each line. In the right panel these are 100 and
+0.10 for ordinary weeks, and 115 and 0.22 for exam weeks. The interaction model writes the same
 four numbers in a different way:
 
 $$
@@ -228,7 +263,7 @@ You will check this in R in the after-class practice.
 ::: {.callout-caution collapse="true"}
 ## Try it: two lines from four coefficients
 
-Try this with your neighbour first. In an invented example, a venture models
+In an invented example, a venture models
 weekly orders with advertising spend in euros, a dummy for exam weeks,
 and their interaction:
 fitted orders = 100 + 0.10 × ads + 15 × exam + 0.12 × ads × exam.
@@ -429,6 +464,15 @@ $$
 and a one-unit increase in $X$ changes the conditional mean by
 $\beta_1+\beta_3Z$. There are now not two lines but one line for every value
 of $Z$.
+
+| Value of $Z$ | Slope of $X$ |
+|---|---|
+| $Z=0$ | $\beta_1$ |
+| $Z=1$ | $\beta_1+\beta_3$ |
+| $Z=2$ | $\beta_1+2\beta_3$ |
+| $Z=3$ | $\beta_1+3\beta_3$ |
+
+Each extra unit of $Z$ changes the slope of $X$ by $\beta_3$.
 
 ::: {.definition-box}
 <span class="label">Definition</span>

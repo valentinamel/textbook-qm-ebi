@@ -16,6 +16,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 - calculate the standard deviation and the standard error of a sample mean
 - explain how sample size affects the precision of an estimate
 - use the central limit theorem for sample means and sample proportions
+- explain why an estimated standard deviation leads to the t distribution
 :::
 
 ::: {.driving-question}
@@ -34,16 +35,25 @@ average even though the equity offered in single pitches is strongly skewed?
 
 Do all the preparation below before class.
 
-<div class="video-prep">
-<span class="label">Video preparation</span><br>
-Watch <a href="https://www.youtube.com/watch?v=IrKUM3nNXJE">The Central Limit
-Theorem</a>. Focus on which distribution becomes approximately normal as the
-sample size grows. The video uses $M_n$ for the sample mean, where this
-book uses $\bar X$, and $\hat\Theta$ for an estimator. The link is also listed in the
-<a href="../resources/video-guide.html">External Video Guide</a>.
-The videos explain key ideas in another way and can use a different
-notation. The lecture material and its notation always come first.
-</div>
+::: {.video-prep}
+[Video preparation]{.label}
+
+Watch these videos from the jbstatistics channel before class. Focus on which distribution becomes approximately normal as the sample size grows.
+
+1. [Sampling Distributions: Introduction to the Concept](https://www.youtube.com/watch?v=Zbw-YvELsaM). You saw it for Lecture 7. Watch it again if needed.
+2. [The Sampling Distribution of the Sample Mean](https://www.youtube.com/watch?v=q50GpTdFYyI)
+3. [Introduction to the Central Limit Theorem](https://www.youtube.com/watch?v=Pujol1yC1_A)
+4. [Deriving the Mean and Variance of the Sample Mean](https://www.youtube.com/watch?v=7mYDHbrLEQo)
+
+<details class="video-notes">
+<summary>Where these videos differ from this book</summary>
+
+- If a video calls $\sigma/\sqrt n$ the standard error, read it as follows. This book calls $\sigma/\sqrt n$ the standard deviation of the sample mean, and keeps the name standard error for the estimated version $S/\sqrt n$.
+
+</details>
+
+The videos explain key ideas in another way. The lecture material and its notation always come first.
+:::
 
 **Warm up.** Classify each object as a population
 distribution, a sampling distribution, or a realised estimate:
@@ -62,10 +72,18 @@ one sample. Keep the three apart. Lecture 7 named the sampling distribution.
 This lecture describes it.
 :::
 
-**Predict.** Answer this question before you come to class: to cut the typical error of a sample mean
-in half, do you need 2, 4, or 10 times as many
-observations? Choose one answer. You find the correct answer in the lecture
-material.
+**Predict.** Answer these two questions before you come to class.
+
+1. To cut the typical error of a sample mean in half, do you need 2, 4, or
+   10 times as many observations?
+2. This lecture standardises the sample mean with the population SD:
+   $Z=(\bar X-\mu)/(\sigma/\sqrt n)$. In a real sample $\sigma$ is unknown
+   and is replaced by the sample SD $S$, which changes from sample to sample.
+   Across many samples, does the ratio $(\bar X-\mu)/(S/\sqrt n)$ vary more
+   than $Z$, less than $Z$, or the same?
+
+Choose one answer to each question. You find the correct answers in the
+lecture material.
 
 If you are not sure about square roots, sums, degrees of freedom, or
 standardisation, review [Mathematics Refresher: powers, roots, and
@@ -102,8 +120,9 @@ probably fall. This lecture makes that statement precise.
 
 ### The distribution behind the five dots
 
-[Shark Tank data]{.shark-tag} The sample mean $\bar X$ is a sample statistic: a number calculated from the
-sample. We use it as an estimator of the parameter $\mu$ (Lecture 7). Its
+[Shark Tank data]{.shark-tag} The sample mean $\bar X$ is a sample statistic: a quantity calculated from
+the sample. Before the draw it is a random variable, after the draw a
+number. We use it as an estimator of the parameter $\mu$ (Lecture 7). Its
 value depends on which random sample is drawn. So $\bar X$ is random, and it
 has a distribution. The estimate $\bar x$ is different. It is the one number
 that an observed sample gives, such as 12.76.
@@ -293,11 +312,12 @@ in [Lecture 3](b03-discrete-distributions.qmd#b03-shift-rescale) and from the
 rules for sums of variables in
 [Lecture 5](b05-joint-covariance-correlation.qmd#b05-sums):
 
-- $E[X+Y]=E[X]+E[Y]$ and $E[aX]=aE[X]$, so
+- $E[X+Y]=E[X]+E[Y]$ and $E[aX]=aE[X]$, applied to $n$ summands, give
   $E[\bar X]=\frac{1}{n}\sum_i E[X_i]=\frac{1}{n}\,n\mu=\mu$.
 - $\operatorname{Var}(aX)=a^2\operatorname{Var}(X)$ and, for
   independent variables,
-  $\operatorname{Var}(X+Y)=\operatorname{Var}(X)+\operatorname{Var}(Y)$, so
+  $\operatorname{Var}(X+Y)=\operatorname{Var}(X)+\operatorname{Var}(Y)$.
+  Applied to $n$ summands, they give
 
 $$
 \operatorname{Var}(\bar X)
@@ -347,9 +367,13 @@ c(SD_of_sample_mean = sigma_equity / sqrt(100),
 
 The standard error is $7.71/\sqrt{100}=0.771$ percentage points. Here the
 population is known, so the standard error can be compared with the standard
-deviation of the sample mean, 0.844. The two are close. Replacing a
-parameter by an estimate adds a little extra uncertainty. Lecture 9 shows
-how to take this extra uncertainty into account.
+deviation of the sample mean, 0.844. The two are close. $S$ is a
+consistent estimator of $\sigma$, so for large $n$ the standard error is
+close to $\sigma/\sqrt n$. The [section on consistency](#b08-consistent)
+below explains the term. Replacing a parameter by an estimate adds a little
+extra uncertainty. The [last section of the lecture
+material](#b08-t-distribution) shows how to take this extra uncertainty into
+account.
 
 ::: {#exm-b08-se}
 ## Worked example: E, Var, and SD of the sample mean for σ = 12, n = 36
@@ -382,7 +406,7 @@ would be $11.4/6=1.9$.
 
 ### The square-root rule
 
-Precision grows with $\sqrt n$, not with $n$. This answers the prediction
+Precision grows with $\sqrt n$, not with $n$. This answers the first prediction
 question from before class: to cut the standard deviation of the sample mean
 in half you need four times the observations, because
 
@@ -405,7 +429,7 @@ around and gives the sample size for a target precision.
 ::: {.callout-caution collapse="true"}
 ## Try it: cut the standard deviation of a sample mean from 4 to 1
 
-Try this with your neighbour first. Complete the missing steps
+Complete the missing steps
 before opening the answer.
 
 *Step 1 (given).* The standard deviation of the sample mean must fall by a
@@ -694,8 +718,10 @@ which is usually unknown. Replacing $p$ by the estimate $\hat p$ gives the
 standard error of the sample proportion:
 
 $$
-\operatorname{SE}(\widehat P)=\sqrt{\frac{\hat p(1-\hat p)}{n}}.
+\operatorname{SE}(\widehat P)=\sqrt{\frac{\widehat P(1-\widehat P)}{n}}.
 $$
+
+In one observed sample its value is $\sqrt{\hat p(1-\hat p)/n}$.
 
 Use the standard deviation, with $p$, when the population proportion is
 given or assumed. Use the standard error, with $\hat p$, when you only have
@@ -853,6 +879,37 @@ c(SD_deal_proportion_n_100 = sqrt(p_deal * (1 - p_deal) / 100),
 ```
 :::
 
+When the success-failure condition holds, the CLT gives the sampling
+distribution of the sample proportion:
+
+$$
+\widehat P\ \dot\sim\ N\!\left(p,\ \frac{p(1-p)}{n}\right),
+\qquad\text{so}\qquad
+Z=\frac{\widehat P-p}{\sqrt{p(1-p)/n}}\ \dot\sim\ N(0,1).
+$$
+
+So a probability for a sample proportion works like a probability for a
+sample mean. An example with the deal proportion $p=0.612$ and $n=100$: how
+likely is a sample in which 70% or more of the pitches ended with a deal?
+The standard deviation of the sample proportion is 0.0487, from the worked
+example above. Standardise:
+
+$$
+P(\widehat P\ge 0.70)=P\!\left(Z\ge\frac{0.70-0.612}{0.0487}\right)
+=P(Z\ge 1.81)=0.035.
+$$
+
+About 3.5% of random samples of 100 pitches would show a deal proportion of
+70% or more.
+
+```{r}
+#| label: b08-proportion-probability
+p_given <- 0.612
+sd_p_hat <- sqrt(p_given * (1 - p_given) / 100)
+z_value <- (0.70 - p_given) / sd_p_hat
+c(sd_p_hat = sd_p_hat, z = z_value, probability = 1 - pnorm(z_value))
+```
+
 ### Consistency and the CLT answer different questions
 
 Consistency and the CLT are both statements about large random samples. They
@@ -898,6 +955,213 @@ representative one (see the box below).
 decide how many people to ask.
 Stop collecting when more data would no longer change your decision.
 :::
+
+### The price of estimating σ: the t distribution {#b08-t-distribution}
+
+This lecture standardised the sample mean as
+
+$$
+Z=\frac{\bar X-\mu}{\sigma/\sqrt n}.
+$$
+
+Its distribution is known in two situations. If the population is normal,
+$Z$ is exactly standard normal for every sample size. If the
+population is not normal but $n$ is large, $Z$ is approximately standard
+normal by the central limit theorem (CLT). In both situations the
+distribution of $Z$ is known, although $\mu$ is not. So we can use $Z$ to
+draw conclusions about $\mu$. This is the step from sample statistics to
+population parameters (Lecture 7).
+
+But $Z$ also contains the population SD $\sigma$, and in a real study nobody
+knows $\sigma$. The only replacement we have is the sample SD $S$. This
+gives
+
+$$
+T=\frac{\bar X-\mu}{S/\sqrt n}.
+$$
+
+#### Why $T$ has heavier tails than $Z$
+
+$S$ is itself a random variable. It changes from sample to sample, and in a
+small sample it can be far from $\sigma$. In a sample where $S$ comes out
+larger than $\sigma$, the denominator is too large and $T$ is pulled towards
+zero. In a sample where $S$ comes out smaller than $\sigma$, the denominator
+is too small and $T$ is pushed away from zero. When $S$ is far below
+$\sigma$, the push is large. The two effects do not cancel. A moderate value
+of $Z$ becomes an extreme value of $T$ whenever $S$ is much smaller than
+$\sigma$. So $T$ has two sources of variation, $\bar X$ and $S$. Its
+distribution is still symmetric around zero, but it puts more probability
+far from zero. This is what "heavier tails" means.
+
+#### The exact result for a normal population
+
+If the population is normal, the distribution of $T$ is known exactly, for
+every $n$:
+
+$$
+T=\frac{\bar X-\mu}{S/\sqrt n}
+\sim t_{n-1}.
+$$
+
+::: {.definition-box}
+<span class="label">Definition</span>
+
+**t distributions and degrees of freedom.** The t distributions are a family
+of distributions. There is one member for each value of a single number, the
+**degrees of freedom** ($df=1,2,3,\ldots$). Every member is symmetric around
+zero and has heavier tails than the standard normal. The smaller the degrees
+of freedom, the heavier the tails. As the degrees of freedom grow, the
+member approaches $N(0,1)$. For a random sample of size $n$ from a normal
+population, $T$ follows the member with $df=n-1$.
+:::
+
+```{r}
+#| label: fig-b09-t-curves
+#| code-fold: true
+#| code-summary: "See the R code for this figure"
+#| fig-cap: "The t distribution for 4 and 10 degrees of freedom against the standard normal. All three are symmetric around zero. The t curves put more probability in the tails, most visibly at low degrees of freedom."
+library(ggplot2)
+
+t_grid <- seq(-4, 4, length.out = 800)
+curve_levels <- c("t, df = 4", "t, df = 10", "standard normal")
+reference_curves <- rbind(
+  data.frame(x = t_grid, density = dt(t_grid, df = 4),
+             curve = curve_levels[1]),
+  data.frame(x = t_grid, density = dt(t_grid, df = 10),
+             curve = curve_levels[2]),
+  data.frame(x = t_grid, density = dnorm(t_grid),
+             curve = curve_levels[3])
+)
+reference_curves$curve <- factor(reference_curves$curve,
+                                 levels = curve_levels)
+curve_colours <- c("t, df = 4" = "#D55E00",
+                   "t, df = 10" = "#0072B2",
+                   "standard normal" = "#009E73")
+
+ggplot(reference_curves, aes(x, density,
+                             colour = curve, linetype = curve)) +
+  geom_line(linewidth = 0.9) +
+  annotate("text", x = 2.3, y = 0.375, label = "t, df = 4",
+           colour = "#D55E00", size = 3.4, hjust = 0) +
+  annotate("text", x = 2.3, y = 0.335, label = "t, df = 10",
+           colour = "#0072B2", size = 3.4, hjust = 0) +
+  annotate("text", x = 2.3, y = 0.295, label = "standard normal",
+           colour = "#009E73", size = 3.4, hjust = 0) +
+  scale_colour_manual(values = curve_colours, guide = "none") +
+  scale_linetype_manual(values = c("solid", "dashed", "dotted"),
+                        guide = "none") +
+  scale_y_continuous(limits = c(0, 0.41),
+                     expand = expansion(mult = c(0, 0.02))) +
+  labs(x = "Standardised value", y = "Density") +
+  theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    plot.caption = element_text(colour = "#5B6976"),
+    axis.title = element_text(colour = "#17324D")
+  )
+```
+
+@fig-b09-t-curves shows two members of the family and the standard normal.
+With $df=4$ the tails are clearly heavier. With $df=10$ the difference is
+much smaller. A probability or a quantile for $T$ always comes from the
+member with $df=n-1$. A different sample size means a different curve.
+
+The difference is most visible in the tails. The central 95% of the standard
+normal lies between $-1.96$ and $1.96$ (Lecture 6). A t curve must reach
+further out to include its central 95%. The point where the central 95% ends
+is the 0.975 quantile of the t distribution. We write it $t_{0.975,\,df}$
+and compute it in R with `qt(0.975, df)`. Lecture 9 uses this number as the
+**critical value** for a 95% interval. For small $df$ it is clearly larger
+than 1.96. Other
+levels work in the same way: the central 90% ends at the 0.95 quantile
+$t_{0.95,\,df}$, and the central 99% ends at the 0.995 quantile
+$t_{0.995,\,df}$.
+
+#### Why $n-1$
+
+The degrees of freedom measure how precisely $S$ estimates $\sigma$. With
+few degrees of freedom, $S$ is imprecise and the tails are heavy. With many
+degrees of freedom, $S$ is close to $\sigma$ in almost every sample, and $T$
+behaves like $Z$. The number is $n-1$ and not $n$ for the reason given in
+Lecture 7. Once $\bar X$ is fixed, the $n$ deviations $X_i-\bar X$ must sum
+to zero. So only $n-1$ of them can vary freely, and $S$ is built from those
+$n-1$ free deviations.
+
+#### The rule of this course {#b09-t-rule}
+
+What if the population is not normal? For a large sample, $T$ is then
+approximately standard normal, so a z value would be enough. The optional
+box at the end of this section shows why. The t value is still a safe
+choice, because $t_{n-1}$ comes closer and closer to $N(0,1)$ as $n$ grows.
+At $n\approx 30$ the two curves are already almost the same. At $n=100$
+the 0.975 quantiles are $t_{0.975,\,99}=1.984$ and $z_{0.975}=1.96$. So
+using the t distribution costs almost nothing when $n$ is large, and it is
+exactly right when the population is normal. So this course uses one
+rule: $\sigma$ unknown means t with $n-1$ degrees of freedom, whatever the
+sample size.
+
+| | Population normal | Population not normal, $n$ large |
+|---|---|---|
+| $\sigma$ known | $Z\sim N(0,1)$ exactly, for every $n$ | $Z\ \dot\sim\ N(0,1)$ by the CLT |
+| $\sigma$ unknown | $T\sim t_{n-1}$ exactly, for every $n$ | $T\ \dot\sim\ N(0,1)$, and $t_{n-1}$ is almost the same, so we use $t_{n-1}$ |
+
+The table shows the distribution of the standardised sample mean in each
+situation. One case is missing: a small sample from a population that is not
+normal. No result covers it. This is one reason to check the conditions
+before calculating, as Lecture 9 does before every interval.
+
+::: {.callout-note collapse="true"}
+## Check: which is larger, $t_{0.975,\,11}$ or $t_{0.975,\,99}$?
+
+$t_{0.975,\,11}=2.201$ is larger than $t_{0.975,\,99}=1.984$. With
+only 11 degrees of freedom, $S$ is an imprecise estimate of $\sigma$, so
+the t distribution has heavier tails and its 0.975 quantile lies further
+from zero. At $df=99$ the 0.975 quantile is already close to the normal
+1.96. With a large sample, the t and normal answers are almost the same.
+Verify in R: `qt(0.975, df = 11)` and `qt(0.975, df = 99)`.
+:::
+
+::: {.callout-tip collapse="true"}
+## Optional: $T$ is $Z$ times a random factor
+
+The two standardised means differ by one factor:
+
+$$
+T=\frac{\bar X-\mu}{\sigma/\sqrt n}\times\frac{\sigma}{S}
+=Z\times\frac{\sigma}{S}.
+$$
+
+If $S$ were equal to $\sigma$, the factor would be 1 and $T$ would be $Z$.
+But $S$ is random, so the factor $\sigma/S$ is random too. When $S$ is
+larger than $\sigma$, the factor is below 1 and $T$ is closer to zero than
+$Z$. When $S$ is smaller than $\sigma$, the factor is above 1 and $T$ is
+further from zero than $Z$. Everything about $T$ follows from how far this
+factor moves away from 1.
+
+The factor also explains the large-sample case. If the population is not
+normal, $Z$ is approximately normal only for large $n$. The same large $n$
+makes $S$ a precise estimate of $\sigma$, because $S$ is a consistent
+estimator: with a larger and larger sample it comes closer and closer to
+$\sigma$ (see the [section on consistency](#b08-consistent) above). The factor $\sigma/S$ is then close to 1 in almost
+every sample, and
+
+$$
+T=Z\times\frac{\sigma}{S}\approx Z,\qquad\text{so}\qquad T\ \dot\sim\ N(0,1).
+$$
+
+Replacing $\sigma$ by a consistent estimate does not change the distribution
+in large samples.
+:::
+
+This answers the second prediction question from the preparation. $T$
+varies more than $Z$, because $S$ adds its own sampling variation to the
+ratio. That is why the t distribution has heavier tails than the standard
+normal, and why its 0.975 quantile $t_{0.975,\,n-1}$ is larger than
+$z_{0.975}=1.96$. For a confidence interval in Lecture 9 this means a larger
+multiplier. It does not always mean a wider interval in your particular
+sample. The sample SD $s$ can come out below $\sigma$, as it does in the
+seed-123 sample ($7.71<8.44$).
 
 ### Answering the driving question
 
@@ -1003,9 +1267,9 @@ one standard deviation of the sample mean, which the standard error
 estimates. A report needs a sentence such as "the population mean plausibly
 lies between $a$ and $b$". This needs one more step. In a real sample
 $\sigma$ is unknown, so we must estimate it too, and this adds uncertainty.
-Lecture 9 introduces the t distribution, which takes this extra uncertainty
-into account, and builds the confidence interval from it. Lecture 9
-also shows how many customers you must ask to reach a target precision.
+The t distribution of the last section takes this extra uncertainty into
+account. Lecture 9 builds the confidence interval from it. Lecture 9 also
+shows how many customers you must ask to reach a target precision.
 
 :::
 
@@ -1033,6 +1297,10 @@ unclear and bring it to the next tutorial, or ask Tilly.
    must the sample size grow, and why?
 5. What does the CLT say becomes approximately normal?
 6. Why does a larger sample not remove selection bias?
+7. Why does replacing $\sigma$ with the sample SD $S$ require a t
+   distribution in place of the normal distribution?
+8. Why does the t distribution for one sample mean have $n-1$ degrees of
+   freedom?
 
 ::: {.callout-note collapse="true"}
 ## Check your answers
@@ -1055,6 +1323,11 @@ unclear and bring it to the next tutorial, or ask Tilly.
    approximately normal. The single observations do not become normal.
 6. Sample size shrinks random error only. It does not change how units
    entered the sampling frame or the sample.
+7. $S$ is itself estimated and varies from sample to sample. The heavier
+   tails of the t distribution represent that extra uncertainty.
+8. Before we estimate the spread, we estimate the sample mean. This sets
+   one condition: the deviations must sum to zero. So only $n-1$ deviations
+   can vary freely.
 :::
 
 ### Finish a half-worked example
@@ -1119,9 +1392,10 @@ unknown.
 4. Averaging 40 observations cancels more of the skewness and shrinks the
    sampling variation more than averaging 5 observations. The histogram
    follows its normal curve much more closely.
-5. Dependence between observations. A non-representative sample is a
-   different problem: the approximation still works, but the mean then
-   estimates the wrong quantity. Extreme outliers are a problem too: with
+5. Dependence between observations. A badly selected sample is a
+   different problem. There is no random mechanism, so neither the CLT nor
+   consistency applies, and whatever the sample mean estimates is not
+   $\mu$. Extreme outliers are a problem too: with
    them, the approximation needs a much larger sample to work.
 6. The sample is large, so by the CLT $\bar X$ is approximately normal with
    mean 30 and $\operatorname{SD}(\bar X)=5/\sqrt{100}=0.5$. Standardise:

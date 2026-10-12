@@ -15,7 +15,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 - carry out a two-sided test for a mean or a proportion
 - use a p-value or a confidence interval to reach the test decision
 - describe Type I error, Type II error, and power in context
-- separate statistical significance from size and causality, also in regression output
+- separate statistical significance from size and causality
 :::
 
 ::: {.driving-question}
@@ -34,17 +34,32 @@ makes each of them rarer?
 
 Do all the preparation below before class.
 
-<div class="video-prep">
-<span class="label">Video preparation</span><br>
-Review <a href="https://www.youtube.com/watch?v=ti9NFdjf3sM">Introduction to
-Hypothesis Testing</a> and watch
-<a href="https://www.youtube.com/watch?v=JNOWWJeZBTc">Examples Identifying
-Type I and Type II Errors</a>. Focus on two-sided tests, decision errors,
-and why "do not reject" is not "accept." All links are also listed in the
-<a href="../resources/video-guide.html">External Video Guide</a>.
-The videos explain key ideas in another way and can use a different
-notation. The lecture material and its notation always come first.
-</div>
+::: {.video-prep}
+[Video preparation]{.label}
+
+Watch these videos from the jbstatistics channel before class. Focus on two-sided tests, decision errors, and why "do not reject" is not "accept".
+
+1. [Z Tests for One Mean: The Rejection Region Approach](https://www.youtube.com/watch?v=60x86lYtWI4)
+2. [Z Tests for One Mean: The p-value](https://www.youtube.com/watch?v=m6sGjWz2CPg)
+3. [Z Tests for One Mean: An Example](https://www.youtube.com/watch?v=Xi33dGcZCA0)
+4. [What is a p-value?](https://www.youtube.com/watch?v=UsU-O2Z1rAs)
+5. [Type I Errors, Type II Errors, and the Power of the Test](https://www.youtube.com/watch?v=7mE-K_w1v90)
+6. [Statistical Significance versus Practical Significance](https://www.youtube.com/watch?v=_k1MQTUCXmU)
+7. [The Relationship Between Confidence Intervals and Hypothesis Tests](https://www.youtube.com/watch?v=k1at8VukIbw)
+8. [t Tests for One Mean: Introduction](https://www.youtube.com/watch?v=T9nI6vhTU1Y)
+9. [t Tests for One Mean: An Example](https://www.youtube.com/watch?v=kQ4xcx6N0o4)
+
+<details class="video-notes">
+<summary>Where these videos differ from this book</summary>
+
+- The videos write $z_{\alpha/2}$ and $t_{\alpha/2}$ for the value with area $\alpha/2$ to its right. This book writes $z_{0.975}=1.96$ and $t_{0.975,\,n-1}$.
+- The videos read critical values and p-values from tables. This course uses R.
+- Some examples use one-sided tests. In this course all tests are two-sided.
+
+</details>
+
+The videos explain key ideas in another way. The lecture material and its notation always come first.
+:::
 
 [Shark Tank data]{.shark-tag} **Warm up.** An advisor said that founders offer 15% of their
 company on average. The seed-123 random sample of 100 Shark Tank pitches
@@ -367,8 +382,8 @@ For a two-sided test of a mean with $\sigma$ known:
 1. Hypotheses. $H_0:\mu=\mu_0$ versus $H_1:\mu\ne\mu_0$. State the
    significance level $\alpha$.
 2. Test statistic. $Z=\dfrac{\bar X-\mu_0}{\sigma/\sqrt n}$, which follows
-   the standard normal distribution if $H_0$ is true (normal population, or
-   large $n$).
+   the standard normal distribution if $H_0$ is true. This holds exactly for
+   a normal population and approximately for a large $n$.
 3. Critical value and rejection region. Reject $H_0$ if
    $|z_{obs}|\ge z_{1-\alpha/2}$.
 4. Observed value. Calculate $z_{obs}$ from the sample.
@@ -428,7 +443,7 @@ $$
 T=\frac{\bar X-\mu_0}{S/\sqrt n}.
 $$
 
-Lecture 9 showed what this change does to the distribution. There are two
+Lecture 8 showed what this change does to the distribution. There are two
 situations.
 
 - The population is normal. Then $T$ follows exactly the t distribution
@@ -460,7 +475,7 @@ case there is no critical value that we can justify. This is why you check the
 conditions before you run a test.
 
 The optional box of
-[Lecture 9](b09-t-confidence-intervals.qmd#b09-t-rule) shows why the t
+[Lecture 8](b08-sampling-distributions.qmd#b09-t-rule) shows why the t
 value also works for a large sample from a population that is not normal.
 
 The five steps stay the same. Only the statistic and the critical value
@@ -478,7 +493,8 @@ Write these five steps, in this order.
    level $\alpha$.
 2. **Test statistic.** The formula and its distribution if $H_0$ is true,
    with the condition. Mean: $T=(\bar X-\mu_0)/(S/\sqrt n)$, which has the
-   $t_{n-1}$ distribution (normal population, or large $n$). Proportion:
+   $t_{n-1}$ distribution if $H_0$ is true. This holds exactly for a normal
+   population and approximately for a large $n$. Proportion:
    $Z=(\widehat P-p_0)/\sqrt{p_0(1-p_0)/n}$, approximately $N(0,1)$ if
    $np_0\ge10$ and $n(1-p_0)\ge10$.
 3. **Critical value and rejection region.** $t_{1-\alpha/2,\,n-1}$ or
@@ -489,8 +505,9 @@ Write these five steps, in this order.
    $z_{obs}$.
 5. **Conclusion.** Say whether the observed value lies in the rejection
    region. Write "reject $H_0$" or "do not reject $H_0$", never "accept
-   $H_0$". Then one sentence in the words of the question: "At the
-   $\alpha$ level we can (cannot) conclude that ...". If you reject, add
+   $H_0$". Then one sentence in the words of the question, for example "At
+   the 5% significance level we can (cannot) conclude that ...". If you
+   reject, add
    the direction from the sign of the observed value.
 
 The p-value, when the question asks for it, comes after step 5:
@@ -554,6 +571,30 @@ from $-2.65$ to $-2.91$, because the standard deviation of this sample,
 7.71, happens to be smaller than the 8.44 of the population. Another sample
 would have another $s$ and another $t_{obs}$. The heavier tails of the t
 curve take this variation in $S$ into account.
+
+::: {#exm-b10-small-normal}
+## Worked example: a small sample from a normal population
+
+An invented example. A coffee roaster fills bags labelled 250 grams. A
+random sample of $n=16$ bags has $\bar x=252.4$ grams and $s=4.8$ grams.
+Assume that the weights of all bags are normally distributed. Supplied
+value: $t_{0.975,\,15}=2.131$.
+
+1. **Hypotheses.** $H_0:\mu=250$ versus $H_1:\mu\ne250$, where $\mu$ is the
+   mean weight of all bags. The significance level is $\alpha=0.05$.
+2. **Test statistic.** $T=(\bar X-250)/(S/\sqrt{16})$. The population is
+   normal, so $T$ has exactly the $t_{15}$ distribution if $H_0$ is true.
+3. **Critical value and rejection region.** Reject $H_0$ if
+   $t_{obs}\le-2.131$ or $t_{obs}\ge2.131$.
+4. **Observed value.** The standard error is $4.8/\sqrt{16}=1.2$ grams. So
+   $t_{obs}=(252.4-250)/1.2=2.00$.
+5. **Conclusion.** $2.00$ lies between $-2.131$ and $2.131$, so do not
+   reject $H_0$. At the 5% significance level we cannot conclude that the
+   mean weight of all bags differs from 250 grams.
+
+With $n=16$ the t critical value, 2.131, is clearly above 1.96. The
+standard normal value would have led to a rejection here.
+:::
 
 ### The confidence interval and the test give the same decision
 
@@ -623,7 +664,7 @@ uses $p_0$. Use the procedure that the question names.
 ::: {.callout-caution collapse="true"}
 ## Try it: read the decision directly from an interval
 
-Try this with your neighbour first. An invented example. A colleague reports
+An invented example. A colleague reports
 a 95% confidence interval for a population mean: $(13.6,\,18.8)$%.
 The value under test is $\mu_0=15$. The report gives no t statistic and no
 p-value.
@@ -787,7 +828,7 @@ four sentences that claim more than the p-value says. All four are wrong.
 ::: {.callout-caution collapse="true"}
 ## Try it: correct the four wrong p-value sentences
 
-[Shark Tank data]{.shark-tag} Try this with your neighbour first. The four sentences are about the advisor's test of
+[Shark Tank data]{.shark-tag} The four sentences are about the advisor's test of
 $H_0:\mu=15$, where $\mu$ is the mean equity offered (`equity_offered_pct`)
 among all 1,441 Shark Tank pitches. The seed-123 random sample of 100
 pitches gives $\bar x=12.76$% and $s=7.71$, so $t_{obs}=-2.91$ and
@@ -1481,7 +1522,8 @@ with about 0.82 percentage points less equity offered. For comparison, the
 mean equity offered in the file is 13.21%, so this is about 6% of the mean
 per season. The standard error, 0.048, is the sampling uncertainty of the
 estimate, in the same units. The t value, $-17.3$, is the estimate divided
-by its standard error. This is step 4 of the five steps, with zero as the
+by its standard error. R calculates it from the unrounded values. With the
+rounded numbers above you get $-0.824/0.048=-17.2$. This is step 4 of the five steps, with zero as the
 value under $H_0$. The p-value in the last column belongs to the two-sided
 test
 
@@ -1623,7 +1665,6 @@ unclear and bring it to the next tutorial, or ask Tilly.
 5. What is a Type II error?
 6. Name three factors that increase power.
 7. Why is "do not reject" different from "accept"?
-8. What does $H_0:\beta_1=0$ mean in a regression model?
 
 ::: {.callout-note collapse="true"}
 ## Check your answers
@@ -1646,8 +1687,6 @@ unclear and bring it to the next tutorial, or ask Tilly.
 7. The test controls only the probability of a Type I error. With low
    power, a test often does not reject although $H_0$ is false. So a result
    that does not reject is weak evidence for $H_0$.
-8. The slope of the line in the population is zero. The outcome has no
-   linear association with the predictor.
 :::
 
 ### Finish a half-worked example
@@ -1704,17 +1743,15 @@ Solve these tasks on your own.
 2. Take the test of the half-worked example above: 120 successes in 200
    trials, $H_0:p=0.50$ against $H_1:p\ne0.50$. Describe the Type I error
    and the Type II error of this test, in context.
-3. An invented example. A regression of the equity offered (in percentage
-   points) on the amount requested has the coefficient $-0.360$ percentage
-   points per \$100,000, with standard error 0.090 and a large $df$. Calculate
-   its t statistic and an approximate 95% interval. Then interpret the
-   row.
-4. A coefficient estimate is too small to matter for any business decision,
-   but it has $p<0.001$. Explain how both facts can be true.
-5. The section "Preview: the test that comes with a regression slope"
-   regresses the equity offered (`equity_offered_pct`) on the season
-   (`season`) in all 1,441 Shark Tank pitches. State two reasons why this
-   regression cannot support a causal conclusion.
+3. An invented example. A bakery states that its loaves weigh 800 grams on
+   average. A random sample of $n=25$ loaves has $\bar x=792$ grams and
+   $s=15$ grams. Assume that the weights of all loaves are normally
+   distributed. Test $H_0:\mu=800$ against $H_1:\mu\ne800$ at the 5% level
+   in the five steps. Supplied value: $t_{0.975,\,24}=2.064$.
+4. An invented example. A test of a mean against $\mu_0$ in a very large
+   sample gives $p<0.001$. The estimated difference from $\mu_0$ is too
+   small to matter for any business decision. Explain how both facts can be
+   true.
 
 ::: {.callout-note collapse="true"}
 ## Check your answers
@@ -1741,18 +1778,22 @@ Solve these tasks on your own.
 2. Type I: concluding that the population success proportion differs from
    0.50 when it equals 0.50. Type II: not detecting a success proportion
    that really differs from 0.50.
-3. $t_{obs}=-0.360/0.090=-4.00$. With a large $df$, the 95% interval is
-   approximately $-0.360\pm1.96\times0.090=(-0.536,\,-0.184)$ percentage
-   points per \$100,000. An additional \$100,000 requested goes together
-   with between about 0.18 and 0.54 percentage points less equity offered.
-   The interval does not contain zero and $|t_{obs}|=4.00$ is far above
-   1.96, so reject the null hypothesis that the coefficient is zero.
-4. A very large sample or very little variation makes the standard error
-   tiny. Then even a very small coefficient lies many standard errors from
-   zero. A precise estimate is not automatically an important one.
-5. Nobody assigned pitches to seasons at random. Other factors that
-   changed over the seasons, the selection of pitches for the show, and
-   measurement error can all play a role.
+3. The five steps:
+   1. Hypotheses. $H_0:\mu=800$ versus $H_1:\mu\ne800$, where $\mu$ is the
+      mean weight of all loaves. The significance level is $\alpha=0.05$.
+   2. Test statistic. $T=(\bar X-800)/(S/\sqrt{25})$. The population is
+      normal, so $T$ has exactly the $t_{24}$ distribution if $H_0$ is true.
+   3. Critical value and rejection region. $t_{0.975,\,24}=2.064$. Reject
+      $H_0$ if $t_{obs}\le-2.064$ or $t_{obs}\ge2.064$.
+   4. Observed value. The standard error is $15/\sqrt{25}=3$ grams. So
+      $t_{obs}=(792-800)/3=-2.67$.
+   5. Conclusion. $-2.67\le-2.064$, so the observed value lies in the
+      rejection region. Reject $H_0$. At the 5% significance level we can
+      conclude that the mean weight of all loaves differs from 800 grams.
+      The negative sign of $t_{obs}$ shows that it is below 800 grams.
+4. A very large sample makes the standard error tiny. Then even a very
+   small difference lies many standard errors from $\mu_0$. A precise
+   estimate is not automatically an important one.
 :::
 
 ::: {.callout-tip collapse="true"}
@@ -1815,20 +1856,13 @@ cor(sharks$season, sharks$equity_offered_pct)
 ```
 :::
 
-### Worked exam interpretation: a proportion test and a regression row
+### Worked exam interpretation: a proportion test
 
 **Exam-style question.** An invented example. A crowdfunding
 platform states that 40% of its campaigns reach
 their funding goal. In a simple random sample of 600 campaigns from last
 year, 270 reached the goal. Let $p$ be the proportion of all campaigns of
-last year that reached the goal. The same study fits a regression of the
-amount raised (thousands of euros) on the number of updates that the
-founder posted during the campaign. One row of the output is:
-
-```text
-                 Estimate  Std. Error  t value  Pr(>|t|)  95% CI
-updates_posted      0.60       0.25       2.40     0.0167  [0.11, 1.09]
-```
+last year that reached the goal.
 
 Supplied values: the two-sided p-value of the proportion test is 0.0124,
 and a 95% confidence interval for $p$ is $(0.410,\,0.490)$.
@@ -1836,8 +1870,7 @@ and a 95% confidence interval for $p$ is $(0.410,\,0.490)$.
 Test $H_0:p=0.40$ against $H_1:p\ne0.40$ at the 5% level. Give all five
 steps of the testing procedure. Then define a Type I error for this test.
 Name what raises power while $\alpha$ stays fixed, and say which of these
-the researcher can change. Last, interpret the regression row without
-causal language.
+the researcher can change.
 
 ::: {.callout-note collapse="true"}
 ## Check a model answer
@@ -1867,13 +1900,6 @@ when it equals 40%. With $\alpha$ fixed, power rises with a larger sample
 and with a larger true difference from 0.40. The researcher can change only
 the sample size. The true difference is not a choice, and for a 0/1 outcome
 the spread is determined by $p$.
-
-The regression row: each additional update goes together with 0.60 thousand
-euros (€600) more raised. The observed value is $t_{obs}=0.60/0.25=2.40$.
-The p-value, 0.0167, is below 0.05, and the interval $(0.11,\,1.09)$ does
-not contain zero, so reject $H_0:\beta_1=0$. The founders decided
-themselves how many updates to post, so this is an association, not a
-causal effect.
 :::
 
 ### Worked exam interpretation: a mean test

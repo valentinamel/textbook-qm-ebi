@@ -74,7 +74,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-130a4d33f88b74c424d8c0f2e9cca01a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-9625fb8afdc25f0504cb337f379810a0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -379,12 +379,6 @@ window.Quarto = {
   <div class="sidebar-item-container"> 
   <a href="../resources/math-refresher.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Mathematics Refresher</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../resources/video-guide.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">External Video Guide</span></a>
   </div>
 </li>
       </ul>
@@ -1033,6 +1027,7 @@ Check your answer
 <li>Calculate the sample size that she needs at the 95% level (<span class="math inline">\(z_{0.975}=1.960\)</span>).</li>
 <li>Calculate the sample size for a margin of 2.5 minutes at the 95% level. Compare it with part 1.</li>
 <li>Calculate the sample size for a margin of 5 minutes at the 99% level (<span class="math inline">\(z_{0.995}=2.576\)</span>).</li>
+<li>Her business partner asks for a 95% confidence interval whose total width is at most 4 minutes, from the lower end to the upper end. Calculate the sample size for this interval.</li>
 </ol>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
@@ -1054,22 +1049,29 @@ n\ge\left(\frac{z_{1-\alpha/2}\,\sigma}{m}\right)^2 .
 <li><span class="math inline">\(n\ge(1.960\times28/5)^2=10.976^2\approx120.5\)</span>, so she needs 121 visits. Always round up: with 120 visits the margin would be slightly above 5 minutes.</li>
 <li><span class="math inline">\(n\ge(1.960\times28/2.5)^2=21.952^2\approx481.9\)</span>, so 482 visits. Half the margin needs about four times the sample.</li>
 <li><span class="math inline">\(n\ge(2.576\times28/5)^2=14.4256^2\approx208.1\)</span>, so 209 visits. More confidence with the same margin needs more observations: 209 in place of 121.</li>
+<li>The formula needs the margin of error, which is half the width. So <span class="math inline">\(m=4/2=2\)</span> minutes, and <span class="math inline">\(n\ge(1.960\times28/2)^2=27.44^2\approx752.95\)</span>. She needs 753 visits. If you put the full width of 4 into the formula, you get 189 visits, about a quarter of the correct number. The interval from 189 visits would be about twice as wide as asked.</li>
 </ol>
 <p>The planning value is a guess. If the true <span class="math inline">\(\sigma\)</span> is larger than 28 minutes, the margin of the new sample will be larger than planned.</p>
 <p>Verification in R:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>n_needed <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">margin_5_at_95 =</span> (<span class="fl">1.960</span> <span class="sc">*</span> <span class="dv">28</span> <span class="sc">/</span> <span class="dv">5</span>)<span class="sc">^</span><span class="dv">2</span>,</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>              <span class="at">margin_2.5_at_95 =</span> (<span class="fl">1.960</span> <span class="sc">*</span> <span class="dv">28</span> <span class="sc">/</span> <span class="fl">2.5</span>)<span class="sc">^</span><span class="dv">2</span>,</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">margin_5_at_99 =</span> (<span class="fl">2.576</span> <span class="sc">*</span> <span class="dv">28</span> <span class="sc">/</span> <span class="dv">5</span>)<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>n_needed</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">margin_5_at_99 =</span> (<span class="fl">2.576</span> <span class="sc">*</span> <span class="dv">28</span> <span class="sc">/</span> <span class="dv">5</span>)<span class="sc">^</span><span class="dv">2</span>,</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">width_4_at_95 =</span> (<span class="fl">1.960</span> <span class="sc">*</span> <span class="dv">28</span> <span class="sc">/</span> <span class="dv">2</span>)<span class="sc">^</span><span class="dv">2</span>,</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>              <span class="at">wrong_full_width =</span> (<span class="fl">1.960</span> <span class="sc">*</span> <span class="dv">28</span> <span class="sc">/</span> <span class="dv">4</span>)<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>n_needed</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>  margin_5_at_95 margin_2.5_at_95   margin_5_at_99 
-        120.4726         481.8903         208.0979 </code></pre>
+<pre><code>  margin_5_at_95 margin_2.5_at_95   margin_5_at_99    width_4_at_95 
+        120.4726         481.8903         208.0979         752.9536 
+wrong_full_width 
+        188.2384 </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ceiling</span>(n_needed)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>  margin_5_at_95 margin_2.5_at_95   margin_5_at_99 
-             121              482              209 </code></pre>
+<pre><code>  margin_5_at_95 margin_2.5_at_95   margin_5_at_99    width_4_at_95 
+             121              482              209              753 
+wrong_full_width 
+             189 </code></pre>
 </div>
 </div>
 </div>
