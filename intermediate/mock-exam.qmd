@@ -39,18 +39,14 @@ collapsed box at the end of this page. It is there only so that anyone can
 check how we made the data. It is not part of the exam.
 
 A part that starts with "In R:" needs code that you write and run yourself.
-Its answer is not printed in the question. For these parts, paste the R code
-that you used into your answer, and type the numbers that the part asks
-for. You can answer all other parts from your own results, from printed
+Paste the R code that you used into your answer, and type the numbers that
+the part asks for. You can answer all other parts from your own results, from printed
 output, or with a short calculation. You may use R as a calculator
 everywhere.
 
 Most parts give a structure for your answer. Copy it into the answer field
 and fill in each line.
 
-Question 3 shows an R output of a colleague, and Question 4 shows a
-regression table in the layout of a research paper. You interpret them.
-Question 6 shows an answer of an AI assistant. You assess it.
 
 All tests in this course are two-sided. Use a 5% significance level.
 
@@ -176,14 +172,14 @@ fit_50k
 
 ## Question 2: Assumptions and diagnostics (15 points)
 
-Check the model of Question 1, `growth_pct ~ marketing_10k`. Parts 1 and 4
+Check the model of Question 1, `growth_pct ~ marketing_10k`. Parts 1 and 3
 ask for two plots.
 
 1. In R: make the residual-versus-fitted plot of the model. For each of
    the two assumptions, linearity and homoskedasticity, state whether it is
    likely to hold and describe the pattern in the plot that shows this. Use
    one or two sentences per assumption. Use (copy and paste) this
-   structure: **(5 points)**
+   structure: **(6 points)**
 
    ```text
    R code:
@@ -191,19 +187,10 @@ ask for two plots.
    Homoskedasticity:
    ```
 
-2. In R: count the ventures with a standardised residual beyond $\pm3$.
-   Then count the ventures with a Cook's distance above $4/n$. Use (copy and
-   paste) this structure: **(2 points)**
-
-   ```text
-   R code:
-   Number with a standardised residual beyond ±3:
-   Number with a Cook's distance above 4/n:
-   ```
-
-3. A colleague wants to delete all ventures that part 2 flags, "to get a
+2. Some ventures in this model have a large standardised residual or a
+   large Cook's distance. A colleague wants to delete all of them, "to get a
    cleaner model". State in one sentence the rule for flagged observations
-   from Lecture 2. Then describe in one or two sentences what you would do
+   that you learned in this course. Then describe in one or two sentences what you would do
    with these ventures. Use (copy and paste) this structure: **(4 points)**
 
    ```text
@@ -211,11 +198,11 @@ ask for two plots.
    What I would do with these ventures:
    ```
 
-4. In R: make the normal Q-Q plot of the standardised residuals. Describe
+3. In R: make the normal Q-Q plot of the standardised residuals. Describe
    in one sentence how the points lie relative to the line. Then explain in
    one sentence whether a departure from normality is a serious problem for
    this model with 320 ventures. Use (copy and paste) this structure:
-   **(4 points)**
+   **(5 points)**
 
    ```text
    R code:
@@ -238,16 +225,9 @@ abline(h = 0, lty = 2)
 ```
 
 ```{r}
-#| label: imock-q2-flags
-# Part 2
-sum(abs(rstandard(simple_model)) > 3)
-sum(cooks.distance(simple_model) > 4 / nobs(simple_model))
-```
-
-```{r}
 #| label: imock-q2-qq-plot
 #| fig-height: 4
-# Part 4
+# Part 3
 qqnorm(rstandard(simple_model))
 qqline(rstandard(simple_model))
 ```
@@ -264,18 +244,14 @@ qqline(rstandard(simple_model))
      heteroskedasticity, so homoskedasticity (constant variance of the
      errors) is likely not met.
 2. Filled-in structure:
-   - R code: see the code above, part 2.
-   - Number with a standardised residual beyond ±3: 1
-   - Number with a Cook's distance above 4/n: 19 (here $4/n=4/320=0.0125$)
-3. Filled-in structure:
    - Rule for flagged observations: investigate, report, never silently
      delete.
    - What I would do with these ventures: look at the flagged ventures in
      the data and ask whether a value is an error or whether the venture is
      of a different kind. Then fit the model with and without these
      ventures, show both results, and say which one I use and why.
-4. Filled-in structure:
-   - R code: see the code above, part 4.
+3. Filled-in structure:
+   - R code: see the code above, part 3.
    - How the points lie relative to the line: they follow the line in the
      middle. At the upper end they lie above the line, and near the lower
      end slightly below it.
@@ -296,7 +272,7 @@ thirds <- cut(
 tapply(residuals(simple_model), thirds, sd)
 ```
 
-## Question 3: Inference and fit (10 points)
+## Question 3: Inference and fit (12 points)
 
 A colleague drew 200 of the 320 ventures at random and fitted the model
 below to these 200 ventures. You do not know which ventures she drew, so you
@@ -344,7 +320,7 @@ $t_{0.975,\,196}=1.972$.
    `marketing_10k`. Then state whether the two-sided test at the 5% level
    rejects a coefficient of zero, and explain in one or two sentences how
    the interval shows this. Use (copy and paste) this structure:
-   **(6 points)**
+   **(8 points)**
 
    ```text
    Formula:
@@ -400,12 +376,12 @@ qt(0.975, df.residual(model_200))
 confint(model_200)["marketing_10k", ]
 ```
 
-## Question 4: Multiple regression and a dummy predictor (23 points)
+## Question 4: Multiple regression and a dummy predictor (21 points)
 
 The table below has the layout of a regression table in a research paper.
 It shows three models of sales growth (`growth_pct`), fitted to all 320
 ventures of the practice data. You do not need to run these models for
-parts 1 to 3.
+parts 1 and 2.
 
 ::: {.reg-table}
 | | (1) | (2) | (3) |
@@ -436,7 +412,7 @@ $t_{0.975,\,df}=1.967$ in all three columns.
 1. Perform a 5-step test of whether team size is individually significant
    in column (3), with the critical value approach at the 5% level. Then
    state in one sentence what the missing star of team size means. Use
-   (copy and paste) this structure: **(4 points)**
+   (copy and paste) this structure: **(5 points)**
 
    ```text
    Null hypothesis H0:          and alternative hypothesis H1:
@@ -458,23 +434,11 @@ $t_{0.975,\,df}=1.967$ in all three columns.
    Fitted growth of B minus fitted growth of A:
    ```
 
-3. Founder experience has three stars in column (2). Still, adding it moves
-   the marketing coefficient only from 1.340 to 1.338. Explain in one or two
-   sentences what this says about the relation between experience and
-   marketing spending in this sample. Then name one problem that the stable
-   coefficient does not exclude, in one sentence. Use (copy and paste) this
-   structure: **(5 points)**
-
-   ```text
-   What the stable coefficient says:
-   A problem it does not exclude:
-   ```
-
-4. In R: test whether founder experience and team size are jointly useful
+3. In R: test whether founder experience and team size are jointly useful
    in the model of column (3), compared with the model of column (1), with
    the p-value approach at the 5% level. Then explain in one sentence how
    your conclusion and the missing star of team size can both be true. Use
-   (copy and paste) this structure: **(9 points)**
+   (copy and paste) this structure: **(11 points)**
 
    ```text
    R code:
@@ -494,7 +458,7 @@ $t_{0.975,\,df}=1.967$ in all three columns.
 
 ```{r}
 #| label: imock-q4-anova
-# Part 4
+# Part 3
 col_1 <- lm(growth_pct ~ marketing_10k + digital, data = ventures)
 col_3 <- lm(
   growth_pct ~ marketing_10k + digital + experience_years + team_size,
@@ -529,16 +493,7 @@ anova(col_1, col_3)
    - Fitted growth of B minus fitted growth of A:
      $4.023+1.032+3.084=8.14$ percentage points
 3. Filled-in structure:
-   - What the stable coefficient says: a coefficient changes when the added
-     predictor is related to the outcome and also to the predictor of
-     interest. Experience is related to growth, but in this sample it is
-     almost unrelated to marketing spending. So holding it fixed changes the
-     marketing comparison very little.
-   - A problem it does not exclude: a variable that is not in the data and
-     that is related to both marketing spending and growth, for example the
-     quality of the product.
-4. Filled-in structure:
-   - R code: see the code above, part 4.
+   - R code: see the code above, part 3.
    - Null hypothesis H0 and alternative hypothesis H1: $H_0$: the
      coefficients of founder experience and team size are both zero. $H_1$:
      at least one of them is not zero.
@@ -561,7 +516,7 @@ anova(col_1, col_3)
 ```{r}
 #| label: imock-q4-table
 #| include: false
-# Checks the regression table and the answers to parts 1 to 4 of Question 4.
+# Checks the regression table and the answers to parts 1 to 3 of Question 4.
 col_2 <- lm(growth_pct ~ marketing_10k + digital + experience_years,
             data = ventures)
 summary(col_1)
