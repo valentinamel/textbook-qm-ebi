@@ -366,7 +366,8 @@ $p$ be the proportion of returned orders among all 6,000 orders.
 1. Construct a 95% confidence interval for $p$. Write the five parts of a
    complete answer for an interval for a proportion (Lecture 9), with the
    check of the condition. Check the 10% condition first. In part 5, say what the
-   interval tells you about the 15% reported by the parcel service.
+   interval tells you about the 15% reported by the parcel service. Use
+   $z_{0.95}=1.645$ and $z_{0.975}=1.960$ as needed.
 2. The founder says: "My return rate is 10%, so I am 5 percentage points
    below the 15%." Say in at most four sentences what is wrong with this
    sentence and what she can correctly say.
@@ -496,8 +497,8 @@ subscription.
    $n=196$.
 4. Construct a 95% confidence interval for the mean monthly spending of all
    customers, in the five parts of a complete answer. The degrees of
-   freedom are 48. Use the closest value on the formula sheet:
-   $t_{0.975,\,60}=2.000$. The business plan of the founder assumes a mean
+   freedom are 48. Use $t_{0.95,\,48}=1.677$ and $t_{0.975,\,48}=2.011$
+   as needed. The business plan of the founder assumes a mean
    spending of €85. Say in part 5 what the interval tells you about this
    value.
 5. Write one sentence that explains the difference between sampling
@@ -526,15 +527,16 @@ subscription.
    1. **Formula.** $\bar X\pm t_{1-\alpha/2,\,n-1}\,S/\sqrt n$. It may be
       used because $n=49$ is large.
    2. **Given values.** $\bar x=78$ euros, $s=21$ euros, $n=49$, $df=48$.
-      The confidence level is 95%, and the closest value on the formula
-      sheet is $t_{0.975,\,60}=2.000$.
+      The confidence level is 95%, so the critical value is
+      $t_{0.975,\,48}=2.011$.
    3. **Calculations.** The standard error is $21/\sqrt{49}=3$ euros. The
-      margin of error is $2.000\times3=6$ euros.
-   4. **Interval.** $(78-6,\ 78+6)=(72,\ 84)$ euros.
+      margin of error is $2.011\times3=6.033$ euros.
+   4. **Interval.** $(78-6.033,\ 78+6.033)=(71.967,\ 84.033)$ euros.
    5. **Conclusion.** The value 85 euros lies outside the interval. At the
       5% level we can conclude that the mean monthly spending differs from
       85 euros. The whole interval lies below 85, so customers spend less
-      than the plan assumes: at least 1 euro less, about 1% of 85 euros.
+      than the plan assumes: at least 0.97 euros less, about 1.1% of 85
+      euros.
 
 5. The standard errors and the interval describe random variation from
    sample to sample, not bias created by an unrepresentative sampling
@@ -553,9 +555,10 @@ Verification in R:
 p_hat_renew <- 31 / 49
 c(se_mean = 21 / sqrt(49),
   se_proportion = sqrt(p_hat_renew * (1 - p_hat_renew) / 49),
-  t_exact_df48 = qt(0.975, df = 48),
-  lower = 78 - 2.000 * 3, upper = 78 + 2.000 * 3,
-  below_85_in_percent = 100 * (85 - 84) / 85,
+  t_df48 = qt(0.975, df = 48),
+  margin = 2.011 * 3, lower = 78 - 2.011 * 3, upper = 78 + 2.011 * 3,
+  below_85 = 85 - (78 + 2.011 * 3),
+  below_85_in_percent = 100 * (85 - (78 + 2.011 * 3)) / 85,
   p_mean_above_81 = 1 - pnorm(81, mean = 78, sd = 3),
   n_for_margin_3 = (1.96 * 21 / 3)^2)
 ```

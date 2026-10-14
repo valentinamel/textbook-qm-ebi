@@ -390,7 +390,8 @@ plans to draw a random sample of $n=100$ repairs from her records of
 7. Next year the prices change, and she will estimate the new mean price
    from a sample. She wants a margin of error of at most 5 euros at the 95%
    level. Use $\sigma=20$ euros as a planning value. Calculate the sample
-   size that she needs. **(2 points)**
+   size that she needs. Use $z_{0.95}=1.645$ and $z_{0.975}=1.96$ as
+   needed. **(2 points)**
 
 ::: {.callout-note collapse="true"}
 ## Model answer
@@ -453,8 +454,9 @@ a mean of 64.60 euros and a standard deviation of $s=22.00$ euros.
 1. State (a) in words what the parameter $\mu$ stands for in this question
    and (b) the estimate of $\mu$ with its unit. **(2 points: 1 + 1)**
 2. Test at the 5% level whether the mean order value differs from 60 euros.
-   Give all five steps of the testing procedure. The critical value is on
-   the formula sheet. **(7 points)**
+   Give all five steps of the testing procedure. Use
+   $t_{0.95,\,120}=1.658$ and $t_{0.975,\,120}=1.980$ as needed.
+   **(7 points)**
 
 This year she drew a new simple random sample of 100 of the 2,600 orders
 that the shop has had so far this year. Its standard deviation is 24.00 euros. She ran the same test in R
@@ -476,9 +478,9 @@ mean of x
 3. Interpret the p-value of 0.008949 in one or two sentences.
    **(2 points)**
 4. The output also shows a 95% confidence interval. Show with a
-   calculation how R found the two ends of this interval. Use the closest
-   value on the formula sheet. A small difference in the last decimals is
-   expected. **(1 point)**
+   calculation how R found the two ends of this interval. Use
+   $t_{0.95,\,99}=1.660$ and $t_{0.975,\,99}=1.984$ as needed. A small
+   difference in the last decimals is expected. **(1 point)**
 5. The founder will rent a larger storage room only if the mean order value
    of this year is above 60 euros. Write your advice to her in two or three
    sentences. (a) Give a decision and support it with both ends of the
@@ -511,11 +513,12 @@ mean of x
 3. If the mean of all 2,600 orders of this year were 60 euros, a sample
    mean at least as far from 60 euros as this one, in either direction,
    would occur in about 0.89% of random samples.
-4. The standard error is $24.00/\sqrt{100}=2.40$ euros. With $df=99$ the
-   closest listed value is $t_{0.975,\,100}=1.984$, so the ends are
+4. The standard error is $24.00/\sqrt{100}=2.40$ euros. The confidence
+   level is 95% and $df=99$, so the critical value is
+   $t_{0.975,\,99}=1.984$, and the ends are
    $$66.40\pm1.984\times2.40=66.40\pm4.7616.$$
    The interval runs from 61.6384
-   to 71.1616 euros. R uses the exact critical value for $df=99$, so its
+   to 71.1616 euros. R uses the unrounded critical value, so its
    ends, 61.6379 and 71.1621 euros, differ only in the fourth decimal.
 5. &#40;a) "Rent the room, because both ends of the interval, 61.6379 and
    71.1621 euros, are above 60 euros. At the lower end the mean is 1.6379
@@ -544,7 +547,7 @@ order_value <- 64.6 + 22 * z_values
 c(n = length(order_value), mean = mean(order_value), sd = sd(order_value),
   standard_error = sd(order_value) / sqrt(length(order_value)))
 t.test(order_value, mu = 60)
-64.6 + c(-1, 1) * 1.980 * 2   # the interval by hand with the sheet value
+64.6 + c(-1, 1) * 1.980 * 2   # the interval by hand with the given value
 
 set.seed(2026)
 z_values <- rnorm(100)
@@ -553,7 +556,7 @@ order_value <- 66.4 + 24 * z_values   # the new sample of this year
 c(n = length(order_value), mean = mean(order_value), sd = sd(order_value),
   standard_error = sd(order_value) / sqrt(length(order_value)))
 t.test(order_value, mu = 60)
-66.4 + c(-1, 1) * 1.984 * 2.4   # the interval by hand with the sheet value
+66.4 + c(-1, 1) * 1.984 * 2.4   # the interval by hand with the given value
 ```
 :::
 
@@ -576,10 +579,11 @@ subscription among all 1,500 trial customers of last year.
    draw. **(3 points: 1 + 2)**
 2. Construct a 95% confidence interval for $p$. Use it to answer the
    question whether her share differs from 20%. Give all five parts of the
-   interval procedure, with the condition for the formula. **(7 points)**
+   interval procedure, with the condition for the formula. Use
+   $z_{0.95}=1.645$ and $z_{0.975}=1.96$ as needed. **(7 points)**
 3. Test at the 5% level whether her share differs from 20%. Give all five
-   steps of the testing procedure. The critical value is on the formula
-   sheet. **(7 points)**
+   steps of the testing procedure. Use $z_{0.95}=1.645$ and
+   $z_{0.975}=1.96$ as needed. **(7 points)**
 4. Describe (a) a Type I error and (b) a Type II error for the test of
    part 3, in the context of the founder. **(2 points: 1 + 1)**
 5. &#40;a) State which of the two errors is possible after the decision of
@@ -677,8 +681,8 @@ simple random sample of 64 of her 5,000 users. For each user she recorded
 practised last month. Let $\mu$ be the mean of `practice_minutes` among all
 5,000 users.
 The sample has a mean of 27.5 minutes and a standard deviation of $s=12$
-minutes. The degrees of freedom are 63. Use the closest value on the
-formula sheet: $t_{0.975,\,60}=2.000$.
+minutes. The degrees of freedom are 63. Use $t_{0.95,\,63}=1.669$ and
+$t_{0.975,\,63}=1.998$ as needed.
 
 The founder gave these numbers to an AI assistant and asked: "What does my
 sample say about the 30 minutes in my plan? And how many users do I need
@@ -702,15 +706,17 @@ answered:
    and name the error that is possible after this decision. (b) Write a
    correct conclusion about the 30 minutes in the plan. **(3 points: 2 + 1)**
 4. Assess the last sentence of the AI answer. Find the error and calculate
-   the correct sample size. **(2 points)**
+   the correct sample size. Use $z_{0.95}=1.645$ and $z_{0.975}=1.96$ as
+   needed. **(2 points)**
 
 ::: {.callout-note collapse="true"}
 ## Model answer
 
 1. The standard error is $s/\sqrt n=12/\sqrt{64}=1.5$ minutes. The margin
-   of error is $2.000\times1.5=3.0$ minutes. The interval is
-   $$(27.5-3.0,\ 27.5+3.0)=(24.5,\ 30.5) \text{ minutes.}$$ The interval of the AI
-   is correct.
+   of error is $1.998\times1.5=2.997$ minutes. The interval is
+   $$(27.5-2.997,\ 27.5+2.997)=(24.503,\ 30.497) \text{ minutes.}$$
+   Rounded to one decimal, this is the interval of the AI, so the interval
+   of the AI is correct.
 2. &#40;a) The mean $\mu$ of all 5,000 users is a fixed number. A
    calculated interval either contains it or does not. The 95% refers to
    the procedure, not to this one interval. (b) "The interval comes from a
@@ -743,9 +749,9 @@ but you can skip it.
 ```{r}
 #| label: bmock-q7-check
 se_practice <- 12 / sqrt(64)
-c(standard_error = se_practice, margin = 2.000 * se_practice,
-  lower = 27.5 - 2.000 * se_practice, upper = 27.5 + 2.000 * se_practice,
-  t_exact_df63 = qt(0.975, df = 63),
+c(t_df63 = qt(0.975, df = 63),
+  standard_error = se_practice, margin = 1.998 * se_practice,
+  lower = 27.5 - 1.998 * se_practice, upper = 27.5 + 1.998 * se_practice,
   t_obs = (27.5 - 30) / se_practice,
   p_value = 2 * pt(-abs((27.5 - 30) / se_practice), df = 63),
   below_plan_in_percent = 100 * (30 - 25) / 30)
