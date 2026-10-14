@@ -22,7 +22,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 ::: {.driving-question}
 <span class="label">Driving question</span>
 
-<p class="dq-context">You plan to ask an investor for money. The more you claim your company is worth, the more you get, or so you hope. Do investors follow a higher claim, and by how much? Regression turns this question into one number: how much agreed valuation goes, on average, with one more dollar of claimed valuation.</p>
+<p class="dq-context">You plan to ask an investor for money. You hope that a higher claimed value of your company leads to a higher agreed value. Do investors follow a higher claim, and by how much? Regression turns this question into one number: how much agreed valuation goes, on average, with one more dollar of claimed valuation.</p>
 
 Among Shark Tank pitches that ended in a deal for a share of the company,
 how does the agreed valuation relate to the claimed valuation: how many
@@ -86,6 +86,15 @@ formulas. With the sheet open, answer the five items below.
    p-value are unit-free.
 :::
 
+If some of these items were difficult, read the QM Basic lectures that
+explain them again before the first lecture. The estimate is explained in
+[Basic Lecture 7](../basic/b07-samples-estimators.qmd), the standard error in
+[Basic Lecture 8](../basic/b08-sampling-distributions.qmd#b08-standard-error),
+the confidence interval and its critical value in
+[Basic Lecture 9](../basic/b09-t-confidence-intervals.qmd), and the t
+statistic and the p-value in
+[Basic Lecture 10](../basic/b10-testing-errors-power.qmd).
+
 **Define the variables.** The data of this course are 1,441
 pitches from the television show Shark Tank, where founders ask investors
 (the sharks) for money in exchange for a share of their company. This lecture
@@ -98,7 +107,12 @@ measures all money in millions of dollars:
   20% values the company at \$0.5 million, so $Y_i = 0.5$.
 
 [Shark Tank data]{.shark-tag} **R warm-up.** Every Intermediate lecture has a short R warm-up:
-you run a few lines of R and bring the output to class. This week, load the
+you run a few lines of R and bring the output to class. This week you work
+with the data file of the course for the first time in R.
+
+[Download `shark_tank_teaching.csv`](../data/shark_tank_teaching.csv){download="shark_tank_teaching.csv"}
+and place it in the `data` subfolder of your course project, as in
+[Basic Lecture 1](../basic/b01-introduction-data-analysis.qmd). Then load the
 data, keep the deals for a share of the company, and plot the agreed
 valuation against the claimed valuation:
 
@@ -134,6 +148,13 @@ agreed valuation. The lecture material gives the answer.
 
 ## Lecture material
 
+Founders care about how one variable goes with another. How much more do
+you sell when you spend more on advertising? How many fewer units do you sell
+when you raise the price? How much higher is the valuation investors agree
+to when you claim a higher one? Each question is about a relationship between
+two variables, and each answer helps with a decision: the advertising budget,
+the price, the claim in a pitch.
+
 QM Basic ended with one variable: you estimated a mean, gave its standard
 error, built a confidence interval, and tested a claim about it. Earlier, in
 [Basic Lecture 5](../basic/b05-joint-covariance-correlation.qmd), the
@@ -142,12 +163,21 @@ much in their own units. A founder needs the second answer: how much more
 agreed valuation goes with a higher claim, in dollars. Regression gives this
 answer, and the rest of QM Intermediate builds on it.
 
-This section fits the regression line to the valuations in the Shark Tank
-data. Many straight lines can be drawn through a cloud of points. The
-regression line is the one that fits best by the least-squares criterion: the
-sum of its squared vertical distances to the points (the residuals) is as
-small as possible. The section explains what this line describes, how it is
-calculated, and how to read its slope and its intercept.
+To describe a relationship with numbers, we start with the simplest summary:
+a straight line through the cloud of points. Many straight lines can be drawn
+through the same cloud, so we need to say which one approximates the
+relationship best. The usual definition of "best" is the least-squares
+criterion: the best line is the one that makes the sum of the squared
+vertical distances between the points and the line as small as possible.
+Linear regression is the mathematics that finds this line, so that it runs
+through the middle of the data points.
+
+Once you have the line, you can also use it to predict. A founder who plans
+to claim \$2 million can read from the line at what valuation such deals
+closed on average. Such predictions are useful with care: inside the range
+of the data, and under the assumptions that Lecture 2 explains. This section
+explains what the line describes, how it is calculated, and how to read its
+slope and its intercept.
 
 ### Start with a founder's question
 
@@ -190,81 +220,145 @@ nrow(vals)                      # deals for a share of the company
 #| label: fig-i01-scatter
 #| code-fold: true
 #| code-summary: "See the R code for this figure"
-#| fig-cap: "Valuation agreed on air against the valuation claimed by the founder, for the 874 deals for a share of the company. Both axes in $ millions. The display zooms in on valuations up to $10 million (819 of 874 deals). The orange line is the fitted regression line, calculated from all 874 deals. On the grey dashed line the agreed valuation equals the claimed one."
-#| fig-alt: "Scatter plot of the agreed valuation against the claimed valuation, both from 0 to 10 million dollars. Green points rise from the lower left, most of them below a grey dashed diagonal where agreed equals claimed. An orange fitted line rises less steeply than the diagonal."
+#| fig-width: 9
+#| fig-height: 4.4
+#| fig-cap: "Valuation agreed on air against the valuation claimed by the founder, for the 874 deals for a share of the company. Both axes in $ millions. Left: all 874 deals. Right: the same data, zoomed in on valuations up to $10 million on both axes (819 of 874 deals). The orange line is the fitted regression line, calculated from all 874 deals and identical in both panels. On the grey dashed line the agreed valuation equals the claimed one."
+#| fig-alt: "Two scatter plots of the agreed valuation against the claimed valuation. Left panel: all deals, with axes up to 50 million dollars; most green points are crowded in the lower left corner and a few lie far out. Right panel: the same data up to 10 million dollars; green points rise from the lower left, most of them below a grey dashed diagonal where agreed equals claimed, and many points line up in vertical columns at round claims such as 1, 2, 5 and 10 million. In both panels an orange fitted line rises less steeply than the diagonal."
 library(ggplot2)
 sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
 vals <- subset(sharks, deal_on_show == 1 & deal_equity_pct > 0)
 vals$claimed_m <- vals$requested_valuation_usd / 1e6
 vals$agreed_m <- vals$deal_valuation_usd / 1e6
 val_model <- lm(agreed_m ~ claimed_m, data = vals)
-display_vals <- subset(vals, claimed_m <= 10 & agreed_m <= 10)
 
-ggplot(display_vals, aes(x = claimed_m, y = agreed_m)) +
-  geom_point(alpha = 0.45, size = 1.6, colour = "#009E73") +
+# the same deals twice: once in full, once only those up to $10 million
+panel_names <- c("All 874 deals", "Zoomed in: up to $10 million (819 deals)")
+zoomed <- subset(vals, claimed_m <= 10 & agreed_m <= 10)
+plot_df <- rbind(
+  data.frame(panel = panel_names[1], claimed_m = vals$claimed_m,
+             agreed_m = vals$agreed_m),
+  data.frame(panel = panel_names[2], claimed_m = zoomed$claimed_m,
+             agreed_m = zoomed$agreed_m)
+)
+plot_df$panel <- factor(plot_df$panel, levels = panel_names)
+# invisible corner points fix the axis range of each panel
+corner_df <- data.frame(panel = factor(panel_names, levels = panel_names),
+                        claimed_m = c(52, 10.3), agreed_m = c(52, 10.3))
+label_df <- data.frame(panel = factor(panel_names, levels = panel_names),
+                       claimed_m = c(34, 6.8), agreed_m = c(38, 7.6),
+                       lab = "agreed = claimed")
+
+ggplot(plot_df, aes(x = claimed_m, y = agreed_m)) +
+  geom_blank(data = corner_df) +
+  geom_point(alpha = 0.45, size = 1.5, colour = "#009E73") +
   geom_abline(intercept = coef(val_model)[1],
               slope = coef(val_model)[2],
               colour = "#D55E00", linewidth = 0.9) +
   geom_abline(intercept = 0, slope = 1, colour = "#5B6976",
               linetype = "dashed", linewidth = 0.6) +
-  annotate("text", x = 6.8, y = 7.5, label = "agreed = claimed",
-           hjust = 1, colour = "#5B6976", size = 3.2) +
-  annotate("text", x = 0.3, y = 9.85,
-           label = "Fitted regression (estimated on all 874 deals)",
-           colour = "#D55E00", size = 3.4, hjust = 0) +
-  coord_cartesian(xlim = c(0, 10.3), ylim = c(0, 10.3), expand = FALSE) +
+  geom_text(data = label_df, aes(label = lab), hjust = 1,
+            colour = "#5B6976", size = 3.1) +
+  facet_wrap(~ panel, scales = "free") +
+  scale_x_continuous(expand = expansion(mult = c(0.01, 0))) +
+  scale_y_continuous(expand = expansion(mult = c(0.01, 0))) +
   labs(x = "Valuation claimed by the founder ($ millions)",
        y = "Valuation agreed on air ($ millions)") +
   theme_minimal(base_size = 13) +
   theme(
     panel.grid.minor = element_blank(),
     panel.grid.major.x = element_blank(),
-    plot.caption = element_text(colour = "#5B6976"),
-    axis.title = element_text(colour = "#17324D")
+    panel.spacing = grid::unit(1.5, "lines"),
+    axis.title = element_text(colour = "#17324D"),
+    strip.text = element_text(colour = "#17324D", face = "bold")
   )
 ```
 
 Each point in @fig-i01-scatter is one deal. The claimed valuation is on
-the horizontal axis and the agreed valuation is on the vertical axis. Both axes use units of
-\$1 million. The grey dashed line is a reference line, not an estimate. It joins
-all points where the agreed valuation equals the claimed one, such as
-(1, 1) and (5, 5). A deal below this line closed at a lower valuation than
-the founder claimed. The orange line is the regression line, the line that fits the
-points best by the least-squares criterion. It shows the average agreed
+the horizontal axis and the agreed valuation is on the vertical axis. Both
+axes use units of \$1 million. The grey dashed line is a reference line, not
+an estimate. It joins all points where the agreed valuation equals the
+claimed one, such as (1, 1) and (5, 5). A deal below this line closed at a
+lower valuation than the founder claimed.
+
+The orange line is the regression line. Among all straight lines, it is the
+one whose squared vertical distances to the points add up to the smallest
+total. It runs through the middle of the cloud and shows the average agreed
 valuation at each claimed valuation, not the result of every deal. The rest
 of this lecture explains this criterion and how to read the line.
 
-The figure shows 819 of the 874 deals, so that the area with many points is
-easy to read. The figure leaves out the 55 deals with a valuation above
-\$10 million on at least one axis. R still uses these deals to calculate the
-orange line. Always say when a graph is zoomed in, that is, when it shows
-only part of the data. Otherwise readers may think that the displayed range
-is the complete data.
+The left panel shows all 874 deals. A few deals with claims of up to
+\$50 million stretch both axes, so that most points are pressed into the
+lower left corner and are hard to tell apart. The right panel therefore
+zooms in on valuations up to \$10 million on both axes. This range is not a
+cut of the data: 94% of the founders claimed at most \$10 million, and the
+zoomed panel shows 819 of the 874 deals. R uses all 874 deals to calculate
+the orange line, which is the same in both panels. When you zoom in on part
+of a graph, show the full data next to it, as here. Otherwise readers may
+think that the displayed range is the complete data. Whether the few very
+large deals pull the line in one direction is a question for Lecture 2.
 
-The code below counts the deals inside the zoomed area. It also gives the
-percentage of deals in which the agreed valuation is below, equal to, or
-above the claimed valuation.
+The code below counts the deals in the zoomed panel and the share of
+founders who claimed at most \$10 million. It also gives the percentage of
+deals in which the agreed valuation is below, equal to, or above the claimed
+valuation.
 
 ```{r}
 #| label: i01-below-diagonal
-sum(vals$claimed_m <= 10 & vals$agreed_m <= 10)   # deals shown in the figure
+sum(vals$claimed_m <= 10 & vals$agreed_m <= 10)   # deals in the zoomed panel
+round(100 * mean(vals$claimed_m <= 10), 1)        # % claiming at most $10 million
 round(100 * c(below = mean(vals$agreed_m < vals$claimed_m),
               equal = mean(vals$agreed_m == vals$claimed_m),
               above = mean(vals$agreed_m > vals$claimed_m)), 1)
 ```
 
-Most points lie below the grey dashed line. In 81.5% of the deals the agreed
-valuation is lower than the valuation the founder claimed. In 12.8% it is the
-same, and in 5.7% it is higher. The sharks usually pay the amount that the
-founder asked for, but they take a larger share of the company for it. In
-this way the agreed valuation ends up lower than the claimed valuation.
+The first two numbers confirm the description of the zoomed panel: it holds
+819 deals, and 94.1% of the founders claimed at most \$10 million. The third
+output shows that most points lie below the grey dashed line. In 81.5% of the
+deals the agreed valuation is lower than the valuation the founder claimed.
+In 12.8% it is the same, and in 5.7% it is higher. The sharks usually pay the
+amount that the founder asked for, but they take a larger share of the
+company for it. In this way the agreed valuation ends up lower than the
+claimed valuation.
 
-### Units first: money in millions
+::: {.callout-caution collapse="true"}
+## Try it: do the points pile up at certain values?
 
-Every number in this lecture has the units of these two columns. So we fix
-the units before we fit any model. We divide the raw dollar valuations by
-1,000,000: a claimed valuation of \$2,000,000 becomes `claimed_m = 2`. This
-change in the units of measurement does not change the relationship between the two valuations. @exm-i01-units, after the model is
+Look at the right panel of @fig-i01-scatter. Are the points spread evenly
+along the horizontal axis, or do they pile up at certain claimed valuations?
+If they pile up, why could that be?
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+They pile up. Many points form vertical columns at round claims such as
+\$1, \$2, \$2.5, \$5, and \$10 million. This pattern is called bunching.
+Founders and sharks named these valuations on the spot, in a negotiation on
+television, and round numbers are easy to name. A valuation calculated with
+a formal method, for example from expected future profits, would rarely
+land exactly on a round number. The code below counts the share of deals in
+which the claimed valuation is one of nine round values.
+
+```{r}
+#| label: i01-bunching
+round_values <- c(0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 10)   # in $ millions
+at_round <- sapply(vals$claimed_m,
+                   function(v) any(abs(v - round_values) < 1e-9))
+round(100 * mean(at_round), 1)   # % of claims at one of these values
+```
+
+In 55.3% of the 874 deals, the claimed valuation is exactly \$0.5, 1, 1.5,
+2, 2.5, 3, 4, 5, or 10 million. More than half of all claims sit on only
+nine values. Bunching does not stop us from fitting a line. But it reminds
+you to ask how your data were generated: here, the claimed valuation is a
+number chosen in a pitch, not a measured value of the company.
+:::
+:::
+
+Every number in this lecture has the units of the two valuation columns, so
+we fix the units before we fit any model. We divide the raw dollar
+valuations by 1,000,000: a claimed valuation of \$2,000,000 becomes
+`claimed_m = 2`. This change in the units of measurement does not change the
+relationship between the two valuations. @exm-i01-units, after the model is
 fitted, shows what happens to the coefficients when the units change.
 
 ### The population model and the conditional mean
@@ -276,6 +370,19 @@ R help pages, and AI assistants use other names for the same things. The
 outcome is also called the dependent variable or the response. The
 predictor is also called the independent variable, the explanatory
 variable, or the regressor. This book always says outcome and predictor.
+
+Every straight line is made of two simple things: a starting point and a
+steepness. Regression gives them practical names.
+
+- The intercept is where the line starts: its value at $X=0$. In our
+  example, it is the agreed valuation that the line gives for a claimed
+  valuation of zero.
+- The slope tells you how steep the line is. Practically, it answers the
+  question: for every additional unit of $X$, how much higher or lower is $Y$
+  on average? In our example: for every additional \$1 million of claimed
+  valuation, how much higher is the agreed valuation on average?
+
+In the model, the intercept is written $\beta_0$ and the slope $\beta_1$.
 The simple linear regression model is
 
 $$
@@ -286,8 +393,8 @@ $$
 - $X_i$ is the predictor for observation $i$.
 - $\beta_0$ is the population intercept.
 - $\beta_1$ is the population slope.
-- $\varepsilon_i$ is the error term: the part of $Y_i$ that
-  $\beta_0+\beta_1X_i$ does not capture. Nobody observes it.
+- $\varepsilon_i$ is the error term: the part of $Y_i$ that the population
+  line $\beta_0+\beta_1X_i$ does not capture.
 
 The intercept and the slope are the two coefficients of the model.
 
@@ -322,22 +429,22 @@ the data.
 :::
 
 Here the slope is the difference in the average agreed valuation between
-deals whose claimed valuations differ by \$1 million. The words "associated
-with" matter. A regression line compares averages across
-groups of observed deals. It does not say what would happen if one founder
-changed their claimed valuation. The box "What this fitted line can and cannot say" later
-in this section explains this limit.
-
-You can read the slope as an effect only under one condition: nothing
-outside the model affects both the claimed and the agreed valuation. Lecture 2 calls this
-condition zero conditional mean of the error, with no omitted confounder.
+deals whose claimed valuations differ by \$1 million. We say "is associated
+with", because the line compares groups of observed deals. The slope is the
+effect of the claim only if the claimed valuation is as good as randomly
+assigned, that is, unrelated to everything else that drives the agreed
+valuation, such as the sales of the company. Lecture 2 returns to this
+condition.
 
 ### Error terms versus residuals
 
-The population line $\beta_0+\beta_1x$ is part of the model. Nobody can observe
-it, because $\beta_0$ and $\beta_1$ are unknown. In the words of
+The population line $\beta_0+\beta_1x$ describes the whole population, for
+example all founders who pitch to investors and reach a deal. We usually do
+not have data on this whole population, so we cannot compute $\beta_0$ and
+$\beta_1$. In the words of
 [Basic Lecture 7](../basic/b07-samples-estimators.qmd), they are
-parameters. What we calculate from the data is the fitted line. Its
+parameters. What we have is a sample from the population, and what we
+calculate from it is the fitted line. Its
 coefficients $\hat\beta_0$ and $\hat\beta_1$ have a hat symbol on top. The
 hat marks an estimate: these are the values that we calculate from the data
 for the unknown $\beta_0$ and $\beta_1$. The rule that turns the data into
@@ -357,7 +464,7 @@ line.
 
 **Error term** $\varepsilon_i$. The distance of observation $i$ from the
 population line: $\varepsilon_i=Y_i-(\beta_0+\beta_1X_i)$. It belongs to the
-model and is never observed.
+model, and without the population line we cannot calculate it.
 
 **Fitted value** $\widehat Y_i$. The value on the fitted line at the
 predictor value of observation $i$: $\widehat Y_i=\hat\beta_0+\hat\beta_1X_i$.
@@ -420,7 +527,7 @@ ggplot(er_df, aes(x = x, y = y)) +
   geom_point(size = 2.6, colour = "#009E73") +
   geom_text(data = label_df, aes(x = x, y = y, label = lab),
             parse = TRUE, colour = "#0072B2", size = 4) +
-  coord_cartesian(xlim = c(0, 9.4), ylim = c(0, 9.4)) +
+  coord_cartesian(xlim = c(0, 9.4), ylim = c(0, 9.4)) +   # all points inside
   facet_wrap(~ panel) +
   labs(x = "Predictor X", y = "Outcome Y") +
   theme_minimal(base_size = 13) +
@@ -434,14 +541,13 @@ ggplot(er_df, aes(x = x, y = y)) +
 ```
 
 - $\varepsilon_i = Y_i - (\beta_0+\beta_1X_i)$ measures the distance to the
-  population line. Because $\beta_0$ and $\beta_1$ are unknown,
-  $\varepsilon_i$ is never observed.
+  population line. Because we cannot compute $\beta_0$ and $\beta_1$, we
+  cannot compute $\varepsilon_i$ either.
 - $e_i = Y_i - (\hat\beta_0+\hat\beta_1X_i)$ measures the distance to the fitted line.
   It is computed from data, one number per observation.
 
-We never see the error terms. The residuals are what we can calculate in
-their place, so they are estimates of the error terms and not the error
-terms themselves.
+The residuals are what we can calculate in place of the error terms. They
+are estimates of the error terms, not the error terms themselves.
 Lecture 2 uses residuals to check the model.
 
 ::: {.callout-note collapse="true"}
@@ -468,7 +574,7 @@ negative residuals cancel. Adding up their absolute values avoids this, but then
 no simple formula for the best line. Squared residuals are never negative,
 they count a large residual more heavily than a small one, and they lead to a
 direct formula for the best line. For these reasons squaring is the standard
-choice. But it is not the only possible choice.
+choice.
 
 ::: {.definition-box}
 <span class="label">Definition</span>
@@ -720,7 +826,9 @@ $$
 
 The covariance has the units of $X$ times the units of $Y$, and the variance
 has the squared units of $X$. So their ratio has the units of a slope:
-units of $Y$ per unit of $X$.
+units of $Y$ per unit of $X$. Why the covariance is divided by exactly this
+quantity is the topic of a subsection with a picture after the worked example
+below.
 
 The same slope can be written with the correlation
 $r_{XY}=s_{XY}/(s_X s_Y)$. The correlation is the covariance rescaled so that
@@ -786,7 +894,9 @@ $$
 \hat\beta_0 = \bar y - \hat\beta_1\bar x = 4 - 1.5\times 2 = 1.
 $$
 
-The fitted line is $\widehat y = 1 + 1.5x$. @fig-i01-toy shows that the line
+The fitted line is $\widehat y = 1 + 1.5x$. In words: in these three
+observations, an $x$ that is one unit higher goes with a $y$ that is on
+average 1.5 units higher. @fig-i01-toy shows that the line
 passes exactly through the point of means $(\bar x,\bar y)=(2,4)$. The
 residuals are $-0.5$, $+1$, and $-0.5$. They sum to zero, as least-squares
 residuals always do when the model has an intercept.
@@ -816,7 +926,7 @@ ggplot(toy_df, aes(x = x, y = y)) +
   annotate("text", x = 2.34, y = 3.72,
            label = "'('*bar(x)*', '*bar(y)*')'", parse = TRUE,
            colour = "#17324D", size = 3.4) +
-  coord_cartesian(xlim = c(0.5, 3.5), ylim = c(1, 6)) +
+  coord_cartesian(xlim = c(0.5, 3.5), ylim = c(1, 6)) +   # all points inside
   labs(x = "x", y = "y") +
   theme_minimal(base_size = 13) +
   theme(
@@ -842,9 +952,100 @@ $X$ equal to 1, standard deviation of $Y$ about 1.732, and correlation about
 0.866. The second output is what `lm()` (introduced in the next section)
 reports: intercept 1 and slope 1.5, the same line as by hand.
 
+#### Why the covariance is divided by the variance of $X$
+
+The slope is the number you will interpret most often in this course, so it
+pays to understand what it measures and why the formula divides the
+covariance by the variance of $X$. @fig-i01-slope-intuition shows the three
+toy points with the fitted line $\widehat y=1+1.5x$.
+
+As you know from school, the slope of a straight line is rise over run. The
+run is how far you move to the right along the $x$-axis, and the rise is how
+far the line goes up over that distance. In the small triangle, the run goes
+from $x=2$ to $x=3$, so it is 1. Over this run the fitted line goes up from
+$1+1.5\times2=4$ to $1+1.5\times3=5.5$, a rise of 1.5. The slope is therefore
+$1.5/1=1.5$. The large triangle uses a run of 2, from $x=1$ to $x=3$. Over
+this run the line goes up from $1+1.5\times1=2.5$ to 5.5, a rise of 3, and
+the ratio is again $3/2=1.5$. On a straight line, rise over run is the same
+wherever you measure it and however long the run is. A single number
+therefore describes the whole line, and the most convenient way to state it
+is the rise over a run of exactly one unit.
+
+```{r}
+#| label: fig-i01-slope-intuition
+#| code-fold: true
+#| code-summary: "See the R code for this figure"
+#| fig-width: 5.6
+#| fig-height: 4.4
+#| fig-cap: "The slope as rise over run in the three-point toy example. The small triangle has a run of 1 (from x = 2 to x = 3) and a rise of 1.5. The large triangle has a run of 2 (from x = 1 to x = 3) and a rise of 3. Both give the same slope, 1.5, because the fitted line is straight."
+#| fig-alt: "Three green points at (1, 2), (2, 5) and (3, 5) with an orange rising fitted line. Below the line, a solid blue triangle runs from x equal to 2 to x equal to 3, labelled run 1 and rise 1.5. Above the line, a dark dashed triangle runs from x equal to 1 to x equal to 3, labelled run 2 and rise 3. A label reads slope equals rise over run equals 1.5."
+library(ggplot2)
+x_toy <- c(1, 2, 3); y_toy <- c(2, 5, 5)
+toy_fit <- lm(y_toy ~ x_toy)
+b0 <- coef(toy_fit)[1]; b1 <- coef(toy_fit)[2]
+line_at <- function(x) b0 + b1 * x
+pts <- data.frame(x = x_toy, y = y_toy)
+# small triangle below the line: run 1 from x = 2 to x = 3
+small <- data.frame(x = c(2, 3), xend = c(3, 3),
+                    y = c(line_at(2), line_at(2)),
+                    yend = c(line_at(2), line_at(3)))
+# large triangle above the line: run 2 from x = 1 to x = 3
+large <- data.frame(x = c(1, 1), xend = c(1, 3),
+                    y = c(line_at(1), line_at(3)),
+                    yend = c(line_at(3), line_at(3)))
+
+ggplot(pts, aes(x = x, y = y)) +
+  geom_abline(intercept = b0, slope = b1, colour = "#D55E00", linewidth = 0.9) +
+  geom_segment(data = small, aes(xend = xend, yend = yend),
+               colour = "#0072B2", linewidth = 1) +
+  geom_segment(data = large, aes(xend = xend, yend = yend),
+               colour = "#17324D", linewidth = 0.8, linetype = "dashed") +
+  geom_point(size = 3, colour = "#009E73") +
+  annotate("text", x = 2.5, y = line_at(2) - 0.22, label = "run = 1",
+           colour = "#0072B2", size = 3.6) +
+  annotate("text", x = 3.06, y = line_at(2.5), label = "rise = 1.5",
+           colour = "#0072B2", size = 3.6, hjust = 0) +
+  annotate("text", x = 2, y = line_at(3) + 0.25, label = "run = 2",
+           colour = "#17324D", size = 3.6) +
+  annotate("text", x = 0.94, y = line_at(2), label = "rise = 3",
+           colour = "#17324D", size = 3.6, hjust = 1) +
+  annotate("text", x = 2.6, y = 2.2,
+           label = "slope = rise / run\n= 1.5 / 1 = 3 / 2 = 1.5",
+           colour = "#17324D", size = 3.6) +
+  coord_cartesian(xlim = c(0.3, 3.7), ylim = c(1.5, 6)) +   # all points inside
+  labs(x = "x", y = "y") +
+  theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    axis.title = element_text(colour = "#17324D")
+  )
+```
+
+The formula $\hat\beta_1=s_{XY}/s_X^2$ finds this rise per unit of run from
+the data points themselves. The covariance in the numerator measures how $X$
+and $Y$ move together. Each product $(x_i-\bar x)(y_i-\bar y)$ is positive
+for a point to the upper right or lower left of the point of means, and
+negative for a point to the upper left or lower right
+([Basic Lecture 5](../basic/b05-joint-covariance-correlation.qmd)). A
+positive covariance therefore goes with a rising line, and a negative
+covariance with a falling line.
+
+The size of the covariance, however, is not yet a slope. It also grows when
+the values of $X$ are more spread out, and its units are units of $X$ times
+units of $Y$. Dividing by the variance of $X$ removes the spread of $X$ and
+leaves units of $Y$ per unit of $X$, which is a rise per one unit of run. In
+the toy data the variance of $X$ is exactly 1, so the slope equals the
+covariance, 1.5, the rise of the small triangle in @fig-i01-slope-intuition.
+
+Whenever you compute a slope in this course, read it as such a rise over
+run: how much higher the outcome is, on average, per one unit more of the
+predictor, in the units of both variables.
+
 ### Fit and read the Shark Tank model in R
 
-[Shark Tank data]{.shark-tag} Now the Shark Tank data. The function `lm()` (for "linear model") fits the
+[Shark Tank data]{.shark-tag} Let us apply this to real data and to the
+driving question. The function `lm()` (for "linear model") fits the
 least-squares line. Its first argument is a formula of the form
 `outcome ~ predictor`. The block below loads the data again, so you can run
 it on its own:
@@ -867,7 +1068,11 @@ $$
 =-0.068+0.649\times\text{claimed valuation},
 $$
 
-with both valuations measured in \$ millions.
+with both valuations measured in \$ millions. Read the slope as rise over
+run. On the fitted line, a claim of \$2 million goes with an agreed
+valuation of about \$1.23 million, and a claim of \$3 million with about
+\$1.88 million. A run of \$1 million in the claim goes with a rise of about
+\$0.65 million in the average agreed valuation.
 
 R calculated these two numbers with the formulas of the previous section.
 You can check this with the covariance, the variance, the correlation, and
@@ -885,12 +1090,42 @@ c(mean_y_minus_slope_times_mean_x = mean(y) - cov(x, y) / var(x) * mean(x),
   intercept_from_lm = unname(coef(val_model)["(Intercept)"]))
 ```
 
-Both formulas give the slope 0.649 that `lm()` reports, and the intercept
-formula gives $-0.068$. The second form of the slope also shows why it is
-below 1. The correlation of the two valuations is 0.893, and the agreed
-valuations spread less than the claimed ones: their standard deviation is
-\$3.70 million against \$5.09 million. So
+The first line of output gives the correlation of the two valuations, 0.893,
+and their standard deviations, \$5.09 million for the claimed and
+\$3.70 million for the agreed valuation. The second line shows that both
+formulas give the slope 0.649 that `lm()` reports, and the third line that
+the intercept formula gives $-0.068$, as `lm()` does.
+
+The form $\hat\beta_1=r_{XY}\,s_Y/s_X$ shows where the slope below 1 comes
+from. If every deal had closed exactly at the claimed valuation, all points
+would lie on the grey dashed line. The correlation would then be 1, both
+standard deviations would be equal, and the slope would be 1. In the data,
+both parts are below 1. The correlation is 0.893, because the deals do not
+lie exactly on a line. And the ratio of the standard deviations is
+$3.70/5.09\approx0.73$, because the agreed valuations are less spread out
+than the claimed ones: in dollars, the gap between the claim and the agreed
+valuation tends to be larger for high claims. Together,
 $\hat\beta_1 = 0.893 \times 3.70/5.09 \approx 0.649$.
+
+The weights of the previous section also matter here. Deals with a claim
+far from the average claim have a long run, so they count heavily in the
+slope. The code below computes the share of all weight, the squared run
+$(x_i-\bar x)^2$, that falls on the deals with a claim above \$10 million.
+
+```{r}
+#| label: i01-slope-weights
+weight <- (x - mean(x))^2                      # squared run of every deal
+c(deals_above_10m = sum(x > 10),
+  pct_of_deals = round(100 * mean(x > 10), 1),
+  pct_of_weight = round(100 * sum(weight[x > 10]) / sum(weight), 1))
+```
+
+The 52 deals with a claim above \$10 million are only 5.9% of the deals,
+but they carry 73.8% of the weight in the slope. So a few large deals have
+a strong say in the slope of 0.649. This is not an error: least squares
+trusts points with a long run. But it is worth knowing before you rely on
+the slope. Lecture 2 shows how to check how much the slope changes without
+such deals.
 
 The table below shows the observed value, the fitted value, and the residual
 for the first six rows of the data:
@@ -943,8 +1178,7 @@ same unit, so the slope also reads per dollar: each extra dollar of claimed
 valuation goes with about 65 cents more agreed valuation, on average. This
 answers the prediction question from before class. The sign is positive,
 the unit is millions of dollars agreed per million claimed, and the slope is
-clearly below 1. The slope does not mean that claiming more causes the
-sharks to pay more.
+clearly below 1.
 
 Is \$0.65 million a large difference? Two benchmarks help. The average
 agreed valuation in these deals is \$2.22 million, so \$0.65 million is about
@@ -1028,7 +1262,9 @@ about a coefficient, check the units first.
 Some outcomes are percentages, such as the equity offered or a conversion
 rate (the percentage of visitors who buy). The slope is then in percentage
 points per unit of $X$. A percentage point is the difference between two
-percentages. A conversion rate that falls from 3.0% to 2.6% falls by 0.4
+percentages. If this distinction is not fresh, the
+[Mathematics Refresher](../resources/math-refresher.qmd#numbers-proportions-percentages-and-units)
+explains it with more examples. A conversion rate that falls from 3.0% to 2.6% falls by 0.4
 percentage points. In percent of its old value, the same fall is about 13%.
 The two statements are different, so always say which one you mean.
 
@@ -1194,6 +1430,15 @@ Try it yourself first.
 :::
 :::
 
+This lecture gave you a line that summarises how the agreed valuation goes
+with the claimed valuation, and a way to read its slope and intercept in
+units that matter for a pitch: about 65 cents of agreed valuation per extra
+dollar claimed. It leaves open whether you can trust this line. A straight
+line may describe a curved pattern badly, a few very large deals may pull
+it, and the deals may scatter more around it at high claims than at low
+ones. Before you use the line to prepare a negotiation or to predict a deal,
+Lecture 2 shows how to check the assumptions behind it with residual plots.
+
 **Next:** R fits a least-squares line to any data, even to data that a
 straight line describes badly. R gives no warning. Lecture 2 states the assumptions behind the
 fitted line and shows how to check them with residual plots.
@@ -1230,7 +1475,8 @@ unclear and bring it to the next tutorial, or ask Tilly.
 ## Check your answers
 
 1. $\varepsilon_i$ is the error term of the population model: the distance to
-   the unknown population line. It is never observed. $e_i$ is the residual:
+   the population line, which we cannot compute without data on the whole
+   population. $e_i$ is the residual:
    the distance to the fitted line, calculated from the data.
 2. The sum of squared residuals, $\operatorname{SSE}=\sum_i e_i^2$. In a
    plain sum the positive and the negative residuals would cancel. Squares
@@ -1297,8 +1543,8 @@ Then do five more tasks. These tasks have no given steps:
    measures the claimed valuation in \$1,000s. Which intercept and which
    slope does it report? Use the rule of @exm-i01-units.
 5. Under which condition could the slope 0.649 be read as the effect of a
-   higher claim? Name one factor outside the model that breaks this condition
-   for the Shark Tank deals.
+   higher claim? Name one factor that breaks this condition for the Shark
+   Tank deals.
 
 ::: {.callout-note collapse="true"}
 ## Check your answers
@@ -1314,8 +1560,9 @@ Then do five more tasks. These tasks have no given steps:
    by 1,000: $0.649/1000 = 0.000649$ million dollars of agreed valuation per
    \$1,000 claimed, which is \$649 per \$1,000. The intercept stays at
    $-0.068$, because the outcome keeps its units.
-5. The condition: nothing outside the model affects both the claimed and the
-   agreed valuation. Here it fails. A company with high sales can claim a
+5. The condition: the claimed valuation is as good as randomly assigned,
+   that is, unrelated to everything else that drives the agreed valuation.
+   Here it fails. A company with high sales can claim a
    higher valuation, and the sharks also agree to a higher valuation for it.
    The slope then mixes the effect of the claim with the effect of the sales.
 
@@ -1478,8 +1725,7 @@ answer."
 
 [Code sheet: Lecture 1 commands and formulas](code-sheet.qmd#lecture-1-simple-linear-regression).
 
-For a more formal treatment, see James et al., *An Introduction to
-Statistical Learning*, 2nd ed., Sections 3.1 and 3.6.2, and
+For a more formal treatment, see
 [Nieuwenhuis, *Statistical Methods for Business and Economics*](https://tilburguniversity.on.worldcat.org/oclc/317545871),
 Chapter 19.
 

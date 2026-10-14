@@ -395,7 +395,6 @@ window.Quarto = {
   <ul class="collapse">
   <li><a href="#before-class" id="toc-before-class" class="nav-link active" data-scroll-target="#before-class">Before class</a></li>
   <li><a href="#in-the-tutorial" id="toc-in-the-tutorial" class="nav-link" data-scroll-target="#in-the-tutorial">In the tutorial</a></li>
-  <li><a href="#after-class" id="toc-after-class" class="nav-link" data-scroll-target="#after-class">After class</a></li>
   </ul>
 </nav>
     </div>
@@ -467,25 +466,26 @@ Check your preparation
 </section>
 <section id="in-the-tutorial" class="level2 course-phase phase-in-class">
 <h2 class="anchored" data-anchor-id="in-the-tutorial">In the tutorial</h2>
-<p>Try each task in R before you open the answer. A complete written answer does five things. It names the sample, shows the calculation, and reports values with units. It interprets the values in context. And it states one important limit of the model or of the data.</p>
-<p>Tasks 1 to 5 and Task 7 follow one founder question through all steps of Lectures 1 to 3: how closely does the valuation agreed with the sharks follow the valuation that the founder claims? All tasks use the Shark Tank teaching file. The valuations are in millions of dollars: the valuation agreed on air (<code>agreed_m</code>) and the valuation claimed by the founder (<code>claimed_m</code>). The code below builds the data in the same way as in Lectures 1 to 3. It keeps the deals in which the sharks took a share of the company, and it converts both valuations from dollars to millions of dollars. The eight deals in which the sharks took no share of the company have no agreed valuation (the file records it as zero), so they are left out. The last line prints the number of deals that remain.</p>
+<p>Try each task in R before you open the answer. A complete written answer does five things. It names the sample, shows the calculation, and reports values with units. It interprets the values in context. And it states one important limit of the model or of the data. More practice for home is in the final section of this page, <a href="#i-ep01-home">Extra practice for home</a>.</p>
+<p>All seven tasks follow one founder question through the steps of Lectures 1 to 3: when founders offer more equity, how much equity do they end up giving in the deal? Before a pitch, every founder decides which share of the company to offer. On Shark Tank the sharks often accept the amount of money but ask for a larger share in return. A founder who knows how the final share is related to the opening offer can choose the offer with the likely final share in mind, and can decide in advance how far to go in the negotiation.</p>
+<p>All tasks use the Shark Tank teaching file. The code below loads the data and keeps the 882 pitches that ended in a deal on air (<code>deals</code>). Two variables answer the question, both in percent of the company: the equity that the founder offered at the start of the pitch (<code>equity_offered_pct</code>) and the equity that the founder gave in the deal (<code>deal_equity_pct</code>). A difference between two shares is measured in percentage points. Review <a href="../resources/math-refresher.html#numbers-proportions-percentages-and-units">percent and percentage points</a> if you need to. In eight of the deals the sharks invested without taking a share of the company, so the file records a deal share of 0%. These deals stay in the sample, because 0% is the equity that these founders gave. The last line prints the number of pitches and the number of deals.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>vals <span class="ot">&lt;-</span> <span class="fu">subset</span>(sharks, deal_on_show <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> deal_equity_pct <span class="sc">&gt;</span> <span class="dv">0</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>vals<span class="sc">$</span>claimed_m <span class="ot">&lt;-</span> vals<span class="sc">$</span>requested_valuation_usd <span class="sc">/</span> <span class="fl">1e6</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>vals<span class="sc">$</span>agreed_m <span class="ot">&lt;-</span> vals<span class="sc">$</span>deal_valuation_usd <span class="sc">/</span> <span class="fl">1e6</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(vals)   <span class="co"># deals for a share of the company</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>deals <span class="ot">&lt;-</span> <span class="fu">subset</span>(sharks, deal_on_show <span class="sc">==</span> <span class="dv">1</span>)   <span class="co"># pitches with a deal on air</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">pitches =</span> <span class="fu">nrow</span>(sharks), <span class="at">deals =</span> <span class="fu">nrow</span>(deals))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 874</code></pre>
+<pre><code>pitches   deals 
+   1441     882 </code></pre>
 </div>
 </div>
 <section id="task-1-fit-and-interpret-lecture-1" class="level3">
 <h3 class="anchored" data-anchor-id="task-1-fit-and-interpret-lecture-1">Task 1: Fit and interpret (Lecture 1)</h3>
-<p><span class="shark-tag">Shark Tank data</span> Fit the simple regression of the agreed valuation (<code>agreed_m</code>) on the claimed valuation (<code>claimed_m</code>), among the deals for a share of the company. Then report:</p>
+<p><span class="shark-tag">Shark Tank data</span> Fit the simple regression of the equity given in the deal (<code>deal_equity_pct</code>) on the equity offered by the founder (<code>equity_offered_pct</code>), with all deals. Then report:</p>
 <ol type="1">
 <li>the sample, with its number of deals,</li>
 <li>the fitted equation,</li>
 <li>the interpretation of the slope with units, in one sentence,</li>
+<li>the size of the slope for an offer that is one standard deviation higher, in percentage points, as a percent of the mean deal share, and in standard deviations of the deal share, followed by one sentence that judges the size,</li>
 <li>the limit of the intercept’s meaning, in one sentence.</li>
 </ol>
 <p>Use (copy and paste) this structure:</p>
@@ -493,6 +493,7 @@ Check your preparation
 Sample:
 Fitted equation:
 Interpretation of the slope:
+Size of the slope for one standard deviation more equity offered:
 Limit of the intercept's meaning:</code></pre>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
@@ -506,37 +507,51 @@ Check your answer
 </div>
 <div id="callout-2" class="callout-2-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
+<p>The code fits the model and prints its two coefficients. It then prints the mean and the standard deviation of the deal share, the benchmarks for the size of the slope, the standard deviation of the offer, and the smallest and largest offer.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>val_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(agreed_m <span class="sc">~</span> claimed_m, <span class="at">data =</span> vals)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(val_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>equity_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(deal_equity_pct <span class="sc">~</span> equity_offered_pct, <span class="at">data =</span> deals)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(equity_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>(Intercept)   claimed_m 
--0.06798986  0.64874084 </code></pre>
+<pre><code>       (Intercept) equity_offered_pct 
+          8.315024           1.207341 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">mean_deal =</span> <span class="fu">mean</span>(deals<span class="sc">$</span>deal_equity_pct),     <span class="co"># benchmarks, in %</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">sd_deal =</span> <span class="fu">sd</span>(deals<span class="sc">$</span>deal_equity_pct),</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">sd_offer =</span> <span class="fu">sd</span>(deals<span class="sc">$</span>equity_offered_pct))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>mean_deal   sd_deal  sd_offer 
+23.345329 14.878996  7.674459 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">range</span>(deals<span class="sc">$</span>equity_offered_pct)                <span class="co"># smallest and largest offer</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1]  1 51</code></pre>
 </div>
 </div>
 <p>Filled-in structure:</p>
 <ul>
 <li>R code: see the code above.</li>
-<li>Sample: the 874 deals for a share of the company.</li>
-<li>Fitted equation: <span class="math inline">\(\widehat y = -0.068 + 0.649x\)</span>, with both valuations in $ millions.</li>
-<li>Interpretation of the slope: a claimed valuation that is $1 million higher is associated with an agreed valuation that is on average about $0.65 million higher, so about two thirds of a higher claim shows up in the agreed valuation.</li>
-<li>Limit of the intercept’s meaning: a claimed valuation of zero is outside the observed range, so the intercept (about <span class="math inline">\(-\$68{,}000\)</span>) has no useful business meaning of its own.</li>
+<li>Sample: all 882 pitches in the file that ended in a deal on air.</li>
+<li>Fitted equation: <span class="math inline">\(\widehat y = 8.32 + 1.207x\)</span>, with the equity given in the deal <span class="math inline">\(y\)</span> and the equity offered <span class="math inline">\(x\)</span>, both in percent of the company.</li>
+<li>Interpretation of the slope: a founder who offered one percentage point more of the company gave on average about 1.21 percentage points more in the deal.</li>
+<li>Size of the slope for one standard deviation more equity offered: the offers have a standard deviation of 7.67 percentage points, so <span class="math inline">\(1.207\times7.67\approx9.27\)</span> percentage points more equity given. This is about 40% of the mean deal share of 23.3% and <span class="math inline">\(9.27/14.88\approx0.62\)</span> standard deviations of the deal share. This is a large difference in the share of the company that a founder gives up.</li>
+<li>Limit of the intercept’s meaning: the intercept of 8.3% is the fitted deal share for an offer of 0%, and no founder offered less than 1%, so it has no useful business meaning of its own.</li>
 </ul>
 </div>
 </div>
 </div>
 </section>
-<section id="task-2-fitted-value-and-residual-lecture-1" class="level3">
-<h3 class="anchored" data-anchor-id="task-2-fitted-value-and-residual-lecture-1">Task 2: Fitted value and residual (Lecture 1)</h3>
-<p><span class="shark-tag">Shark Tank data</span> Use the Task 1 model of the agreed valuation on the claimed valuation, both in $ millions. A founder claimed a valuation of $5 million and the deal was agreed on air at a valuation of $2.5 million.</p>
+<section id="task-2-prediction-and-residual-lecture-1" class="level3">
+<h3 class="anchored" data-anchor-id="task-2-prediction-and-residual-lecture-1">Task 2: Prediction and residual (Lecture 1)</h3>
+<p><span class="shark-tag">Shark Tank data</span> Use the Task 1 model of the equity given in the deal on the equity offered. A founder plans to offer 10% of the company.</p>
 <ol type="1">
-<li>Calculate the fitted value of this deal.</li>
-<li>Calculate the residual of this deal.</li>
+<li>Calculate the fitted deal share for this offer. Say in one sentence whether an offer of 10% lies inside the range of offers in the data, and why this matters for the prediction.</li>
+<li>The founder ends up giving 30% of the company. Calculate the residual of this deal, and give it as a percent of the fitted value.</li>
 <li>Interpret the sign of the residual in one sentence.</li>
 </ol>
 <p>Use (copy and paste) this structure:</p>
 <pre class="text"><code>R code:
-Fitted value:
+Fitted deal share:
+Inside the range of the data, and why it matters:
 Residual:
 Meaning of the sign:</code></pre>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -551,31 +566,36 @@ Check your answer
 </div>
 <div id="callout-3" class="callout-3-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
+<p>The code prints the fitted deal share for an offer of 10% and the residual of a deal at 30%, both in percent of the company.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>val_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(agreed_m <span class="sc">~</span> claimed_m, <span class="at">data =</span> vals)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">unname</span>(<span class="fl">2.5</span> <span class="sc">-</span> <span class="fu">predict</span>(val_model, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">claimed_m =</span> <span class="dv">5</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>equity_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(deal_equity_pct <span class="sc">~</span> equity_offered_pct, <span class="at">data =</span> deals)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>fitted_10 <span class="ot">&lt;-</span> <span class="fu">unname</span>(<span class="fu">predict</span>(equity_model,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                            <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">equity_offered_pct =</span> <span class="dv">10</span>)))</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">fitted =</span> fitted_10, <span class="at">residual =</span> <span class="dv">30</span> <span class="sc">-</span> fitted_10)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] -0.6757143</code></pre>
+<pre><code>   fitted  residual 
+20.388438  9.611562 </code></pre>
 </div>
 </div>
 <p>Filled-in structure:</p>
 <ul>
-<li>R code: see the code above. It prints the residual.</li>
-<li>Fitted value: with <span class="math inline">\(x=5\)</span> (in $ millions), <span class="math inline">\(\widehat y = -0.068 + 0.649 \times 5 \approx 3.18\)</span>, or about $3.18 million.</li>
-<li>Residual: the observed <span class="math inline">\(y = 2.5\)</span>, so <span class="math inline">\(e = 2.5 - 3.18 = -0.68\)</span>, about <span class="math inline">\(-\$680{,}000\)</span>. This is about 21% of the fitted value.</li>
-<li>Meaning of the sign: the negative sign means that this deal was agreed below the model’s fitted conditional mean for a claimed valuation of $5 million.</li>
+<li>R code: see the code above.</li>
+<li>Fitted deal share: with <span class="math inline">\(x=10\)</span>, <span class="math inline">\(\widehat y = 8.315 + 1.2073 \times 10 \approx 20.4\)</span>, so about 20% of the company, twice the offer.</li>
+<li>Inside the range of the data, and why it matters: the offers in the data run from 1% to 51%, and 309 deals started with an offer of exactly 10%, so the prediction rests on many similar deals and does not extrapolate.</li>
+<li>Residual: <span class="math inline">\(e = 30 - 20.4 = 9.6\)</span> percentage points, about 47% of the fitted value.</li>
+<li>Meaning of the sign: the positive sign means that this founder gave more equity than the fitted mean deal share of founders who offered 10%.</li>
 </ul>
 </div>
 </div>
 </div>
 </section>
-<section id="task-3-diagnostics-and-influence-lecture-2" class="level3">
-<h3 class="anchored" data-anchor-id="task-3-diagnostics-and-influence-lecture-2">Task 3: Diagnostics and influence (Lecture 2)</h3>
-<p><span class="shark-tag">Shark Tank data</span> Produce the residual-versus-fitted plot and the normal Q–Q plot for the Task 1 model of the agreed valuation on the claimed valuation.</p>
+<section id="task-3-diagnostics-and-how-the-data-were-generated-lecture-2" class="level3">
+<h3 class="anchored" data-anchor-id="task-3-diagnostics-and-how-the-data-were-generated-lecture-2">Task 3: Diagnostics and how the data were generated (Lecture 2)</h3>
+<p><span class="shark-tag">Shark Tank data</span> Produce the residual-versus-fitted plot and the normal Q–Q plot for the Task 1 model of the equity given in the deal on the equity offered.</p>
 <ol type="1">
 <li>Name two problems with the assumptions that you can see in the plots. For each one, say in one sentence what in the plots shows it.</li>
-<li>Count the standardised residuals beyond <span class="math inline">\(\pm 3\)</span> and the observations with a Cook’s distance above <span class="math inline">\(4/n\)</span>.</li>
-<li>State the three-step rule for handling a flagged observation.</li>
+<li>Count the standardised residuals beyond <span class="math inline">\(\pm 3\)</span> and the observations with a Cook’s distance above <span class="math inline">\(4/n\)</span>. Say in one sentence what most deals with a standardised residual above 3 have in common.</li>
+<li>The residual plot shows vertical stripes, and inside the stripes the points lie in rows. Count the offers and the deal shares that are a multiple of 5%. Then explain in two sentences how the way the data were generated produces this bunching, and why it is not a violation of an assumption.</li>
 <li>Name one assumption that these plots cannot assess, and say in one sentence what information would assess it.</li>
 </ol>
 <p>Use (copy and paste) this structure:</p>
@@ -584,7 +604,9 @@ First problem, and what in the plots shows it:
 Second problem, and what in the plots shows it:
 Number with a standardised residual beyond ±3:
 Number with a Cook's distance above 4/n:
-Rule for flagged observations:
+What most deals with a standardised residual above 3 have in common:
+Offers and deal shares at a multiple of 5%:
+How the data were generated, and why the bunching is not a violation:
 Assumption the plots cannot assess, and what would assess it:</code></pre>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
@@ -598,55 +620,90 @@ Check your answer
 </div>
 <div id="callout-4" class="callout-4-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
+<p>The code draws the two plots side by side. It then prints the standard deviation of the residuals in five groups of offers, the two counts of flagged deals, the number of flagged deals in which the sharks took the whole company, and the number of offers and deal shares at a multiple of 5%.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>val_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(agreed_m <span class="sc">~</span> claimed_m, <span class="at">data =</span> vals)</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>old_par <span class="ot">&lt;-</span> <span class="fu">par</span>(<span class="at">no.readonly =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="at">mar =</span> <span class="fu">c</span>(<span class="fl">4.5</span>, <span class="fl">4.4</span>, <span class="fl">1.3</span>, <span class="fl">0.7</span>), <span class="at">las =</span> <span class="dv">1</span>)</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">fitted</span>(val_model), <span class="fu">residuals</span>(val_model),</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">col =</span> grDevices<span class="sc">::</span><span class="fu">adjustcolor</span>(<span class="st">"#0072B2"</span>, <span class="at">alpha.f =</span> <span class="fl">0.35</span>),</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">bty =</span> <span class="st">"n"</span>, <span class="at">xlab =</span> <span class="st">"Fitted agreed valuation ($ millions)"</span>,</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylab =</span> <span class="st">"Residual ($ millions)"</span>)</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">0</span>, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"#D55E00"</span>)</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="fu">qqnorm</span>(<span class="fu">rstandard</span>(val_model), <span class="at">pch =</span> <span class="dv">16</span>,</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> grDevices<span class="sc">::</span><span class="fu">adjustcolor</span>(<span class="st">"#009E73"</span>, <span class="at">alpha.f =</span> <span class="fl">0.40</span>),</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">bty =</span> <span class="st">"n"</span>, <span class="at">main =</span> <span class="st">""</span>, <span class="at">xlab =</span> <span class="st">"Normal theoretical quantile"</span>,</span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">ylab =</span> <span class="st">"Standardised residual"</span>)</span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="fu">qqline</span>(<span class="fu">rstandard</span>(val_model), <span class="at">col =</span> <span class="st">"#D55E00"</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>equity_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(deal_equity_pct <span class="sc">~</span> equity_offered_pct, <span class="at">data =</span> deals)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>old_par <span class="ot">&lt;-</span> <span class="fu">par</span>(<span class="at">no.readonly =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="at">mar =</span> <span class="fu">c</span>(<span class="fl">4.5</span>, <span class="fl">4.4</span>, <span class="fl">1.3</span>, <span class="fl">0.7</span>), <span class="at">las =</span> <span class="dv">1</span>)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">fitted</span>(equity_model), <span class="fu">residuals</span>(equity_model),</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">col =</span> grDevices<span class="sc">::</span><span class="fu">adjustcolor</span>(<span class="st">"#0072B2"</span>, <span class="at">alpha.f =</span> <span class="fl">0.35</span>),</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">bty =</span> <span class="st">"n"</span>, <span class="at">xlab =</span> <span class="st">"Fitted deal share (%)"</span>,</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylab =</span> <span class="st">"Residual (percentage points)"</span>)</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">0</span>, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"#D55E00"</span>)</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="fu">qqnorm</span>(<span class="fu">rstandard</span>(equity_model), <span class="at">pch =</span> <span class="dv">16</span>,</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> grDevices<span class="sc">::</span><span class="fu">adjustcolor</span>(<span class="st">"#009E73"</span>, <span class="at">alpha.f =</span> <span class="fl">0.40</span>),</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">bty =</span> <span class="st">"n"</span>, <span class="at">main =</span> <span class="st">""</span>, <span class="at">xlab =</span> <span class="st">"Normal theoretical quantile"</span>,</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">ylab =</span> <span class="st">"Standardised residual"</span>)</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="fu">qqline</span>(<span class="fu">rstandard</span>(equity_model), <span class="at">col =</span> <span class="st">"#D55E00"</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
-<div>
+<div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="t01-exam-prep_files/figure-html/iep01-task3-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="t01-exam-prep_files/figure-html/iep01-task3-1.png" class="img-fluid figure-img" alt="Two panels. Left: residuals against fitted deal shares between about 9 and 70 percent. The points form vertical stripes at round offers, narrow at the smallest fitted values and wider to the right, with a few residuals between 50 and 86 percentage points. Right: normal Q-Q plot whose points follow the line in the middle and bend sharply upwards at the right end, up to a standardised residual of about 7." width="672"></p>
+<figcaption>Residuals against fitted deal shares (left) and normal Q-Q plot of the standardised residuals (right), for the 882 deals.</figcaption>
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(old_par)</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">big_rstandard =</span> <span class="fu">sum</span>(<span class="fu">abs</span>(<span class="fu">rstandard</span>(val_model)) <span class="sc">&gt;</span> <span class="dv">3</span>),</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">cooks_flagged =</span> <span class="fu">sum</span>(<span class="fu">cooks.distance</span>(val_model) <span class="sc">&gt;</span> <span class="dv">4</span> <span class="sc">/</span> <span class="fu">nobs</span>(val_model)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(old_par)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>offer_group <span class="ot">&lt;-</span> <span class="fu">cut</span>(deals<span class="sc">$</span>equity_offered_pct, <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">4.99</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">100</span>))</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">tapply</span>(<span class="fu">residuals</span>(equity_model), offer_group, sd), <span class="dv">1</span>)   <span class="co"># spread per group</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-stdout">
-<pre><code>big_rstandard cooks_flagged 
-           25            64 </code></pre>
+<pre><code>(0,4.99] (4.99,5]   (5,10]  (10,20] (20,100] 
+     3.1     10.6     11.0     11.3     18.0 </code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>rs <span class="ot">&lt;-</span> <span class="fu">rstandard</span>(equity_model)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">big_rstandard =</span> <span class="fu">sum</span>(<span class="fu">abs</span>(rs) <span class="sc">&gt;</span> <span class="dv">3</span>),</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">above_3 =</span> <span class="fu">sum</span>(rs <span class="sc">&gt;</span> <span class="dv">3</span>),</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">above_3_whole_company =</span> <span class="fu">sum</span>(rs <span class="sc">&gt;</span> <span class="dv">3</span> <span class="sc">&amp;</span> deals<span class="sc">$</span>deal_equity_pct <span class="sc">==</span> <span class="dv">100</span>),</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">cooks_flagged =</span> <span class="fu">sum</span>(<span class="fu">cooks.distance</span>(equity_model) <span class="sc">&gt;</span> <span class="dv">4</span> <span class="sc">/</span> <span class="fu">nobs</span>(equity_model)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>        big_rstandard               above_3 above_3_whole_company 
+                   15                    14                     8 
+        cooks_flagged 
+                   34 </code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">offer_multiple_of_5 =</span> <span class="fu">sum</span>(deals<span class="sc">$</span>equity_offered_pct <span class="sc">%%</span> <span class="dv">5</span> <span class="sc">==</span> <span class="dv">0</span>),</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">deal_multiple_of_5 =</span> <span class="fu">sum</span>(deals<span class="sc">$</span>deal_equity_pct <span class="sc">%%</span> <span class="dv">5</span> <span class="sc">==</span> <span class="dv">0</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>offer_multiple_of_5  deal_multiple_of_5 
+                745                 686 </code></pre>
 </div>
 </div>
 <p>Filled-in structure:</p>
 <ul>
 <li>R code: see the code above.</li>
-<li>First problem, and what in the plots shows it: the spread of the residuals widens with the fitted value, and this fan shape shows heteroskedasticity, so it challenges homoskedasticity.</li>
-<li>Second problem, and what in the plots shows it: the Q–Q plot leaves the line at both ends, with several extreme residuals on both sides, which challenges normality and suggests that some deals may be influential.</li>
-<li>Number with a standardised residual beyond ±3: 25 deals, about 3% of the 874.</li>
-<li>Number with a Cook’s distance above 4/n: 64 deals, about 7% of the 874.</li>
-<li>Rule for flagged observations: investigate, report, never silently delete.</li>
-<li>Assumption the plots cannot assess, and what would assess it: the plots cannot assess independence. To assess it, you need knowledge of how the data were collected, for example whether the same sharks or founders appear in several rows.</li>
+<li>First problem, and what in the plots shows it: the residuals lie in a narrow band at the smallest fitted values and spread out more at larger fitted values. Their standard deviation grows from about 3 percentage points for offers below 5% to about 11 for offers of 5% to 20% and 18 for offers above 20%. This widening band shows heteroskedasticity, so it challenges homoskedasticity.</li>
+<li>Second problem, and what in the plots shows it: the Q–Q plot leaves the line at the right end, with standardised residuals up to about 7.4. Some deals lie far above the line, so the right tail is much heavier than a normal tail, which challenges normality.</li>
+<li>Number with a standardised residual beyond ±3: 15 deals, about 1.7% of the 882.</li>
+<li>Number with a Cook’s distance above 4/n: 34 deals, about 3.9% of the 882.</li>
+<li>What most deals with a standardised residual above 3 have in common: in 14 of the 15 the founder gave far more than the fitted share, and in 8 of them the sharks bought the whole company (a deal share of 100%).</li>
+<li>Offers and deal shares at a multiple of 5%: 745 offers (84%) and 686 deal shares (78%) are a multiple of 5%. Another 49 deal shares are about one third of the company, recorded as 33% or 33.3%.</li>
+<li>How the data were generated, and why the bunching is not a violation: founders and sharks name these shares on the spot during a televised negotiation, so they choose round numbers such as 10%, 20%, 25%, a third, or a half. A share calculated with a valuation method would not bunch at these values. The bunching only shows that the offers and the deal shares take few distinct values, and it does not by itself challenge linearity, homoskedasticity, or normality.</li>
+<li>Assumption the plots cannot assess, and what would assess it: the plots cannot assess independence. To assess it, you need knowledge of how the data were collected, for example whether deals in the same episode were negotiated by the same sharks on the same day.</li>
 </ul>
+<p>You may also notice that the 42 deals with an offer below 5% lie mostly below the line. Their average residual is about <span class="math inline">\(-5.6\)</span> percentage points, so the straight line overstates the deal share for the smallest offers.</p>
 </div>
 </div>
 </div>
 </section>
 <section id="task-4-coefficient-inference-lecture-3" class="level3">
 <h3 class="anchored" data-anchor-id="task-4-coefficient-inference-lecture-3">Task 4: Coefficient inference (Lecture 3)</h3>
-<p><span class="shark-tag">Shark Tank data</span> Use the coefficient table and the 95% confidence intervals of the Task 1 model of the agreed valuation on the claimed valuation.</p>
+<p><span class="shark-tag">Shark Tank data</span> Use the coefficient table and the 95% confidence intervals of the Task 1 model of the equity given in the deal on the equity offered.</p>
 <ol type="1">
 <li>Test <span class="math inline">\(H_0:\beta_1=0\)</span> against <span class="math inline">\(H_1:\beta_1\ne0\)</span> in five steps, with the critical value approach at the 5% level.</li>
-<li>Report the 95% confidence interval for <span class="math inline">\(\beta_1\)</span>, verify it by hand from the estimate and the standard error, and compare it with the interval in the output.</li>
+<li>Calculate the 95% confidence interval for <span class="math inline">\(\beta_1\)</span> by hand from the estimate and the standard error, and compare it with the interval in the output. Then interpret the interval in one sentence, with units.</li>
+<li>A slope of exactly 1 would mean that each extra percentage point offered adds exactly one percentage point to the deal share, so that the sharks take the same extra share on top of every offer. Say whether 1 lies inside the interval. Then test <span class="math inline">\(H_0:\beta_1=1\)</span> against <span class="math inline">\(H_1:\beta_1\ne1\)</span> at the 5% level, with <span class="math inline">\(t=(\hat\beta_1-1)/\operatorname{SE}(\hat\beta_1)\)</span>, and state the conclusion in business terms in one sentence.</li>
 <li>Would heteroskedasticity-robust standard errors fix both problems with the assumptions that you named in Task 3? Answer yes or no, and explain in one or two sentences.</li>
 </ol>
 <p>Use (copy and paste) this structure:</p>
@@ -659,8 +716,12 @@ Test, conclusion:
 Interval, formula:
 Interval, given values:
 Interval, calculations:
-Interval:
+Interval, lower and upper bound:
 Interval, comparison with the output:
+Interval interpretation:
+Slope of 1, inside the interval or not:
+Slope of 1, observed test statistic:
+Slope of 1, conclusion in business terms:
 Robust standard errors, yes or no, and why:</code></pre>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
@@ -674,35 +735,50 @@ Check your answer
 </div>
 <div id="callout-5" class="callout-5-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
+<p>The code prints the coefficient table, the 95% confidence intervals, the critical value, and the t statistic for a slope of 1.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>val_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(agreed_m <span class="sc">~</span> claimed_m, <span class="at">data =</span> vals)</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(val_model)<span class="sc">$</span>coefficients</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>equity_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(deal_equity_pct <span class="sc">~</span> equity_offered_pct, <span class="at">data =</span> deals)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>coef_table <span class="ot">&lt;-</span> <span class="fu">summary</span>(equity_model)<span class="sc">$</span>coefficients</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>coef_table</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>               Estimate Std. Error    t value      Pr(&gt;|t|)
-(Intercept) -0.06798986 0.06847892 -0.9928582  3.210545e-01
-claimed_m    0.64874084 0.01106883 58.6096854 1.099793e-304</code></pre>
+<pre><code>                   Estimate Std. Error  t value     Pr(&gt;|t|)
+(Intercept)        8.315024  0.7477311 11.12034 5.684681e-27
+equity_offered_pct 1.207341  0.0511365 23.61017 7.368475e-96</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(val_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(equity_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                 2.5 %     97.5 %
-(Intercept) -0.2023926 0.06641292
-claimed_m    0.6270162 0.67046551</code></pre>
+<pre><code>                      2.5 %   97.5 %
+(Intercept)        6.847480 9.782569
+equity_offered_pct 1.106978 1.307705</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qt</span>(<span class="fl">0.975</span>, <span class="at">df =</span> <span class="dv">882</span> <span class="sc">-</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1.962663</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>(coef_table[<span class="st">"equity_offered_pct"</span>, <span class="st">"Estimate"</span>] <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">/</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  coef_table[<span class="st">"equity_offered_pct"</span>, <span class="st">"Std. Error"</span>]   <span class="co"># t statistic for a slope of 1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 4.054665</code></pre>
 </div>
 </div>
 <p>Filled-in structure:</p>
 <ul>
 <li>R code: see the code above.</li>
 <li>Test, hypotheses: <span class="math inline">\(H_0:\beta_1=0\)</span>, <span class="math inline">\(H_1:\beta_1\ne0\)</span>. The significance level is 5%.</li>
-<li>Test, test statistic: <span class="math inline">\(T=\hat\beta_1/\operatorname{SE}(\hat\beta_1)\)</span>, with <span class="math inline">\(874-2=872\)</span> degrees of freedom.</li>
-<li>Test, critical value and rejection region: <span class="math inline">\(t_{0.975,\,872}\)</span> = <code>qt(0.975, 872)</code> = 1.963. Reject <span class="math inline">\(H_0\)</span> if <span class="math inline">\(|t_{obs}|\ge1.963\)</span>.</li>
-<li>Test, observed value: the slope is <span class="math inline">\(0.649\)</span> with standard error <span class="math inline">\(0.0111\)</span>, so <span class="math inline">\(t_{obs} \approx 58.6\)</span>.</li>
-<li>Test, conclusion: since <span class="math inline">\(58.6\ge1.963\)</span>, reject a zero slope at the 5% level. The p-value, far below 0.001, gives the same decision.</li>
-<li>Interval, formula: <span class="math inline">\(\hat\beta_1\pm t_{0.975,\,872}\,\operatorname{SE}(\hat\beta_1)\)</span>.</li>
-<li>Interval, given values: <span class="math inline">\(\hat\beta_1=0.6487\)</span>, <span class="math inline">\(\operatorname{SE}(\hat\beta_1)=0.01107\)</span>, <span class="math inline">\(t_{0.975,\,872}=1.963\)</span>. One more digit than usual avoids rounding error.</li>
-<li>Interval, calculations: <span class="math inline">\(0.6487 \pm 1.963 \times 0.01107 = 0.6487 \pm 0.0217\)</span>.</li>
-<li>Interval: <span class="math inline">\((0.627,\; 0.670)\)</span>, in $ million agreed per $ million claimed.</li>
+<li>Test, test statistic: <span class="math inline">\(T=\hat\beta_1/\operatorname{SE}(\hat\beta_1)\)</span>, with <span class="math inline">\(882-2=880\)</span> degrees of freedom.</li>
+<li>Test, critical value and rejection region: <span class="math inline">\(t_{0.975,\,880}\)</span> = <code>qt(0.975, 880)</code> = 1.963. Reject <span class="math inline">\(H_0\)</span> if <span class="math inline">\(|t_{obs}|\ge1.963\)</span>.</li>
+<li>Test, observed value: the slope is <span class="math inline">\(1.207\)</span> with standard error <span class="math inline">\(0.0511\)</span>, so <span class="math inline">\(t_{obs} \approx 23.6\)</span>.</li>
+<li>Test, conclusion: since <span class="math inline">\(23.6\ge1.963\)</span>, reject a zero slope at the 5% level. Founders who offered a larger share gave a larger share in the deal, on average. The p-value, far below 0.001, gives the same decision.</li>
+<li>Interval, formula: <span class="math inline">\(\hat\beta_1\pm t_{0.975,\,880}\,\operatorname{SE}(\hat\beta_1)\)</span>.</li>
+<li>Interval, given values: <span class="math inline">\(\hat\beta_1=1.2073\)</span>, <span class="math inline">\(\operatorname{SE}(\hat\beta_1)=0.05114\)</span>, <span class="math inline">\(t_{0.975,\,880}=1.963\)</span>. One more digit than usual avoids rounding error.</li>
+<li>Interval, calculations: <span class="math inline">\(1.2073 \pm 1.963 \times 0.05114 = 1.2073 \pm 0.1004\)</span>.</li>
+<li>Interval, lower and upper bound: <span class="math inline">\((1.107,\; 1.308)\)</span>, in percentage points given per percentage point offered.</li>
 <li>Interval, comparison with the output: the interval by hand matches the interval in the output.</li>
-<li>Robust standard errors, yes or no, and why: no. Robust standard errors address the heteroskedasticity only. They do not help with influential observations, with the selection of pitches that ended in a deal, or with a relationship that is not linear.</li>
+<li>Interval interpretation: under the model assumptions, the data are consistent with a population slope between about 1.11 and 1.31 percentage points of equity given per extra percentage point offered. For an offer one standard deviation (7.67 points) higher, this is about 8.5 to 10.0 points more equity given, a narrow range of large values.</li>
+<li>Slope of 1, inside the interval or not: 1 lies below the lower bound of 1.107, so it is outside the interval.</li>
+<li>Slope of 1, observed test statistic: <span class="math inline">\(t_{obs}=(1.2073-1)/0.05114\approx4.05\)</span>. Since <span class="math inline">\(4.05\ge1.963\)</span>, reject <span class="math inline">\(H_0:\beta_1=1\)</span> at the 5% level, the same decision as the interval gives.</li>
+<li>Slope of 1, conclusion in business terms: founders who offered more gave more than one extra point per point offered, so the extra share that the sharks take on top of the offer grows with the offer, from about <span class="math inline">\(8.32+0.207\times10\approx10.4\)</span> points at an offer of 10% to about 12.5 points at an offer of 20%.</li>
+<li>Robust standard errors, yes or no, and why: no. Robust standard errors address the heteroskedasticity only. They do not change the estimated line, so they do not help with the deals far above the line that may move it.</li>
 </ul>
 </div>
 </div>
@@ -710,7 +786,7 @@ claimed_m    0.6270162 0.67046551</code></pre>
 </section>
 <section id="task-5-r²-and-f-lecture-3" class="level3">
 <h3 class="anchored" data-anchor-id="task-5-r²-and-f-lecture-3">Task 5: R² and F (Lecture 3)</h3>
-<p><span class="shark-tag">Shark Tank data</span> Use the Task 1 model of the agreed valuation on the claimed valuation.</p>
+<p><span class="shark-tag">Shark Tank data</span> Use the Task 1 model of the equity given in the deal on the equity offered.</p>
 <ol type="1">
 <li>Calculate SST, SSE, SSR, and <span class="math inline">\(R^2\)</span> from the observed and the fitted values.</li>
 <li>Compare your <span class="math inline">\(R^2\)</span> with the R-squared in the regression output.</li>
@@ -737,58 +813,58 @@ Check your answer
 </div>
 <div id="callout-6" class="callout-6-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
+<p>The code computes the three sums of squares from the observed and the fitted values, and then prints <span class="math inline">\(R^2\)</span> by hand, <span class="math inline">\(R^2\)</span> from the output, the overall F statistic, and the squared t statistic of the slope.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>val_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(agreed_m <span class="sc">~</span> claimed_m, <span class="at">data =</span> vals)</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> vals<span class="sc">$</span>agreed_m</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>yhat <span class="ot">&lt;-</span> <span class="fu">fitted</span>(val_model)</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>SST <span class="ot">&lt;-</span> <span class="fu">sum</span>((y <span class="sc">-</span> <span class="fu">mean</span>(y))<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>SSE <span class="ot">&lt;-</span> <span class="fu">sum</span>((y <span class="sc">-</span> yhat)<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>SSR <span class="ot">&lt;-</span> <span class="fu">sum</span>((yhat <span class="sc">-</span> <span class="fu">mean</span>(y))<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">SST =</span> SST, <span class="at">SSE =</span> SSE, <span class="at">SSR =</span> SSR)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>equity_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(deal_equity_pct <span class="sc">~</span> equity_offered_pct, <span class="at">data =</span> deals)</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> deals<span class="sc">$</span>deal_equity_pct</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>yhat <span class="ot">&lt;-</span> <span class="fu">fitted</span>(equity_model)</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>SST <span class="ot">&lt;-</span> <span class="fu">sum</span>((y <span class="sc">-</span> <span class="fu">mean</span>(y))<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>SSE <span class="ot">&lt;-</span> <span class="fu">sum</span>((y <span class="sc">-</span> yhat)<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>SSR <span class="ot">&lt;-</span> <span class="fu">sum</span>((yhat <span class="sc">-</span> <span class="fu">mean</span>(y))<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">SST =</span> SST, <span class="at">SSE =</span> SSE, <span class="at">SSR =</span> SSR)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>      SST       SSE       SSR 
-11926.367  2414.572  9511.795 </code></pre>
+195039.77 119403.23  75636.54 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">R2_manual =</span> <span class="dv">1</span> <span class="sc">-</span> SSE <span class="sc">/</span> SST,</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">R2_summary =</span> <span class="fu">summary</span>(val_model)<span class="sc">$</span>r.squared,</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">F_summary =</span> <span class="fu">unname</span>(<span class="fu">summary</span>(val_model)<span class="sc">$</span>fstatistic[<span class="st">"value"</span>]),</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">t_squared =</span> <span class="fu">summary</span>(val_model)<span class="sc">$</span>coefficients[<span class="st">"claimed_m"</span>, <span class="st">"t value"</span>]<span class="sc">^</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">R2_manual =</span> <span class="dv">1</span> <span class="sc">-</span> SSE <span class="sc">/</span> SST,</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">R2_summary =</span> <span class="fu">summary</span>(equity_model)<span class="sc">$</span>r.squared,</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">F_summary =</span> <span class="fu">unname</span>(<span class="fu">summary</span>(equity_model)<span class="sc">$</span>fstatistic[<span class="st">"value"</span>]),</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">t_squared =</span> <span class="fu">summary</span>(equity_model)<span class="sc">$</span>coefficients[<span class="st">"equity_offered_pct"</span>, <span class="st">"t value"</span>]<span class="sc">^</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>   R2_manual   R2_summary    F_summary    t_squared 
-   0.7975434    0.7975434 3435.0952236 3435.0952236 </code></pre>
+<pre><code>  R2_manual  R2_summary   F_summary   t_squared 
+  0.3878006   0.3878006 557.4401201 557.4401201 </code></pre>
 </div>
 </div>
 <p>Filled-in structure:</p>
 <ul>
 <li>R code: see the code above.</li>
-<li>SST, SSE, and SSR: in squared $ millions, <span class="math inline">\(\text{SST}\approx11{,}926\)</span>, <span class="math inline">\(\text{SSE}\approx2{,}415\)</span>, and <span class="math inline">\(\text{SSR}\approx9{,}512\)</span>, so <span class="math inline">\(\text{SST}=\text{SSR}+\text{SSE}\)</span>.</li>
-<li>R-squared by hand: <span class="math inline">\(R^2=1-2{,}415/11{,}926\approx0.798\)</span>.</li>
-<li>R-squared in the output: 0.798, the same value.</li>
-<li>F and t squared: the overall F statistic is about 3435. The t statistic of the slope is about 58.6, and <span class="math inline">\(58.6^2\approx3435\)</span>, as it must be in simple regression.</li>
-<li>The two models that the overall F-test compares: the complete model and the intercept-only model, which predicts the mean agreed valuation for every deal.</li>
-<li>Concluding sentence: among these deals, the claimed valuation explains about 80% of the variation in the agreed valuations, but this is an association in a selected set of deals, partly driven by a few influential deals, and not the effect of changing a claim.</li>
+<li>SST, SSE, and SSR: in squared percentage points, <span class="math inline">\(\text{SST}\approx195{,}040\)</span>, <span class="math inline">\(\text{SSE}\approx119{,}403\)</span>, and <span class="math inline">\(\text{SSR}\approx75{,}637\)</span>, so <span class="math inline">\(\text{SST}=\text{SSR}+\text{SSE}\)</span>.</li>
+<li>R-squared by hand: <span class="math inline">\(R^2=1-119{,}403/195{,}040\approx0.388\)</span>.</li>
+<li>R-squared in the output: 0.388, the same value.</li>
+<li>F and t squared: the overall F statistic is about 557.4. The t statistic of the slope is about 23.61, and <span class="math inline">\(23.61^2\approx557.4\)</span>, as it must be in simple regression.</li>
+<li>The two models that the overall F-test compares: the complete model and the intercept-only model, which predicts the mean deal share of 23.3% for every deal.</li>
+<li>Concluding sentence: among these 882 deals, the equity offered explains about 39% of the variation in the equity given, so the offer is a useful guide to the typical deal share, but single deals often lie far from the line.</li>
 </ul>
 </div>
 </div>
 </div>
 </section>
-<section id="task-6-a-new-question-how-much-more-equity-do-the-sharks-take" class="level3">
-<h3 class="anchored" data-anchor-id="task-6-a-new-question-how-much-more-equity-do-the-sharks-take">Task 6: A new question: how much more equity do the sharks take?</h3>
-<p><span class="shark-tag">Shark Tank data</span> On Shark Tank, the sharks often pay the amount that the founder asks for but take a larger share of the company than the founder offered. Model this pattern directly. Use the same 874 deals for a share of the company (<code>vals</code>). Regress the equity agreed in the deal (<code>deal_equity_pct</code>) on the equity that the founder first offered (<code>equity_offered_pct</code>), both in percent of the company. Report the coefficients, their 95% confidence intervals, and <span class="math inline">\(R^2\)</span>.</p>
+<section id="task-6-do-a-few-deals-drive-the-answer-lecture-2" class="level3">
+<h3 class="anchored" data-anchor-id="task-6-do-a-few-deals-drive-the-answer-lecture-2">Task 6: Do a few deals drive the answer? (Lecture 2)</h3>
+<p><span class="shark-tag">Shark Tank data</span> Task 3 flagged 34 deals with a Cook’s distance above <span class="math inline">\(4/n\)</span>. Before a founder relies on the Task 1 line, check how much these deals move it. Fit the Task 1 model again without the flagged deals. The rule, a Cook’s distance above <span class="math inline">\(4/n\)</span>, is fixed before you look at the result.</p>
 <ol type="1">
-<li>Interpret the slope and the intercept with units, in one sentence each.</li>
-<li>A founder offers 10% of the company. Which agreed share does the model give as the fitted value?</li>
-<li>Compare the <span class="math inline">\(R^2\)</span> with that of the valuation model of Task 1 (about 0.798). What does the difference tell a founder? Answer in one or two sentences.</li>
-<li>Advise the founder in two sentences.</li>
+<li>Report the slope and the intercept of both fits, and the change of the slope in percent.</li>
+<li>Calculate the fitted deal share for an offer of 10% in both fits.</li>
+<li>State the three-step rule for handling a flagged observation, and say in one sentence which fit you would report as the main result.</li>
+<li>Advise a founder who plans to offer 10% in two sentences. Use the residual standard error of the Task 1 model to say how far single deals lie from the fitted share.</li>
 </ol>
 <p>Use (copy and paste) this structure:</p>
 <pre class="text"><code>R code:
-Coefficients with their 95% intervals:
-R-squared:
-Interpretation of the slope:
-Interpretation of the intercept:
-Fitted agreed share for an offer of 10%:
-What the difference in R-squared tells a founder:
+Slope and intercept, all deals:
+Slope and intercept, without the flagged deals:
+Change of the slope:
+Fitted deal share for an offer of 10%, both fits:
+Rule for flagged observations, and the fit to report:
 Advice in two sentences:</code></pre>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
@@ -802,35 +878,44 @@ Check your answer
 </div>
 <div id="callout-7" class="callout-7-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
+<p>The code marks the flagged deals, fits the model without them, and prints the coefficients of both fits, the change of the slope in percent, the fitted deal shares for an offer of 10%, and the residual standard error of the model with all deals.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>equity_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(deal_equity_pct <span class="sc">~</span> equity_offered_pct, <span class="at">data =</span> vals)</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(equity_model)<span class="sc">$</span>coefficients</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>equity_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(deal_equity_pct <span class="sc">~</span> equity_offered_pct, <span class="at">data =</span> deals)</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>flagged <span class="ot">&lt;-</span> <span class="fu">cooks.distance</span>(equity_model) <span class="sc">&gt;</span> <span class="dv">4</span> <span class="sc">/</span> <span class="fu">nobs</span>(equity_model)</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>equity_model_kept <span class="ot">&lt;-</span> <span class="fu">lm</span>(deal_equity_pct <span class="sc">~</span> equity_offered_pct,</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>                        <span class="at">data =</span> deals[<span class="sc">!</span>flagged, ])</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a><span class="fu">rbind</span>(<span class="at">all_deals =</span> <span class="fu">coef</span>(equity_model), <span class="at">without_flagged =</span> <span class="fu">coef</span>(equity_model_kept))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                   Estimate Std. Error  t value     Pr(&gt;|t|)
-(Intercept)        8.519643 0.73993946 11.51397 1.173912e-28
-equity_offered_pct 1.207227 0.05053385 23.88948 1.975473e-97</code></pre>
+<pre><code>                (Intercept) equity_offered_pct
+all_deals          8.315024           1.207341
+without_flagged    7.720026           1.193338</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(equity_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="dv">100</span> <span class="sc">*</span> (<span class="fu">coef</span>(equity_model_kept)[<span class="dv">2</span>] <span class="sc">/</span> <span class="fu">coef</span>(equity_model)[<span class="dv">2</span>] <span class="sc">-</span> <span class="dv">1</span>)   <span class="co"># change in %</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                      2.5 %   97.5 %
-(Intercept)        7.067372 9.971913
-equity_offered_pct 1.108045 1.306410</code></pre>
+<pre><code>equity_offered_pct 
+         -1.159826 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(equity_model)<span class="sc">$</span>r.squared</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>new_offer <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">equity_offered_pct =</span> <span class="dv">10</span>)</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">all_deals =</span> <span class="fu">unname</span>(<span class="fu">predict</span>(equity_model, <span class="at">newdata =</span> new_offer)),</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">without_flagged =</span> <span class="fu">unname</span>(<span class="fu">predict</span>(equity_model_kept, <span class="at">newdata =</span> new_offer)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.3955808</code></pre>
+<pre><code>      all_deals without_flagged 
+       20.38844        19.65341 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sigma</span>(equity_model)   <span class="co"># residual standard error, in percentage points</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 11.64841</code></pre>
 </div>
 </div>
 <p>Filled-in structure:</p>
 <ul>
 <li>R code: see the code above.</li>
-<li>Coefficients with their 95% intervals: slope about 1.21, with a 95% interval of about 1.11 to 1.31. Intercept about 8.5, with a 95% interval of about 7.1 to 10.0.</li>
-<li>R-squared: about 0.40.</li>
-<li>Interpretation of the slope: a founder who offers one percentage point more of the company gives up on average about 1.21 percentage points more in the agreed deal.</li>
-<li>Interpretation of the intercept: it is the fitted agreed share for an offer of 0%, and no founder offers 0%, so it has no business meaning of its own.</li>
-<li>Fitted agreed share for an offer of 10%: <span class="math inline">\(8.52 + 1.21\times10\approx20.6\)</span>% of the company, about twice the offer.</li>
-<li>What the difference in R-squared tells a founder: the offered share explains about 40% of the variation in the agreed share, against 80% for the valuations, so single deals lie far from the fitted value more often and the fitted share is a rough guide only.</li>
-<li>Advice in two sentences: “For an offer of 10%, expect to give up about 20%, and decide before the pitch how large a share you are willing to give up. These numbers describe what founders who agreed a deal on air gave up, not what would happen to you if you offered a different share.”</li>
+<li>Slope and intercept, all deals: slope 1.207, intercept 8.32, with 882 deals.</li>
+<li>Slope and intercept, without the flagged deals: slope 1.193, intercept 7.72, with 848 deals.</li>
+<li>Change of the slope: about <span class="math inline">\(-1.2\%\)</span>, a very small change.</li>
+<li>Fitted deal share for an offer of 10%, both fits: about 20.4% with all deals and about 19.7% without the flagged deals, a difference of less than one percentage point.</li>
+<li>Rule for flagged observations, and the fit to report: investigate, report, never silently delete. The flagged deals are real deals, such as the sharks buying the whole company, and the answer hardly changes without them, so the fit with all deals is the main result and the check without them is reported next to it.</li>
+<li>Advice in two sentences: “For an offer of 10%, expect to give about 20% of the company in the deal, and decide before the pitch how large a share you are willing to give. Single deals typically lie about 11.6 percentage points above or below the fitted share, more than half of the fitted 20%, so be prepared for a final share well above or below this number.”</li>
 </ul>
 </div>
 </div>
@@ -838,18 +923,18 @@ equity_offered_pct 1.108045 1.306410</code></pre>
 </section>
 <section id="task-7-check-the-ai-lectures-1-to-3" class="level3">
 <h3 class="anchored" data-anchor-id="task-7-check-the-ai-lectures-1-to-3">Task 7: Check the AI (Lectures 1 to 3)</h3>
-<p><span class="shark-tag">Shark Tank data</span> Tom prepares a pitch. He gave the output of the Task 1 model of the agreed valuation on the claimed valuation to an AI assistant. Here is the output:</p>
-<pre class="text"><code>Outcome: agreed valuation ($ millions), 874 deals   Estimate  Std. Error  p-value
-Claimed valuation ($ millions)                         0.649       0.011   &lt;0.001
-Intercept                                             -0.068       0.068    0.321
-R-squared: 0.798</code></pre>
+<p><span class="shark-tag">Shark Tank data</span> Tom prepares a pitch. He gave the output of the Task 1 model of the equity given in the deal on the equity offered to an AI assistant. Here is the output:</p>
+<pre class="text"><code>Outcome: equity given in the deal (%), 882 deals   Estimate  Std. Error  p-value
+Equity offered (%)                                     1.207       0.051   &lt;0.001
+Intercept                                              8.315       0.748   &lt;0.001
+R-squared: 0.388</code></pre>
 <p>He asked: “How good is this model?” The AI answered:</p>
 <blockquote class="blockquote">
-<p>“Great model. The claimed valuation predicts the agreed valuation correctly for about 80% of the deals, because <span class="math inline">\(R^2\)</span> is 0.798. A deal with a claimed valuation that is $1 million higher has, on average, an agreed valuation that is about $0.65 million higher. And the p-value of the slope is below 0.001, which proves that the assumptions of the model hold.”</p>
+<p>“Good model. The equity offered predicts the deal share correctly for about 39% of the deals, because <span class="math inline">\(R^2\)</span> is 0.388. A founder who offers one percentage point more of the company gives, on average, about 1.2 percentage points more in the deal. And the p-value of the slope is below 0.001, which proves that the assumptions of the model hold.”</p>
 </blockquote>
 <ol type="1">
 <li>The AI answer contains exactly two errors. Name each error and explain it in one sentence.</li>
-<li>Write one correct sentence about the <span class="math inline">\(R^2\)</span> of 0.798.</li>
+<li>Write one correct sentence about the <span class="math inline">\(R^2\)</span> of 0.388.</li>
 <li>State in one sentence what the small p-value of the slope does show. Then name in one sentence one result from Task 3 that Tom should know before he trusts this p-value.</li>
 </ol>
 <p>Use (copy and paste) this structure:</p>
@@ -872,11 +957,11 @@ Check your answer
 <div class="callout-body-container callout-body">
 <p>Filled-in structure:</p>
 <ul>
-<li>First error: <span class="math inline">\(R^2\)</span> is the share of the variation in the agreed valuations that the fitted values explain, not a share of deals that the model predicts correctly, and only about 2% of the deals lie within $10,000 of their fitted value.</li>
+<li>First error: <span class="math inline">\(R^2\)</span> is the share of the variation in the deal shares that the fitted values explain, not a share of deals that the model predicts correctly, and only about 16% of the deals lie within one percentage point of their fitted value.</li>
 <li>Second error: a p-value is calculated under the assumptions of the model, so it cannot prove that they hold.</li>
-<li>Correct sentence about the R-squared: “Among these 874 deals, the claimed valuation explains about 80% of the variation in the agreed valuations.”</li>
+<li>Correct sentence about the R-squared: “Among these 882 deals, the equity offered explains about 39% of the variation in the equity given in the deal.”</li>
 <li>What the small p-value does show: it is strong evidence against a slope of zero, if the assumptions of the model hold.</li>
-<li>A result from Task 3 to know before trusting the p-value: the residual plot shows a fan shape, so the homoskedasticity assumption fails and the usual standard error and p-value may be wrong.</li>
+<li>A result from Task 3 to know before trusting the p-value: the spread of the residuals grows with the offer, so the homoskedasticity assumption fails and the usual standard error and p-value may be wrong.</li>
 </ul>
 <p>The second sentence of the AI answer is correct. It is the interpretation of the slope from Task 1.</p>
 </div>
@@ -884,14 +969,16 @@ Check your answer
 </div>
 </section>
 </section>
-<section id="after-class" class="level2 course-phase phase-after">
+<div class="course-phase phase-after">
+<section id="after-class" class="level2">
 <h2 class="anchored" data-anchor-id="after-class">After class</h2>
 <section id="individual-practice" class="level3">
 <h3 class="anchored" data-anchor-id="individual-practice">Individual practice</h3>
-<p><span class="shark-tag">Shark Tank data</span> Do the sharks pay the amount that a founder asks for? Use the 874 deals for a share of the company (<code>vals</code>). Regress the amount agreed in the deal on the amount that the founder asked for, both in thousands of dollars. The code below converts both amounts from dollars to thousands of dollars.</p>
+<p><span class="shark-tag">Shark Tank data</span> Do the sharks pay the amount that a founder asks for? Use all 882 deals (<code>deals</code>). Regress the amount agreed in the deal on the amount that the founder asked for, both in thousands of dollars. The code below keeps the deals and converts both amounts from dollars to thousands of dollars.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>vals<span class="sc">$</span>ask_1k <span class="ot">&lt;-</span> vals<span class="sc">$</span>ask_amount_usd <span class="sc">/</span> <span class="dv">1000</span>     <span class="co"># amount asked, in $1,000s</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>vals<span class="sc">$</span>deal_1k <span class="ot">&lt;-</span> vals<span class="sc">$</span>deal_amount_usd <span class="sc">/</span> <span class="dv">1000</span>   <span class="co"># amount agreed, in $1,000s</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>deals <span class="ot">&lt;-</span> <span class="fu">subset</span>(sharks, deal_on_show <span class="sc">==</span> <span class="dv">1</span>)</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>deals<span class="sc">$</span>ask_1k <span class="ot">&lt;-</span> deals<span class="sc">$</span>ask_amount_usd <span class="sc">/</span> <span class="dv">1000</span>     <span class="co"># amount asked, in $1,000s</span></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>deals<span class="sc">$</span>deal_1k <span class="ot">&lt;-</span> deals<span class="sc">$</span>deal_amount_usd <span class="sc">/</span> <span class="dv">1000</span>   <span class="co"># amount agreed, in $1,000s</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <ol type="1">
 <li>Make the scatterplot with the fitted line, and describe it in two sentences.</li>
@@ -913,41 +1000,41 @@ Check a model answer
 <div id="callout-9" class="callout-9-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>amount_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(deal_1k <span class="sc">~</span> ask_1k, <span class="at">data =</span> vals)</span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(amount_model)<span class="sc">$</span>coefficients</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>amount_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(deal_1k <span class="sc">~</span> ask_1k, <span class="at">data =</span> deals)</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(amount_model)<span class="sc">$</span>coefficients</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>             Estimate Std. Error  t value      Pr(&gt;|t|)
-(Intercept) 27.946252 7.30038928  3.82805  1.383943e-04
-ask_1k       1.008318 0.01829848 55.10392 2.740561e-286</code></pre>
+<pre><code>            Estimate Std. Error  t value      Pr(&gt;|t|)
+(Intercept) 27.57097 7.24074969  3.80775  1.499641e-04
+ask_1k       1.00851 0.01820567 55.39538 4.161677e-289</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(amount_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(amount_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>                 2.5 %    97.5 %
-(Intercept) 13.6178639 42.274640
-ask_1k       0.9724036  1.044232</code></pre>
+(Intercept) 13.3598133 41.782122
+ask_1k       0.9727782  1.044241</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">r_squared =</span> <span class="fu">summary</span>(amount_model)<span class="sc">$</span>r.squared,</span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">F =</span> <span class="fu">unname</span>(<span class="fu">summary</span>(amount_model)<span class="sc">$</span>fstatistic[<span class="st">"value"</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">r_squared =</span> <span class="fu">summary</span>(amount_model)<span class="sc">$</span>r.squared,</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">F =</span> <span class="fu">unname</span>(<span class="fu">summary</span>(amount_model)<span class="sc">$</span>fstatistic[<span class="st">"value"</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   r_squared            F 
-   0.7768932 3036.4416122 </code></pre>
+   0.7771389 3068.6477368 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># deals that paid exactly, more than, and less than the amount asked</span></span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">same =</span> <span class="fu">sum</span>(vals<span class="sc">$</span>deal_1k <span class="sc">==</span> vals<span class="sc">$</span>ask_1k),</span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">more =</span> <span class="fu">sum</span>(vals<span class="sc">$</span>deal_1k <span class="sc">&gt;</span> vals<span class="sc">$</span>ask_1k),</span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">less =</span> <span class="fu">sum</span>(vals<span class="sc">$</span>deal_1k <span class="sc">&lt;</span> vals<span class="sc">$</span>ask_1k))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="co"># deals that paid exactly, more than, and less than the amount asked</span></span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">same =</span> <span class="fu">sum</span>(deals<span class="sc">$</span>deal_1k <span class="sc">==</span> deals<span class="sc">$</span>ask_1k),</span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">more =</span> <span class="fu">sum</span>(deals<span class="sc">$</span>deal_1k <span class="sc">&gt;</span> deals<span class="sc">$</span>ask_1k),</span>
+<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">less =</span> <span class="fu">sum</span>(deals<span class="sc">$</span>deal_1k <span class="sc">&lt;</span> deals<span class="sc">$</span>ask_1k))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>same more less 
- 720  138   16 </code></pre>
+ 727  138   17 </code></pre>
 </div>
 </div>
 <p>The code fits the model, prints the coefficient table, the 95% intervals, <span class="math inline">\(R^2\)</span> and the overall F statistic, and then counts how many deals paid exactly, more than, or less than the amount asked.</p>
 <ol type="1">
 <li>Most deals lie on one straight line on which the amount agreed equals the amount asked. A smaller group lies above that line, where the sharks paid more than the founder asked for, in a few cases millions of dollars more.</li>
-<li>The fitted equation is <span class="math inline">\(\widehat{\text{agreed}}=27.9+1.008\,\text{asked}\)</span>, both in $1,000s. A founder who asks $1,000 more agrees on average about $1,008 more.</li>
-<li>The standard error is about 0.018, <span class="math inline">\(t\approx55.1\)</span>, and the p-value is below 0.001. The 95% interval runs from about 0.972 to 1.044, so a slope of exactly 1 lies inside it.</li>
-<li><span class="math inline">\(R^2\approx0.777\)</span>: the amount asked explains about 78% of the variation in the amount agreed. The overall F-test (<span class="math inline">\(F\approx3036=t^2\)</span>) rejects the intercept-only model at the 5% level, as the slope test does.</li>
-<li>Conclusion: “Among the 874 deals for a share of the company, the sharks paid about one dollar per dollar asked. In 720 deals (82%) they paid exactly the amount asked, in 138 deals more, and in 16 deals less. The residual plot shows a dense row of residuals just below zero, about <span class="math inline">\(-\$29{,}000\)</span>, from the deals that paid exactly the ask, and a few very large positive residuals, up to about $2.8 million. The Q–Q plot rises steeply at the right end, so the residuals are far from normal. The usual standard errors are therefore only a rough guide. The data contain only pitches that ended in a deal on air, so they do not show that asking for more money would bring more money.”</li>
+<li>The fitted equation is <span class="math inline">\(\widehat{\text{agreed}}=27.6+1.009\,\text{asked}\)</span>, both in $1,000s. A founder who asks $1,000 more agrees on average about $1,009 more.</li>
+<li>The standard error is about 0.018, <span class="math inline">\(t\approx55.4\)</span>, and the p-value is below 0.001. The 95% interval runs from about 0.973 to 1.044, so a slope of exactly 1 lies inside it.</li>
+<li><span class="math inline">\(R^2\approx0.777\)</span>: the amount asked explains about 78% of the variation in the amount agreed. The overall F-test (<span class="math inline">\(F\approx3069=t^2\)</span>) rejects the intercept-only model at the 5% level, as the slope test does.</li>
+<li>Conclusion: “Among the 882 deals, the sharks paid about one dollar per dollar asked. In 727 deals (82%) they paid exactly the amount asked, in 138 deals more, and in 17 deals less. The residual plot shows a dense row of residuals just below zero, about <span class="math inline">\(-\$29{,}000\)</span>, from the deals that paid exactly the ask, and a few very large positive residuals, up to about $2.8 million. The Q–Q plot rises steeply at the right end, so the residuals are far from normal. The usual standard errors are therefore only a rough guide. The data contain only pitches that ended in a deal on air, so they do not show that asking for more money would bring more money.”</li>
 </ol>
 </div>
 </div>
@@ -959,7 +1046,7 @@ ask_1k       0.9724036  1.044232</code></pre>
 <ol type="1">
 <li>A residual is …</li>
 <li>The slope’s standard error estimates …</li>
-<li>A fan shape in the residual plot challenges …</li>
+<li>A funnel shape in the residual plot challenges …</li>
 <li><span class="math inline">\(R^2\)</span> is the proportion of …</li>
 <li>In simple regression, the overall F statistic equals …</li>
 </ol>
@@ -1003,7 +1090,7 @@ See an example, then write your own
 </div>
 <div id="callout-11" class="callout-11-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>Take a student venture that sells boxes of prepared meals on campus. “Headline: the slope with its 95% interval. Each extra €100 of advertising is associated with about 12 to 19 more orders. An investor wants to know how many orders the money brings, and the interval shows how uncertain the number is. Limit: the fan shape in my residual plot shows that orders vary more in busy weeks. So the interval depends on an assumption that my own residual plot puts in doubt.”</p>
+<p>Take a student venture that sells boxes of prepared meals on campus. “Headline: the slope with its 95% interval. Each extra €100 of advertising is associated with about 12 to 19 more orders. An investor wants to know how many orders the money brings, and the interval shows how uncertain the number is. Limit: the funnel shape in my residual plot shows that orders vary more in busy weeks. So the interval depends on an assumption that my own residual plot puts in doubt.”</p>
 </div>
 </div>
 </div>
@@ -1013,9 +1100,234 @@ See an example, then write your own
 <section id="more-practice" class="level3">
 <h3 class="anchored" data-anchor-id="more-practice">More practice</h3>
 <p>For extra exercises on the lectures of this tutorial, with worked solutions, ask Tilly for QM Intermediate, the course AI assistant. For example: “Give me an extra exercise for Intermediate Tutorial 1. Show the solution only after I send my answer.”</p>
+</section>
+</section>
+<section id="i-ep01-home" class="level2">
+<h2 class="anchored" data-anchor-id="i-ep01-home">Extra practice for home</h2>
+<p>These tasks practise the content of Lectures 1 to 3 at home, with a focus on a question that every regression answer must address: is the estimated association large or small in business terms? Task 8 uses the Shark Tank file. Tasks 9 and 10 use invented examples.</p>
+<section id="task-8-significant-but-is-it-large-lecture-3" class="level3">
+<h3 class="anchored" data-anchor-id="task-8-significant-but-is-it-large-lecture-3">Task 8: Significant, but is it large? (Lecture 3)</h3>
+<p><span class="shark-tag">Shark Tank data</span> Some deals are made with one shark, others with two or more sharks who invest together. Does a deal with more sharks bring in more money? Use all 882 deals (<code>deals</code>). Regress the amount agreed in the deal, in thousands of dollars, on the number of sharks in the deal (<code>number_sharks_in_deal</code>). The code below keeps the deals, converts the amount agreed to thousands of dollars, and counts the deals by the number of sharks.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>deals <span class="ot">&lt;-</span> <span class="fu">subset</span>(sharks, deal_on_show <span class="sc">==</span> <span class="dv">1</span>)</span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>deals<span class="sc">$</span>deal_1k <span class="ot">&lt;-</span> deals<span class="sc">$</span>deal_amount_usd <span class="sc">/</span> <span class="dv">1000</span>   <span class="co"># amount agreed, in $1,000s</span></span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(deals<span class="sc">$</span>number_sharks_in_deal)             <span class="co"># deals with 1, 2, ..., 5 sharks</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+  1   2   3   4   5 
+648 203  22   3   6 </code></pre>
+</div>
+</div>
+<ol type="1">
+<li>Interpret the slope with units, in one sentence, and state whether it is significantly different from zero at the 5% level.</li>
+<li>Judge the size of the slope in three ways: as a percent of the mean amount agreed, in standard deviations of the amount agreed, and at the lower and the upper end of its 95% confidence interval.</li>
+<li>Report <span class="math inline">\(R^2\)</span>, and explain in one or two sentences why a slope can be significant while <span class="math inline">\(R^2\)</span> is close to zero.</li>
+<li>Write one sentence for a founder that reports both the significance and the size of the association.</li>
+</ol>
+<p>Use (copy and paste) this structure:</p>
+<pre class="text"><code>R code:
+Interpretation of the slope, and significance:
+Size as a percent of the mean amount agreed:
+Size in standard deviations of the amount agreed:
+Size at both ends of the 95% interval:
+R-squared, and why it can be small for a significant slope:
+Sentence for a founder:</code></pre>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check your answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-12" class="callout-12-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The code fits the model, prints the coefficient table, the 95% intervals, and <span class="math inline">\(R^2\)</span>, and then the mean and the standard deviation of the amount agreed, the two benchmarks for the size of the slope.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>sharks_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(deal_1k <span class="sc">~</span> number_sharks_in_deal, <span class="at">data =</span> deals)</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(sharks_model)<span class="sc">$</span>coefficients</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                       Estimate Std. Error  t value     Pr(&gt;|t|)
+(Intercept)           231.33410   27.50160 8.411659 1.621022e-16
+number_sharks_in_deal  45.70094   18.95847 2.410582 1.613122e-02</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(sharks_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                           2.5 %    97.5 %
+(Intercept)           177.357705 285.31049
+number_sharks_in_deal   8.491843  82.91004</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(sharks_model)<span class="sc">$</span>r.squared</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.006559982</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">mean =</span> <span class="fu">mean</span>(deals<span class="sc">$</span>deal_1k), <span class="at">sd =</span> <span class="fu">sd</span>(deals<span class="sc">$</span>deal_1k))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    mean       sd 
+291.5433 342.7692 </code></pre>
+</div>
+</div>
+<p>Filled-in structure:</p>
+<ul>
+<li>R code: see the code above.</li>
+<li>Interpretation of the slope, and significance: a deal with one more shark is associated with an amount agreed that is on average about $45,700 higher. With <span class="math inline">\(t\approx2.41\)</span> and p <span class="math inline">\(\approx\)</span> 0.016, the slope is significantly different from zero at the 5% level.</li>
+<li>Size as a percent of the mean amount agreed: $45,700 is about 16% of the mean amount agreed of about $291,500.</li>
+<li>Size in standard deviations of the amount agreed: <span class="math inline">\(45.7/342.8\approx0.13\)</span> standard deviations, a small difference compared with how much deal amounts vary.</li>
+<li>Size at both ends of the 95% interval: the interval runs from about $8,500 to $82,900, which is about 3% to 28% of the mean amount agreed. The data are consistent with a very small and with a sizeable association.</li>
+<li>R-squared, and why it can be small for a significant slope: <span class="math inline">\(R^2\)</span> is about 0.007, so the number of sharks explains less than 1% of the variation in the amounts agreed. With 882 deals the average difference is estimated well enough to be significant, but single deal amounts vary so much that the number of sharks says little about any one deal.</li>
+<li>Sentence for a founder: “Deals with one more shark bring on average about $46,000 more, about 16% of a typical deal, but this estimate is uncertain and the amount of a single deal depends much more on other things than on the number of sharks.”</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<section id="task-9-a-regression-line-from-summary-statistics-lecture-1" class="level3">
+<h3 class="anchored" data-anchor-id="task-9-a-regression-line-from-summary-statistics-lecture-1">Task 9: A regression line from summary statistics (Lecture 1)</h3>
+<p>A start-up sells online courses. Over 30 weeks it recorded its weekly advertising spend <span class="math inline">\(X\)</span>, in hundreds of euros, and the number of new sign-ups <span class="math inline">\(Y\)</span>. The summary statistics are:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">Mean</th>
+<th style="text-align: right;">Standard deviation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Advertising spend <span class="math inline">\(X\)</span> (€100s)</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">4</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">New sign-ups <span class="math inline">\(Y\)</span></td>
+<td style="text-align: right;">85</td>
+<td style="text-align: right;">20</td>
+</tr>
+</tbody>
+</table>
+<p>The correlation between <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> is 0.6.</p>
+<ol type="1">
+<li>Calculate the slope and the intercept of the fitted line, and write the fitted equation.</li>
+<li>Interpret the slope with units, in one sentence. Then say in one sentence what it implies for the advertising cost per extra sign-up.</li>
+<li>Calculate the fitted number of sign-ups for a week with €1,500 of advertising.</li>
+<li>Judge the size of the slope: by how much do the fitted sign-ups differ between two weeks whose advertising spend differs by one standard deviation? Give the answer in sign-ups, in standard deviations of <span class="math inline">\(Y\)</span>, and as a percent of the mean of <span class="math inline">\(Y\)</span>.</li>
+<li>Calculate <span class="math inline">\(R^2\)</span> and interpret it in one sentence.</li>
+</ol>
+<p>Use (copy and paste) this structure:</p>
+<pre class="text"><code>Slope, formula and calculation:
+Intercept, formula and calculation:
+Fitted equation:
+Interpretation of the slope:
+Advertising cost per extra sign-up:
+Fitted sign-ups at €1,500:
+Size for one standard deviation more advertising:
+R-squared and its interpretation:</code></pre>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check your answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-13" class="callout-13-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Filled-in structure:</p>
+<ul>
+<li>Slope, formula and calculation: <span class="math inline">\(\hat\beta_1=r\,s_Y/s_X=0.6\times20/4=3\)</span> sign-ups per €100.</li>
+<li>Intercept, formula and calculation: <span class="math inline">\(\hat\beta_0=\bar y-\hat\beta_1\bar x=85-3\times12=49\)</span> sign-ups.</li>
+<li>Fitted equation: <span class="math inline">\(\widehat y=49+3x\)</span>, with <span class="math inline">\(x\)</span> in €100s.</li>
+<li>Interpretation of the slope: a week with €100 more advertising is associated with on average 3 more new sign-ups.</li>
+<li>Advertising cost per extra sign-up: €100 for 3 sign-ups, about €33 per extra sign-up, which the start-up can compare with the revenue of one sign-up.</li>
+<li>Fitted sign-ups at €1,500: <span class="math inline">\(x=15\)</span>, so <span class="math inline">\(\widehat y=49+3\times15=94\)</span> sign-ups.</li>
+<li>Size for one standard deviation more advertising: <span class="math inline">\(3\times4=12\)</span> more sign-ups, which is <span class="math inline">\(12/20=0.6\)</span> standard deviations of <span class="math inline">\(Y\)</span> and about 14% of the mean of 85 sign-ups. In simple regression, one standard deviation more in <span class="math inline">\(X\)</span> always goes with <span class="math inline">\(r\)</span> standard deviations more in the fitted <span class="math inline">\(Y\)</span>.</li>
+<li>R-squared and its interpretation: <span class="math inline">\(R^2=r^2=0.6^2=0.36\)</span>, so advertising spend explains 36% of the variation in weekly sign-ups in these 30 weeks.</li>
+</ul>
+<p>A check in R of the hand calculations:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a>b1 <span class="ot">&lt;-</span> <span class="fl">0.6</span> <span class="sc">*</span> <span class="dv">20</span> <span class="sc">/</span> <span class="dv">4</span></span>
+<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a>b0 <span class="ot">&lt;-</span> <span class="dv">85</span> <span class="sc">-</span> b1 <span class="sc">*</span> <span class="dv">12</span></span>
+<span id="cb67-3"><a href="#cb67-3" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">slope =</span> b1, <span class="at">intercept =</span> b0, <span class="at">fitted_at_15 =</span> b0 <span class="sc">+</span> b1 <span class="sc">*</span> <span class="dv">15</span>,</span>
+<span id="cb67-4"><a href="#cb67-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">one_sd_effect =</span> b1 <span class="sc">*</span> <span class="dv">4</span>, <span class="at">in_sd_of_y =</span> b1 <span class="sc">*</span> <span class="dv">4</span> <span class="sc">/</span> <span class="dv">20</span>,</span>
+<span id="cb67-5"><a href="#cb67-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">percent_of_mean =</span> <span class="dv">100</span> <span class="sc">*</span> b1 <span class="sc">*</span> <span class="dv">4</span> <span class="sc">/</span> <span class="dv">85</span>, <span class="at">r_squared =</span> <span class="fl">0.6</span><span class="sc">^</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>          slope       intercept    fitted_at_15   one_sd_effect      in_sd_of_y 
+        3.00000        49.00000        94.00000        12.00000         0.60000 
+percent_of_mean       r_squared 
+       14.11765         0.36000 </code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="task-10-a-result-without-stars-that-is-still-informative-lecture-3" class="level3">
+<h3 class="anchored" data-anchor-id="task-10-a-result-without-stars-that-is-still-informative-lecture-3">Task 10: A result without stars that is still informative (Lecture 3)</h3>
+<p>A webshop with 250 product pages wants to know whether more product photos go with a higher conversion rate, the percent of visitors of a page who buy the product. The mean conversion rate is 3.2%. A simple regression of the conversion rate (in %) on the number of photos on the page gives this output:</p>
+<pre class="text"><code>Outcome: conversion rate (%), 250 product pages   Estimate  Std. Error  p-value
+Number of photos                                      0.010       0.015     0.51
+Intercept                                             3.150       0.090   &lt;0.001</code></pre>
+<p>The critical value for a 95% confidence interval is <span class="math inline">\(t_{0.975,\,248}=1.970\)</span>. A professional photographer would add five photos to every page.</p>
+<ol type="1">
+<li>Calculate the 95% confidence interval for the slope, and say whether the slope is significantly different from zero at the 5% level.</li>
+<li>Use the upper end of the interval to state the largest association with five more photos that the data are consistent with, in percentage points and as a percent of the mean conversion rate. Review <a href="../resources/math-refresher.html#numbers-proportions-percentages-and-units">percent and percentage points</a> if you need to.</li>
+<li>A colleague says: “No stars, so the result tells us nothing.” Correct this statement in one or two sentences.</li>
+</ol>
+<p>Use (copy and paste) this structure:</p>
+<pre class="text"><code>Interval, formula:
+Interval, calculations:
+Interval, lower and upper bound:
+Significance at the 5% level:
+Largest association with five more photos:
+Correction of the colleague's statement:</code></pre>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check your answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-14" class="callout-14-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The code repeats the hand calculations.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>ci_photos <span class="ot">&lt;-</span> <span class="fl">0.010</span> <span class="sc">+</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>) <span class="sc">*</span> <span class="fl">1.970</span> <span class="sc">*</span> <span class="fl">0.015</span></span>
+<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a>ci_photos                          <span class="co"># interval for one more photo, in percentage points</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] -0.01955  0.03955</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span> <span class="sc">*</span> ci_photos[<span class="dv">2</span>]                   <span class="co"># upper end for five more photos</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.19775</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="dv">100</span> <span class="sc">*</span> <span class="dv">5</span> <span class="sc">*</span> ci_photos[<span class="dv">2</span>] <span class="sc">/</span> <span class="fl">3.2</span>       <span class="co"># as a percent of the mean conversion rate</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 6.179688</code></pre>
+</div>
+</div>
+<p>Filled-in structure:</p>
+<ul>
+<li>Interval, formula: <span class="math inline">\(\hat\beta_1\pm t_{0.975,\,248}\,\operatorname{SE}(\hat\beta_1)\)</span>.</li>
+<li>Interval, calculations: <span class="math inline">\(0.010\pm1.970\times0.015=0.010\pm0.0296\)</span>.</li>
+<li>Interval, lower and upper bound: <span class="math inline">\((-0.020,\;0.040)\)</span> percentage points of conversion per extra photo.</li>
+<li>Significance at the 5% level: zero lies inside the interval, so the slope is not significantly different from zero (p <span class="math inline">\(\approx\)</span> 0.51).</li>
+<li>Largest association with five more photos: <span class="math inline">\(5\times0.040=0.20\)</span> percentage points, a rise from 3.2% to at most about 3.4%, which is about 6% of the mean conversion rate.</li>
+<li>Correction of the colleague’s statement: the interval is narrow, so the result rules out large associations. Pages with five more photos convert at most about 0.2 percentage points better on average, and the webshop can compare this with the cost of the photographer.</li>
+</ul>
+</div>
+</div>
+</div>
 <p><a href="../intermediate/i04-multiple-regression.html">Continue to Lecture 4: Multiple regression and what controls do</a>.</p>
 </section>
 </section>
+</div>
 
 
 

@@ -461,7 +461,7 @@ Where these videos differ from this book
 </details>
 <p>The videos explain key ideas in another way. The lecture material and its notation always come first.</p>
 </div>
-<p><span class="shark-tag">Shark Tank data</span> <strong>R warm-up.</strong> The Shark Tank file sorts the presenting teams into three categories: <code>all_men</code>, <code>all_women</code>, and <code>mixed</code>. The code below reads the data, leaves out the seven pitches whose team category is unknown, and turns the team category into a factor with all-men teams as the reference category. It also measures the requested amount in thousands of dollars. The last two lines print the three categories and the contrasts table, which shows the dummy variables that R builds for the categories. Run the code and count the columns of the contrasts table. This is the number of dummies that a model with an intercept needs for three categories.</p>
+<p><span class="shark-tag">Shark Tank data</span> <strong>R warm-up.</strong> This task needs R. Open the course project in RStudio, so that the data file <code>shark_tank_teaching.csv</code> is in the folder <code>data</code>, and run the code there. The Shark Tank file sorts the presenting teams into three categories: <code>all_men</code>, <code>all_women</code>, and <code>mixed</code>. The code below reads the data and leaves out the seven pitches whose team category is missing (the source could not classify them). It then turns the team category into a factor with all-men teams as the reference category. It also measures the requested amount in thousands of dollars. The last two lines print the three categories and the contrasts table, which shows the dummy variables that R builds for the categories. Run the code and count the columns of the contrasts table. This is the number of dummies that a model with an intercept needs for three categories.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>known_gender <span class="ot">&lt;-</span> <span class="fu">subset</span>(sharks, pitcher_gender_group <span class="sc">!=</span> <span class="st">"unknown"</span>)</span>
@@ -473,7 +473,7 @@ Where these videos differ from this book
 </div>
 <p><strong>Code along (bring your laptop).</strong> Bring a charged laptop with RStudio and the course project open. All the code of the lecture is in this chapter, ready to copy. You can run each step yourself during the lecture and get the same numbers and figures.</p>
 <p>If indicators and reference categories are unfamiliar, review <a href="../resources/math-refresher.html#indicators-and-reference-categories">Mathematics Refresher: indicators and reference categories</a>.</p>
-<p><strong>Predict.</strong> Compare pitches from the same season that asked for the same amount. Do you expect all-women presenting teams to offer more, less, or about the same equity as all-men presenting teams? Write down your answer and one reason. The lecture material gives the answer from the data.</p>
+<p><strong>Predict.</strong> Compare pitches from the same season that asked for the same amount. Do you expect all-women presenting teams to offer more, less, or about the same equity as all-men presenting teams? Write down your answer and one reason. You do not need R or the data for this question. The lecture material gives the answer from the data.</p>
 </section>
 <section id="lecture-material" class="level2 course-phase phase-in-class">
 <h2 class="anchored" data-anchor-id="lecture-material">Lecture material</h2>
@@ -481,7 +481,7 @@ Where these videos differ from this book
 <section id="start-with-a-founders-question" class="level3">
 <h3 class="anchored" data-anchor-id="start-with-a-founders-question">Start with a founder’s question</h3>
 <p><span class="shark-tag">Shark Tank data</span> Founders often compare groups: customers from the app against customers from the website, one price against another, one kind of team against another. Start with the comparison in the driving question. The Shark Tank file sorts the presenting teams into all men, all women, and mixed (<code>pitcher_gender_group</code>). What equity (<code>equity_offered_pct</code>) did each group offer on average?</p>
-<p>The code reads the data and leaves out the seven pitches whose team category is unknown. It then prints the mean equity offered in each group and the number of pitches in each group.</p>
+<p>The code reads the data and leaves out the seven pitches whose team category is missing, as explained in the next section. It then prints the mean equity offered in each group and the number of pitches in each group.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>known <span class="ot">&lt;-</span> <span class="fu">subset</span>(sharks, pitcher_gender_group <span class="sc">!=</span> <span class="st">"unknown"</span>)</span>
@@ -501,7 +501,7 @@ Where these videos differ from this book
 </section>
 <section id="measurement-first-what-the-category-records" class="level3">
 <h3 class="anchored" data-anchor-id="measurement-first-what-the-category-records">Measurement first: what the category records</h3>
-<p>The categories describe the people who presented on screen: all men, all women, or mixed. They do not record the share of women in a team, and they do not describe the full team behind the venture. In seven records the source classifies the team as <code>unknown</code>. We leave these records out of every model in this lecture. A later section of this lecture explains why. Keep these limits in mind for every result in this chapter.</p>
+<p>The categories describe the people who presented on screen: all men, all women, or mixed. They do not record the share of women in a team, and they do not describe the full team behind the venture. In seven records the source classifies the team as <code>unknown</code>, which means that the category of these teams is missing. We leave these seven of the 1,441 records out of every model in this lecture, because a regression on the team category needs a known category for each pitch. The section <a href="#i05-unknown">Why unknown is excluded</a> returns to this choice. Keep these limits in mind for every result in this chapter.</p>
 </section>
 <section id="a-two-level-indicator" class="level3">
 <h3 class="anchored" data-anchor-id="a-two-level-indicator">A two-level indicator</h3>
@@ -790,7 +790,7 @@ Check your answer
 <li>a relative change: 1.28% of the all-men level more (13.2% would become about 13.4%),</li>
 <li>an absolute change of 1.28 percentage points (13.2% would become 14.48%).</li>
 </ul>
-<p>The two readings differ by a factor of about eight here. A coefficient for an outcome in percent is always an absolute change in percentage points. The precise sentence is: “At the same season and requested amount, all-women presenting teams are fitted to offer 1.28 equity percentage points more than all-men presenting teams.” Always write percentage points for this outcome.</p>
+<p>The two readings differ by a factor of about eight here. A coefficient for an outcome in percent is always an absolute change in percentage points. The precise sentence is: “At the same season and requested amount, all-women presenting teams are fitted to offer 1.28 equity percentage points more than all-men presenting teams.” Always write percentage points for this outcome. If the difference between percent and percentage points is not yet familiar, review <a href="../resources/math-refresher.html#numbers-proportions-percentages-and-units">Mathematics Refresher: numbers, proportions, percentages, and units</a>.</p>
 </section>
 <section id="the-adjusted-comparison" class="level3">
 <h3 class="anchored" data-anchor-id="the-adjusted-comparison">The adjusted comparison</h3>
@@ -831,7 +831,7 @@ F-statistic: 84.49 on 4 and 1429 DF,  p-value: &lt; 2.2e-16</code></pre>
 <li><strong>Mixed versus all-men.</strong> Among the same pitches, mixed teams are fitted to offer about 0.12 percentage points more than all-men teams at the same season and requested amount (p <span class="math inline">\(\approx\)</span> 0.823). This estimate is not statistically distinguishable from zero.</li>
 </ul>
 <p>A small p-value does not say that a difference is large, so judge the size with a benchmark. The all-women difference of 1.28 points is about 10% of the mean offer of all-men teams (13.20%) and about 0.15 standard deviations of the equity offered (8.45 points). This is a modest difference. The mixed estimate of 0.12 points is below 1% of the all-men mean, small as well as not significant.</p>
-<p>The first sentence answers the Predict question from before class: at the same season and requested amount, all-women teams offer more. The adjusted difference between all-women and all-men teams (1.28 points) is larger than the unadjusted difference from the worked example (0.82 points). One reason is the season. All-women teams pitched in later seasons on average (season 9.1 against 8.2 for all-men teams), and offers fall by about 0.82 points per season. The raw comparison therefore set all-women teams against all-men teams from earlier seasons with higher offers. Holding season and requested amount fixed changed the comparison. This is why the sentence must name what is held fixed. Both coefficients are comparisons with the reference category. They do not show that the gender of a team causes the offer.</p>
+<p>The first sentence answers the Predict question from before class: at the same season and requested amount, all-women teams offer more. The adjusted difference between all-women and all-men teams (1.28 points) is larger than the unadjusted difference from the worked example (0.82 points). One reason is the season. All-women teams pitched in later seasons on average (season 9.1 against 8.2 for all-men teams), and offers fall by about 0.82 points per season. The raw comparison therefore set all-women teams against all-men teams from earlier seasons with higher offers. Holding season and requested amount fixed changed the comparison. This is why the sentence must name what is held fixed. Both coefficients are comparisons with the reference category.</p>
 <p>Changing the reference category changes the names and values of the coefficients. It does not change the fitted values or the overall fit. Check this in R. The code makes all-women teams the reference category, fits the same model again, and prints the coefficients:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>known_gender<span class="sc">$</span>gender_women_ref <span class="ot">&lt;-</span> <span class="fu">relevel</span>(known_gender<span class="sc">$</span>gender,</span>
@@ -860,41 +860,7 @@ F=\dfrac{(\text{SSE}_R-\text{SSE}_C)/q}{\text{SSE}_C/(n-k_C-1)},
 <p>with <span class="math inline">\(\text{SSE}_R\)</span> and <span class="math inline">\(\text{SSE}_C\)</span> the sums of squared residuals of the reduced and the complete model, <span class="math inline">\(q\)</span> the number of tested coefficients, and <span class="math inline">\(k_C\)</span> the number of slopes of the complete model.</p>
 </div>
 <p>The overall F-test of Lecture 3 is the special case in which the reduced model contains only an intercept. Its sum of squared residuals is then SST, so <span class="math inline">\(\text{SSE}_R-\text{SSE}_C=\text{SSR}\)</span>, <span class="math inline">\(q=k\)</span>, and the formula above gives the overall F statistic.</p>
-<p><a href="#fig-i05-nested" class="quarto-xref">Figure&nbsp;<span>5.2</span></a> shows the pair of nested models for the two category dummies.</p>
-<div class="cell">
-<details class="code-fold">
-<summary>See the R code for this figure</summary>
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>old_par <span class="ot">&lt;-</span> <span class="fu">par</span>(<span class="at">no.readonly =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="fl">0.3</span>, <span class="fl">0.3</span>, <span class="fl">0.3</span>, <span class="fl">0.3</span>))</span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="cn">NA</span>, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">10</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">5</span>), <span class="at">axes =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">""</span>, <span class="at">ylab =</span> <span class="st">""</span>, <span class="at">xaxs =</span> <span class="st">"i"</span>, <span class="at">yaxs =</span> <span class="st">"i"</span>)</span>
-<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="fu">rect</span>(<span class="fl">0.4</span>, <span class="fl">1.1</span>, <span class="fl">4.6</span>, <span class="fl">3.9</span>, <span class="at">col =</span> <span class="st">"#DCEAF3"</span>, <span class="at">border =</span> <span class="st">"#17324D"</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span>
-<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a><span class="fu">rect</span>(<span class="fl">5.4</span>, <span class="fl">1.1</span>, <span class="fl">9.6</span>, <span class="fl">3.9</span>, <span class="at">col =</span> <span class="st">"#FDE5C1"</span>, <span class="at">border =</span> <span class="st">"#17324D"</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span>
-<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="fl">2.5</span>, <span class="fl">3.35</span>, <span class="st">"Reduced model"</span>, <span class="at">font =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"#17324D"</span>)</span>
-<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="fl">2.5</span>, <span class="fl">2.55</span>, <span class="st">"season + ask_1k"</span>, <span class="at">cex =</span> <span class="fl">0.95</span>)</span>
-<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="fl">2.5</span>, <span class="fl">1.85</span>, <span class="fu">expression</span>(beta[<span class="st">"all_women"</span>] <span class="sc">==</span> <span class="dv">0</span> <span class="sc">~</span> <span class="st">","</span> <span class="sc">~</span> beta[<span class="st">"mixed"</span>] <span class="sc">==</span> <span class="dv">0</span>),</span>
-<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>     <span class="at">cex =</span> <span class="fl">0.95</span>, <span class="at">col =</span> <span class="st">"#5B6976"</span>)</span>
-<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="fl">7.5</span>, <span class="fl">3.35</span>, <span class="st">"Complete model"</span>, <span class="at">font =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"#17324D"</span>)</span>
-<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="fl">7.5</span>, <span class="fl">2.55</span>, <span class="st">"season + ask_1k"</span>, <span class="at">cex =</span> <span class="fl">0.95</span>)</span>
-<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="fl">7.5</span>, <span class="fl">1.85</span>, <span class="st">"+ two category dummies"</span>, <span class="at">cex =</span> <span class="fl">0.95</span>)</span>
-<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a><span class="fu">arrows</span>(<span class="fl">4.7</span>, <span class="fl">2.5</span>, <span class="fl">5.3</span>, <span class="fl">2.5</span>, <span class="at">length =</span> <span class="fl">0.1</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"#17324D"</span>)</span>
-<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="fl">5.0</span>, <span class="fl">3.0</span>, <span class="st">"free the</span><span class="sc">\n</span><span class="st">two coefficients"</span>, <span class="at">cex =</span> <span class="fl">0.8</span>, <span class="at">col =</span> <span class="st">"#5B6976"</span>)</span>
-<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(old_par)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<div id="fig-i05-nested" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-i05-nested-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="i05-categories-joint-tests_files/figure-html/fig-i05-nested-1.png" class="img-fluid figure-img" width="672">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-i05-nested-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;5.2: The two nested models of the partial F-test. The reduced model is the complete model with the two category coefficients set to zero, fitted on the same observations.
-</figcaption>
-</figure>
-</div>
-</div>
-</div>
-<p>The hypotheses:</p>
+<p>For the driving question, the two models are as follows. The complete model is the adjusted model of the previous section, with season, requested amount, and the two category dummies. The reduced model keeps season and requested amount but leaves out the two dummies. Leaving them out is the same as setting their two coefficients to zero, so the models are nested and <span class="math inline">\(q=2\)</span>. Both are fitted on the same 1,434 pitches, so the only difference between them is the two category terms. If the reduced model fits almost as well as the complete model, the categories add little. The hypotheses:</p>
 <p><span class="math display">\[
 H_0:\beta_{\text{all\_women}}=\beta_{\text{mixed}}=0
 \quad\text{against at least one non-zero.}
@@ -902,9 +868,9 @@ H_0:\beta_{\text{all\_women}}=\beta_{\text{mixed}}=0
 <div id="exm-i05-partial-f" class="theorem example">
 <p><span class="theorem-title"><strong>Example 5.3 (Worked example: the partial F statistic by hand)</strong></span> <span class="shark-tag">Shark Tank data</span> Fit both models and ask R for the anova table. <code>anova()</code> with two models prints one row per model: the residual degrees of freedom (<code>Res.Df</code>) and the residual sum of squares (<code>RSS</code>). The second row adds the change between the models, the F statistic, and its p-value:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>reduced_gender <span class="ot">&lt;-</span> <span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> ask_1k,</span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>                     <span class="at">data =</span> known_gender)</span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(reduced_gender, gender_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>reduced_gender <span class="ot">&lt;-</span> <span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> ask_1k,</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>                     <span class="at">data =</span> known_gender)</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(reduced_gender, gender_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Analysis of Variance Table
 
@@ -925,7 +891,8 @@ F=\frac{436.25/2}{82{,}792/1{,}429}
 \]</span></p>
 <p>Read the ratio. The numerator is the variation that the two terms explain, per tested coefficient. The denominator is the variation that is left unexplained, per residual degree of freedom. If the two coefficients were really zero, the ratio would be close to 1. Here it is about 3.8, and the p-value is about 0.023.</p>
 </div>
-<p>At 5%, the two category terms are jointly significant in this model. Their size is another matter. The fall of 436.25 is about 0.5% of the residual sum of squares of the reduced model (83,228), and <span class="math inline">\(R^2\)</span> rises only from 0.187 to 0.191. The categories add a real but small part to the explanation of the offers. Compare this with the single results: the p-value of the joint test is <span class="math inline">\(0.023\)</span>, and the p-value of the mixed dummy alone is <span class="math inline">\(0.823\)</span>. Joint significance is not the same as individual significance. The F-test asks whether the two terms together improve the model. It does not ask whether each term is significant on its own. The overall F-test in <code>summary(gender_model)</code> is about 84.5, with a very small p-value. It answers a third question: do all four coefficients together improve on a model with only an intercept?</p>
+<p>At 5%, the two category terms are jointly significant in this model. Their size is another matter. The fall of 436.25 is about 0.5% of the residual sum of squares of the reduced model (83,228), and <span class="math inline">\(R^2\)</span> rises only from 0.187 to 0.191. The categories add a real but small part to the explanation of the offers. Compare this with the single results: the p-value of the joint test is <span class="math inline">\(0.023\)</span>, and the p-value of the mixed dummy alone is <span class="math inline">\(0.823\)</span>. Joint significance is not the same as individual significance. The F-test asks whether the two terms together improve the model. It does not ask whether each term is significant on its own.</p>
+<p>The last line of <code>summary(gender_model)</code> reports one more F-test, the overall F-test of Lecture 3. It answers a third question: do all four slopes together (season, requested amount, and the two dummies) improve on a model with only an intercept, which predicts the mean offer of 13.22% for every pitch? The answer is a clear yes: F <span class="math inline">\(\approx\)</span> 84.5 on 4 and 1,429 degrees of freedom, with a p-value far below 0.001. Together the four predictors explain about 19% of the variation in the offers (<span class="math inline">\(R^2\approx 0.191\)</span>). Season and requested amount do most of this work, since they alone explain 18.7%. In practice, knowing the season and the request lets you predict an opening offer clearly better than the overall mean does, and the team category adds a small refinement on top.</p>
 </section>
 <section id="the-same-model-as-a-one-way-anova" class="level3">
 <h3 class="anchored" data-anchor-id="the-same-model-as-a-one-way-anova">The same model as a one-way ANOVA</h3>
@@ -956,8 +923,8 @@ F=\frac{\text{SSR}/(G-1)}{\text{SSE}/(n-G)}.
 </ul>
 <p><span class="shark-tag">Shark Tank data</span> Return to the raw comparison at the start of this lecture. Are the three group means of the equity offered (<code>equity_offered_pct</code>) further apart than chance alone would produce? The code fits the model with the gender groups only, without season and requested amount. It prints the ANOVA table and then the regression summary of the same model:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>anova_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> gender, <span class="at">data =</span> known_gender)</span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(anova_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>anova_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> gender, <span class="at">data =</span> known_gender)</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(anova_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Analysis of Variance Table
 
@@ -968,7 +935,7 @@ Residuals 1431 101822  71.155
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(anova_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(anova_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
@@ -1002,14 +969,14 @@ F=\frac{275.5}{71.15}\approx 3.87.
 \]</span></p>
 <p>This is the <code>F-statistic</code> in the last line of <code>summary()</code>: 3.872 on 2 and 1,431 degrees of freedom, with the same p-value 0.021. The mean square of the residuals is <span class="math inline">\(s^2\)</span>, and <span class="math inline">\(\sqrt{71.15}\approx 8.435\)</span> is the residual standard error. The code below computes SSR from the group means with the formula above, and the overall mean and standard deviation for comparison:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> known_gender<span class="sc">$</span>equity_offered_pct</span>
-<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>group_means <span class="ot">&lt;-</span> <span class="fu">tapply</span>(y, known_gender<span class="sc">$</span>gender, mean)</span>
-<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>group_sizes <span class="ot">&lt;-</span> <span class="fu">table</span>(known_gender<span class="sc">$</span>gender)</span>
-<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(group_sizes <span class="sc">*</span> (group_means <span class="sc">-</span> <span class="fu">mean</span>(y))<span class="sc">^</span><span class="dv">2</span>)   <span class="co"># SSR, between groups</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> known_gender<span class="sc">$</span>equity_offered_pct</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>group_means <span class="ot">&lt;-</span> <span class="fu">tapply</span>(y, known_gender<span class="sc">$</span>gender, mean)</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>group_sizes <span class="ot">&lt;-</span> <span class="fu">table</span>(known_gender<span class="sc">$</span>gender)</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(group_sizes <span class="sc">*</span> (group_means <span class="sc">-</span> <span class="fu">mean</span>(y))<span class="sc">^</span><span class="dv">2</span>)   <span class="co"># SSR, between groups</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 551.0092</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">mean =</span> <span class="fu">mean</span>(y), <span class="at">sd =</span> <span class="fu">sd</span>(y))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">mean =</span> <span class="fu">mean</span>(y), <span class="at">sd =</span> <span class="fu">sd</span>(y))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     mean        sd 
 13.219784  8.452202 </code></pre>
@@ -1049,47 +1016,47 @@ Optional: a one-way ANOVA by hand
 </section>
 <section id="visualise-the-adjusted-comparison" class="level3">
 <h3 class="anchored" data-anchor-id="visualise-the-adjusted-comparison">Visualise the adjusted comparison</h3>
-<p><span class="shark-tag">Shark Tank data</span> The coefficients of the adjusted comparison are differences. A figure shows the three fitted levels side by side. To draw it, the code fixes season and requested amount at their averages in the data (season 8.8 and about $283,000). It then uses the adjusted model to predict the equity offered for each of the three groups, with a 95% confidence interval. <a href="#fig-i05-adjusted" class="quarto-xref">Figure&nbsp;<span>5.3</span></a> shows the result.</p>
+<p><span class="shark-tag">Shark Tank data</span> The coefficients of the adjusted comparison are differences. A figure shows the three fitted levels side by side. To draw it, the code fixes season and requested amount at their averages in the data (season 8.8 and about $283,000). It then uses the adjusted model to predict the equity offered for each of the three groups, with a 95% confidence interval. <a href="#fig-i05-adjusted" class="quarto-xref">Figure&nbsp;<span>5.2</span></a> shows the result.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>See the R code for this figure</summary>
-<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>known_gender <span class="ot">&lt;-</span> <span class="fu">subset</span>(sharks, pitcher_gender_group <span class="sc">!=</span> <span class="st">"unknown"</span>)</span>
-<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>known_gender<span class="sc">$</span>gender <span class="ot">&lt;-</span> <span class="fu">relevel</span>(<span class="fu">factor</span>(known_gender<span class="sc">$</span>pitcher_gender_group),</span>
-<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>                               <span class="at">ref =</span> <span class="st">"all_men"</span>)</span>
-<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>known_gender<span class="sc">$</span>ask_1k <span class="ot">&lt;-</span> known_gender<span class="sc">$</span>ask_amount_usd <span class="sc">/</span> <span class="dv">1000</span></span>
-<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>gender_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
-<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>  equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> ask_1k <span class="sc">+</span> gender,</span>
-<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> known_gender</span>
-<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a>newdat <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb46-12"><a href="#cb46-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">season =</span> <span class="fu">mean</span>(known_gender<span class="sc">$</span>season),</span>
-<span id="cb46-13"><a href="#cb46-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">ask_1k =</span> <span class="fu">mean</span>(known_gender<span class="sc">$</span>ask_1k),</span>
-<span id="cb46-14"><a href="#cb46-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">gender =</span> <span class="fu">factor</span>(<span class="fu">c</span>(<span class="st">"all_men"</span>, <span class="st">"all_women"</span>, <span class="st">"mixed"</span>),</span>
-<span id="cb46-15"><a href="#cb46-15" aria-hidden="true" tabindex="-1"></a>                  <span class="at">levels =</span> <span class="fu">levels</span>(known_gender<span class="sc">$</span>gender))</span>
-<span id="cb46-16"><a href="#cb46-16" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb46-17"><a href="#cb46-17" aria-hidden="true" tabindex="-1"></a>pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(gender_model, <span class="at">newdata =</span> newdat, <span class="at">interval =</span> <span class="st">"confidence"</span>)</span>
-<span id="cb46-18"><a href="#cb46-18" aria-hidden="true" tabindex="-1"></a>adj_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb46-19"><a href="#cb46-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">team =</span> <span class="fu">factor</span>(<span class="fu">c</span>(<span class="st">"All-men"</span>, <span class="st">"All-women"</span>, <span class="st">"Mixed"</span>),</span>
-<span id="cb46-20"><a href="#cb46-20" aria-hidden="true" tabindex="-1"></a>                <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"All-men"</span>, <span class="st">"All-women"</span>, <span class="st">"Mixed"</span>)),</span>
-<span id="cb46-21"><a href="#cb46-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">fit =</span> pred[, <span class="st">"fit"</span>],</span>
-<span id="cb46-22"><a href="#cb46-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">lwr =</span> pred[, <span class="st">"lwr"</span>],</span>
-<span id="cb46-23"><a href="#cb46-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">upr =</span> pred[, <span class="st">"upr"</span>]</span>
-<span id="cb46-24"><a href="#cb46-24" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb46-25"><a href="#cb46-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-26"><a href="#cb46-26" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(adj_df, <span class="fu">aes</span>(<span class="at">x =</span> team, <span class="at">y =</span> fit)) <span class="sc">+</span></span>
-<span id="cb46-27"><a href="#cb46-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_pointrange</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> lwr, <span class="at">ymax =</span> upr),</span>
-<span id="cb46-28"><a href="#cb46-28" aria-hidden="true" tabindex="-1"></a>                  <span class="at">colour =</span> <span class="st">"#009E73"</span>, <span class="at">linewidth =</span> <span class="fl">0.7</span>, <span class="at">fatten =</span> <span class="fl">2.6</span>) <span class="sc">+</span></span>
-<span id="cb46-29"><a href="#cb46-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Source classification of pitching team"</span>,</span>
-<span id="cb46-30"><a href="#cb46-30" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Fitted initial equity offered (%)"</span>) <span class="sc">+</span></span>
-<span id="cb46-31"><a href="#cb46-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
-<span id="cb46-32"><a href="#cb46-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb46-33"><a href="#cb46-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb46-34"><a href="#cb46-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.x =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb46-35"><a href="#cb46-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#5B6976"</span>),</span>
-<span id="cb46-36"><a href="#cb46-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>)</span>
-<span id="cb46-37"><a href="#cb46-37" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>known_gender <span class="ot">&lt;-</span> <span class="fu">subset</span>(sharks, pitcher_gender_group <span class="sc">!=</span> <span class="st">"unknown"</span>)</span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>known_gender<span class="sc">$</span>gender <span class="ot">&lt;-</span> <span class="fu">relevel</span>(<span class="fu">factor</span>(known_gender<span class="sc">$</span>pitcher_gender_group),</span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>                               <span class="at">ref =</span> <span class="st">"all_men"</span>)</span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>known_gender<span class="sc">$</span>ask_1k <span class="ot">&lt;-</span> known_gender<span class="sc">$</span>ask_amount_usd <span class="sc">/</span> <span class="dv">1000</span></span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>gender_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>  equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> ask_1k <span class="sc">+</span> gender,</span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> known_gender</span>
+<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a>newdat <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">season =</span> <span class="fu">mean</span>(known_gender<span class="sc">$</span>season),</span>
+<span id="cb45-13"><a href="#cb45-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">ask_1k =</span> <span class="fu">mean</span>(known_gender<span class="sc">$</span>ask_1k),</span>
+<span id="cb45-14"><a href="#cb45-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">gender =</span> <span class="fu">factor</span>(<span class="fu">c</span>(<span class="st">"all_men"</span>, <span class="st">"all_women"</span>, <span class="st">"mixed"</span>),</span>
+<span id="cb45-15"><a href="#cb45-15" aria-hidden="true" tabindex="-1"></a>                  <span class="at">levels =</span> <span class="fu">levels</span>(known_gender<span class="sc">$</span>gender))</span>
+<span id="cb45-16"><a href="#cb45-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb45-17"><a href="#cb45-17" aria-hidden="true" tabindex="-1"></a>pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(gender_model, <span class="at">newdata =</span> newdat, <span class="at">interval =</span> <span class="st">"confidence"</span>)</span>
+<span id="cb45-18"><a href="#cb45-18" aria-hidden="true" tabindex="-1"></a>adj_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb45-19"><a href="#cb45-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">team =</span> <span class="fu">factor</span>(<span class="fu">c</span>(<span class="st">"All-men"</span>, <span class="st">"All-women"</span>, <span class="st">"Mixed"</span>),</span>
+<span id="cb45-20"><a href="#cb45-20" aria-hidden="true" tabindex="-1"></a>                <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"All-men"</span>, <span class="st">"All-women"</span>, <span class="st">"Mixed"</span>)),</span>
+<span id="cb45-21"><a href="#cb45-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">fit =</span> pred[, <span class="st">"fit"</span>],</span>
+<span id="cb45-22"><a href="#cb45-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">lwr =</span> pred[, <span class="st">"lwr"</span>],</span>
+<span id="cb45-23"><a href="#cb45-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">upr =</span> pred[, <span class="st">"upr"</span>]</span>
+<span id="cb45-24"><a href="#cb45-24" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb45-25"><a href="#cb45-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-26"><a href="#cb45-26" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(adj_df, <span class="fu">aes</span>(<span class="at">x =</span> team, <span class="at">y =</span> fit)) <span class="sc">+</span></span>
+<span id="cb45-27"><a href="#cb45-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_pointrange</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> lwr, <span class="at">ymax =</span> upr),</span>
+<span id="cb45-28"><a href="#cb45-28" aria-hidden="true" tabindex="-1"></a>                  <span class="at">colour =</span> <span class="st">"#009E73"</span>, <span class="at">linewidth =</span> <span class="fl">0.7</span>, <span class="at">fatten =</span> <span class="fl">2.6</span>) <span class="sc">+</span></span>
+<span id="cb45-29"><a href="#cb45-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Source classification of pitching team"</span>,</span>
+<span id="cb45-30"><a href="#cb45-30" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Fitted initial equity offered (%)"</span>) <span class="sc">+</span></span>
+<span id="cb45-31"><a href="#cb45-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
+<span id="cb45-32"><a href="#cb45-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb45-33"><a href="#cb45-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb45-34"><a href="#cb45-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb45-35"><a href="#cb45-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#5B6976"</span>),</span>
+<span id="cb45-36"><a href="#cb45-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>)</span>
+<span id="cb45-37"><a href="#cb45-37" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-i05-adjusted" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1098,23 +1065,49 @@ Optional: a one-way ANOVA by hand
 <img src="i05-categories-joint-tests_files/figure-html/fig-i05-adjusted-1.png" class="img-fluid figure-img" width="672">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-i05-adjusted-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;5.3: Fitted equity offered for the three groups of presenting teams at the average season and requested amount, with 95% confidence intervals. The all-women point lies above the other two. The intervals show sampling uncertainty under the model, not uncertainty about how the categories were recorded.
+Figure&nbsp;5.2: Fitted equity offered for the three groups of presenting teams at the average season and requested amount, with 95% confidence intervals. The all-women point lies above the other two. The intervals show sampling uncertainty under the model, not uncertainty about how the categories were recorded.
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
-<p>Read <a href="#fig-i05-adjusted" class="quarto-xref">Figure&nbsp;<span>5.3</span></a> with the <a href="../basic/b01-introduction-data-analysis.html#b01-read-graph">five steps for reading a figure</a>:</p>
+<p>Read <a href="#fig-i05-adjusted" class="quarto-xref">Figure&nbsp;<span>5.2</span></a> with the <a href="../basic/b01-introduction-data-analysis.html#b01-read-graph">five steps for reading a figure</a>:</p>
 <ol type="1">
 <li><strong>Unit and variables:</strong> the horizontal axis shows the three categories of teams. The vertical axis shows the fitted equity offered, in percent.</li>
 <li><strong>Scales:</strong> each point is a fitted mean at the same average season and requested amount. This is an adjusted comparison, not a comparison of raw group means.</li>
 <li><strong>One element:</strong> the points are fitted values (about 12.85, 14.14, and 12.97). The vertical lines are 95% confidence intervals. They are wider for the smaller groups.</li>
 <li><strong>Pattern:</strong> the all-women point lies about 1.28 points above the all-men point. The mixed interval overlaps both.</li>
-<li><strong>Limits:</strong> the intervals show sampling uncertainty under the model. They say nothing about how well the broad categories were recorded, and nothing about causes.</li>
+<li><strong>Limits:</strong> the intervals show sampling uncertainty under the model. They say nothing about how well the broad categories were recorded.</li>
 </ol>
+<p>The figure suggests that all-women teams offer more than both other groups. Which of these differences can be told apart from chance? Overlapping or separate intervals around each point are only a rough guide, because a difference between two groups has its own standard error. The test of a difference is the t-test of the matching dummy coefficient. The adjusted model with all-men teams as the reference gives two of the three differences. For the third, all-women against mixed teams, the code uses the model with all-women teams as the reference from the section on changing the reference category, fitted again here. It prints the two dummy rows of the coefficient table and their 95% confidence intervals:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>known_gender<span class="sc">$</span>gender_women_ref <span class="ot">&lt;-</span> <span class="fu">relevel</span>(known_gender<span class="sc">$</span>gender,</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>                                         <span class="at">ref =</span> <span class="st">"all_women"</span>)</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>women_ref_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> ask_1k <span class="sc">+</span> gender_women_ref,</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>                      <span class="at">data =</span> known_gender)</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">summary</span>(women_ref_model)<span class="sc">$</span>coefficients[<span class="dv">4</span><span class="sc">:</span><span class="dv">5</span>, ], <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                        Estimate Std. Error t value Pr(&gt;|t|)
+gender_women_refall_men   -1.284      0.481  -2.668    0.008
+gender_women_refmixed     -1.163      0.602  -1.932    0.054</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">confint</span>(women_ref_model)[<span class="dv">4</span><span class="sc">:</span><span class="dv">5</span>, ], <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                        2.5 % 97.5 %
+gender_women_refall_men -2.23  -0.34
+gender_women_refmixed   -2.34   0.02</code></pre>
+</div>
+</div>
+<p>The two rows compare all-men and mixed teams with all-women teams, so their estimates are negative: both groups are fitted below all-women teams. Reversing the signs gives the differences seen from the all-women point in the figure. Together with the mixed coefficient of the adjusted model, the three differences are as follows.</p>
+<ul>
+<li>All-women against all-men teams: 1.28 percentage points, with a 95% interval from 0.34 to 2.23 points (p <span class="math inline">\(\approx\)</span> 0.008). This difference is statistically distinguishable from zero.</li>
+<li>All-women against mixed teams: 1.16 percentage points, with an interval from <span class="math inline">\(-0.02\)</span> to 2.34 points (p <span class="math inline">\(\approx\)</span> 0.054). The estimate is almost as large, but at the 5% level it is just not distinguishable from zero, because the mixed group is small (276 pitches).</li>
+<li>Mixed against all-men teams: 0.12 percentage points, with an interval from <span class="math inline">\(-0.94\)</span> to 1.18 points (p <span class="math inline">\(\approx\)</span> 0.823). This interval rules out differences larger than about one point in either direction.</li>
+</ul>
+<p>How large are these differences in business terms? A difference of 1.28 points is about 10% of the mean offer of all-men teams (13.20%), or about one point on an opening offer of about 13%. Even the upper end of its interval, 2.23 points, is about a sixth of that mean and a quarter of one standard deviation of the offers (8.45 points). For comparison, the same model fits an offer about 0.82 points lower for every later season, so the all-women difference is about the size of the change over a season and a half. A founder can conclude that, among these pitches, all-women teams opened with somewhat higher equity offers than all-men teams at the same season and request, and that mixed teams did not differ from all-men teams by much. The team category is a modest factor next to the season, the size of the request, and the large spread of offers within every group.</p>
 </section>
-<section id="why-unknown-is-excluded-not-a-fourth-group" class="level3">
-<h3 class="anchored" data-anchor-id="why-unknown-is-excluded-not-a-fourth-group">Why <code>unknown</code> is excluded, not a fourth group</h3>
+<section id="i05-unknown" class="level3">
+<h3 class="anchored" data-anchor-id="i05-unknown">Why <code>unknown</code> is excluded, not a fourth group</h3>
 <p>Seven records have the classification <code>unknown</code>. This label says that information is missing. It is not a kind of team. A fourth category would estimate the mean equity of teams that the source could not classify. This number has no business meaning. If we leave these records out, every coefficient has a clear meaning. The cost is that the results describe the 1,434 classified records only.</p>
 <div class="caveat-box">
 <p><span class="label">What these category coefficients can and cannot say</span></p>
@@ -1162,7 +1155,8 @@ See the solution
 </div>
 </div>
 </div>
-<p><strong>Next:</strong> You can now compare categories at fixed values of the other predictors. So far every group has the same slope, and every trend is a straight line. Both are choices of the model, not facts. Lecture 6 removes these two restrictions. An interaction lets the season trend differ between groups of teams, and a quadratic term lets the trend curve.</p>
+<p>This lecture gave you the tools to bring categories into a regression. You can compare customer segments, sales channels, or kinds of teams at the same values of the other predictors, test whether a whole set of categories improves a model, and read an A/B test as the effect of a change you made. One practical question remains open. In every model so far, the groups differ only by a fixed amount, and every trend is a straight line. A founder often expects more than that: a price cut may help one customer segment more than another, and growth from advertising may slow down as the budget rises. Lecture 6 shows how a regression captures both patterns.</p>
+<p><strong>Next:</strong> Lecture 6 removes these two restrictions. An interaction lets the season trend differ between groups of teams, and a quadratic term lets the trend curve.</p>
 </section>
 </section>
 <section id="after-class" class="level2 course-phase phase-after">
@@ -1212,12 +1206,12 @@ Check your answers
 </section>
 <section id="finish-a-half-worked-example-a-partial-f-with-new-numbers" class="level3">
 <h3 class="anchored" data-anchor-id="finish-a-half-worked-example-a-partial-f-with-new-numbers">Finish a half-worked example: a partial F with new numbers</h3>
-<p><span class="shark-tag">Shark Tank data</span> Test the two team-category dummies again, now in a smaller complete model. The outcome is the equity offered, in percent (<code>equity_offered_pct</code>). The data are the 1,434 pitches with a known team classification (<code>known_gender</code>). The reduced model contains only the season (<code>season</code>). The complete model adds the team category (<code>gender</code>, reference all-men teams):</p>
+<p><span class="shark-tag">Shark Tank data</span> Test the two team-category dummies again, now in a smaller complete model. The outcome is the equity offered, in percent (<code>equity_offered_pct</code>). The data are the 1,434 pitches with a known team classification (<code>known_gender</code>). The reduced model contains only the season (<code>season</code>). The complete model adds the team category (<code>gender</code>, reference all-men teams). You can run the code below in R after the R warm-up, or work on paper with the numbers from its output given in Step 1:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>reduced_season <span class="ot">&lt;-</span> <span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> season, <span class="at">data =</span> known_gender)</span>
-<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>full_season    <span class="ot">&lt;-</span> <span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> gender,</span>
-<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">data =</span> known_gender)</span>
-<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(reduced_season, full_season)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>reduced_season <span class="ot">&lt;-</span> <span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> season, <span class="at">data =</span> known_gender)</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>full_season    <span class="ot">&lt;-</span> <span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> gender,</span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">data =</span> known_gender)</span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(reduced_season, full_season)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Analysis of Variance Table
 
@@ -1252,7 +1246,7 @@ Check your answer
 </section>
 <section id="practice-relevelling-hypotheses-an-ab-test-and-an-anova-table" class="level3">
 <h3 class="anchored" data-anchor-id="practice-relevelling-hypotheses-an-ab-test-and-an-anova-table">Practice: relevelling, hypotheses, an A/B test, and an ANOVA table</h3>
-<p>Questions 1, 2, 3, and 5 use the model of the section “The adjusted comparison” in this lecture, saved as <code>gender_model</code>. It regresses the equity offered (<code>equity_offered_pct</code>) on the season, the requested amount in thousands of dollars (<code>ask_1k</code>), and the team category <code>gender</code>, with all-men teams as the reference category. The data are the 1,434 pitches with a known team classification (<code>known_gender</code>).</p>
+<p>Questions 1, 2, 3, and 5 use the model of the section “The adjusted comparison” in this lecture, saved as <code>gender_model</code>. It regresses the equity offered (<code>equity_offered_pct</code>) on the season, the requested amount in thousands of dollars (<code>ask_1k</code>), and the team category <code>gender</code>, with all-men teams as the reference category. The data are the 1,434 pitches with a known team classification (<code>known_gender</code>). Questions 1 and 2 need R: open the course project in RStudio and first run the code of the R warm-up and of the section “The adjusted comparison”. Questions 3 to 6 can be answered on paper.</p>
 <ol type="1">
 <li><p><span class="shark-tag">Shark Tank data</span> Fit the same model again, but with mixed teams as the reference category. Save it as <code>relevelled_model</code>, and interpret both dummy coefficients.</p></li>
 <li><p><span class="shark-tag">Shark Tank data</span> Show that the fitted values of <code>relevelled_model</code> are the same as those of <code>gender_model</code>.</p></li>
@@ -1279,12 +1273,12 @@ Check your answers
 <div class="callout-body-container callout-body">
 <ol type="1">
 <li><p>Use:</p>
-<div class="sourceCode" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>mixed_reference <span class="ot">&lt;-</span> <span class="fu">relevel</span>(known_gender<span class="sc">$</span>gender, <span class="at">ref =</span> <span class="st">"mixed"</span>)</span>
-<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>relevelled_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
-<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>  equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> ask_1k <span class="sc">+</span> mixed_reference,</span>
-<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> known_gender</span>
-<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(relevelled_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>mixed_reference <span class="ot">&lt;-</span> <span class="fu">relevel</span>(known_gender<span class="sc">$</span>gender, <span class="at">ref =</span> <span class="st">"mixed"</span>)</span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>relevelled_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>  equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> ask_1k <span class="sc">+</span> mixed_reference,</span>
+<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> known_gender</span>
+<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb53-6"><a href="#cb53-6" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(relevelled_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>At the same season and requested amount, the all-men coefficient is about <span class="math inline">\(-0.121\)</span> percentage points and the all-women coefficient about <span class="math inline">\(1.163\)</span> percentage points. Both compare with mixed teams.</p></li>
 <li><p><code>all.equal(fitted(gender_model), fitted(relevelled_model))</code> returns <code>TRUE</code>.</p></li>
 <li><p><span class="math inline">\(H_0:\beta_{\text{all\_women}}=\beta_{\text{mixed}}=0\)</span> against the alternative that at least one of the two is not zero, with all-men as the reference category.</p></li>
@@ -1426,7 +1420,7 @@ See an example, then write your own
 <p>For extra exercises on this lecture, with worked solutions, ask Tilly for QM Intermediate, the course AI assistant. For example: “Give me an extra exercise for Intermediate Lecture 5. Show the solution only after I send my answer.”</p>
 <p><a href="../intermediate/i06-interactions-curvature.html">Continue to Lecture 6: Interactions and curvature</a>.</p>
 <p><a href="../intermediate/code-sheet.html#lecture-5-factors-reference-categories-and-partial-f-tests">Code sheet: Lecture 5 commands and formulas</a>.</p>
-<p>For a more formal treatment, see James et al., <em>An Introduction to Statistical Learning</em>, 2nd ed., Sections 3.2.2 and 3.3.1, and <a href="https://tilburguniversity.on.worldcat.org/oclc/317545871">Nieuwenhuis, <em>Statistical Methods for Business and Economics</em></a>, Chapters 20–21.</p>
+<p>For a more formal treatment, see <a href="https://tilburguniversity.on.worldcat.org/oclc/317545871">Nieuwenhuis, <em>Statistical Methods for Business and Economics</em></a>, Chapters 20–21.</p>
 </section>
 </section>
 

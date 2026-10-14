@@ -58,10 +58,13 @@ Watch these three parts of Brandon Foltz's Statistics 101 series before class.
 The videos explain key ideas in another way. The lecture material and its notation always come first.
 :::
 
-[Shark Tank data]{.shark-tag} **R warm-up.** The Shark Tank file sorts the
+[Shark Tank data]{.shark-tag} **R warm-up.** This task needs R. Open the
+course project in RStudio, so that the data file `shark_tank_teaching.csv`
+is in the folder `data`, and run the code there. The Shark Tank file sorts the
 presenting teams into three categories: `all_men`, `all_women`, and `mixed`.
-The code below reads the data, leaves out the seven pitches whose team
-category is unknown, and turns the team category into a factor with all-men
+The code below reads the data and leaves out the seven pitches whose team
+category is missing (the source could not classify them). It then turns the
+team category into a factor with all-men
 teams as the reference category. It also measures the requested amount in
 thousands of dollars. The last two lines print the three categories and the
 contrasts table, which shows the dummy variables that R builds for the
@@ -92,7 +95,8 @@ If indicators and reference categories are unfamiliar, review
 **Predict.** Compare pitches from the same season that asked for the same
 amount. Do you expect all-women presenting teams to offer more, less, or
 about the same equity as all-men presenting teams? Write down your answer
-and one reason. The lecture material gives the answer from the data.
+and one reason. You do not need R or the data for this question. The
+lecture material gives the answer from the data.
 
 :::
 
@@ -117,7 +121,7 @@ mixed (`pitcher_gender_group`). What equity (`equity_offered_pct`) did each
 group offer on average?
 
 The code reads the data and leaves out the seven pitches whose team category
-is unknown. It then prints the mean equity offered in each group and the
+is missing, as explained in the next section. It then prints the mean equity offered in each group and the
 number of pitches in each group.
 
 ```{r}
@@ -141,8 +145,11 @@ contains words, not numbers?
 The categories describe the people who presented on screen: all men, all
 women, or mixed. They do not record the share of women in a team, and they
 do not describe the full team behind the venture. In seven records the
-source classifies the team as `unknown`. We leave these records out of every
-model in this lecture. A later section of this lecture explains why. Keep these
+source classifies the team as `unknown`, which means that the category of
+these teams is missing. We leave these seven of the 1,441 records out of
+every model in this lecture, because a regression on the team category needs
+a known category for each pitch. The section
+[Why unknown is excluded](#i05-unknown) returns to this choice. Keep these
 limits in mind for every result in this chapter.
 
 ### A two-level indicator
@@ -522,7 +529,9 @@ The two readings differ by a factor of about eight here. A coefficient for
 an outcome in percent is always an absolute change in percentage points. The precise sentence is:
 "At the same season and requested amount, all-women presenting teams are
 fitted to offer 1.28 equity percentage points more than all-men presenting
-teams." Always write percentage points for this outcome.
+teams." Always write percentage points for this outcome. If the difference
+between percent and percentage points is not yet familiar, review
+[Mathematics Refresher: numbers, proportions, percentages, and units](../resources/math-refresher.qmd#numbers-proportions-percentages-and-units).
 
 ### The adjusted comparison
 
@@ -570,7 +579,7 @@ season. The raw comparison therefore set all-women teams against all-men
 teams from earlier seasons with higher offers. Holding season and requested
 amount fixed changed the comparison. This is why the sentence must name what
 is held fixed. Both coefficients are comparisons with the reference
-category. They do not show that the gender of a team causes the offer.
+category.
 
 Changing the reference category changes the names and values of the
 coefficients. It does not change the fitted values or the overall fit. Check
@@ -627,34 +636,14 @@ model contains only an intercept. Its sum of squared residuals is then SST,
 so $\text{SSE}_R-\text{SSE}_C=\text{SSR}$, $q=k$, and the formula above
 gives the overall F statistic.
 
-@fig-i05-nested shows the pair of nested models for the two category
-dummies.
-
-```{r}
-#| label: fig-i05-nested
-#| code-fold: true
-#| code-summary: "See the R code for this figure"
-#| fig-height: 2.6
-#| fig-cap: "The two nested models of the partial F-test. The reduced model is the complete model with the two category coefficients set to zero, fitted on the same observations."
-old_par <- par(no.readonly = TRUE)
-par(mar = c(0.3, 0.3, 0.3, 0.3))
-plot(NA, xlim = c(0, 10), ylim = c(0, 5), axes = FALSE,
-     xlab = "", ylab = "", xaxs = "i", yaxs = "i")
-rect(0.4, 1.1, 4.6, 3.9, col = "#DCEAF3", border = "#17324D", lwd = 2)
-rect(5.4, 1.1, 9.6, 3.9, col = "#FDE5C1", border = "#17324D", lwd = 2)
-text(2.5, 3.35, "Reduced model", font = 2, col = "#17324D")
-text(2.5, 2.55, "season + ask_1k", cex = 0.95)
-text(2.5, 1.85, expression(beta["all_women"] == 0 ~ "," ~ beta["mixed"] == 0),
-     cex = 0.95, col = "#5B6976")
-text(7.5, 3.35, "Complete model", font = 2, col = "#17324D")
-text(7.5, 2.55, "season + ask_1k", cex = 0.95)
-text(7.5, 1.85, "+ two category dummies", cex = 0.95)
-arrows(4.7, 2.5, 5.3, 2.5, length = 0.1, lwd = 2, col = "#17324D")
-text(5.0, 3.0, "free the\ntwo coefficients", cex = 0.8, col = "#5B6976")
-par(old_par)
-```
-
-The hypotheses:
+For the driving question, the two models are as follows. The complete model
+is the adjusted model of the previous section, with season, requested amount,
+and the two category dummies. The reduced model keeps season and requested
+amount but leaves out the two dummies. Leaving them out is the same as
+setting their two coefficients to zero, so the models are nested and $q=2$.
+Both are fitted on the same 1,434 pitches, so the only difference between
+them is the two category terms. If the reduced model fits almost as well as
+the complete model, the categories add little. The hypotheses:
 
 $$
 H_0:\beta_{\text{all\_women}}=\beta_{\text{mixed}}=0
@@ -704,9 +693,19 @@ this with the single results: the p-value of the joint test is $0.023$, and
 the p-value of the mixed dummy alone is $0.823$. Joint significance is not the
 same as individual significance. The F-test asks whether the two terms
 together improve the model. It does not ask whether each term is significant
-on its own. The overall F-test in `summary(gender_model)` is about 84.5, with a
-very small p-value. It answers a third question: do all four coefficients
-together improve on a model with only an intercept?
+on its own.
+
+The last line of `summary(gender_model)` reports one more F-test, the
+overall F-test of Lecture 3. It answers a third question: do all four slopes
+together (season, requested amount, and the two dummies) improve on a model
+with only an intercept, which predicts the mean offer of 13.22% for every
+pitch? The answer is a clear yes: F $\approx$ 84.5 on 4 and 1,429 degrees of
+freedom, with a p-value far below 0.001. Together the four predictors
+explain about 19% of the variation in the offers ($R^2\approx 0.191$).
+Season and requested amount do most of this work, since they alone explain
+18.7%. In practice, knowing the season and the request lets you predict an
+opening offer clearly better than the overall mean does, and the team
+category adds a small refinement on top.
 
 ### The same model as a one-way ANOVA
 
@@ -936,10 +935,60 @@ Read @fig-i05-adjusted with the
 4. **Pattern:** the all-women point lies about 1.28 points above the all-men
    point. The mixed interval overlaps both.
 5. **Limits:** the intervals show sampling uncertainty under the model. They
-   say nothing about how well the broad categories were recorded, and
-   nothing about causes.
+   say nothing about how well the broad categories were recorded.
 
-### Why `unknown` is excluded, not a fourth group
+The figure suggests that all-women teams offer more than both other groups.
+Which of these differences can be told apart from chance? Overlapping or
+separate intervals around each point are only a rough guide, because a
+difference between two groups has its own standard error. The test of a
+difference is the t-test of the matching dummy coefficient. The adjusted
+model with all-men teams as the reference gives two of the three
+differences. For the third, all-women against mixed teams, the code uses the
+model with all-women teams as the reference from the section on changing the
+reference category, fitted again here. It prints the two dummy rows of the coefficient table
+and their 95% confidence intervals:
+
+```{r}
+#| label: i05-adjusted-differences
+known_gender$gender_women_ref <- relevel(known_gender$gender,
+                                         ref = "all_women")
+women_ref_model <- lm(equity_offered_pct ~ season + ask_1k + gender_women_ref,
+                      data = known_gender)
+round(summary(women_ref_model)$coefficients[4:5, ], 3)
+round(confint(women_ref_model)[4:5, ], 2)
+```
+
+The two rows compare all-men and mixed teams with all-women teams, so their
+estimates are negative: both groups are fitted below all-women teams.
+Reversing the signs gives the differences seen from the all-women point in
+the figure. Together with the mixed coefficient of the adjusted model, the
+three differences are as follows.
+
+- All-women against all-men teams: 1.28 percentage points, with a 95%
+  interval from 0.34 to 2.23 points (p $\approx$ 0.008). This difference is
+  statistically distinguishable from zero.
+- All-women against mixed teams: 1.16 percentage points, with an interval
+  from $-0.02$ to 2.34 points (p $\approx$ 0.054). The estimate is almost as
+  large, but at the 5% level it is just not distinguishable from zero,
+  because the mixed group is small (276 pitches).
+- Mixed against all-men teams: 0.12 percentage points, with an interval from
+  $-0.94$ to 1.18 points (p $\approx$ 0.823). This interval rules out
+  differences larger than about one point in either direction.
+
+How large are these differences in business terms? A difference of 1.28
+points is about 10% of the mean offer of all-men teams (13.20%), or about
+one point on an opening offer of about 13%. Even the upper end of its
+interval, 2.23 points, is about a sixth of that mean and a quarter of one
+standard deviation of the offers (8.45 points). For comparison, the same
+model fits an offer about 0.82 points lower for every later season, so the
+all-women difference is about the size of the change over a season and a
+half. A founder can conclude that, among these pitches, all-women teams
+opened with somewhat higher equity offers than all-men teams at the same
+season and request, and that mixed teams did not differ from all-men teams
+by much. The team category is a modest factor next to the season, the size
+of the request, and the large spread of offers within every group.
+
+### Why `unknown` is excluded, not a fourth group {#i05-unknown}
 
 Seven records have the classification `unknown`. This label says that
 information is missing. It is not a kind of team. A fourth category would
@@ -1020,11 +1069,19 @@ Try it yourself first.
 :::
 :::
 
-**Next:** You can now compare categories at fixed values of the other
-predictors. So far every group has the same slope, and every trend is a
-straight line. Both are choices of the model, not facts. Lecture 6 removes
-these two restrictions. An interaction lets the season trend differ between
-groups of teams, and a quadratic term lets the trend curve.
+This lecture gave you the tools to bring categories into a regression. You
+can compare customer segments, sales channels, or kinds of teams at the same
+values of the other predictors, test whether a whole set of categories
+improves a model, and read an A/B test as the effect of a change you made.
+One practical question remains open. In every model so far, the groups
+differ only by a fixed amount, and every trend is a straight line. A founder
+often expects more than that: a price cut may help one customer segment more
+than another, and growth from advertising may slow down as the budget rises.
+Lecture 6 shows how a regression captures both patterns.
+
+**Next:** Lecture 6 removes these two restrictions. An interaction lets the
+season trend differ between groups of teams, and a quadratic term lets the
+trend curve.
 
 :::
 
@@ -1097,7 +1154,9 @@ assistant.
 model. The outcome is the equity offered, in percent (`equity_offered_pct`).
 The data are the 1,434 pitches with a known team classification
 (`known_gender`). The reduced model contains only the season (`season`). The
-complete model adds the team category (`gender`, reference all-men teams):
+complete model adds the team category (`gender`, reference all-men teams).
+You can run the code below in R after the R warm-up, or work on paper with
+the numbers from its output given in Step 1:
 
 ```{r}
 #| label: i05-faded-anova
@@ -1132,7 +1191,10 @@ comparison" in this lecture, saved as `gender_model`. It regresses the
 equity offered (`equity_offered_pct`) on the season, the requested amount
 in thousands of dollars (`ask_1k`), and the team category `gender`, with
 all-men teams as the reference category. The data are the 1,434 pitches
-with a known team classification (`known_gender`).
+with a known team classification (`known_gender`). Questions 1 and 2 need R:
+open the course project in RStudio and first run the code of the R warm-up
+and of the section "The adjusted comparison". Questions 3 to 6 can be
+answered on paper.
 
 1. [Shark Tank data]{.shark-tag} Fit the same model again, but with mixed
    teams as the reference category. Save it as `relevelled_model`, and
@@ -1344,8 +1406,7 @@ answer."
 
 [Code sheet: Lecture 5 commands and formulas](code-sheet.qmd#lecture-5-factors-reference-categories-and-partial-f-tests).
 
-For a more formal treatment, see James et al., *An Introduction to
-Statistical Learning*, 2nd ed., Sections 3.2.2 and 3.3.1, and
+For a more formal treatment, see
 [Nieuwenhuis, *Statistical Methods for Business and Economics*](https://tilburguniversity.on.worldcat.org/oclc/317545871),
 Chapters 20--21.
 

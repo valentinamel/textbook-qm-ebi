@@ -5,7 +5,7 @@ One source of truth: the exam PDF is built from the sheet body below (the
 block that starts with `::: {.formula-sheet}` and ends with the matching
 `:::`). Build both exam PDFs with `python3 scripts/build_exam_sheets.py`.
 The introduction above the block is not part of the PDF. Keep the body dry:
-formulas, R commands with a short comment, and plain labels only. Keep code
+formulas, R commands without comments, and plain labels only. Keep code
 lines at 58 characters or fewer, so that they fit the PDF column (the build
 script checks this). A `::: {.sheet-wide}` block spans the full page width
 in the PDF.
@@ -44,26 +44,24 @@ The table shows which sections you use in which session.
 ```r
 dat <- read.csv("data.csv")
 
-dim(dat)            # number of rows and columns
-nrow(dat)           # number of rows
-names(dat)          # variable names
-head(dat)           # first six rows
-summary(dat)        # summary of each variable
-table(dat$group)    # count per category
-mean(dat$y)         # mean
-sd(dat$y)           # standard deviation
-cor(dat$x, dat$y)   # correlation
-tapply(dat$y, dat$group, mean)   # mean of y per category
+dim(dat)
+nrow(dat)
+names(dat)
+head(dat)
+summary(dat)
+table(dat$group)
+mean(dat$y)
+sd(dat$y)
+cor(dat$x, dat$y)
+tapply(dat$y, dat$group, mean)
 ```
 
 **New variables and the analysis sample**
 
 ```r
-dat$x_1k <- dat$x_euros / 1000       # in 1,000 euros
-dat$group <- factor(dat$group)       # categorical
-dat$d <- as.integer(dat$group == "A")  # 1 if A, else 0
-
-# rows that meet the conditions
+dat$x_1k <- dat$x_euros / 1000
+dat$group <- factor(dat$group)
+dat$d <- as.integer(dat$group == "A")
 analysis <- subset(dat, x > 0 & group == "A")
 ```
 
@@ -109,10 +107,10 @@ $$
 
 ```r
 m <- lm(y ~ x, data = dat)
-coef(m)          # estimates
-summary(m)       # coefficient table and fit
-fitted(m)        # fitted values
-residuals(m)     # residuals
+coef(m)
+summary(m)
+fitted(m)
+residuals(m)
 ```
 
 **Scatter plot with the fitted line**
@@ -127,10 +125,10 @@ abline(m, col = "blue", lwd = 2)
 
 ```r
 b <- coef(m)
-b[1] + b[2] * x_A                  # fitted value by hand
+b[1] + b[2] * x_A
 
 new_cases <- data.frame(x = c(x_A, x_B))
-predict(m, newdata = new_cases)    # fitted values
+predict(m, newdata = new_cases)
 ```
 
 ## Lecture 2: What the model assumes and how residuals reveal it {#lecture-2-assumptions-residual-diagnostics-and-influence}
@@ -149,10 +147,10 @@ qqline(rstandard(m))
 **Standardised residuals and Cook's distance**
 
 ```r
-summary(residuals(m))    # summary of the residuals
-rstandard(m)             # standardised residuals
-cooks.distance(m)        # Cook's distances
-nobs(m)                  # number of observations n
+summary(residuals(m))
+rstandard(m)
+cooks.distance(m)
+nobs(m)
 ```
 
 **Flagged observations**
@@ -164,8 +162,8 @@ $$
 $$
 
 ```r
-sum(abs(rstandard(m)) > 3)            # how many beyond ±3
-sum(cooks.distance(m) > 4 / nobs(m))  # how many above 4/n
+sum(abs(rstandard(m)) > 3)
+sum(cooks.distance(m) > 4 / nobs(m))
 ```
 
 ## Lecture 3: Coefficient inference, fit, and the F-test {#lecture-3-coefficient-inference-fit-and-the-f-test}
@@ -195,10 +193,10 @@ df=n-k-1,
 $$
 
 ```r
-summary(m)                  # coefficient table and fit
-confint(m, level = 0.95)    # 95% confidence intervals
-df.residual(m)              # residual degrees of freedom
-qt(0.975, df.residual(m))   # critical value, 95% interval
+summary(m)
+confint(m, level = 0.95)
+df.residual(m)
+qt(0.975, df.residual(m))
 ```
 
 **Labels in the output of `summary(m)`**
@@ -218,13 +216,13 @@ qt(0.975, df.residual(m))   # critical value, 95% interval
 +---------------------------+--------------------------------------------+
 | `Multiple R-squared`      | $R^2$                                      |
 +---------------------------+--------------------------------------------+
-| `Adjusted R-squared`      | $R^2_{\text{adjusted}}$                    |
+| `Adjusted R-squared`      | adjusted $R^2$                             |
 +---------------------------+--------------------------------------------+
 | `F-statistic`             | overall $F$, with $k$ and $n-k-1$          |
 |                           | degrees of freedom                         |
 +---------------------------+--------------------------------------------+
 
-**The t statistic and the two-sided p-value step by step**
+**The t statistic and the two-sided p-value**
 
 ```r
 tab <- summary(m)$coefficients
@@ -248,33 +246,21 @@ R^2=1-\frac{\text{SSE}}{\text{SST}}
 $$
 
 ```r
-y <- dat$y           # outcome values
-yhat <- fitted(m)    # fitted values
-
+y <- dat$y
 SST <- sum((y - mean(y))^2)
 SSE <- sum(residuals(m)^2)
 SSR <- SST - SSE
 R2 <- 1 - SSE / SST
+summary(m)$r.squared
 ```
 
-**Residual standard error and adjusted $R^2$**
+**Residual standard error**
 
 $$
-s=\sqrt{\frac{\text{SSE}}{n-k-1}},
-\qquad
-R^2_{\text{adjusted}}
-=1-(1-R^2)\frac{n-1}{n-k-1}.
+s=\sqrt{\frac{\text{SSE}}{n-k-1}}.
 $$
-
-```r
-summary(m)$r.squared        # R-squared
-summary(m)$fstatistic       # overall F, k, and n - k - 1
-```
 
 **Overall F-test, model with $k$ slopes**
-
-Compares the complete model with the intercept-only model, which predicts
-$\bar y$ for every observation.
 
 $$
 H_0:\beta_1=\cdots=\beta_k=0,
@@ -285,8 +271,15 @@ $$
 $$
 F=\frac{\text{SSR}/k}{\text{SSE}/(n-k-1)},
 \qquad
+df_1=k,\ df_2=n-k-1,
+\qquad
 \text{simple regression: }F=t^2.
 $$
+
+```r
+summary(m)$fstatistic
+qf(0.95, df1, df2)
+```
 
 **Heteroskedasticity-robust standard errors (HC1)**
 
@@ -294,9 +287,7 @@ $$
 library(lmtest)
 library(sandwich)
 
-# robust standard errors, t statistics, and p-values
 coeftest(m, vcov. = vcovHC(m, type = "HC1"))
-# robust 95% confidence intervals
 coefci(m, vcov. = vcovHC(m, type = "HC1"))
 ```
 
@@ -310,8 +301,18 @@ $$
 
 ```r
 m_multi <- lm(y ~ x1 + x2 + x3, data = analysis)
-summary(m_multi)     # coefficient table and fit
-confint(m_multi)     # 95% confidence intervals
+summary(m_multi)
+confint(m_multi)
+```
+
+**Adjusted $R^2$, model with $k$ slopes**
+
+$$
+\text{adjusted }R^2=1-(1-R^2)\,\frac{n-1}{n-k-1}.
+$$
+
+```r
+summary(m_multi)$adj.r.squared
 ```
 
 **Fitted difference for changes $\Delta x_1,\ldots,\Delta x_k$ of the predictors**
@@ -328,31 +329,26 @@ cases <- data.frame(
   x2 = c(x2_A, x2_B),
   x3 = c(x3_A, x3_B)
 )
-fits <- predict(m_multi, newdata = cases)  # fitted values
-fits[2] - fits[1]                          # B minus A
-```
-
-**Regression table with one column per model**
-
-```r
-# install once: install.packages("modelsummary")
-library(modelsummary)
-m_a <- lm(y ~ x1, data = analysis)
-m_b <- lm(y ~ x1 + x2, data = analysis)
-modelsummary(
-  list("(1)" = m_a, "(2)" = m_b, "(3)" = m_multi),
-  stars = c("*" = 0.05, "**" = 0.01, "***" = 0.001),
-  gof_map = c("nobs", "r.squared", "adj.r.squared")
-)
+fits <- predict(m_multi, newdata = cases)
+fits[2] - fits[1]
 ```
 
 ## Lecture 5: Categories as predictors and joint tests {#lecture-5-factors-reference-categories-and-partial-f-tests}
 
-**Reference category and model with a categorical predictor**
+**Dummy predictor $D$, reference category $D=0$**
+
+$$
+E[Y_i\mid D_i]=\beta_0+\beta_1D_i,
+\qquad
+E[Y_i\mid D_i=0]=\beta_0,
+\qquad
+E[Y_i\mid D_i=1]=\beta_0+\beta_1.
+$$
+
+**Categorical predictor and reference category**
 
 ```r
 analysis$group <- factor(analysis$group)
-# categories: the first one is the reference
 levels(analysis$group)
 analysis$group <- relevel(analysis$group,
                           ref = "reference")
@@ -369,34 +365,33 @@ confint(m_group)
 analysis$group_alt <- relevel(analysis$group,
                               ref = "other")
 m_alt <- lm(y ~ x1 + x2 + group_alt, data = analysis)
-# TRUE if the fitted values of the two models are equal
 all.equal(fitted(m_group), fitted(m_alt))
 ```
 
 **Partial F-test of nested models**
+
+Complete model C with $k_C$ slopes. Reduced model R: model C without the
+$q$ tested terms.
+
+$$
+H_0:\beta_j=\cdots=\beta_l=0\ \ (q\text{ coefficients}),
+\qquad
+H_1:\text{at least one of }\beta_j,\ldots,\beta_l\text{ is not }0,
+$$
+
+$$
+F=
+\frac{(\text{SSE}_{R}-\text{SSE}_{C})/q}
+{\text{SSE}_{C}/(n-k_C-1)},
+\qquad
+df_1=q,\ df_2=n-k_C-1.
+$$
 
 ```r
 reduced <- lm(y ~ x1 + x2, data = analysis)
 complete <- lm(y ~ x1 + x2 + group, data = analysis)
 anova(reduced, complete)
 ```
-
-Complete (unrestricted) model: $k_C$ slopes. Reduced (restricted) model: the
-complete model without $q$ of its terms, with the same outcome and the same
-observations.
-
-$$
-H_0:\text{the }q\text{ coefficients left out of the reduced model are all }0,
-$$
-
-$$
-F=
-\frac{(\text{SSE}_{R}-\text{SSE}_{C})/q}
-{\text{SSE}_{C}/(n-k_C-1)}.
-$$
-
-Overall F-test as a special case: reduced model with only an intercept, so
-$\text{SSE}_R=\text{SST}$, $\text{SSE}_R-\text{SSE}_C=\text{SSR}$, and $q=k$.
 
 **Labels in the output of `anova(reduced, complete)`**
 
@@ -411,19 +406,18 @@ $\text{SSE}_R=\text{SST}$, $\text{SSE}_R-\text{SSE}_C=\text{SSR}$, and $q=k$.
 
 **One-way ANOVA: one model, $G$ groups**
 
+$$
+H_0:\mu_1=\mu_2=\cdots=\mu_G,
+\qquad
+F=\frac{\text{SSR}/(G-1)}{\text{SSE}/(n-G)},
+\qquad
+df_1=G-1,\ df_2=n-G.
+$$
+
 ```r
 m_anova <- lm(y ~ group, data = analysis)
-anova(m_anova)   # ANOVA table
-qf(0.95, df1, df2)   # critical value of F for a 5% test
-# one-way ANOVA: df1 = G - 1, df2 = n - G
-# partial F-test: df1 = q, df2 = n - k_C - 1
+anova(m_anova)
 ```
-
-$$
-H_0:\text{all }G\text{ group means are equal},
-\qquad
-F=\frac{\text{SSR}/(G-1)}{\text{SSE}/(n-G)}.
-$$
 
 **Labels in the output of `anova(m_anova)`**
 
@@ -450,7 +444,6 @@ $$
 
 ```r
 m_interaction <- lm(y ~ x * group + z, data = analysis)
-# x * group expands to x + group + x:group
 summary(m_interaction)
 ```
 
@@ -467,14 +460,12 @@ $$
 
 ```r
 m_moderator <- lm(y ~ x * z, data = analysis)
-# x * z expands to x + z + x:z
 summary(m_moderator)
 ```
 
 **Centred predictor**
 
 ```r
-# x minus its mean
 analysis$x_c <- analysis$x - mean(analysis$x)
 m_centred <- lm(y ~ x_c * group + z, data = analysis)
 ```
@@ -493,8 +484,6 @@ $$
 ```r
 m_linear <- lm(y ~ x + z, data = analysis)
 m_quadratic <- lm(y ~ x + I(x^2) + z, data = analysis)
-# I(x^2) is the square of x
-
 summary(m_quadratic)
 anova(m_linear, m_quadratic)
 ```
@@ -517,13 +506,13 @@ anova(m_linear, m_quadratic)
 | $R^2$, adjusted $R^2$, overall F | `summary(m)` |
 | Residual degrees of freedom | `df.residual(m)` |
 | Critical value of a 95% interval | `qt(0.975, df.residual(m))` |
+| Critical value of a 5% F-test | `qf(0.95, df1, df2)` |
 | Partial F-test of nested models | `anova(reduced, complete)` |
 | ANOVA table of one model | `anova(m)` |
 | Reference category of a factor | `relevel(factor(group), ref = "category")` |
 | Interaction | `x * group` |
 | Square in a formula | `I(x^2)` |
 | Robust standard errors | `coeftest(m, vcov. = vcovHC(m, type = "HC1"))` |
-| Regression table with several models | `modelsummary(list(...))` |
 
 :::
 

@@ -142,15 +142,30 @@ the model is useful at all, with the F-test.
 ### Start with a founder's question
 
 [Shark Tank data]{.shark-tag} Lecture 1 estimated the valuation line and
-Lecture 2 checked the assumptions behind it. The slope says 65 cents per
-claimed dollar. Would another set of deals give
-50 cents, or 80? A founder who negotiates with this number wants to know how
-far the number can be from the true value. R and AI assistants usually answer with a table of standard
-errors, t statistics, and p-values. This lecture shows how to read that table
-and how to check what R or an AI assistant says about it. It then asks two
-further questions that a precise slope does not answer: how close the line
-comes to single deals, and whether the model beats the simplest prediction,
-the mean.
+Lecture 2 checked the assumptions behind it. The slope says that each extra
+dollar of claimed valuation goes with about 65 cents of agreed valuation.
+Before a founder uses this number to prepare a negotiation, three practical
+questions come up, one for each part of the driving question.
+
+- Precision: would another set of deals give 50 cents, or 80? A founder who
+  plans with 65 cents needs to know how far the true value can be from it,
+  and whether the rising line could be a chance pattern in these particular
+  deals. The standard error, the confidence interval, and the t-test answer
+  this question, and benchmarks from the data then show whether the slope is
+  large enough to matter.
+- Fit: how close does the line come to a single deal? A founder who wants
+  to predict the outcome of their own pitch needs this, and a precise slope
+  does not tell it. The split of the variation into an explained and an
+  unexplained part, and $R^2$, answer this question.
+- Usefulness: does the claimed valuation predict better than the simplest
+  rule, the mean agreed valuation of all deals? The overall F-test answers
+  this question. It combines the two earlier steps, because it uses the
+  same split of the variation as $R^2$ and makes a test decision in the same
+  way as the t-test.
+
+R and AI assistants report all these numbers together in one output. This
+lecture builds them up one by one, shows how to read the output, and shows
+how to check what R or an AI assistant says about it.
 
 ### How precisely do we know the slope?
 
@@ -285,9 +300,20 @@ makes an interval wider when the study design is weak.
 
 ### The t-test against zero
 
-[Shark Tank data]{.shark-tag} The standard test asks whether the data are consistent with no linear
+[Shark Tank data]{.shark-tag} The interval gives a range of plausible
+slopes. A founder often has a more basic question first: is there a
+relationship at all, or could the rising line be a chance pattern among
+these 874 deals? Even if claimed and agreed valuations had no linear
+relationship in the population of all pitches, a set of deals could show a
+slope that differs somewhat from zero, just by chance. The t-test asks
+whether the estimated slope lies too far from zero to be explained in this
+way. It uses the same two numbers as the interval, the estimate and its
+standard error.
+
+The standard test asks whether the data are consistent with no linear
 association between $X$ and $Y$, that is, with a population slope of zero.
-The test is two-sided:
+The test is two-sided, because a slope far below zero would speak against
+$H_0$ just as much as a slope far above zero:
 
 $$
 H_0:\beta_1=0
@@ -332,11 +358,8 @@ What it does not say:
 - It does not say that the model is correct. The heteroskedasticity and the
   influential deals of Lecture 2 limit how much you can trust every number in this table.
 - It does not say that the association is large or important. With 874
-  observations, even a very small slope can have a tiny p-value. The size
-  comes from the estimate and a benchmark, here about 29% of the mean
-  agreed valuation per extra million claimed.
-- It does not say that claiming more causes a higher agreed valuation. No
-  test can turn observed deals into an experiment.
+  observations, even a very small slope can have a tiny p-value. The
+  section after the box below shows how to judge the size.
 
 ::: {.callout-note collapse="true"}
 ## Check: the p-value is 1×10^-304^. Is this slope therefore trustworthy?
@@ -397,12 +420,99 @@ $|t_{obs}|\ge t_{0.975,\,df}$.
 and gives the parts of the interval and the steps of the test in this order.</p>
 :::
 
+### Significant is not the same as large {#i03-significant-large}
+
+[Shark Tank data]{.shark-tag} The t-test told the founder that the valuation
+slope is not a chance pattern. The next practical question is whether the
+slope is large enough to matter in a negotiation. A small p-value does not
+answer this question. With 874 deals, even a slope of a few cents per
+claimed dollar would be clearly different from zero. To judge the size of a
+coefficient, compare the change it describes with a benchmark from the data.
+Three benchmarks are common:
+
+- the mean of the outcome, which shows how large the change is compared
+  with the typical level of the outcome,
+- the standard deviation of the outcome, which shows how large the change is
+  compared with the usual differences between cases,
+- a typical step in the predictor, such as one standard deviation, instead
+  of one unit, which can be unrealistically small or large.
+
+The code below calculates these benchmarks for the valuation slope. It uses
+`b1`, the slope from the code above.
+
+```{r}
+#| label: i03-magnitude
+round(c(
+  mean_agreed = mean(vals$agreed_m),
+  sd_agreed = sd(vals$agreed_m),
+  sd_claimed = sd(vals$claimed_m),
+  slope_share_of_mean = b1 / mean(vals$agreed_m),
+  one_sd_step = b1 * sd(vals$claimed_m),
+  one_sd_step_in_sd_of_y = b1 * sd(vals$claimed_m) / sd(vals$agreed_m)
+), 3)
+```
+
+The first three numbers are the mean agreed valuation, \$2.22 million, its
+standard deviation, \$3.70 million, and the standard deviation of the claimed
+valuation, \$5.09 million. One extra million claimed goes with \$0.65 million
+more agreed valuation, 29% of the mean agreed valuation. A claim that is one
+standard deviation higher, about \$5.1 million more, goes with about \$3.30
+million more agreed valuation. This is 0.89 standard deviations of the agreed
+valuation. By all three benchmarks the association is large. The last number
+is exactly the correlation of 0.893 from Lecture 1. In simple regression the
+correlation is the slope measured in standard deviations of both variables.
+
+A result without stars is also informative, especially when it is precise.
+Take a question that a founder might ask before going on the show: do
+founders who appear late in a season open with smaller equity offers than
+those who appear early? The code below regresses the equity offered at the
+start of the pitch (`equity_offered_pct`, in percent) on the episode number
+within the season (`episode`, from 1 to 29) for all 1,441 pitches. It prints
+the slope, its p-value, its 95% interval, the standard deviation of the
+episode number, the interval for a step of one standard deviation, and the
+mean and the standard deviation of the equity offered.
+
+```{r}
+#| label: i03-precise-null
+episode_model <- lm(equity_offered_pct ~ episode, data = sharks)
+ci_episode <- confint(episode_model)["episode", ]
+round(c(
+  slope = unname(coef(episode_model)["episode"]),
+  p_value = summary(episode_model)$coefficients["episode", "Pr(>|t|)"],
+  ci_episode,
+  sd_episode = sd(sharks$episode),
+  ci_per_sd = ci_episode * sd(sharks$episode),
+  mean_equity = mean(sharks$equity_offered_pct),
+  sd_equity = sd(sharks$equity_offered_pct)
+), 3)
+```
+
+The slope is $-0.046$ percentage points per episode, with a p-value of 0.13,
+so it is not significantly different from zero at the 5% level. The outcome
+is a percentage, so a change in it is measured in percentage points. The
+[Mathematics Refresher](../resources/math-refresher.qmd#numbers-proportions-percentages-and-units)
+explains the difference between percent and percentage points. The 95%
+interval runs from $-0.105$ to $0.013$ percentage points per episode. For a
+step of one standard deviation, about seven episodes, it runs from $-0.77$
+to $0.10$ percentage points. So a pitch that airs seven episodes later in a
+season goes with at most about 0.8 percentage points less equity offered.
+This is 6% of the mean offer of 13.2%, and less than a tenth of its standard
+deviation of 8.4 percentage points. The data rule out a large association,
+and this is useful to know: the position of a pitch within a season matters
+little for the opening offer. A result without stars and with a wide
+interval, which includes both zero and large values, would say much less.
+
+Report the size next to the significance every time. For a result without
+stars, also report the interval and the largest values it allows.
+
 ### Decomposing variation
 
-[Shark Tank data]{.shark-tag} A precise slope says how well we know the
-average relationship. It does not say how close the line comes to single
-deals, which matters when you use the line to predict one valuation. The second part of the driving question asks how much the line explains.
-To answer it, we need a point of comparison. Without a predictor, the best single
+[Shark Tank data]{.shark-tag} The interval, the test, and the benchmarks all
+describe the average relationship: how much more agreed valuation goes, on
+average, with a higher claim. A founder preparing for one negotiation has a
+different question: if I claim \$5 million, how close will my agreed
+valuation be to the line? This is the second part of the driving question,
+how much the line explains. To answer it, we need a point of comparison. Without a predictor, the best single
 prediction for every deal is the mean agreed valuation $\bar y$. A
 regression is useful when its fitted values $\widehat y_i$ come closer to
 the observed values than this one mean does. The closer they come, the more
@@ -668,10 +778,19 @@ how the sharks negotiate can all lower $R^2$. The fit is evidence about these
 
 ### The overall F-test
 
-[Shark Tank data]{.shark-tag} The last part of the driving question asks whether the model is useful at
-all, compared with predicting the mean $\bar y$ for every deal. The overall
-F-test answers this question. We state the test here for a regression with
-$k$ predictors, because Lecture 4 adds more predictors. In this lecture $k=1$.
+[Shark Tank data]{.shark-tag} $R^2$ says that the line explains about 80%
+of the variation among these deals. The last part of the driving question
+asks whether the model is useful at all. Without any model, a founder could
+use the simplest rule and predict the mean agreed valuation, \$2.22 million,
+for every deal. Does the claimed valuation improve on this rule by more than
+chance? Even a predictor that has no relationship with the outcome gives an
+$R^2$ slightly above zero in a sample, because the fitted line follows
+chance patterns in the data. The overall F-test asks whether the fit is too
+good to come from such chance patterns alone. It builds on the two earlier
+steps: it uses SSR and SSE from the split of the variation, and it makes a
+test decision in the same way as the t-test. We state the test here for a
+regression with $k$ predictors, because Lecture 4 adds more predictors. In
+this lecture $k=1$.
 
 ::: {.definition-box}
 <span class="label">Definition</span>
@@ -704,8 +823,8 @@ together help to explain the outcome.
 All numbers of this lecture appear together in the output of `summary()`.
 Read it from top to bottom in this order: (1) the formula and the data, (2)
 the coefficient estimates and their units, (3) the standard errors, t
-statistics, and p-values, (4) the residual standard error, (5) $R^2$ and adjusted
-$R^2$, (6) the overall F-test. Then remember (7), which the output does not
+statistics, and p-values, (4) the residual standard error, (5) $R^2$, (6) the
+overall F-test. Then remember (7), which the output does not
 print: the assumptions and the limits of the data.
 
 ```{r}
@@ -713,19 +832,15 @@ print: the assumptions and the limits of the data.
 summary(val_model)
 ```
 
-Two lines of this output are new. The **residual standard error**, 1.664, is
+One line of this output is new. The **residual standard error**, 1.664, is
 the standard deviation of the residuals in the units of the outcome:
 $s=\sqrt{\text{SSE}/(n-2)}$, here about \$1.66 million. This number is large
 mainly because of a few very large residuals: Lecture 2 showed that half of the
 residuals lie between $-0.40$ and $0.17$. Still, it is large compared with
 the mean agreed valuation of \$2.22 million, about 75% of it. So single deals can lie far from
-the line even though $R^2$ is high. **Adjusted $R^2$** is $R^2$ with a small
-penalty for every predictor in the model, $1-(1-R^2)(n-1)/(n-k-1)$. It is
-below $R^2$, and it can even be negative when the predictors add almost
-nothing. Unlike $R^2$, it can fall when you include a
-predictor that explains almost nothing. This property makes it the fairer
-number for comparing models with different numbers of predictors. With one predictor
-and 874 observations the two hardly differ (0.7975 and 0.7973).
+the line even though $R^2$ is high. Next to $R^2$, the output prints
+adjusted $R^2$. It matters only when you compare models with different
+numbers of predictors, and Lecture 4 introduces it.
 
 The last line reports $F \approx 3435$ on 1 and 872 degrees of freedom.
 Without any relationship, F would be near 1, so 3435 is very far from what
@@ -785,9 +900,8 @@ invented:
 Always judge a model by its goal: explanation, prediction, or support for a
 decision. A clearly significant coefficient can also describe a
 small association, as in the loyalty-programme example. So always judge the
-size of a coefficient with a benchmark, as we did for the valuation slope
-with the mean agreed valuation. Lecture 4 adds the standard deviation of
-the outcome as a second benchmark.
+size of a coefficient with a benchmark, as in the section
+[Significant is not the same as large](#i03-significant-large).
 
 ### Robust standard errors: what they fix {#i03-robust}
 
@@ -856,7 +970,8 @@ model is useful, but only under certain conditions. The slope 0.649 has standard
 0.0111. Its 95% interval $(0.627, 0.670)$ is only about four cents per
 claimed dollar wide. With robust standard errors it is about 13 cents wide,
 from 0.58 to 0.72. The t-test clearly rejects a zero slope
-($t \approx 58.6$). The line explains about 80% of the variation in agreed
+($t \approx 58.6$), and the slope is also large: one extra million claimed
+goes with about 29% of the mean agreed valuation. The line explains about 80% of the variation in agreed
 valuations, and the overall F-test ($F \approx 3435$) confirms that the
 model fits better than the mean alone. All of these statements depend on the
 assumptions checked in Lecture 2, where the residuals showed heteroskedasticity and a few
@@ -867,9 +982,7 @@ you might expect about \$0.58 to \$0.72 million more agreed valuation on
 average, under the assumption that deals like yours follow the same line as
 these televised deals. For a single negotiation, though, the line can miss
 by much more: the residual standard error of \$1.66 million is about 75% of
-the mean agreed valuation. And because the claims were not randomly assigned,
-this is an association, not a promise that a higher claim raises your own
-valuation.
+the mean agreed valuation.
 
 ::: {.founder-box}
 <span class="label">A founder's decision (invented example)</span>
@@ -901,12 +1014,22 @@ Try it yourself first.
 :::
 :::
 
+This lecture gave you the tools to judge a regression slope: how precisely
+it is known, whether it is large, how much of the outcome the line explains,
+and whether the model beats the mean. All of them were applied to a model
+with one predictor. A founder rarely faces a question with only one factor.
+Agreed valuations also differ by season, by industry, and by how much money
+the founders asked for, and these factors may move together with the
+claimed valuation. A slope from one predictor can then mix several
+relationships. Lecture 4 adds further predictors to the model, so that you
+can read one relationship while the others are held fixed. The intervals,
+tests, benchmarks, and $R^2$ of this lecture carry over to every coefficient
+of such a model.
+
 **Next:** Tutorial 1 practises Lectures 1--3 with exam-style questions: fit a
 model in R, check its residuals, and report its coefficients with intervals,
 tests, and $R^2$. You take the exam in TestVision, and R is available during the exam.
-Lecture 4 then adds a second predictor. A slope from one predictor can mix
-several relationships, and the intervals, tests, and $R^2$ of this lecture
-are the tools you need to read a model with several predictors.
+Lecture 4 then adds more predictors to the model.
 
 :::
 
@@ -1136,8 +1259,7 @@ answer."
 
 [Code sheet: Lecture 3 commands and formulas](code-sheet.qmd#lecture-3-coefficient-inference-fit-and-the-f-test).
 
-For a more formal treatment, see James et al., *An Introduction to
-Statistical Learning*, 2nd ed., Sections 3.1.2--3.1.3, and
+For a more formal treatment, see
 [Nieuwenhuis, *Statistical Methods for Business and Economics*](https://tilburguniversity.on.worldcat.org/oclc/317545871),
 Chapters 19--20.
 

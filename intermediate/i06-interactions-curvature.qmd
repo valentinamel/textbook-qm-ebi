@@ -423,15 +423,9 @@ same speed. The fitted slopes are about $-0.80$ points per season for
 all-men teams and $-0.86$ for teams with women. The interaction estimate is
 $-0.061$ equity percentage points per season,
 with a p-value of about 0.520. The difference is small, about 8% of the
-all-men slope (@exm-i06-reading-interaction). Draw two conclusions from
-this result. First, the model gives no
-evidence that the season trend differs between the two groups. Second, the model
-does not prove that the two slopes are equal. The estimate is imprecise
-(standard error about 0.096). The 95% confidence interval, from
-`confint(interaction_model)`, runs from about $-0.25$ to $0.13$. So the data
-are consistent with a trend for teams with women that is up to 31% steeper
-than the all-men slope of $-0.80$, and also with one that is up to 16%
-flatter. No evidence of a difference is not proof of no difference.
+all-men slope (@exm-i06-reading-interaction). The model gives no evidence
+that the season trend differs between the two groups: offers fell at about
+the same speed for all-men teams and for teams with women.
 
 @fig-i06-interaction shows the two fitted lines. They are built from the
 model, not drawn through the data. For each season from 1 to 16 and each
@@ -533,8 +527,7 @@ $\beta_1+\beta_3Z$, is called the conditional effect of $X$ at that value.
 :::
 
 The name "conditional effect" is standard, but it is still a fitted slope.
-It is a causal effect only when the design of the study allows a causal
-reading. Two coefficients now need care. $\beta_1$ is the slope of $X$ only
+Two coefficients now need care. $\beta_1$ is the slope of $X$ only
 where $Z=0$, and $\beta_2$ is the slope of $Z$ only where $X=0$. If zero lies
 outside the data, neither number describes any real case. The coefficients
 $\beta_1$ and $\beta_2$ are often called the main effects. With $XZ$ in the
@@ -675,7 +668,8 @@ ggplot(franchise, aes(x = marketing, y = sales)) +
                                    "6 stores" = "longdash",
                                    "10 stores" = "dashed"),
                         guide = "none") +
-  coord_cartesian(xlim = c(2, 23)) +
+  # extra space on the right for the line labels, no data are left out
+  scale_x_continuous(expand = expansion(mult = c(0.02, 0.18))) +
   labs(x = "Monthly marketing spending (EUR 1,000s)",
        y = "Monthly sales (EUR 1,000s)") +
   theme_minimal(base_size = 13) +
@@ -955,55 +949,79 @@ more of the variation in the equity offered. So also look at the shape of
 the curve in @fig-i06-polynomial. Each point in the figure is the mean
 equity offered in one season. The curve is the fitted quadratic for a pitch
 with the average requested amount: `predict()` computes the fitted value at
-200 points between Season 1 and Season 16, and the line connects them.
+many seasons, and the line connects them. The left panel draws the curve
+only for Seasons 1 to 16, the seasons in the data. The right panel draws
+the same curve and continues it to Season 24, eight seasons beyond the
+data. The continued part is dashed and lies in the shaded area. Both panels
+use the same vertical axis.
 
 ```{r}
 #| label: fig-i06-polynomial
 #| code-fold: true
 #| code-summary: "See the R code for this figure"
-#| fig-cap: "Season means of the equity offered (points) and the fitted quadratic curve at the average requested amount. The curve becomes flatter towards the last observed seasons. Beyond Season 16 (shaded) it would turn upward, but there are no data in that region."
-#| fig-alt: "Sixteen green points for the season means fall from about 22 percent in season 1 to about 8 percent in season 16. An orange fitted curve follows them, falls steeply at first and becomes almost flat near season 16. The region beyond season 16 is shaded and marked as having no data."
+#| fig-width: 9
+#| fig-height: 4.2
+#| fig-cap: "Season means of the equity offered (points) and the fitted quadratic curve at the average requested amount. Left: the curve within Seasons 1 to 16, the seasons in the data. Right: the same curve continued to Season 24. Beyond Season 16 (shaded, dashed) there are no data, and the curve rises only because a quadratic must turn."
+#| fig-alt: "Two panels with the same vertical axis. In both, sixteen green points for the season means fall from about 22 percent in season 1 to about 8 percent in season 16, and a solid orange fitted curve follows them and flattens near season 16. In the right panel the curve continues as a dashed line through a shaded area from season 16 to season 24 and rises from about 9 percent to about 12 percent."
 library(ggplot2)
 sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
 sharks$ask_1k <- sharks$ask_amount_usd / 1000
 poly_season <- lm(equity_offered_pct ~ season + I(season^2) + ask_1k,
                   data = sharks)
 season_means <- aggregate(equity_offered_pct ~ season, data = sharks, mean)
-curve_data <- data.frame(season = seq(1, 16, length.out = 200),
-                         ask_1k = mean(sharks$ask_1k))
-curve_data$fit <- predict(poly_season, newdata = curve_data)
 
-ggplot(season_means, aes(x = season, y = equity_offered_pct)) +
-  annotate("rect", xmin = 16, xmax = 17.6, ymin = -Inf, ymax = Inf,
-           fill = "grey75", alpha = 0.25) +
-  geom_vline(xintercept = 16, colour = "grey60",
-             linetype = "dashed", linewidth = 0.8) +
-  geom_line(data = curve_data, aes(x = season, y = fit),
+# fitted curve inside the data (Seasons 1 to 16) and beyond it (16 to 24)
+inside <- data.frame(season = seq(1, 16, length.out = 150))
+beyond <- data.frame(season = seq(16, 24, length.out = 80))
+inside$ask_1k <- mean(sharks$ask_1k)
+beyond$ask_1k <- mean(sharks$ask_1k)
+inside$fit <- predict(poly_season, newdata = inside)
+beyond$fit <- predict(poly_season, newdata = beyond)
+
+panel_names <- c("Within the data: Seasons 1 to 16",
+                 "Extended beyond the data: to Season 24")
+panel <- function(k) factor(panel_names[k], levels = panel_names)
+means_both <- rbind(cbind(season_means, panel = panel(1)),
+                    cbind(season_means, panel = panel(2)))
+inside_both <- rbind(cbind(inside, panel = panel(1)),
+                     cbind(inside, panel = panel(2)))
+beyond$panel <- panel(2)
+shade <- data.frame(xmin = 16, xmax = 24, panel = panel(2))
+
+ggplot(means_both, aes(x = season, y = equity_offered_pct)) +
+  geom_rect(data = shade, inherit.aes = FALSE,
+            aes(xmin = xmin, xmax = xmax, ymin = -Inf, ymax = Inf),
+            fill = "grey75", alpha = 0.3) +
+  geom_line(data = inside_both, aes(x = season, y = fit),
             colour = "#D55E00", linewidth = 1.1) +
-  geom_point(size = 2.6, colour = "#009E73") +
-  annotate("text", x = 16.8, y = max(season_means$equity_offered_pct),
-           label = "no data beyond\nseason 16", colour = "#5B6976",
-           size = 3, lineheight = 0.95) +
-  scale_x_continuous(breaks = seq(1, 16, by = 3)) +
-  coord_cartesian(xlim = c(1, 17.6)) +
+  geom_line(data = beyond, aes(x = season, y = fit),
+            colour = "#D55E00", linewidth = 1.1, linetype = "dashed") +
+  geom_point(size = 2.4, colour = "#009E73") +
+  geom_text(data = data.frame(season = 20, equity_offered_pct = 20,
+                              panel = panel(2)),
+            label = "no data beyond\nSeason 16", colour = "#5B6976",
+            size = 3.2, lineheight = 0.95) +
+  facet_wrap(~ panel, scales = "free_x") +
+  scale_x_continuous(breaks = c(seq(1, 16, by = 3), 20, 24)) +
   labs(x = "Season", y = "Initial equity offered (%)") +
   theme_minimal(base_size = 13) +
   theme(
     panel.grid.minor = element_blank(),
     panel.grid.major.x = element_blank(),
-    plot.caption = element_text(colour = "#5B6976"),
+    strip.text = element_text(colour = "#17324D"),
     axis.title = element_text(colour = "#17324D")
   )
 ```
 
-The season means lie close to the curve, and the curve flattens towards
-Season 16. Use the curve only for Seasons 1 to 16, the seasons in the data.
+Within the data, the season means lie close to the curve, and the curve
+flattens towards Season 16. Here the curve is a useful summary of the trend.
 Using a fitted model outside the range of the data is called extrapolation.
-Here it would mislead. The fitted curve reaches its lowest point at about
-Season 16.8 and rises after that. The data contain no season after 16, so
-nothing in the data supports this rise. A quadratic curve always turns
-somewhere, and the rise only follows from this shape. It is not a forecast
-for Season 17 or later.
+The right panel shows what it does here. The curve reaches its lowest point
+at about Season 16.8, with a fitted offer of about 9.0%, and then rises to
+about 9.6% in Season 20 and 11.7% in Season 24. No pitch after Season 16 is
+in the data, so this rise comes only from the shape of the quadratic, which
+must turn somewhere. Use the curve for Seasons 1 to 16, and do not read it
+as a forecast for later seasons.
 
 ::: {.caveat-box}
 <span class="label">What flexible terms can and cannot repair</span>
@@ -1023,9 +1041,8 @@ combined results.
 
 **The same trend for every kind of team?** The estimated difference in
 slopes is $-0.061$ percentage points per season (p $\approx$ 0.52), about 8%
-of the all-men slope of $-0.80$. The data show no difference between
-all-men teams and teams with women. They also do not prove that the trends
-are equal, because the estimate is imprecise.
+of the all-men slope of $-0.80$. The data show no difference in the trend
+between all-men teams and teams with women.
 
 **A straight line?** Not quite. The quadratic term is significant (partial
 $F \approx 20.1$, p $<$ 0.001). The fitted decline becomes flatter: from
@@ -1083,6 +1100,18 @@ Try it yourself first.
    weeks for one more study period before you decide.
 :::
 :::
+
+This lecture completes QM Intermediate. In this sample, you can now describe
+how an outcome is related to several variables at the same time: with
+numbers and categories as predictors, with slopes that differ between
+groups, and with trends that bend. You can also judge how precise these
+relationships are, test them alone and jointly, and say whether they are
+large in business terms. Real business data often raise questions that need
+more than one regression line, even a flexible one. QM Advanced builds on
+this course and introduces more advanced data analysis techniques for such
+questions. The regression model of QM Intermediate, and the habit of
+reading every coefficient with its unit, its uncertainty, and its size, is
+the basis for all of them.
 
 **Next:** With dummies, interactions and curves, the regression model can
 now answer most "does it depend?" questions that a founder asks. Tutorial 2
@@ -1323,7 +1352,7 @@ step of Attempt → Ask → Verify → Explain.
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-Two errors. A large p-value means the data do not show a difference. It does not prove that the trends are the same, because the estimate is imprecise. And with an interaction in the model, -0.80 is the trend for the group coded 0, the all-men teams. For teams with women it is -0.80 - 0.06 = -0.86.
+Two errors. A large p-value means the data do not show a difference. It does not prove that the trends are exactly the same. And with an interaction in the model, -0.80 is the trend for the group coded 0, the all-men teams. For teams with women it is -0.80 - 0.06 = -0.86.
 :::
 
 ### Make it yours
@@ -1363,9 +1392,7 @@ answer."
 
 [Code sheet: Lecture 6 commands and formulas](code-sheet.qmd#lecture-6-interactions-and-polynomial-terms).
 
-For a more formal treatment, see James et al., *An Introduction to
-Statistical Learning*, 2nd ed., Section 3.3.2 and Sections 3.6.4--3.6.6,
-and
+For a more formal treatment, see
 [Nieuwenhuis, *Statistical Methods for Business and Economics*](https://tilburguniversity.on.worldcat.org/oclc/317545871),
 Chapter 21.
 

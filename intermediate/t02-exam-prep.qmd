@@ -65,28 +65,30 @@ Tasks 1 to 4 use the Shark Tank file, and money is measured in thousands of
 dollars. Tutorial 1 asked how a single predictor relates to the outcome.
 This tutorial asks what changes when several predictors are held fixed at
 the same time, when categories enter the model, and when a slope depends on
-a group or on the season. First build the data for the analysis, with the
-same steps as in Lectures 4 to 6. The code converts the requested amount to
-thousands of dollars (`ask_1k`). It keeps the 874 deals for a share of the
-company (`deals`) for Task 1. For Tasks 2 to 4 it keeps the 1,434 pitches
-with a known team classification (`known_gender`). The 7 pitches with an
-unknown team are left out, so that all models of Tasks 2 to 4 use the same
-observations. Then it makes all-men teams the reference category of the
-team variable, builds the dummy `women` (1 for all-women and mixed teams),
-and centres the season at its mean.
+a group or on the season. First build the data for the analysis. The code
+converts the requested amount to thousands of dollars (`ask_1k`). Task 2
+uses all 1,441 pitches (`sharks`). Task 1 uses the 874 deals for a share of
+the company (`deals`). Tasks 3 and 4 use the 869 of these deals with a known
+team classification (`known_deals`). The 5 deals with an unknown team are
+left out, because the team dummy cannot be defined for them, and Tasks 3
+and 4 then use the same observations. For these deals the code builds the
+dummy `women` (1 for all-women and mixed teams), the team variable `gender`
+with all-men teams as the reference category, and the season centred at its
+mean (`season_c`).
 
 ```{r}
 #| label: iep02-load
 sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
 sharks$ask_1k <- sharks$ask_amount_usd / 1000
 deals <- subset(sharks, deal_on_show == 1 & deal_equity_pct > 0)
-known_gender <- subset(sharks, pitcher_gender_group != "unknown")
-known_gender$gender <- relevel(factor(known_gender$pitcher_gender_group),
-                               ref = "all_men")
-known_gender$women <- as.integer(
-  known_gender$pitcher_gender_group %in% c("all_women", "mixed")
+known_deals <- subset(deals, pitcher_gender_group != "unknown")
+known_deals$women <- as.integer(
+  known_deals$pitcher_gender_group %in% c("all_women", "mixed")
 )
-known_gender$season_c <- known_gender$season - mean(known_gender$season)
+known_deals$gender <- relevel(factor(known_deals$pitcher_gender_group),
+                              ref = "all_men")
+known_deals$season_c <- known_deals$season - mean(known_deals$season)
+c(pitches = nrow(sharks), deals = nrow(deals), known_deals = nrow(known_deals))
 ```
 
 ### Task 1: Multiple-regression coefficients (Lecture 4)
@@ -153,7 +155,8 @@ Filled-in structure:
 - Interpretation of the requested-amount slope: at the same offer and
   season, an extra \$1,000 requested is associated with about 0.0051
   percentage points less agreed equity (about 0.51 points per \$100,000),
-  on average.
+  on average. This is about 2% of the mean agreed share of 23.6%, a small
+  difference.
 - Change in the equity-offered slope, and why: the slope falls from about
   1.21 to about 1.04. In early seasons founders offered larger shares and
   the sharks also took larger shares (both correlations with the season are
@@ -177,8 +180,8 @@ Filled-in structure:
 ### Task 2: Dummy variables and a partial F-test (Lecture 5)
 
 [Shark Tank data]{.shark-tag} Do founders in some industries offer a
-different share of their company? Use the 1,434 pitches with a known team
-classification (`known_gender`). Fit a reduced model of the equity offered
+different share of their company? Use all 1,441 pitches (`sharks`). Fit a
+reduced model of the equity offered
 (`equity_offered_pct`) on the season and the requested amount (`ask_1k`).
 Fit a complete model that adds the industry of the venture (`industry`, 16
 industries), with Food and Beverage, the largest industry, as the reference
@@ -216,15 +219,14 @@ Why the t-test and the F-test can disagree:
 
 ```{r}
 #| label: iep02-industry-models
-known_gender$industry <- relevel(factor(known_gender$industry),
-                                 ref = "Food and Beverage")
-reduced <- lm(equity_offered_pct ~ season + ask_1k,
-              data = known_gender)
+sharks$industry <- relevel(factor(sharks$industry),
+                           ref = "Food and Beverage")
+reduced <- lm(equity_offered_pct ~ season + ask_1k, data = sharks)
 complete <- lm(equity_offered_pct ~ season + ask_1k + industry,
-               data = known_gender)
+               data = sharks)
 summary(complete)
 anova(reduced, complete)
-mean(known_gender$equity_offered_pct)   # benchmark: mean equity offered
+mean(sharks$equity_offered_pct)   # benchmark: mean equity offered
 ```
 
 Filled-in structure:
@@ -234,20 +236,20 @@ Filled-in structure:
   industries except the reference category Food and Beverage.
 - Interpretation of the Technology/Software coefficient: at the same
   season and requested amount, Technology/Software pitches are fitted to
-  offer about 2.95 percentage points less equity than Food and Beverage
+  offer about 2.93 percentage points less equity than Food and Beverage
   pitches (p $\approx$ 0.004).
-- Size, as a percent of the mean equity offered: 2.95 points is about 22%
+- Size, as a percent of the mean equity offered: 2.93 points is about 22%
   of the mean equity offered of 13.2%, a sizeable difference for a founder.
 - Null hypothesis H0: all 15 industry coefficients are zero. Alternative
   hypothesis H1: at least one of them is not zero.
 - Test statistic formula:
   $F=\dfrac{(\text{SSE}_R-\text{SSE}_C)/q}{\text{SSE}_C/(n-k_C-1)}$.
-- Values in the formula: $\text{SSE}_R=83{,}228$,
-  $\text{SSE}_C=81{,}858$, $q=15$, and $n-k_C-1=1{,}434-17-1=1{,}416$.
+- Values in the formula: $\text{SSE}_R=83{,}493$,
+  $\text{SSE}_C=82{,}114$, $q=15$, and $n-k_C-1=1{,}441-17-1=1{,}423$.
 - Value of the test statistic:
-  $F=\dfrac{1{,}370.6/15}{81{,}858/1{,}416}=\dfrac{91.37}{57.81}\approx1.58$.
-- P-value: about 0.072.
-- Conclusion: since $0.072>0.05$, do not reject $H_0$ at the 5% level. The
+  $F=\dfrac{1{,}378.4/15}{82{,}114/1{,}423}=\dfrac{91.89}{57.70}\approx1.59$.
+- P-value: about 0.069.
+- Conclusion: since $0.069>0.05$, do not reject $H_0$ at the 5% level. The
   data do not show that the industry terms together improve the model.
   This does not prove that all industries offer the same share.
 - Why the t-test and the F-test can disagree: the F-test asks whether the
@@ -260,18 +262,20 @@ Filled-in structure:
 
 ### Task 3: Interaction (Lecture 6)
 
-[Shark Tank data]{.shark-tag} With the 1,434 pitches with a known team classification (`known_gender`),
-fit a regression of the equity offered (`equity_offered_pct`) on the
-centred season `season_c`, the dummy `women` (1 for all-women and mixed
-teams), their interaction, and the requested amount (`ask_1k`).
+[Shark Tank data]{.shark-tag} Over the seasons, the sharks took smaller
+shares of the companies in their deals. Did this trend differ between teams
+with women and all-men teams? With the 869 deals with a known team
+classification (`known_deals`), fit a regression of the equity agreed in
+the deal (`deal_equity_pct`) on the centred season `season_c`, the dummy
+`women` (1 for all-women and mixed teams), their interaction, and the
+equity that the founder first offered (`equity_offered_pct`).
 
-1. Write the fitted line for `women = 0` and for `women = 1` at a requested
-   amount of \$100,000. Give both season slopes.
-2. Calculate the fitted difference in the equity offered between a team
-   with women and an all-men team in Season 4, at the same requested
-   amount.
-3. Interpret the interaction estimate and its p-value in one or two
-   sentences, without claiming too much in either direction.
+1. Write the fitted line for `women = 0` and for `women = 1` at an offered
+   share of 10%. Give both season slopes.
+2. Calculate the fitted difference in the agreed equity between a team
+   with women and an all-men team in Season 4, at the same offered share.
+3. Interpret the interaction estimate, its p-value, and its 95% confidence
+   interval in one or two sentences.
 4. Explain in one or two sentences what centring the season changes and
    what it does not change.
 
@@ -284,61 +288,71 @@ Fitted line for women = 1:
 Season slope for all-men teams:
 Season slope for teams with women:
 Fitted difference in Season 4:
-Interpretation of the interaction estimate and its p-value:
+Interpretation of the interaction estimate, its p-value, and its interval:
 What centring changes and what it does not change:
 ```
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
+The code fits the model, prints its summary and the 95% confidence
+intervals, and then the average season, which is the centre of
+`season_c`, and the mean agreed equity, the benchmark for the size of the
+differences.
+
 ```{r}
 #| label: iep02-interaction
 m_interaction <- lm(
-  equity_offered_pct ~ season_c * women + ask_1k,
-  data = known_gender
+  deal_equity_pct ~ season_c * women + equity_offered_pct,
+  data = known_deals
 )
 summary(m_interaction)
-mean(known_gender$season)   # average season, used for centring
+confint(m_interaction)
+mean(known_deals$season)            # average season, used for centring
+mean(known_deals$deal_equity_pct)   # benchmark: mean agreed equity
 ```
 
 Filled-in structure:
 
 - R code: see the code above.
-- Fitted line for women = 0: the intercept at \$100,000 requested is
-  $13.625-0.00268\times100\approx13.357$, so the line is
-  $13.357-0.799\,\text{season\_c}$.
-- Fitted line for women = 1: the intercept is $13.357+0.807=14.164$, so
-  the line is $14.164-0.861\,\text{season\_c}$.
-- Season slope for all-men teams: about $-0.799$ percentage points per
+- Fitted line for women = 0: the intercept at an offer of 10% is
+  $10.188+1.0715\times10\approx20.90$, so the line is
+  $20.90-0.657\,\text{season\_c}$.
+- Fitted line for women = 1: the intercept is $20.90+0.051=20.95$, so the
+  line is $20.95-0.603\,\text{season\_c}$.
+- Season slope for all-men teams: about $-0.657$ percentage points per
   season.
-- Season slope for teams with women: $-0.7994-0.0615\approx-0.861$
+- Season slope for teams with women: $-0.6572+0.0540\approx-0.603$
   percentage points per season.
-- Fitted difference in Season 4: the average season is about 8.78, so
-  Season 4 is $\text{season\_c}=4-8.78=-4.78$. The difference is
-  $0.807+(-0.0615)\times(-4.78)\approx1.10$ percentage points, about 8% of
-  the mean equity offered of 13.2%.
-- Interpretation of the interaction estimate and its p-value: the
-  estimated difference in slopes is $-0.061$ percentage points per season,
-  with p $\approx$ 0.520, so the model gives no evidence that the season
-  trends differ between the two groups. It also does not prove that the
-  trends are equal, because the estimate is imprecise.
+- Fitted difference in Season 4: the average season is about 9.36, so
+  Season 4 is $\text{season\_c}=4-9.36=-5.36$. The difference is
+  $0.051+0.0540\times(-5.36)\approx-0.24$ percentage points, about 1% of
+  the mean agreed equity of 23.6%, so practically no difference.
+- Interpretation of the interaction estimate, its p-value, and its
+  interval: the estimated difference in the season slopes is $0.054$
+  percentage points per season, with p $\approx$ 0.77, so the model gives
+  no evidence that the trends differ between the two groups. The 95%
+  interval, from about $-0.31$ to $0.42$, rules out differences in the
+  yearly trend larger than about 0.4 percentage points, compared with a
+  decline of about 0.66 points per season for all-men teams.
 - What centring changes and what it does not change: centring makes the
-  `women` coefficient compare the groups at the average season (about 8.8)
+  `women` coefficient compare the groups at the average season (about 9.4)
   and not at Season 0, which does not exist. It changes neither the fitted
   values nor the interaction estimate.
 :::
 
 ### Task 4: Polynomial term (Lecture 6)
 
-[Shark Tank data]{.shark-tag} With the 1,434 pitches with a known team
-classification (`known_gender`), fit a linear model of the equity offered
-(`equity_offered_pct`) on the season and the requested amount (`ask_1k`),
-and a quadratic model that adds the square of the season.
+[Shark Tank data]{.shark-tag} With the 869 deals with a known team
+classification (`known_deals`), fit a linear model of the equity agreed in
+the deal (`deal_equity_pct`) on the season and the equity offered
+(`equity_offered_pct`), and a quadratic model that adds the square of the
+season.
 
 1. Decide with a partial F-test at the 5% level whether the quadratic term
    improves the model.
 2. Calculate the fitted change from Season 2 to Season 3 and from Season
-   14 to Season 15, at the same requested amount. Say in one sentence what
+   14 to Season 15, at the same offered share. Say in one sentence what
    the comparison of the two changes shows.
 3. Calculate the fitted change from Season 18 to Season 19. Explain in one
    or two sentences why you should not use this number.
@@ -361,18 +375,27 @@ Why not to use this number:
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
+The code fits both models, prints the summary of the quadratic model and
+the partial F-test, and then the fitted change from one season to the next
+at three starting seasons. The last lines print the season at which the
+fitted curve has its lowest point and the mean agreed equity in each
+season, which the note below the answer uses.
+
 ```{r}
 #| label: iep02-polynomial
-m_linear <- lm(equity_offered_pct ~ season + ask_1k, data = known_gender)
+m_linear <- lm(deal_equity_pct ~ season + equity_offered_pct,
+               data = known_deals)
 m_quadratic <- lm(
-  equity_offered_pct ~ season + I(season^2) + ask_1k,
-  data = known_gender
+  deal_equity_pct ~ season + I(season^2) + equity_offered_pct,
+  data = known_deals
 )
 summary(m_quadratic)
 anova(m_linear, m_quadratic)
 b <- coef(m_quadratic)
 # fitted change from season x to x + 1, for x = 2, 14, and 18
 b["season"] + b["I(season^2)"] * (2 * c(2, 14, 18) + 1)
+-b["season"] / (2 * b["I(season^2)"])   # season with the lowest fitted value
+round(tapply(known_deals$deal_equity_pct, known_deals$season, mean), 1)
 ```
 
 Filled-in structure:
@@ -380,86 +403,91 @@ Filled-in structure:
 - R code: see the code above.
 - Null hypothesis H0: the coefficient of the quadratic term is zero.
   Alternative hypothesis H1: it is not zero.
-- Value of the test statistic: $F\approx20.0$, on 1 and 1,430 degrees of
+- Value of the test statistic: $F\approx40.7$, on 1 and 865 degrees of
   freedom.
 - P-value: below 0.001.
 - Conclusion: reject $H_0$ at the 5% level. The quadratic term improves the
   model.
-- Fitted change from Season 2 to Season 3: with $\hat\beta_1\approx-1.713$
-  and $\hat\beta_2\approx0.0509$, the change is
-  $\hat\beta_1+\hat\beta_2(2\times2+1)=-1.713+5\times0.0509\approx-1.46$
-  percentage points, about 11% of the mean equity offered of 13.2%.
+- Fitted change from Season 2 to Season 3: with $\hat\beta_1\approx-3.199$
+  and $\hat\beta_2\approx0.1398$, the change is
+  $\hat\beta_1+\hat\beta_2(2\times2+1)=-3.199+5\times0.1398\approx-2.50$
+  percentage points, about 11% of the mean agreed equity of 23.6%.
 - Fitted change from Season 14 to Season 15:
-  $-1.713+29\times0.0509\approx-0.24$ percentage points.
-- What the comparison shows: the fitted decline flattens, from about 1.5
-  points per season in the early seasons to less than a quarter point per
-  season in the late seasons.
+  $-3.199+29\times0.1398\approx+0.86$ percentage points.
+- What the comparison shows: the fitted curve falls steeply in the early
+  seasons, reaches its lowest point at about Season 11.4, and then rises a
+  little.
 - Fitted change from Season 18 to Season 19:
-  $-1.713+37\times0.0509\approx+0.17$ percentage points, a rise.
+  $-3.199+37\times0.1398\approx+1.97$ percentage points, a rise.
 - Why not to use this number: the data contain no season after 16, so
   nothing in the data supports this rise. A quadratic curve always turns
   somewhere, and the rise only follows from that shape.
+
+A note on the late rise. The season means of the agreed equity in the
+output fall from 50.1% in Season 1 to about 21% in Season 8 and then stay
+between about 17% and 23%, with no clear rise after Season 11. The
+quadratic curve describes the steep early decline well, but its late rise
+comes mainly from its U shape. A plot of the season means next to the
+fitted curve is the simplest check of such a turn.
 :::
 
-### The models of Tasks 2 to 4 in one table {#iep02-spec-table}
+### The models of Tasks 3 and 4 in one table {#iep02-spec-table}
 
-[Shark Tank data]{.shark-tag} Lecture 4 showed how research papers put several models side by side in one
-regression table. The table below does this for the models of Tasks 2 to 4.
-All columns of such a table must use the same observations. Tasks 2 to 4
-all use the 1,434 pitches with a known team classification
-(`known_gender`), so their models fit in one table. The code prints the one
-model output that the answers above do not show, the reduced model of
-Task 2.
+[Shark Tank data]{.shark-tag} Lecture 4 showed how research papers put
+several models side by side in one regression table. The table below does
+this for the models of Tasks 3 and 4. All columns of such a table must use
+the same observations. Tasks 3 and 4 both use the 869 deals with a known
+team classification (`known_deals`), so their models fit in one table. The
+code prints the one model output that the answers above do not show, the
+linear model of Task 4.
 
 ```{r}
 #| label: iep02-table-models
-summary(reduced)
+summary(m_linear)
 ```
 
-Column (1) is the reduced model of Task 2 (`reduced`), column (2) the
-complete model of Task 2 (`complete`), column (3) the interaction model of
-Task 3 (`m_interaction`), and column (4) the quadratic model of Task 4
-(`m_quadratic`).
+Column (1) is the linear model of Task 4 (`m_linear`), column (2) the
+interaction model of Task 3 (`m_interaction`), and column (3) the quadratic
+model of Task 4 (`m_quadratic`).
 
 ::: {.reg-table}
-| | (1) | (2) | (3) | (4) |
-|:---|---:|---:|---:|---:|
-| Season | −0.815\*\*\* | −0.819\*\*\* | −0.799\*\*\* | −1.713\*\*\* |
-| | (0.047) | (0.048) | (0.066) | (0.206) |
-| Season squared | | | | 0.051\*\*\* |
-| | | | | (0.011) |
-| Amount requested (\$1,000s) | −0.0029\*\*\* | −0.0028\*\*\* | −0.0027\*\*\* | −0.0027\*\*\* |
-| | (0.0006) | (0.0006) | (0.0006) | (0.0006) |
-| Industry dummies (15) | | Yes | | |
-| Team with women (all-women or mixed) | | | 0.807 | |
-| | | | (0.412) | |
-| Season × team with women | | | −0.061 | |
-| | | | (0.096) | |
-| Intercept | 21.185\*\*\* | 21.265\*\*\* | 13.625\*\*\* | 24.168\*\*\* |
-| | (0.484) | (0.631) | (0.335) | (0.822) |
-| Observations | 1,434 | 1,434 | 1,434 | 1,434 |
-| $R^2$ | 0.187 | 0.200 | 0.189 | 0.198 |
-| Adjusted $R^2$ | 0.186 | 0.191 | 0.187 | 0.197 |
+| | (1) | (2) | (3) |
+|:---|---:|---:|---:|
+| Season | −0.631\*\*\* | −0.657\*\*\* | −3.199\*\*\* |
+| | (0.100) | (0.134) | (0.415) |
+| Season squared | | | 0.140\*\*\* |
+| | | | (0.022) |
+| Equity offered (%) | 1.071\*\*\* | 1.071\*\*\* | 1.031\*\*\* |
+| | (0.054) | (0.055) | (0.053) |
+| Team with women (all-women or mixed) | | 0.051 | |
+| | | (0.775) | |
+| Season × team with women | | 0.054 | |
+| | | (0.186) | |
+| Intercept | 16.136\*\*\* | 10.188\*\*\* | 26.005\*\*\* |
+| | (1.411) | (0.841) | (2.073) |
+| Observations | 869 | 869 | 869 |
+| $R^2$ | 0.422 | 0.422 | 0.448 |
+| Adjusted $R^2$ | 0.420 | 0.419 | 0.446 |
 :::
 
-Outcome: equity offered (%). Ordinary least squares. Standard errors in
-parentheses. All four columns use the same 1,434 pitches with a known team
-classification. In column (2), "Yes" means that the model contains the 15
-industry dummies, with Food and Beverage as the reference category. Many
-papers report a large set of dummies in this short way. In column (3) the
-reference category is all-men teams, and season is centred at its mean
-(about 8.8), so the intercept and the coefficient of "Team with women"
-refer to the average season.
+Outcome: equity agreed in the deal (%). Ordinary least squares. Standard
+errors in parentheses. All three columns use the same 869 deals with a
+known team classification. In column (2) the reference category is all-men
+teams, and season is centred at its mean (about 9.4), so the intercept and
+the coefficient of "Team with women" refer to the average season.
 \* p < 0.05, \*\* p < 0.01, \*\*\* p < 0.001.
 
-Read along the Season row. The coefficient is close to $-0.8$ in
-columns (1) to (3). In column (4) it is $-1.713$, because with the quadratic term in
-the model the season coefficient alone is not the trend. Read down a column
-to see one model. Columns (2), (3), and (4) each add terms to column (1), so
-a partial F-test can compare each of them with column (1). The bottom rows
-show that the four models fit almost equally well: adjusted $R^2$ lies
-between 0.186 and 0.197, a difference of about one percentage point of the
-variation in the equity offered. Use this layout for regression results in
+Read along the Equity offered row. The coefficient stays between 1.03 and
+1.07 in all three columns, so the link between the offered and the agreed share
+does not depend on how the season enters the model. The Season row reads
+differently: in columns (1) and (2) it is close to $-0.65$, but in column
+(3) it is $-3.199$, because with the quadratic term in the model the season
+coefficient alone is not the trend. Read down a column to see one model.
+Columns (2) and (3) each add terms to column (1), so a partial F-test can
+compare each of them with column (1). The bottom rows show that the
+interaction adds nothing to the fit, while the quadratic term raises
+adjusted $R^2$ from 0.420 to 0.446, about 2.6 percentage points of the
+variation in the agreed equity. Use this layout for regression results in
 your thesis.
 
 ### Task 5: Read a regression table from a paper
@@ -678,13 +706,12 @@ She asked: "Should I hand out more flyers?" The AI answered:
 Printing 100 flyers costs €3, and Lisa hands them out herself. Of each euro
 of sales, 50 cents are left as margin after the direct costs.
 
-3. Calculate the 95% confidence interval of the flyer coefficient. Then
-   calculate the extra daily margin that goes with 100 more flyers, at the
-   lower and at the upper end of the interval.
+3. Calculate the 95% confidence interval of the flyer coefficient, and
+   interpret the interval in one sentence, with units. Then calculate the
+   extra daily margin that goes with 100 more flyers, at the lower and at
+   the upper end of the interval.
 4. Decide whether Lisa should hand out 100 more flyers per day on the basis
-   of these numbers, and give your reason in one sentence. Then explain in
-   one sentence one reason why her true gain could differ from these
-   numbers.
+   of these numbers, and give your reason in one sentence.
 
 Use (copy and paste) this structure:
 
@@ -694,10 +721,10 @@ Second error:
 Correct sentence about the flyer coefficient:
 Correct sentence about the exam-week coefficient:
 Interval, calculation:
-Interval:
+Interval, lower and upper bound:
+Interval interpretation:
 Extra margin at both ends:
 Decision and reason:
-Why her true gain could differ:
 ```
 
 ::: {.callout-note collapse="true"}
@@ -729,16 +756,18 @@ Filled-in structure:
   have on average €85 lower fitted daily sales than days outside exam weeks
   with the same number of flyers and the same temperature."
 - Interval, calculation: $18.0\pm1.976\times5.0=18.0\pm9.88$.
-- Interval: from €8.12 to €27.88 of daily sales per 100 flyers.
+- Interval, lower and upper bound: from €8.12 to €27.88 of daily sales per
+  100 flyers.
+- Interval interpretation: under the model assumptions, the data are
+  consistent with a population coefficient between about €8 and €28 of
+  mean daily sales per 100 flyers, on days with the same temperature and
+  exam-week status.
 - Extra margin at both ends: at 50 cents per euro,
   $0.5\times\text{€}8.12=\text{€}4.06$ and
   $0.5\times\text{€}27.88=\text{€}13.94$ per day.
 - Decision and reason: hand out the extra flyers on this evidence, because
   even at the lower end of the interval the extra margin of €4.06 is above
   the €3 that 100 flyers cost.
-- Why her true gain could differ: the coefficient is an association in
-  observational data, and if Lisa handed out more flyers on days that were
-  busy anyway, the true effect of extra flyers can be smaller.
 
 The third sentence of the AI answer is correct: the interval from €8.12 to
 €27.88 does not include zero.
@@ -752,12 +781,12 @@ The third sentence of the AI answer is correct: the interval from €8.12 to
 ### Individual practice
 
 [Shark Tank data]{.shark-tag} Build one model of the equity agreed in the
-deal (`deal_equity_pct`) for the deals for a share of the company with a
-known team classification. Use the equity offered, the season, the
+deal (`deal_equity_pct`) for the 869 deals for a share of the company with
+a known team classification (`known_deals`). Use the equity offered, the season, the
 requested amount in \$1,000s, the presenting team, and one extension that
 you can justify: an interaction of the equity offered with the dummy
-`women` (1 for all-women and mixed teams), or a quadratic term in season
-next to the three team categories (`gender`).
+`women` (1 for all-women and mixed teams), or an interaction of the
+requested amount with the dummy `women`.
 
 Your answer must include:
 
@@ -766,7 +795,8 @@ Your answer must include:
 3. one graph of the data before you fit the model,
 4. the R formula and the model summary, and, if you compare several models,
    one regression table in the layout of this tutorial,
-5. interpretations of the coefficients with units and reference categories,
+5. interpretations of the coefficients with units and reference
+   categories, and a judgement of their size with a benchmark,
 6. a t-test of one coefficient and an overall or partial F-test,
 7. $R^2$, adjusted $R^2$, and residual diagnostics,
 8. one graph of fitted values from the model,
@@ -781,19 +811,17 @@ This model structure covers points 4 to 9.
 4. A good solution could fit
 
    ```r
-   known_deals <- subset(known_gender,
-                         deal_on_show == 1 & deal_equity_pct > 0)
    m <- lm(
      deal_equity_pct ~ equity_offered_pct * women + season + ask_1k,
      data = known_deals
    )
    ```
 
-   or a model with a quadratic term for season and the team dummies. Keep
-   `equity_offered_pct` and `women` in the model next to their interaction
-   (the hierarchy principle).
+   or a model with the interaction `ask_1k * women`. Keep both predictors
+   in the model next to their interaction (the hierarchy principle).
 5. Name the reference category. Interpret slopes that combine several
-   coefficients, or differences between fitted values.
+   coefficients, or differences between fitted values. Judge their size,
+   for example as a percent of the mean agreed equity of about 23.6%.
 6. Use `anova()` to compare the model with a nested reduced model.
 7. Inspect the residuals, including `rstandard()` and Cook's distance.
 8. Plot fitted values only inside the observed range of the predictor on
@@ -811,10 +839,10 @@ Complete from memory:
 1. A coefficient in a multiple regression compares cases that ...
 2. In a model with an intercept, R includes a factor with three categories
    as ...
-3. In the model of the equity offered on the centred season, the dummy
-   `women`, their interaction, and the requested amount
-   (`season_c * women + ask_1k`), the season slope for teams with women
-   is ...
+3. In the model of the agreed equity on the centred season, the dummy
+   `women`, their interaction, and the equity offered
+   (`season_c * women + equity_offered_pct`), the season slope for teams
+   with women is ...
 4. Centring a predictor changes ..., and it does not change ...
 5. In a model with $x$ and $x^2$, the fitted change from $x$ to $x+1$ is ...
 
@@ -861,11 +889,13 @@ ask Tilly for QM Intermediate, the course AI assistant. For example: "Give me
 an extra exercise for Intermediate Tutorial 2. Show the solution only after
 I send my answer."
 
-:::
-
 ## Extra practice for home {#i-ep02-home}
 
-This task practises the one-way ANOVA table at home.
+These tasks practise the content of Lectures 4 and 5 at home. Task 8
+practises the one-way ANOVA table. Task 9 practises the question that every
+interpretation of a coefficient must answer: is it large in business
+terms? Task 10 shows what happens to a standard error when two predictors
+move closely together.
 
 ### Task 8: A one-way ANOVA (Lecture 5)
 
@@ -935,6 +965,181 @@ Filled-in structure:
   about 16% of the overall mean of 23.96 hours.
 :::
 
+### Task 9: How large is the coefficient? (Lecture 4)
+
+[Shark Tank data]{.shark-tag} When several sharks invest together, do they
+take a larger share of the company? With the 874 deals for a share of the
+company (`deals`), regress the equity agreed in the deal
+(`deal_equity_pct`) on the number of sharks in the deal
+(`number_sharks_in_deal`), the equity offered (`equity_offered_pct`), and
+the season.
+
+1. Interpret the coefficient of the number of sharks with units and with
+   the predictors that are held fixed, in one sentence, and say whether it
+   is significantly different from zero at the 5% level.
+2. Judge the size of this coefficient in three ways: as a percent of the
+   mean agreed equity, in standard deviations of the agreed equity, and in
+   dollars for a company valued at \$1 million, the median agreed
+   valuation in these deals.
+3. Repeat the judgement as a percent of the mean agreed equity at both
+   ends of the 95% confidence interval.
+4. Write one sentence for a founder who expects to receive offers from two
+   sharks instead of one.
+
+Use (copy and paste) this structure:
+
+```text
+R code:
+Interpretation and significance:
+Size as a percent of the mean agreed equity:
+Size in standard deviations of the agreed equity:
+Size in dollars for a company valued at $1 million:
+Size at both ends of the 95% interval:
+Sentence for a founder:
+```
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+The code fits the model and prints the coefficient table and the 95%
+intervals. It then prints the three benchmarks: the mean and the standard
+deviation of the agreed equity, and the median agreed valuation.
+
+```{r}
+#| label: iep02-home-sharks
+sharks_equity <- lm(
+  deal_equity_pct ~ number_sharks_in_deal + equity_offered_pct + season,
+  data = deals
+)
+summary(sharks_equity)$coefficients
+confint(sharks_equity)
+c(mean = mean(deals$deal_equity_pct), sd = sd(deals$deal_equity_pct),
+  median_valuation = median(deals$deal_valuation_usd))
+```
+
+Filled-in structure:
+
+- R code: see the code above.
+- Interpretation and significance: at the same offered share and season, a
+  deal with one more shark is associated with on average about 2.57
+  percentage points more agreed equity. With $t\approx4.10$ and p below
+  0.001, the coefficient is significantly different from zero at the 5%
+  level.
+- Size as a percent of the mean agreed equity: 2.57 points is about 11% of
+  the mean agreed equity of 23.6%.
+- Size in standard deviations of the agreed equity: $2.57/14.78\approx0.17$
+  standard deviations, small compared with how much agreed shares vary.
+- Size in dollars for a company valued at \$1 million: 2.57% of
+  \$1,000,000 is about \$25,700 of company value that the founder gives up
+  in addition.
+- Size at both ends of the 95% interval: the interval runs from about 1.34
+  to 3.80 percentage points, about 6% to 16% of the mean agreed equity.
+- Sentence for a founder: "A deal with two sharks instead of one goes with
+  about 2.6 percentage points more equity given up, worth about \$26,000
+  for a company valued at \$1 million, so the extra expertise of a second
+  shark should be worth at least that much to you."
+:::
+
+### Task 10: Two predictors that move together (Lecture 4)
+
+A chain of fitness clubs wants to know how the size of a club relates to
+the number of new members per month. For 40 clubs it recorded the floor
+area in hundreds of square metres (`floor_100m2`), the number of training
+machines (`machines`), and the new members in one month (`members`).
+Larger clubs have more machines. The code below creates the data.
+
+```{r}
+#| label: iep02-home-gyms-data
+set.seed(8)
+floor_100m2 <- round(runif(40, 3, 12), 1)                   # floor area, in 100 m2
+machines <- round(4 * floor_100m2 + rnorm(40, 0, 4))        # training machines
+members <- round(20 + 3 * floor_100m2 + 0.5 * machines +
+                   rnorm(40, 0, 8))                         # new members per month
+gyms <- data.frame(floor_100m2, machines, members)
+```
+
+1. Calculate the correlation between the floor area and the number of
+   machines, and the share of the variation in the floor area that the
+   number of machines explains.
+2. Fit the regression of `members` on `floor_100m2` alone, and then on
+   `floor_100m2` and `machines`. Report the slope of the floor area and its
+   standard error in both models, and calculate how many times larger the
+   standard error is in the second model.
+3. Explain in two or three sentences why the standard error of the floor
+   area slope grows when the number of machines is added.
+4. In the second model, neither slope is significantly different from zero
+   at the 5% level. Use the overall F-test to say whether the two
+   predictors together are related to new members. Then explain in one or
+   two sentences how both results can be true at the same time.
+
+Use (copy and paste) this structure:
+
+```text
+R code:
+Correlation, and share of the floor area variation explained by machines:
+Floor area slope and standard error, floor area only:
+Floor area slope and standard error, with machines:
+Ratio of the two standard errors:
+Why the standard error grows:
+Overall F-test and its conclusion:
+How both results can be true:
+```
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+The code prints the correlation and the $R^2$ of a regression of the floor
+area on the number of machines, then the coefficient tables of both
+models, the ratio of the two standard errors, and the overall F statistic
+of the second model with its critical value.
+
+```{r}
+#| label: iep02-home-gyms
+cor(gyms$floor_100m2, gyms$machines)
+summary(lm(floor_100m2 ~ machines, data = gyms))$r.squared
+floor_only <- lm(members ~ floor_100m2, data = gyms)
+floor_and_machines <- lm(members ~ floor_100m2 + machines, data = gyms)
+summary(floor_only)$coefficients
+summary(floor_and_machines)$coefficients
+summary(floor_and_machines)$coefficients["floor_100m2", "Std. Error"] /
+  summary(floor_only)$coefficients["floor_100m2", "Std. Error"]
+summary(floor_and_machines)$fstatistic
+qf(0.95, 2, 37)
+```
+
+Filled-in structure:
+
+- R code: see the code above.
+- Correlation, and share of the floor area variation explained by
+  machines: the correlation is about 0.92. The number of machines explains
+  about 86% of the variation in the floor area ($R^2=0.855$, the squared
+  correlation), so less than 15% of it is not shared with the machines.
+- Floor area slope and standard error, floor area only: 4.62 more new
+  members per 100 m², with a standard error of 0.64.
+- Floor area slope and standard error, with machines: 2.21 more new
+  members per 100 m² at the same number of machines, with a standard error
+  of 1.65.
+- Ratio of the two standard errors: $1.654/0.641\approx2.6$, so the
+  standard error is about 2.6 times as large.
+- Why the standard error grows: with machines in the model, the floor area
+  slope compares clubs with the same number of machines. Such clubs differ
+  only a little in floor area, because less than 15% of the variation in
+  floor area is not shared with the machines. With so little separate
+  variation, the data say little about the floor area slope, and its
+  standard error grows.
+- Overall F-test and its conclusion: $F\approx28.2$ on 2 and 37 degrees of
+  freedom, far above the critical value `qf(0.95, 2, 37)` = 3.25, so reject
+  the null hypothesis that both slopes are zero. Together, the two
+  predictors are clearly related to new members, and they explain about
+  60% of the variation ($R^2=0.604$).
+- How both results can be true: the F-test asks whether club size, in
+  floor area and machines together, is related to new members, and the
+  answer is clearly yes. Each t-test asks about one predictor with the
+  other held fixed, and because the two move so closely together, the data
+  cannot tell which of the two matters, so the non-significant t-tests do
+  not show that size is unimportant.
+:::
+
 This is the end of the QM Intermediate lectures and tutorials. Review the
 [QM Intermediate Code Sheet](code-sheet.qmd), attempt the
 [QM Intermediate Mock Exam](mock-exam.qmd), then return to the
@@ -943,3 +1148,5 @@ This is the end of the QM Intermediate lectures and tutorials. Review the
 review a specific topic.
 
 [Continue to QM Intermediate Code Sheet](code-sheet.qmd).
+
+:::
