@@ -4,6 +4,14 @@ Running log of what changes per chapter relative to the prototype
 (valentinamel.github.io/textbook-prototype). One entry per chapter, updated
 when the chapter is rewritten.
 
+## 2026-10-14 — Comment rounds on QM Basic and QM Intermediate
+
+- Valentina's comments on both courses applied: motivation and transitions in
+  every lecture, magnitude benchmarks, no arbitrary data cuts, Intermediate
+  Lecture 2 restructured per assumption, adjusted R-squared moved to
+  Lecture 4, Tutorial 1 rebuilt (equity given versus equity offered),
+  rounding rules in both mocks, Intermediate mock Q6.3-6.5 dropped.
+
 ## 2026-08-30 — Repo created
 
 - New official repository `textbook-qm-ebi`, Quarto book, publishing to
