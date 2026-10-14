@@ -424,10 +424,10 @@ window.Quarto = {
 <div class="outcomes">
 <p><span class="label">By the end of Lecture 2, you can</span></p>
 <ul>
-<li>explain what the main assumptions of a regression are needed for</li>
-<li>check the main assumptions of a regression with residual plots</li>
-<li>say which assumptions need knowledge of the data rather than plots</li>
-<li>find influential observations and handle them openly and carefully</li>
+<li>explain what the main assumptions of a regression are needed for,</li>
+<li>check the main assumptions of a regression with residual plots,</li>
+<li>say which assumptions need knowledge of the data rather than plots,</li>
+<li>find influential observations and handle them openly and carefully.</li>
 </ul>
 </div>
 <div class="driving-question">
@@ -458,7 +458,6 @@ Where these videos differ from this book
 </details>
 <p>The videos explain key ideas in another way. The lecture material and its notation always come first.</p>
 </div>
-<p><strong>Predict.</strong> Answer this question before you come to class: the agreed valuations are strongly right-skewed (most are small and a few are very large), far from a normal distribution. Does that alone make the Lecture 1 regression of the agreed valuation on the claimed valuation invalid, yes or no? Choose one answer before class and write one sentence explaining why. The lecture material gives the correct answer.</p>
 <p><span class="shark-tag">Shark Tank data</span> <strong>R warm-up.</strong> Rebuild the Lecture 1 model, the regression of the agreed valuation on the claimed valuation (both in $ millions) for the 874 deals for a share of the company. Make its residual-versus-fitted plot: the fitted values on the horizontal axis and the residuals on the vertical axis. Bring the plot to class:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
@@ -470,6 +469,7 @@ Where these videos differ from this book
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">0</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><strong>Code along (bring your laptop).</strong> Bring a charged laptop with RStudio and the course project open, so that you can run the code of this chapter yourself during the lecture and get the same numbers and figures.</p>
+<p><span class="shark-tag">Shark Tank data</span> <strong>Predict.</strong> Answer this question before you come to class. The agreed valuations are strongly right-skewed (most are small and a few are very large), far from a normal distribution. Does that alone make the Lecture 1 regression of the agreed valuation on the claimed valuation invalid, yes or no? Choose one answer and write one sentence explaining why. You find the answer at the end of “What each assumption supports” in the lecture material.</p>
 </section>
 <section id="lecture-material" class="level2 course-phase phase-in-class">
 <h2 class="anchored" data-anchor-id="lecture-material">Lecture material</h2>
@@ -477,10 +477,11 @@ Where these videos differ from this book
 <section id="start-with-a-founders-question" class="level3">
 <h3 class="anchored" data-anchor-id="start-with-a-founders-question">Start with a founder’s question</h3>
 <p><span class="shark-tag">Shark Tank data</span> Lecture 1 gave you a number: each extra dollar of claimed valuation goes with about 65 cents more agreed valuation, on average. Before you plan a negotiation around this number, ask whether you can trust the line behind it. R draws a line through any data, even through data that do not support a line. R never warns you.</p>
+<p>In <a href="../basic/b01-introduction-data-analysis.html">QM Basic Lecture 1</a> you saw that a few very large offers pull the mean up, while the median stays put. A fitted line is a line of averages, so a few very large deals can pull it in the same way. This lecture checks the line in three ways: with a plot of the residuals, with a list of what the model assumes, and with a search for the few deals that move the line most. Lecture 3 then builds on this check when it measures how precise the slope is.</p>
 </section>
 <section id="the-residual-plot-from-the-warm-up" class="level3">
 <h3 class="anchored" data-anchor-id="the-residual-plot-from-the-warm-up">The residual plot from the warm-up</h3>
-<p><span class="shark-tag">Shark Tank data</span> The code below is the warm-up code. It rebuilds the data and the model of Lecture 1: the valuation agreed on air (<code>agreed_m</code>) regressed on the valuation claimed by the founder (<code>claimed_m</code>), both in $ millions, for the 874 Shark Tank deals for a share of the company.</p>
+<p><span class="shark-tag">Shark Tank data</span> The code below is the warm-up code. It rebuilds the data and the model of Lecture 1: the valuation agreed on air (<code>agreed_m</code>) regressed on the valuation claimed by the founder (<code>claimed_m</code>), both in $ millions, for the 874 Shark Tank deals for a share of the company. It only builds objects and prints nothing. The figure below then plots the residuals of this model against its fitted values.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>vals <span class="ot">&lt;-</span> <span class="fu">subset</span>(sharks, deal_on_show <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> deal_equity_pct <span class="sc">&gt;</span> <span class="dv">0</span>)</span>
@@ -519,10 +520,10 @@ Where these videos differ from this book
 <span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div id="fig-i02-warmup-residuals" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-i02-warmup-residuals" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Scatterplot of residuals against fitted agreed valuations, both in $ millions, with a dashed line at residual zero. Most points sit at fitted values below 5 million and stay within about 1 million of zero. Towards larger fitted values the points spread out, from about minus 8 to plus 13 million.">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-i02-warmup-residuals-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="i02-assumptions-diagnostics_files/figure-html/fig-i02-warmup-residuals-1.png" class="img-fluid figure-img" width="672">
+<img src="i02-assumptions-diagnostics_files/figure-html/fig-i02-warmup-residuals-1.png" class="img-fluid figure-img" alt="Scatterplot of residuals against fitted agreed valuations, both in $ millions, with a dashed line at residual zero. Most points sit at fitted values below 5 million and stay within about 1 million of zero. Towards larger fitted values the points spread out, from about minus 8 to plus 13 million." width="672">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-i02-warmup-residuals-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;2.1: Residuals against fitted values for the Lecture 1 valuation model, both in $ millions. On the left the residuals lie close to zero. On the right they spread over several million dollars.
@@ -543,7 +544,7 @@ Figure&nbsp;2.1: Residuals against fitted values for the Lecture 1 valuation mod
 <p><span class="math display">\[
 Y_i=\beta_0+\beta_1X_i+\varepsilon_i.
 \]</span></p>
-<p>Least squares gives a line for any data. Whether the numbers that come with the line are reliable depends on a few assumptions.</p>
+<p>Least squares gives a line for any data. Whether the numbers that come with the line are reliable depends on a few assumptions. A founder who plans with the 65 cents wants to know two things. Is the number right on average? And how far from the truth could it be? The two answers need different assumptions, so it helps to know which assumption supports which answer.</p>
 <div class="definition-box">
 <p><span class="label">Definition</span></p>
 <p><strong>Model assumptions.</strong> Conditions on the data and on the error terms <span class="math inline">\(\varepsilon_i\)</span> under which the estimates, standard errors, tests, and intervals of least squares are reliable.</p>
@@ -604,14 +605,21 @@ Y_i=\beta_0+\beta_1X_i+\varepsilon_i.
 </tbody>
 </table>
 <p>The rows fall into groups. Variation in <span class="math inline">\(X\)</span> is needed before R can calculate a slope at all. In multiple regression (Lecture 4) this condition becomes no perfect multicollinearity. Variation in <span class="math inline">\(X\)</span>, linearity, independent observations, and zero conditional mean together make the estimated slope <span class="math inline">\(\hat\beta_1\)</span> unbiased: across many samples, it is correct on average. Homoskedasticity and independence are needed for the usual standard errors, and so for the t-tests and intervals of Lecture 3. Normality of the errors makes these tests and intervals exact in small samples. In large samples they hold approximately without it, because of the central limit theorem.</p>
-<p>The last row matters for how you read the slope. A <strong>confounder</strong> is a variable that is not in the model and that affects both <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>. If you read the slope only as a description of how average outcomes differ across values of <span class="math inline">\(X\)</span>, the error is just the distance from the line of averages. Linearity then already makes the errors average zero at every value of <span class="math inline">\(X\)</span>. If you read the slope as the effect of changing <span class="math inline">\(X\)</span>, the error term contains all other causes of <span class="math inline">\(Y\)</span>. Zero conditional mean then says that these other causes are unrelated to <span class="math inline">\(X\)</span>. An omitted confounder breaks this assumption. This is common with observational data such as the Shark Tank deals, where nobody sets <span class="math inline">\(X\)</span> at random.</p>
-<p>When a confounder is left out, the slope of <span class="math inline">\(X\)</span> also picks up the relationship between the confounder and <span class="math inline">\(Y\)</span>. The slope is then too large or too small as a measure of the effect of <span class="math inline">\(X\)</span>. This distortion is called <strong>omitted variable bias</strong>. Lecture 4 shows it in an example, and shows how adding the confounder to the model as a control variable removes it.</p>
+<p>The last row matters for how you read the slope. It uses two new terms, defined together here.</p>
+<div class="definition-box">
+<p><span class="label">Definition</span></p>
+<p><strong>Confounder.</strong> A variable that is not in the model and that affects both <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>.</p>
+<p><strong>Omitted variable bias.</strong> The distortion of the slope of <span class="math inline">\(X\)</span> that arises when a confounder is left out of the model: the slope also picks up the relationship between the confounder and <span class="math inline">\(Y\)</span>.</p>
+</div>
+<p>If you read the slope only as a description of how average outcomes differ across values of <span class="math inline">\(X\)</span>, the error is just the distance from the line of averages. Linearity then already makes the errors average zero at every value of <span class="math inline">\(X\)</span>. If you read the slope as the effect of changing <span class="math inline">\(X\)</span>, the error term contains all other causes of <span class="math inline">\(Y\)</span>. Zero conditional mean then says that these other causes are unrelated to <span class="math inline">\(X\)</span>. An omitted confounder breaks this assumption. This is common with observational data such as the Shark Tank deals, where nobody sets <span class="math inline">\(X\)</span> at random.</p>
+<p>When a confounder is left out, the slope is too large or too small as a measure of the effect of <span class="math inline">\(X\)</span>. This is omitted variable bias. Lecture 4 shows it in an example, and shows how adding the confounder to the model as a control variable removes it.</p>
 <p>No row of the table says that the data are normal. This answers the prediction question from before class: the outcome does not need to be normally distributed, and neither does the predictor. The agreed valuations are strongly right-skewed, and this skew alone does not break any assumption. The assumptions are about the average of <span class="math inline">\(Y\)</span> at each <span class="math inline">\(X\)</span>, about the errors, and about how the data were produced. They are not about the histogram of <span class="math inline">\(Y\)</span> or the histogram of <span class="math inline">\(X\)</span>.</p>
 </section>
 <section id="linearity-is-about-the-average-not-every-point" class="level3">
 <h3 class="anchored" data-anchor-id="linearity-is-about-the-average-not-every-point">Linearity is about the average, not every point</h3>
+<p>Two rows of the table can be checked with the residual plot: linearity and homoskedasticity. Before you read the Shark Tank plot for them, it helps to see what each problem looks like when you know the answer.</p>
 <p>Individual outcomes do not have to lie on a line. Linearity says that the average outcome at each predictor value follows a line. If the residual plot shows a curve, one constant slope misses part of that average pattern.</p>
-<p>Homoskedasticity is about the vertical spread. It says that the variance of the errors is the same at each predictor value. It does not say that all residuals have the same size. When the variance changes with the predictor, this is called <strong>heteroskedasticity</strong>. In a residual plot, heteroskedasticity often looks like a fan shape: the vertical band of points widens or narrows from left to right. <a href="#fig-i02-assumption-panels" class="quarto-xref">Figure&nbsp;<span>2.2</span></a> shows both problems.</p>
+<p>Homoskedasticity is about the vertical spread. It says that the variance of the errors is the same at each predictor value. It does not say that all residuals have the same size. When the variance changes with the predictor, this is called <strong>heteroskedasticity</strong>. In a residual plot, heteroskedasticity often looks like a fan shape: the vertical band of points widens or narrows from left to right. <a href="#fig-i02-assumption-panels" class="quarto-xref">Figure&nbsp;<span>2.2</span></a> shows both problems with simulated data. We chose the true average and the true spread of each data set, so we know which assumption holds in each panel. The top left panel shows the outcome against the predictor with the fitted line. The other three panels show residuals against fitted values.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>See the R code for this figure</summary>
@@ -674,10 +682,10 @@ Y_i=\beta_0+\beta_1X_i+\varepsilon_i.
 <span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div id="fig-i02-assumption-panels" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-i02-assumption-panels" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Four panels of simulated data. Top left: points scattered evenly around a rising straight line. Top right: residuals form a U shape, above zero at both ends and below zero in the middle. Bottom left: residuals in an even horizontal band around zero. Bottom right: residuals in a band that is narrow on the left and wide on the right, like a fan.">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-i02-assumption-panels-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="i02-assumptions-diagnostics_files/figure-html/fig-i02-assumption-panels-1.png" class="img-fluid figure-img" width="672">
+<img src="i02-assumptions-diagnostics_files/figure-html/fig-i02-assumption-panels-1.png" class="img-fluid figure-img" alt="Four panels of simulated data. Top left: points scattered evenly around a rising straight line. Top right: residuals form a U shape, above zero at both ends and below zero in the middle. Bottom left: residuals in an even horizontal band around zero. Bottom right: residuals in a band that is narrow on the left and wide on the right, like a fan." width="672">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-i02-assumption-panels-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;2.2: Four simulated situations. Top row: a linear mean fits (left, outcome against predictor), a curved mean leaves a U-shaped residual pattern (right). Bottom row: constant vertical spread, homoskedasticity (left), spread growing with the fitted value, heteroskedasticity with a fan shape (right). The three residual panels share the gold dashed line at residual zero.
@@ -705,18 +713,23 @@ Check: match each residual pattern to the assumption it challenges
 </section>
 <section id="reading-the-valuation-models-vertical-spread" class="level3">
 <h3 class="anchored" data-anchor-id="reading-the-valuation-models-vertical-spread">Reading the valuation model’s vertical spread</h3>
-<p><span class="shark-tag">Shark Tank data</span> Now look for heteroskedasticity in <a href="#fig-i02-warmup-residuals" class="quarto-xref">Figure&nbsp;<span>2.1</span></a>. At small fitted values the residuals stay close to the zero line. At larger fitted values they spread over several million dollars. A short calculation confirms what the plot shows. The code sorts the deals by the claimed valuation into five groups. Each group has about a fifth of the deals. The code then gives the standard deviation of the residuals in each group:</p>
+<p><span class="shark-tag">Shark Tank data</span> Now look for heteroskedasticity in <a href="#fig-i02-warmup-residuals" class="quarto-xref">Figure&nbsp;<span>2.1</span></a>. At small fitted values the residuals stay close to the zero line. At larger fitted values they spread over several million dollars. A short calculation confirms what the plot shows. The code sorts the deals by the claimed valuation into five groups. Each group has about a fifth of the deals. The code then gives the standard deviation of the residuals in each group. As a benchmark, the last line gives the average agreed valuation in each group:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>fifth <span class="ot">&lt;-</span> <span class="fu">cut</span>(vals<span class="sc">$</span>claimed_m,</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>             <span class="at">breaks =</span> <span class="fu">quantile</span>(vals<span class="sc">$</span>claimed_m, <span class="at">probs =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="fl">0.2</span>)),</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">include.lowest =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">tapply</span>(<span class="fu">residuals</span>(val_model), fifth, sd), <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">tapply</span>(<span class="fu">residuals</span>(val_model), fifth, sd), <span class="dv">2</span>)   <span class="co"># spread of the residuals</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[0.04,0.625] (0.625,1.33]   (1.33,2.5]      (2.5,5]       (5,50] 
         0.14         0.36         1.19         1.08         3.61 </code></pre>
 </div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">tapply</span>(vals<span class="sc">$</span>agreed_m, fifth, mean), <span class="dv">2</span>)        <span class="co"># average agreed valuation</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[0.04,0.625] (0.625,1.33]   (1.33,2.5]      (2.5,5]       (5,50] 
+        0.28         0.62         1.34         2.22         7.83 </code></pre>
 </div>
-<p>The standard deviation of the residuals is about $0.14 million in the fifth of deals with the smallest claimed valuations and about $3.6 million in the fifth with the largest, about 25 times as much. The spread of agreed valuations broadly grows with the size of the claim. This makes economic sense: founders and sharks can disagree by much more money about a $20 million company than about a $200,000 company. This pattern is heteroskedasticity. The usual standard errors assume one common variance <span class="math inline">\(\sigma^2\)</span>, so here they depend on an assumption that probably does not hold. The slope itself stays unbiased, because heteroskedasticity is not part of the conditions for an unbiased slope. Lecture 3 returns to this point.</p>
+</div>
+<p>The labels above the numbers are the ranges of claimed valuations, in $ millions. The groups hold between 146 and 206 deals, not exactly 175, because many founders claim the same round amounts, such as $1 million. In the first output, the numbers below the labels are the standard deviations of the residuals, also in $ millions. They are $0.14 million in the fifth with the smallest claims, then $0.36, $1.19, and $1.08 million, and $3.61 million in the fifth with the largest claims. The last is about 25 times the first. So the spread broadly grows with the size of the claim. The second output shows that the deals also get larger: the average agreed valuation rises from $0.28 million to $7.83 million. Relative to the size of the deals the spread is more stable: in every fifth the standard deviation lies between 0.46 and 0.89 times the average agreed valuation of that fifth. This makes economic sense: founders and sharks can disagree by much more money about a $20 million company than about a $200,000 company. This pattern is heteroskedasticity. The usual standard errors assume one common variance <span class="math inline">\(\sigma^2\)</span>, so here they depend on an assumption that probably does not hold. The slope itself stays unbiased, because heteroskedasticity is not part of the conditions for an unbiased slope. Lecture 3 returns to this point.</p>
 <div class="callout callout-style-default callout-caution callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -767,9 +780,10 @@ Check your answer
 </section>
 <section id="influence-when-a-few-rows-move-the-line-a-lot" class="level3">
 <h3 class="anchored" data-anchor-id="influence-when-a-few-rows-move-the-line-a-lot">Influence: when a few rows move the line a lot</h3>
-<p><span class="shark-tag">Shark Tank data</span> A first check needs no plot. The function <code>summary()</code> gives the smallest residual, the largest residual, the mean, the median, and the two quartiles. <a href="../basic/b01-introduction-data-analysis.html#b01-quartiles">Basic Lecture 1</a> defines the median and the quartiles: a quarter of the values lie below the first quartile, half below the median, and three quarters below the third quartile.</p>
+<p><span class="shark-tag">Shark Tank data</span> The fan shape showed that a few large deals lie far from the line. If the 65 cents rest mainly on a handful of such deals, a founder with an ordinary company should not plan with them. This section finds the deals that move the line most.</p>
+<p>A first check needs no plot. The function <code>summary()</code> gives the smallest residual, the largest residual, the mean, the median, and the two quartiles. <a href="../basic/b01-introduction-data-analysis.html#b01-quartiles">Basic Lecture 1</a> defines the median and the quartiles: a quarter of the values lie below the first quartile, half below the median, and three quarters below the third quartile.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">residuals</span>(val_model))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">residuals</span>(val_model))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
 -7.817198 -0.396788 -0.006381  0.000000  0.173447 13.446138 </code></pre>
@@ -780,7 +794,7 @@ Check your answer
 <ul>
 <li>The <strong>median</strong> residual is about <span class="math inline">\(-0.01\)</span>: the typical deal lies almost exactly on the fitted line.</li>
 <li>The middle half of all residuals, from the first to the third quartile, runs from <span class="math inline">\(-0.40\)</span> to <span class="math inline">\(0.17\)</span>: a band about $570,000 wide.</li>
-<li>The <strong>minimum</strong> is about <span class="math inline">\(-7.8\)</span> and the <strong>maximum</strong> about <span class="math inline">\(13.4\)</span>: one deal was agreed $7.8 million below its fitted valuation and another $13.4 million above.</li>
+<li>The <strong>minimum</strong> is about <span class="math inline">\(-7.8\)</span> and the <strong>maximum</strong> about <span class="math inline">\(13.4\)</span>: one deal was agreed $7.8 million below its fitted valuation and another $13.4 million above. As a benchmark, the average agreed valuation is $2.2 million, so each of these misses is several times the size of an average deal.</li>
 </ul>
 <p>The mean is zero, as it always is when the model has an intercept. If no deal were extreme, the largest residuals would be a few times the width of the middle half. Here they are 14 to 24 times as large. A few deals miss the line by far more than the typical deal does, and such deals can strongly change the fitted line. The same numbers, without the mean, appear at the top of <code>summary(val_model)</code>. Lecture 3 explains this output.</p>
 </div>
@@ -791,19 +805,19 @@ Check your answer
 <p><strong>Influential observation.</strong> An observation that changes the fitted line noticeably when it is removed. A common rule is a Cook’s distance above <span class="math inline">\(4/n\)</span>.</p>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>rs <span class="ot">&lt;-</span> <span class="fu">rstandard</span>(val_model)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>cd <span class="ot">&lt;-</span> <span class="fu">cooks.distance</span>(val_model)</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">abs</span>(rs) <span class="sc">&gt;</span> <span class="dv">3</span>)               <span class="co"># standardised residuals beyond 3</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>rs <span class="ot">&lt;-</span> <span class="fu">rstandard</span>(val_model)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>cd <span class="ot">&lt;-</span> <span class="fu">cooks.distance</span>(val_model)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">abs</span>(rs) <span class="sc">&gt;</span> <span class="dv">3</span>)               <span class="co"># standardised residuals beyond 3</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 25</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(cd <span class="sc">&gt;</span> <span class="dv">4</span> <span class="sc">/</span> <span class="fu">nobs</span>(val_model))  <span class="co"># Cook's distance above 4/n</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(cd <span class="sc">&gt;</span> <span class="dv">4</span> <span class="sc">/</span> <span class="fu">nobs</span>(val_model))  <span class="co"># Cook's distance above 4/n</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 64</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>vals[<span class="fu">order</span>(cd, <span class="at">decreasing =</span> <span class="cn">TRUE</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>],</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>      <span class="fu">c</span>(<span class="st">"claimed_m"</span>, <span class="st">"agreed_m"</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>vals[<span class="fu">order</span>(cd, <span class="at">decreasing =</span> <span class="cn">TRUE</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>],</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>      <span class="fu">c</span>(<span class="st">"claimed_m"</span>, <span class="st">"agreed_m"</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     claimed_m agreed_m
 1075        50       25
@@ -811,46 +825,47 @@ Check your answer
 535         28       28</code></pre>
 </div>
 </div>
-<p>The command <code>nobs(val_model)</code> gives the number of observations <span class="math inline">\(n\)</span> that the model uses, here 874. Twenty-five deals have standardised residuals beyond <span class="math inline">\(\pm 3\)</span>, and 64 have a Cook’s distance above <span class="math inline">\(4/n\)</span>. These are 3% and 7% of the 874 deals. The most influential deal claimed a valuation of $50 million and was agreed at $25 million, half of the claim. Its claimed valuation lies far from the claimed valuations of the other deals. Such an observation has high leverage: like a long lever, it can pull the fitted line towards itself. <a href="#fig-i02-influence" class="quarto-xref">Figure&nbsp;<span>2.3</span></a> marks the 64 deals in the scatterplot.</p>
+<p>The code computes both measures for every deal. It then counts the deals beyond each threshold and prints the claimed and agreed valuations of the three deals with the largest Cook’s distance. The command <code>nobs(val_model)</code> gives the number of observations <span class="math inline">\(n\)</span> that the model uses, here 874.</p>
+<p>Twenty-five deals have standardised residuals beyond <span class="math inline">\(\pm 3\)</span>, and 64 have a Cook’s distance above <span class="math inline">\(4/n\)</span>. These are 3% and 7% of the 874 deals. The most influential deal claimed a valuation of $50 million and was agreed at $25 million, half of the claim. The next two claimed $45 million and $28 million and were agreed at $36 million and $28 million. For comparison, the median claim is $2 million, and only 3% of the deals claim $20 million or more. Such deals lie far to the right of all other deals. An observation like this has high leverage: like a long lever, it can pull the fitted line towards itself. <a href="#fig-i02-influence" class="quarto-xref">Figure&nbsp;<span>2.3</span></a> marks the 64 deals in the scatterplot.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>See the R code for this figure</summary>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>vals <span class="ot">&lt;-</span> <span class="fu">subset</span>(sharks, deal_on_show <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> deal_equity_pct <span class="sc">&gt;</span> <span class="dv">0</span>)</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>vals<span class="sc">$</span>claimed_m <span class="ot">&lt;-</span> vals<span class="sc">$</span>requested_valuation_usd <span class="sc">/</span> <span class="fl">1e6</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>vals<span class="sc">$</span>agreed_m <span class="ot">&lt;-</span> vals<span class="sc">$</span>deal_valuation_usd <span class="sc">/</span> <span class="fl">1e6</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>val_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(agreed_m <span class="sc">~</span> claimed_m, <span class="at">data =</span> vals)</span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>cd <span class="ot">&lt;-</span> <span class="fu">cooks.distance</span>(val_model)</span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>vals<span class="sc">$</span>flagged <span class="ot">&lt;-</span> cd <span class="sc">&gt;</span> <span class="dv">4</span> <span class="sc">/</span> <span class="fu">nrow</span>(vals)</span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>top <span class="ot">&lt;-</span> <span class="fu">which.max</span>(cd)</span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(vals, <span class="fu">aes</span>(<span class="at">x =</span> claimed_m, <span class="at">y =</span> agreed_m)) <span class="sc">+</span></span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> <span class="fu">subset</span>(vals, <span class="sc">!</span>flagged),</span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>             <span class="at">colour =</span> <span class="st">"grey75"</span>, <span class="at">alpha =</span> <span class="fl">0.45</span>, <span class="at">size =</span> <span class="fl">1.6</span>) <span class="sc">+</span></span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">intercept =</span> <span class="fu">coef</span>(val_model)[<span class="dv">1</span>],</span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>              <span class="at">slope =</span> <span class="fu">coef</span>(val_model)[<span class="dv">2</span>],</span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>              <span class="at">colour =</span> <span class="st">"#D55E00"</span>, <span class="at">linewidth =</span> <span class="fl">0.9</span>) <span class="sc">+</span></span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> <span class="fu">subset</span>(vals, flagged),</span>
-<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>             <span class="at">colour =</span> <span class="st">"#D55E00"</span>, <span class="at">size =</span> <span class="fl">2.2</span>) <span class="sc">+</span></span>
-<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> vals<span class="sc">$</span>claimed_m[top] <span class="sc">-</span> <span class="fl">1.2</span>, <span class="at">y =</span> vals<span class="sc">$</span>agreed_m[top],</span>
-<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>           <span class="at">label =</span> <span class="st">"claimed 50, agreed 25"</span>,</span>
-<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>           <span class="at">hjust =</span> <span class="dv">1</span>, <span class="at">colour =</span> <span class="st">"#17324D"</span>, <span class="at">size =</span> <span class="fl">3.4</span>) <span class="sc">+</span></span>
-<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Valuation claimed by the founder ($ millions)"</span>,</span>
-<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Valuation agreed on air ($ millions)"</span>) <span class="sc">+</span></span>
-<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
-<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.x =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#5B6976"</span>),</span>
-<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>)</span>
-<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>vals <span class="ot">&lt;-</span> <span class="fu">subset</span>(sharks, deal_on_show <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> deal_equity_pct <span class="sc">&gt;</span> <span class="dv">0</span>)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>vals<span class="sc">$</span>claimed_m <span class="ot">&lt;-</span> vals<span class="sc">$</span>requested_valuation_usd <span class="sc">/</span> <span class="fl">1e6</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>vals<span class="sc">$</span>agreed_m <span class="ot">&lt;-</span> vals<span class="sc">$</span>deal_valuation_usd <span class="sc">/</span> <span class="fl">1e6</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>val_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(agreed_m <span class="sc">~</span> claimed_m, <span class="at">data =</span> vals)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>cd <span class="ot">&lt;-</span> <span class="fu">cooks.distance</span>(val_model)</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>vals<span class="sc">$</span>flagged <span class="ot">&lt;-</span> cd <span class="sc">&gt;</span> <span class="dv">4</span> <span class="sc">/</span> <span class="fu">nrow</span>(vals)</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>top <span class="ot">&lt;-</span> <span class="fu">which.max</span>(cd)</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(vals, <span class="fu">aes</span>(<span class="at">x =</span> claimed_m, <span class="at">y =</span> agreed_m)) <span class="sc">+</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> <span class="fu">subset</span>(vals, <span class="sc">!</span>flagged),</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>             <span class="at">colour =</span> <span class="st">"grey75"</span>, <span class="at">alpha =</span> <span class="fl">0.45</span>, <span class="at">size =</span> <span class="fl">1.6</span>) <span class="sc">+</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">intercept =</span> <span class="fu">coef</span>(val_model)[<span class="dv">1</span>],</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>              <span class="at">slope =</span> <span class="fu">coef</span>(val_model)[<span class="dv">2</span>],</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>              <span class="at">colour =</span> <span class="st">"#D55E00"</span>, <span class="at">linewidth =</span> <span class="fl">0.9</span>) <span class="sc">+</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> <span class="fu">subset</span>(vals, flagged),</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>             <span class="at">colour =</span> <span class="st">"#D55E00"</span>, <span class="at">size =</span> <span class="fl">2.2</span>) <span class="sc">+</span></span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> vals<span class="sc">$</span>claimed_m[top] <span class="sc">-</span> <span class="fl">1.2</span>, <span class="at">y =</span> vals<span class="sc">$</span>agreed_m[top],</span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>           <span class="at">label =</span> <span class="st">"claimed 50, agreed 25"</span>,</span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>           <span class="at">hjust =</span> <span class="dv">1</span>, <span class="at">colour =</span> <span class="st">"#17324D"</span>, <span class="at">size =</span> <span class="fl">3.4</span>) <span class="sc">+</span></span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Valuation claimed by the founder ($ millions)"</span>,</span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Valuation agreed on air ($ millions)"</span>) <span class="sc">+</span></span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#5B6976"</span>),</span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>)</span>
+<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div id="fig-i02-influence" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-i02-influence" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Scatterplot of agreed against claimed valuation in $ millions, with the rising fitted line. Most grey points crowd at claims below 10 million. Orange flagged points include many deals with claims above 10 million and some smaller deals far from the line. A label marks the deal at claimed 50, agreed 25, far to the right and below the line.">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-i02-influence-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="i02-assumptions-diagnostics_files/figure-html/fig-i02-influence-1.png" class="img-fluid figure-img" width="672">
+<img src="i02-assumptions-diagnostics_files/figure-html/fig-i02-influence-1.png" class="img-fluid figure-img" alt="Scatterplot of agreed against claimed valuation in $ millions, with the rising fitted line. Most grey points crowd at claims below 10 million. Orange flagged points include many deals with claims above 10 million and some smaller deals far from the line. A label marks the deal at claimed 50, agreed 25, far to the right and below the line." width="672">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-i02-influence-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;2.3: The 874 deals with the fitted line, full range shown. Orange points have a Cook’s distance above 4/n.&nbsp;The labelled deal (claimed $50 million, agreed $25 million) moves the fitted line most: it sits far to the right (high leverage), so it pulls on the line like a lever.
@@ -859,45 +874,59 @@ Figure&nbsp;2.3: The 874 deals with the fitted line, full range shown. Orange po
 </div>
 </div>
 </div>
+<p>How much do the flagged deals matter for the founder’s number? The code fits the same model twice more: once without the single most influential deal, and once without all 64 flagged deals. It prints the intercept and the slope of each fit.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(<span class="fu">lm</span>(agreed_m <span class="sc">~</span> claimed_m, <span class="at">data =</span> vals[<span class="sc">-</span><span class="fu">which.max</span>(cd), ]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>(Intercept)   claimed_m 
+ -0.1177693   0.6655173 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(<span class="fu">lm</span>(agreed_m <span class="sc">~</span> claimed_m, <span class="at">data =</span> vals[cd <span class="sc">&lt;=</span> <span class="dv">4</span> <span class="sc">/</span> <span class="fu">nobs</span>(val_model), ]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>(Intercept)   claimed_m 
+ 0.05195327  0.56667617 </code></pre>
+</div>
+</div>
+<p>Without the deal claimed at $50 million, the slope rises a little, from 0.649 to 0.666: about 67 cents instead of 65 cents per claimed dollar, a change of 3%. Without all 64 flagged deals, the slope falls to 0.567: about 57 cents per claimed dollar, 13% less than with all deals. So no single deal decides the slope, but the 7% of flagged deals together move it noticeably. The intercepts stay close to zero in all three fits, between <span class="math inline">\(-\$0.12\)</span> million and $0.05 million. This comparison is a check, not a better model. The flagged deals are real pitches, and dropping them only shows how much the result depends on them.</p>
 <p>What should you do with a flagged observation? Follow three steps, in this order:</p>
 <ol type="1">
 <li><strong>Investigate.</strong> Is it a data error, or a real pitch? Here the valuations of the flagged deals match their recorded amounts and shares, so we treat these deals as real.</li>
-<li><strong>Report.</strong> State that the results depend on a few observations and say which ones. Show the fit with and without them if the results change.</li>
+<li><strong>Report.</strong> State that the results depend on a few observations and say which ones. Show the fit with and without them if the results change, as in the comparison above.</li>
 <li><strong>Never silently delete.</strong> If you drop rows that do not fit your story and do not say so, you give a false picture of the data.</li>
 </ol>
 </section>
 <section id="qq-plots-how-to-read-them-when-normality-matters" class="level3">
 <h3 class="anchored" data-anchor-id="qq-plots-how-to-read-them-when-normality-matters">Q–Q plots: how to read them, when normality matters</h3>
-<p><span class="shark-tag">Shark Tank data</span> The fifth row of the table is normality of the errors. A <strong>normal Q–Q plot</strong> (quantile-quantile plot) puts the standardised residuals in order and compares them with the values that a normal distribution would give. If the residuals are close to normal, the points lie along the reference line.</p>
+<p><span class="shark-tag">Shark Tank data</span> The fifth row of the table is normality of the errors. It matters most when you have few observations, for example a young venture with 20 weeks of sales data. The tests and intervals of Lecture 3 then rely on it. A <strong>normal Q–Q plot</strong> (quantile-quantile plot) puts the standardised residuals in order and compares them with the values that a normal distribution would give. If the residuals are close to normal, the points lie along the reference line.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>See the R code for this figure</summary>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>vals <span class="ot">&lt;-</span> <span class="fu">subset</span>(sharks, deal_on_show <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> deal_equity_pct <span class="sc">&gt;</span> <span class="dv">0</span>)</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>vals<span class="sc">$</span>claimed_m <span class="ot">&lt;-</span> vals<span class="sc">$</span>requested_valuation_usd <span class="sc">/</span> <span class="fl">1e6</span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>vals<span class="sc">$</span>agreed_m <span class="ot">&lt;-</span> vals<span class="sc">$</span>deal_valuation_usd <span class="sc">/</span> <span class="fl">1e6</span></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>val_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(agreed_m <span class="sc">~</span> claimed_m, <span class="at">data =</span> vals)</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>qq_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">rs =</span> <span class="fu">rstandard</span>(val_model))</span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(qq_df, <span class="fu">aes</span>(<span class="at">sample =</span> rs)) <span class="sc">+</span></span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_qq_line</span>(<span class="at">colour =</span> <span class="st">"#D55E00"</span>, <span class="at">linewidth =</span> <span class="fl">0.9</span>) <span class="sc">+</span></span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_qq</span>(<span class="at">colour =</span> <span class="st">"#009E73"</span>, <span class="at">alpha =</span> <span class="fl">0.4</span>, <span class="at">size =</span> <span class="fl">1.6</span>) <span class="sc">+</span></span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Normal theoretical quantile"</span>,</span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Standardised residual"</span>) <span class="sc">+</span></span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.x =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#5B6976"</span>),</span>
-<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>)</span>
-<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>vals <span class="ot">&lt;-</span> <span class="fu">subset</span>(sharks, deal_on_show <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> deal_equity_pct <span class="sc">&gt;</span> <span class="dv">0</span>)</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>vals<span class="sc">$</span>claimed_m <span class="ot">&lt;-</span> vals<span class="sc">$</span>requested_valuation_usd <span class="sc">/</span> <span class="fl">1e6</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>vals<span class="sc">$</span>agreed_m <span class="ot">&lt;-</span> vals<span class="sc">$</span>deal_valuation_usd <span class="sc">/</span> <span class="fl">1e6</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>val_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(agreed_m <span class="sc">~</span> claimed_m, <span class="at">data =</span> vals)</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>qq_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">rs =</span> <span class="fu">rstandard</span>(val_model))</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(qq_df, <span class="fu">aes</span>(<span class="at">sample =</span> rs)) <span class="sc">+</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_qq_line</span>(<span class="at">colour =</span> <span class="st">"#D55E00"</span>, <span class="at">linewidth =</span> <span class="fl">0.9</span>) <span class="sc">+</span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_qq</span>(<span class="at">colour =</span> <span class="st">"#009E73"</span>, <span class="at">alpha =</span> <span class="fl">0.4</span>, <span class="at">size =</span> <span class="fl">1.6</span>) <span class="sc">+</span></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Normal theoretical quantile"</span>,</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Standardised residual"</span>) <span class="sc">+</span></span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#5B6976"</span>),</span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>)</span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div id="fig-i02-qq" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-i02-qq" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Normal Q-Q plot with theoretical quantiles from about minus 3 to plus 3 on the horizontal axis and standardised residuals on the vertical axis. In the middle the points follow the rising reference line. At the left end they fall below the line, down to about minus 5, and at the right end they rise far above it, up to about 8.">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-i02-qq-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="i02-assumptions-diagnostics_files/figure-html/fig-i02-qq-1.png" class="img-fluid figure-img" width="672">
+<img src="i02-assumptions-diagnostics_files/figure-html/fig-i02-qq-1.png" class="img-fluid figure-img" alt="Normal Q-Q plot with theoretical quantiles from about minus 3 to plus 3 on the horizontal axis and standardised residuals on the vertical axis. In the middle the points follow the rising reference line. At the left end they fall below the line, down to about minus 5, and at the right end they rise far above it, up to about 8." width="672">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-i02-qq-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;2.4: Normal Q–Q plot of the standardised residuals of the valuation model. Both ends leave the line: a few deals were agreed far above and far below their fitted valuation.
@@ -906,15 +935,15 @@ Figure&nbsp;2.4: Normal Q–Q plot of the standardised residuals of the valuatio
 </div>
 </div>
 </div>
-<p>The horizontal axis shows where a residual of this rank would lie if the errors were normal. The vertical axis shows where the residual actually lies. In <a href="#fig-i02-qq" class="quarto-xref">Figure&nbsp;<span>2.4</span></a> the middle of the distribution is close to the line. Both ends bend away from it, the upper end more strongly. The residuals have more extreme values on both sides than a normal distribution has. We say that such a distribution has heavy tails.</p>
+<p>The horizontal axis shows where a residual of this rank would lie if the errors were normal. The vertical axis shows where the residual actually lies. In <a href="#fig-i02-qq" class="quarto-xref">Figure&nbsp;<span>2.4</span></a> the middle of the distribution is close to the line. Both ends bend away from it, the upper end more strongly. The residuals have more extreme values on both sides than a normal distribution has. We say that such a distribution has heavy tails. As a benchmark, under a normal distribution about 3 in 1,000 values lie beyond <span class="math inline">\(\pm 3\)</span> standard deviations, so about 2 or 3 of the 874 deals. Here 25 deals do, and the most extreme standardised residual is about 8.</p>
 <p>Two base R commands draw the same plot without the styling of the figure:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qqnorm</span>(<span class="fu">rstandard</span>(val_model))</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">qqline</span>(<span class="fu">rstandard</span>(val_model))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qqnorm</span>(<span class="fu">rstandard</span>(val_model))</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">qqline</span>(<span class="fu">rstandard</span>(val_model))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="i02-assumptions-diagnostics_files/figure-html/i02-qq-base-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="i02-assumptions-diagnostics_files/figure-html/i02-qq-base-1.png" class="img-fluid figure-img" alt="Base R version of the normal Q-Q plot of the standardised residuals of the valuation model, with the same shape: points on the reference line in the middle and far from it at both ends." width="672"></p>
 </figure>
 </div>
 </div>
@@ -932,7 +961,9 @@ Figure&nbsp;2.4: Normal Q–Q plot of the standardised residuals of the valuatio
 </section>
 <section id="answering-the-driving-question" class="level3">
 <h3 class="anchored" data-anchor-id="answering-the-driving-question">Answering the driving question</h3>
-<p>You can trust the Lecture 1 line only under certain conditions. Its residuals reveal two problems. The vertical spread grows with the size of the claim (heteroskedasticity). And a few extreme deals, flagged by standardised residuals beyond <span class="math inline">\(\pm3\)</span> and Cook’s distances above <span class="math inline">\(4/n\)</span>, strongly affect both the line and its standard errors. Heteroskedasticity does not bias the slope, but it makes the usual standard errors doubtful. Nothing in the plots contradicts linearity. Independence and zero conditional mean (no omitted confounder) cannot be seen in any plot. They depend on how the show works. Without zero conditional mean, the slope describes how agreed valuations differ across claims, but it is not the effect of claiming more. Lecture 3 calculates standard errors, intervals, and tests for this model. These two problems limit how much you can trust those results.</p>
+<p>Under what conditions should we trust the Lecture 1 line? The slope is right on average if there is variation in <span class="math inline">\(X\)</span>, the average of <span class="math inline">\(Y\)</span> lies on a straight line, the deals are independent, and no omitted confounder is related to the claim. The usual standard errors also need a constant spread of the errors (homoskedasticity) and independence. Normal errors matter only in small samples.</p>
+<p>What do its residuals reveal? Nothing in the plots contradicts linearity. But the vertical spread grows with the size of the claim, from a standard deviation of $0.14 million in the fifth with the smallest claims to $3.61 million in the fifth with the largest. This heteroskedasticity does not bias the slope, but it makes the usual standard errors doubtful. And 64 deals, 7% of all deals, have a Cook’s distance above <span class="math inline">\(4/n\)</span>. Without them the slope falls from 0.65 to 0.57. Independence and zero conditional mean cannot be seen in any plot. They depend on how the show works, for example on shared episodes and on founders’ networks.</p>
+<p>As a founder you might expect about 57 to 65 cents of agreed valuation per extra dollar of claimed valuation, under the assumption that your company is like the companies on the show. This number describes how agreed valuations differ across claims. It is not a promise that claiming more raises your own valuation, because an omitted confounder such as network strength can drive both. Lecture 3 calculates standard errors, intervals, and tests for this model. The spread that grows with the claim and the influential deals limit how much you can trust those results.</p>
 <div class="founder-box">
 <p><span class="label">A founder’s decision (invented example)</span></p>
 <p>You regress weekly orders on weekly advertising spending. One week in your data includes a catering order of 200 meal boxes, in a week with high advertising. With that week the advertising slope is 0.15 orders per euro. Without that week it is 0.09. You earn 4 euros of margin per order. Which slope do you use to plan next term’s advertising budget?</p>
@@ -956,7 +987,7 @@ See the solution
 <div class="callout-body-container callout-body">
 <ol type="1">
 <li>With the slope of 0.15: 15 more orders and 60 euros of margin. With 0.09: 9 more orders and 36 euros of margin.</li>
-<li>The catering week is an influential observation: an unusually large outcome at a high value of the predictor. It pulls the line up at high spending, so the slope gets steeper.</li>
+<li>The catering week is an influential observation: an unusually large outcome at a high value of the predictor. It pulls the line up at high spending, so the slope gets steeper. One week out of many changes the slope by 40%, from 0.15 to 0.09.</li>
 <li>Do not base the budget on a fit that depends on one single week. Catering is a different business from selling single meal boxes every day. Report both fits, plan the daily business with the slope of 0.09, and look at catering separately. Do not simply delete the week.</li>
 </ol>
 </div>
@@ -1017,47 +1048,47 @@ Check your answers
 <div class="cell">
 <details class="code-fold">
 <summary>See the R code for this figure</summary>
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1204</span>)</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>n_p <span class="ot">&lt;-</span> <span class="dv">120</span></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>f_p <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">9</span>, <span class="at">length.out =</span> n_p)</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>res_a <span class="ot">&lt;-</span> <span class="fl">1.6</span> <span class="sc">*</span> (f_p <span class="sc">-</span> <span class="dv">5</span>)<span class="sc">^</span><span class="dv">2</span> <span class="sc">/</span> <span class="dv">8</span> <span class="sc">-</span> <span class="dv">1</span> <span class="sc">+</span> <span class="fu">rnorm</span>(n_p, <span class="dv">0</span>, <span class="fl">0.55</span>)</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>res_b <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n_p, <span class="dv">0</span>, <span class="fl">0.15</span> <span class="sc">+</span> <span class="fl">0.16</span> <span class="sc">*</span> f_p)</span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>res_c <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n_p, <span class="dv">0</span>, <span class="fl">0.8</span>)</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>plots_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">panel =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"Plot A"</span>, <span class="st">"Plot B"</span>, <span class="st">"Plot C"</span>), <span class="at">each =</span> n_p),</span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">fitted =</span> <span class="fu">rep</span>(f_p, <span class="dv">3</span>),</span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">residual =</span> <span class="fu">c</span>(res_a, res_b, res_c)</span>
-<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>zero_lab <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">panel =</span> <span class="fu">c</span>(<span class="st">"Plot A"</span>, <span class="st">"Plot B"</span>, <span class="st">"Plot C"</span>),</span>
-<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="dv">1</span>,</span>
-<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> <span class="fu">c</span>(<span class="fu">max</span>(res_a), <span class="fu">max</span>(res_b), <span class="fu">max</span>(res_c))</span>
-<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(plots_df, <span class="fu">aes</span>(<span class="at">x =</span> fitted, <span class="at">y =</span> residual)) <span class="sc">+</span></span>
-<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">colour =</span> <span class="st">"#C98B2E"</span>,</span>
-<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>             <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
-<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.45</span>, <span class="at">size =</span> <span class="fl">1.6</span>, <span class="at">colour =</span> <span class="st">"#009E73"</span>) <span class="sc">+</span></span>
-<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="at">data =</span> zero_lab, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y, <span class="at">label =</span> <span class="st">"residual = 0"</span>),</span>
-<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>            <span class="at">hjust =</span> <span class="dv">0</span>, <span class="at">colour =</span> <span class="st">"#17324D"</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> panel, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
-<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Fitted value"</span>, <span class="at">y =</span> <span class="st">"Residual"</span>) <span class="sc">+</span></span>
-<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
-<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.x =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#5B6976"</span>),</span>
-<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>),</span>
-<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">strip.text =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>, <span class="at">face =</span> <span class="st">"bold"</span>)</span>
-<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1204</span>)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>n_p <span class="ot">&lt;-</span> <span class="dv">120</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>f_p <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">9</span>, <span class="at">length.out =</span> n_p)</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>res_a <span class="ot">&lt;-</span> <span class="fl">1.6</span> <span class="sc">*</span> (f_p <span class="sc">-</span> <span class="dv">5</span>)<span class="sc">^</span><span class="dv">2</span> <span class="sc">/</span> <span class="dv">8</span> <span class="sc">-</span> <span class="dv">1</span> <span class="sc">+</span> <span class="fu">rnorm</span>(n_p, <span class="dv">0</span>, <span class="fl">0.55</span>)</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>res_b <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n_p, <span class="dv">0</span>, <span class="fl">0.15</span> <span class="sc">+</span> <span class="fl">0.16</span> <span class="sc">*</span> f_p)</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>res_c <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n_p, <span class="dv">0</span>, <span class="fl">0.8</span>)</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>plots_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">panel =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"Plot A"</span>, <span class="st">"Plot B"</span>, <span class="st">"Plot C"</span>), <span class="at">each =</span> n_p),</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">fitted =</span> <span class="fu">rep</span>(f_p, <span class="dv">3</span>),</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">residual =</span> <span class="fu">c</span>(res_a, res_b, res_c)</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>zero_lab <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">panel =</span> <span class="fu">c</span>(<span class="st">"Plot A"</span>, <span class="st">"Plot B"</span>, <span class="st">"Plot C"</span>),</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="dv">1</span>,</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> <span class="fu">c</span>(<span class="fu">max</span>(res_a), <span class="fu">max</span>(res_b), <span class="fu">max</span>(res_c))</span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(plots_df, <span class="fu">aes</span>(<span class="at">x =</span> fitted, <span class="at">y =</span> residual)) <span class="sc">+</span></span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">colour =</span> <span class="st">"#C98B2E"</span>,</span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>             <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.45</span>, <span class="at">size =</span> <span class="fl">1.6</span>, <span class="at">colour =</span> <span class="st">"#009E73"</span>) <span class="sc">+</span></span>
+<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="at">data =</span> zero_lab, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y, <span class="at">label =</span> <span class="st">"residual = 0"</span>),</span>
+<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a>            <span class="at">hjust =</span> <span class="dv">0</span>, <span class="at">colour =</span> <span class="st">"#17324D"</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> panel, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
+<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Fitted value"</span>, <span class="at">y =</span> <span class="st">"Residual"</span>) <span class="sc">+</span></span>
+<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
+<span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb24-30"><a href="#cb24-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb24-31"><a href="#cb24-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb24-32"><a href="#cb24-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#5B6976"</span>),</span>
+<span id="cb24-33"><a href="#cb24-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>),</span>
+<span id="cb24-34"><a href="#cb24-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">strip.text =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>, <span class="at">face =</span> <span class="st">"bold"</span>)</span>
+<span id="cb24-35"><a href="#cb24-35" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div id="fig-i02-three-plots" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-i02-three-plots" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Three panels of residuals against fitted values from 1 to 9. Plot A: the residuals form a U shape, below zero in the middle and above zero at both ends. Plot B: the residuals form a band around zero that is narrow on the left and wide on the right. Plot C: the residuals form an even band around zero with no visible pattern.">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-i02-three-plots-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="i02-assumptions-diagnostics_files/figure-html/fig-i02-three-plots-1.png" class="img-fluid figure-img" width="672">
+<img src="i02-assumptions-diagnostics_files/figure-html/fig-i02-three-plots-1.png" class="img-fluid figure-img" alt="Three panels of residuals against fitted values from 1 to 9. Plot A: the residuals form a U shape, below zero in the middle and above zero at both ends. Plot B: the residuals form a band around zero that is narrow on the left and wide on the right. Plot C: the residuals form an even band around zero with no visible pattern." width="672">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-i02-three-plots-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;2.5: Three simulated residual-versus-fitted plots. The gold dashed line marks residual zero in each panel.
@@ -1099,40 +1130,41 @@ Check your answers
 <div id="callout-7" class="callout-7-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>equity_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> season, <span class="at">data =</span> sharks)</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>old_par <span class="ot">&lt;-</span> <span class="fu">par</span>(<span class="at">no.readonly =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="at">mar =</span> <span class="fu">c</span>(<span class="fl">4.5</span>, <span class="fl">4.4</span>, <span class="fl">1.3</span>, <span class="fl">0.7</span>), <span class="at">las =</span> <span class="dv">1</span>)</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">fitted</span>(equity_model), <span class="fu">residuals</span>(equity_model),</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">col =</span> grDevices<span class="sc">::</span><span class="fu">adjustcolor</span>(<span class="st">"#0072B2"</span>, <span class="at">alpha.f =</span> <span class="fl">0.30</span>),</span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>     <span class="at">bty =</span> <span class="st">"n"</span>, <span class="at">xlab =</span> <span class="st">"Fitted equity offered (pp)"</span>,</span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylab =</span> <span class="st">"Residual (pp)"</span>)</span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">0</span>, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"#D55E00"</span>)</span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="fu">qqnorm</span>(<span class="fu">rstandard</span>(equity_model), <span class="at">pch =</span> <span class="dv">16</span>,</span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> grDevices<span class="sc">::</span><span class="fu">adjustcolor</span>(<span class="st">"#009E73"</span>, <span class="at">alpha.f =</span> <span class="fl">0.35</span>),</span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">bty =</span> <span class="st">"n"</span>, <span class="at">main =</span> <span class="st">""</span>, <span class="at">xlab =</span> <span class="st">"Normal theoretical quantile"</span>,</span>
-<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>       <span class="at">ylab =</span> <span class="st">"Standardised residual"</span>)</span>
-<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a><span class="fu">qqline</span>(<span class="fu">rstandard</span>(equity_model), <span class="at">col =</span> <span class="st">"#D55E00"</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>equity_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> season, <span class="at">data =</span> sharks)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>old_par <span class="ot">&lt;-</span> <span class="fu">par</span>(<span class="at">no.readonly =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="at">mar =</span> <span class="fu">c</span>(<span class="fl">4.5</span>, <span class="fl">4.4</span>, <span class="fl">1.3</span>, <span class="fl">0.7</span>), <span class="at">las =</span> <span class="dv">1</span>)</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">fitted</span>(equity_model), <span class="fu">residuals</span>(equity_model),</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">col =</span> grDevices<span class="sc">::</span><span class="fu">adjustcolor</span>(<span class="st">"#0072B2"</span>, <span class="at">alpha.f =</span> <span class="fl">0.30</span>),</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>     <span class="at">bty =</span> <span class="st">"n"</span>, <span class="at">xlab =</span> <span class="st">"Fitted equity offered (pp)"</span>,</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylab =</span> <span class="st">"Residual (pp)"</span>)</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">0</span>, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"#D55E00"</span>)</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a><span class="fu">qqnorm</span>(<span class="fu">rstandard</span>(equity_model), <span class="at">pch =</span> <span class="dv">16</span>,</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> grDevices<span class="sc">::</span><span class="fu">adjustcolor</span>(<span class="st">"#009E73"</span>, <span class="at">alpha.f =</span> <span class="fl">0.35</span>),</span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">bty =</span> <span class="st">"n"</span>, <span class="at">main =</span> <span class="st">""</span>, <span class="at">xlab =</span> <span class="st">"Normal theoretical quantile"</span>,</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>       <span class="at">ylab =</span> <span class="st">"Standardised residual"</span>)</span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a><span class="fu">qqline</span>(<span class="fu">rstandard</span>(equity_model), <span class="at">col =</span> <span class="st">"#D55E00"</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="i02-assumptions-diagnostics_files/figure-html/i02-practice-equity-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="i02-assumptions-diagnostics_files/figure-html/i02-practice-equity-1.png" class="img-fluid figure-img" alt="Two panels. Left: residuals of equity offered against fitted values, in sixteen vertical stripes between about 7 and 20 percent fitted equity, most residuals between about minus 10 and plus 15 points and a few up to about 83 points. Right: normal Q-Q plot whose points follow the line in the middle and bend sharply upwards at the right end." width="672"></p>
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(old_par)</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">max</span>(<span class="fu">residuals</span>(equity_model))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(old_par)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">max</span>(<span class="fu">residuals</span>(equity_model))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 82.83991</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">big_rstandard =</span> <span class="fu">sum</span>(<span class="fu">abs</span>(<span class="fu">rstandard</span>(equity_model)) <span class="sc">&gt;</span> <span class="dv">3</span>),</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">cooks_flagged =</span> <span class="fu">sum</span>(<span class="fu">cooks.distance</span>(equity_model) <span class="sc">&gt;</span> <span class="dv">4</span> <span class="sc">/</span> <span class="fu">nobs</span>(equity_model)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">big_rstandard =</span> <span class="fu">sum</span>(<span class="fu">abs</span>(<span class="fu">rstandard</span>(equity_model)) <span class="sc">&gt;</span> <span class="dv">3</span>),</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">cooks_flagged =</span> <span class="fu">sum</span>(<span class="fu">cooks.distance</span>(equity_model) <span class="sc">&gt;</span> <span class="dv">4</span> <span class="sc">/</span> <span class="fu">nobs</span>(equity_model)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>big_rstandard cooks_flagged 
            18            58 </code></pre>
 </div>
 </div>
-<p>The residual plot shows sixteen vertical stripes. The season (<code>season</code>) takes only whole-number values, so only sixteen fitted values exist. That is a feature of the predictor, not a violation. The vertical spread is broadly similar across the stripes, so there is no strong heteroskedasticity. The Q–Q plot bends upwards at the right end: some pitches offered far more equity than the fitted trend. The largest residual is about 83 percentage points, from founders who offered almost the whole company. So the normality assumption probably does not hold. With <span class="math inline">\(n = 1441\)</span> this matters little for tests and intervals, but you should look more closely at the extreme rows. Eighteen standardised residuals lie beyond <span class="math inline">\(\pm 3\)</span>, and 58 pitches have a Cook’s distance above <span class="math inline">\(4/n\)</span>. These are about 1% and 4% of the 1,441 pitches.</p>
+<p>The code fits the model, draws the two plots side by side, and then prints the largest residual and the two counts.</p>
+<p>The residual plot shows sixteen vertical stripes. The season (<code>season</code>) takes only whole-number values, so only sixteen fitted values exist. That is a feature of the predictor, not a violation. The vertical spread is broadly similar across the stripes, so there is no strong heteroskedasticity. The Q–Q plot bends upwards at the right end: some pitches offered far more equity than the fitted trend. The largest residual is about 83 percentage points, from a founder who offered the whole company. As a benchmark, the average offer is 13% of the company with a standard deviation of about 8 percentage points, so this residual is about 10 standard deviations of the offers. So the normality assumption probably does not hold. With <span class="math inline">\(n = 1441\)</span> this matters little for tests and intervals, but you should look more closely at the extreme rows. Eighteen standardised residuals lie beyond <span class="math inline">\(\pm 3\)</span>, and 58 pitches have a Cook’s distance above <span class="math inline">\(4/n\)</span>. These are about 1% and 4% of the 1,441 pitches.</p>
 </div>
 </div>
 </div>
@@ -1152,7 +1184,7 @@ Check your answer
 </div>
 <div id="callout-8" class="callout-8-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>Fitted: <span class="math inline">\(-0.068 + 0.649\times3 = 1.88\)</span>, about $1.88 million. Residual: <span class="math inline">\(1.5 - 1.88 = -0.38\)</span>, about <span class="math inline">\(-\$380{,}000\)</span>: the deal was agreed below the model’s fitted conditional mean.</p>
+<p>Fitted: <span class="math inline">\(-0.068 + 0.649\times3 = 1.88\)</span>, about $1.88 million. Residual: <span class="math inline">\(1.5 - 1.88 = -0.38\)</span>, about <span class="math inline">\(-\$380{,}000\)</span>: the deal was agreed below the model’s fitted conditional mean, by about 20% of the fitted value.</p>
 </div>
 </div>
 </div>
@@ -1205,7 +1237,7 @@ Check your answer
 <h3 class="anchored" data-anchor-id="make-it-yours">Make it yours</h3>
 <div class="utility-prompt">
 <p><span class="label">Two sentences about your own venture</span></p>
-<p>Think of your EiA3 venture, or any business you know well. Think of a regression you might one day run on its data (sales on advertising, orders on price, sign-ups on campaign week). Write two sentences. First, name the assumption from the table of assumptions in this lecture that you would worry about most for these data. Second, describe one observation that could dominate the fit, and say what you would do about it. Investigate and report, do not delete.</p>
+<p>Think of your own venture, or any business you know well. Think of a regression you might one day run on its data (sales on advertising, orders on price, sign-ups on campaign week). Write two sentences. First, name the assumption from the table of assumptions in this lecture that you would worry about most for these data. Second, describe one observation that could dominate the fit, and say what you would do about it. Investigate and report, do not delete.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">

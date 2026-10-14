@@ -12,11 +12,11 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 ::: {.outcomes}
 <span class="label">By the end of Lecture 1, you can</span>
 
-- explain what a simple regression model describes and what its parts mean
-- tell apart the error terms of the model and the residuals of a fit
-- explain how least squares chooses the best fitting line
+- explain what a simple regression model describes and what its parts mean,
+- tell apart the error terms of the model and the residuals of a fit,
+- explain how least squares chooses the best fitting line,
 - fit a simple regression in R and interpret the slope and the intercept in
-  the units of the data
+  the units of the data.
 :::
 
 ::: {.driving-question}
@@ -90,17 +90,12 @@ formulas. With the sheet open, answer the five items below.
 pitches from the television show Shark Tank, where founders ask investors
 (the sharks) for money in exchange for a share of their company. This lecture
 uses the 874 pitches that ended in a deal for a share of the company. It
-measures all money in **millions of dollars**:
+measures all money in millions of dollars:
 
 - $X_i$: the valuation the founder claimed, in \$ millions. Asking \$100,000
   for 10% claims \$1 million, so $X_i = 1$.
 - $Y_i$: the valuation agreed on air (during the show), in \$ millions. A deal of \$100,000 for
   20% values the company at \$0.5 million, so $Y_i = 0.5$.
-
-**Predict.** Answer this question before you come to class: what are the sign and the unit of
-the slope in a regression of the agreed valuation on the claimed valuation,
-and is the slope above or below 1? Choose one
-answer before class. The lecture material gives the correct answer.
 
 [Shark Tank data]{.shark-tag} **R warm-up.** Every Intermediate lecture has a short R warm-up:
 you run a few lines of R and bring the output to class. This week, load the
@@ -126,11 +121,26 @@ If you are not sure about lines, slopes, intercepts, or subscripts, review
 [Mathematics Refresher: straight lines, slopes, and intercepts](../resources/math-refresher.html#straight-lines-slopes-and-intercepts)
 and [subscripts and indices](../resources/math-refresher.html#subscripts-and-indices).
 
+**Predict.** Answer this question before you come to class. Think of a line
+that summarises your warm-up plot. When the claimed valuation is \$1 million
+higher, is the average agreed valuation more than \$1 million higher, about
+\$1 million higher, or less than \$1 million higher? If you chose less,
+guess how many cents of each extra claimed dollar show up in the
+agreed valuation. The lecture material gives the answer.
+
 :::
 
 ::: {.course-phase .phase-in-class}
 
 ## Lecture material
+
+QM Basic ended with one variable: you estimated a mean, gave its standard
+error, built a confidence interval, and tested a claim about it. Earlier, in
+[Basic Lecture 5](../basic/b05-joint-covariance-correlation.qmd), the
+correlation measured how strongly two variables move together, but not by how
+much in their own units. A founder needs the second answer: how much more
+agreed valuation goes with a higher claim, in dollars. Regression gives this
+answer, and the rest of QM Intermediate builds on it.
 
 This section fits the regression line to the valuations in the Shark Tank
 data. Many straight lines can be drawn through a cloud of points. The
@@ -181,6 +191,7 @@ nrow(vals)                      # deals for a share of the company
 #| code-fold: true
 #| code-summary: "See the R code for this figure"
 #| fig-cap: "Valuation agreed on air against the valuation claimed by the founder, for the 874 deals for a share of the company. Both axes in $ millions. The display zooms in on valuations up to $10 million (819 of 874 deals). The orange line is the fitted regression line, calculated from all 874 deals. On the grey dashed line the agreed valuation equals the claimed one."
+#| fig-alt: "Scatter plot of the agreed valuation against the claimed valuation, both from 0 to 10 million dollars. Green points rise from the lower left, most of them below a grey dashed diagonal where agreed equals claimed. An orange fitted line rises less steeply than the diagonal."
 library(ggplot2)
 sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
 vals <- subset(sharks, deal_on_show == 1 & deal_equity_pct > 0)
@@ -215,7 +226,10 @@ ggplot(display_vals, aes(x = claimed_m, y = agreed_m)) +
 
 Each point in @fig-i01-scatter is one deal. The claimed valuation is on
 the horizontal axis and the agreed valuation is on the vertical axis. Both axes use units of
-\$1 million. The orange line is the regression line, the line that fits the
+\$1 million. The grey dashed line is a reference line, not an estimate. It joins
+all points where the agreed valuation equals the claimed one, such as
+(1, 1) and (5, 5). A deal below this line closed at a lower valuation than
+the founder claimed. The orange line is the regression line, the line that fits the
 points best by the least-squares criterion. It shows the average agreed
 valuation at each claimed valuation, not the result of every deal. The rest
 of this lecture explains this criterion and how to read the line.
@@ -366,6 +380,7 @@ only for $e_i$.
 #| fig-width: 8
 #| fig-height: 3.6
 #| fig-cap: "The same seven observations twice. Left: the unknown population line with the error terms ε (distances to the population line). Right: the fitted line with the residuals e (distances to the fitted line). Only the right panel can be calculated from data."
+#| fig-alt: "Two panels with the same seven green points. Left: a grey dashed population line with blue vertical segments from each point to it, one labelled epsilon i. Right: an orange fitted line with blue vertical segments from each point to it, one labelled e i. The two lines and the segment lengths differ slightly."
 library(ggplot2)
 set.seed(101)
 x_er <- c(1, 2.2, 3.4, 4.6, 5.8, 7.0, 8.2)
@@ -419,9 +434,9 @@ ggplot(er_df, aes(x = x, y = y)) +
 ```
 
 - $\varepsilon_i = Y_i - (\beta_0+\beta_1X_i)$ measures the distance to the
-  **population** line. Because $\beta_0$ and $\beta_1$ are unknown,
+  population line. Because $\beta_0$ and $\beta_1$ are unknown,
   $\varepsilon_i$ is never observed.
-- $e_i = Y_i - (\hat\beta_0+\hat\beta_1X_i)$ measures the distance to the **fitted** line.
+- $e_i = Y_i - (\hat\beta_0+\hat\beta_1X_i)$ measures the distance to the fitted line.
   It is computed from data, one number per observation.
 
 We never see the error terms. The residuals are what we can calculate in
@@ -784,6 +799,7 @@ residuals always do when the model has an intercept.
 #| fig-width: 5.4
 #| fig-height: 4.2
 #| fig-cap: "The three-point toy dataset with its least-squares line. The open diamond marks the point of means (2, 4), which the fitted line passes through exactly."
+#| fig-alt: "Three green points at (1, 2), (2, 5) and (3, 5) with an orange rising line. Blue dashed vertical segments join each point to the line. An open diamond at (2, 4), labelled x bar, y bar, lies on the line."
 library(ggplot2)
 x_toy <- c(1, 2, 3); y_toy <- c(2, 5, 5)
 toy_fit <- lm(y_toy ~ x_toy)
@@ -820,6 +836,11 @@ c(covariance = cov(x_toy, y_toy), variance_x = var(x_toy),
   sd_y = sd(y_toy), correlation = cor(x_toy, y_toy))
 coef(lm(y_toy ~ x_toy))
 ```
+
+The first output repeats the hand calculation: covariance 1.5, variance of
+$X$ equal to 1, standard deviation of $Y$ about 1.732, and correlation about
+0.866. The second output is what `lm()` (introduced in the next section)
+reports: intercept 1 and slope 1.5, the same line as by hand.
 
 ### Fit and read the Shark Tank model in R
 
@@ -925,8 +946,17 @@ the unit is millions of dollars agreed per million claimed, and the slope is
 clearly below 1. The slope does not mean that claiming more causes the
 sharks to pay more.
 
+Is \$0.65 million a large difference? Two benchmarks help. The average
+agreed valuation in these deals is \$2.22 million, so \$0.65 million is about
+29% of it. And \$1 million is half of the median claimed valuation of
+\$2 million, so it is a sizeable step in the claim. This lecture judges the
+size of the slope only. Whether a slope of this size could also arise by
+chance in a sample of 874 deals is the question of Lecture 3. Even a slope
+that is clearly different from zero must still be judged by its size.
+
 **The intercept, with units.** At a claimed valuation of zero, the fitted
-agreed valuation is about $-\$68{,}000$. A company claimed to be worth
+agreed valuation is about $-\$68{,}000$. This is small, about 3% of the
+average agreed valuation of \$2.22 million. A company claimed to be worth
 nothing is not in the data (the smallest claimed valuation is \$40,000), and
 a negative valuation has no meaning. The line needs an intercept so that it
 is at the right height. But this intercept has no useful meaning of its own.
@@ -940,9 +970,9 @@ $c=1/1{,}000$. The fitted line itself does not change. Only the numbers that
 describe it change, by a simple rule:
 
 - multiply only the outcome by $c$: the intercept and the slope are both
-  multiplied by $c$
+  multiplied by $c$,
 - multiply only the predictor by $c$: the slope is divided by $c$, and the
-  intercept stays the same
+  intercept stays the same,
 - multiply both by $c$: the intercept is multiplied by $c$, and the slope
   stays the same.
 
@@ -1031,8 +1061,11 @@ detail.
 
 ### Prediction inside the range of the data
 
-[Shark Tank data]{.shark-tag} The function `predict()` calculates the fitted value for a new value of the
-predictor:
+[Shark Tank data]{.shark-tag} A founder who plans to claim \$2 million wants
+to know at what valuation such deals closed on average. The fitted line
+answers this. The function `predict()` calculates the fitted value for a new
+value of the predictor, and `range()` gives the smallest and the largest
+claimed valuation in the data:
 
 ```{r}
 #| label: i01-one-prediction
@@ -1041,16 +1074,19 @@ range(vals$claimed_m)   # smallest and largest claimed valuation
 ```
 
 For a claimed valuation of \$2 million (`claimed_m = 2`), the fitted agreed
-valuation is about 1.23, that is, \$1.23 million. This value is the average that
-the model gives for such deals. It is not a guarantee for a new pitch. If such a
+valuation is about 1.23, that is, \$1.23 million, or about 61% of the
+claim. This value is the average that the model gives for such deals. It is not a guarantee for a new pitch. If such a
 deal was agreed on air at a valuation of \$1 million, its residual would be
 
 $$
 e = 1.00 - 1.23 = -0.23,
 $$
 
-about \$230,000 below the fitted value. Use predictions only inside the range
-of the data. The claimed valuations run from \$40,000 to \$50 million. Outside
+about \$230,000 below the fitted value.
+
+Use predictions only inside the range of the data. The second output shows
+this range: the claimed valuations run from \$40,000 (0.04) to
+\$50 million (50). Outside
 this range there are no deals to support the line. A prediction there
 depends only on the assumption that the line continues.
 
@@ -1118,10 +1154,15 @@ valuation rises with the claimed valuation, but less than one for one. The
 slope of the regression line is 0.649. So one more dollar of claimed
 valuation goes with about 65 cents more agreed valuation, on average. In the
 units of the model: each extra \$1 million of claimed valuation is
-associated with about \$0.65 million more agreed valuation. For a founder,
-about two thirds of each extra claimed dollar shows up in the agreed
-valuation. The limits in the box "What this fitted line can and cannot say"
-still apply.
+associated with about \$0.65 million more agreed valuation, about 29% of the
+average agreed valuation of \$2.22 million.
+
+As a founder who claims \$2 million, you might expect a deal at about
+\$1.23 million, and each extra dollar you add to the claim to show up as
+only about 65 cents in the agreed valuation. This holds under the assumption
+that your company is like the companies that reached a deal at such claims,
+and that you reach a deal at all. The limits in the box "What this fitted
+line can and cannot say" still apply.
 
 ::: {.founder-box}
 <span class="label">A founder's decision (invented example)</span>
@@ -1247,8 +1288,8 @@ Then do five more tasks. These tasks have no given steps:
 
 1. Use the fitted equation of Step 1 to predict the agreed valuation for claimed
    valuations of \$1 million and \$10 million.
-2. Calculate the residual for a deal with a claimed valuation of \$2 million
-   and an agreed valuation of \$1 million.
+2. Calculate the residual for a deal with a claimed valuation of \$3 million
+   and an agreed valuation of \$1.5 million.
 3. Explain why `lm(y ~ x, data = dat)` treats the variable left of `~` as
    the outcome.
 4. In \$ millions, the fitted equation of Step 1 has intercept $-0.068$ and
@@ -1264,8 +1305,9 @@ Then do five more tasks. These tasks have no given steps:
 
 1. Substitute `claimed_m = 1` and `claimed_m = 10`. The fitted values are
    about 0.58 and 6.42 in \$ millions.
-2. The fitted valuation is about 1.23 in \$ millions, so the residual is
-   $1-1.23\approx-0.23$, or about $-\$230{,}000$.
+2. The fitted valuation is $-0.068+0.649\times3\approx1.88$ in \$ millions,
+   so the residual is $1.5-1.88\approx-0.38$, or about $-\$380{,}000$. The
+   deal closed below the fitted value.
 3. R formulas use `outcome ~ predictors`: the left-hand side is what the
    model predicts. The right-hand side is what the model uses to predict it.
 4. Only the predictor is rescaled, by the factor 1,000. The slope is divided
@@ -1309,7 +1351,10 @@ percentage points per season. Among all 1,441 pitches, a season that is one
 later is associated with an initial equity offer that is on average 0.824
 percentage points smaller. The outcome and the intercept are in percent. The
 predictor is in seasons. The slope is a difference between two percentages,
-so it is in percentage points per season. The intercept is the fitted value at Season 0, which is
+so it is in percentage points per season. One season is a small step: 0.824
+points is about 6% of the average offer of 13.2%. Over the 15 steps from
+Season 1 to Season 16, the fitted offer falls from about 19.6% to about
+7.3%, a fall of about 12.4 percentage points. The intercept is the fitted value at Season 0, which is
 outside the data (Seasons 1 to 16), so it has no useful meaning of its own.
 :::
 
@@ -1405,7 +1450,7 @@ Three errors. The slope describes how deals differed. It does not say what happe
 :::: {.utility-prompt}
 <span class="label">Two sentences about your own venture</span>
 
-Think of your EiA3 venture, or any business you know well. Name one
+Think of your own venture, or any business you know well. Name one
 numerical outcome and one numerical input that you think affects it. Then
 write two sentences. First, state the slope you would expect (sign and
 units). Second, say what decision would change if the fitted slope turned

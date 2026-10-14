@@ -424,10 +424,10 @@ window.Quarto = {
 <div class="outcomes">
 <p><span class="label">By the end of Lecture 1, you can</span></p>
 <ul>
-<li>explain what a simple regression model describes and what its parts mean</li>
-<li>tell apart the error terms of the model and the residuals of a fit</li>
-<li>explain how least squares chooses the best fitting line</li>
-<li>fit a simple regression in R and interpret the slope and the intercept in the units of the data</li>
+<li>explain what a simple regression model describes and what its parts mean,</li>
+<li>tell apart the error terms of the model and the residuals of a fit,</li>
+<li>explain how least squares chooses the best fitting line,</li>
+<li>fit a simple regression in R and interpret the slope and the intercept in the units of the data.</li>
 </ul>
 </div>
 <div class="driving-question">
@@ -490,12 +490,11 @@ Check your preparation
 </div>
 </div>
 </div>
-<p><strong>Define the variables.</strong> The data of this course are 1,441 pitches from the television show Shark Tank, where founders ask investors (the sharks) for money in exchange for a share of their company. This lecture uses the 874 pitches that ended in a deal for a share of the company. It measures all money in <strong>millions of dollars</strong>:</p>
+<p><strong>Define the variables.</strong> The data of this course are 1,441 pitches from the television show Shark Tank, where founders ask investors (the sharks) for money in exchange for a share of their company. This lecture uses the 874 pitches that ended in a deal for a share of the company. It measures all money in millions of dollars:</p>
 <ul>
 <li><span class="math inline">\(X_i\)</span>: the valuation the founder claimed, in $ millions. Asking $100,000 for 10% claims $1 million, so <span class="math inline">\(X_i = 1\)</span>.</li>
 <li><span class="math inline">\(Y_i\)</span>: the valuation agreed on air (during the show), in $ millions. A deal of $100,000 for 20% values the company at $0.5 million, so <span class="math inline">\(Y_i = 0.5\)</span>.</li>
 </ul>
-<p><strong>Predict.</strong> Answer this question before you come to class: what are the sign and the unit of the slope in a regression of the agreed valuation on the claimed valuation, and is the slope above or below 1? Choose one answer before class. The lecture material gives the correct answer.</p>
 <p><span class="shark-tag">Shark Tank data</span> <strong>R warm-up.</strong> Every Intermediate lecture has a short R warm-up: you run a few lines of R and bring the output to class. This week, load the data, keep the deals for a share of the company, and plot the agreed valuation against the claimed valuation:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
@@ -506,9 +505,11 @@ Check your preparation
 </div>
 <p><strong>Code along (bring your laptop).</strong> Bring a charged laptop with RStudio and the course project open. The code of the lecture is in this chapter, ready to copy, so you can run each step yourself during the lecture and get the same numbers and figures.</p>
 <p>If you are not sure about lines, slopes, intercepts, or subscripts, review <a href="../resources/math-refresher.html#straight-lines-slopes-and-intercepts">Mathematics Refresher: straight lines, slopes, and intercepts</a> and <a href="../resources/math-refresher.html#subscripts-and-indices">subscripts and indices</a>.</p>
+<p><strong>Predict.</strong> Answer this question before you come to class. Think of a line that summarises your warm-up plot. When the claimed valuation is $1 million higher, is the average agreed valuation more than $1 million higher, about $1 million higher, or less than $1 million higher? If you chose less, guess how many cents of each extra claimed dollar show up in the agreed valuation. The lecture material gives the answer.</p>
 </section>
 <section id="lecture-material" class="level2 course-phase phase-in-class">
 <h2 class="anchored" data-anchor-id="lecture-material">Lecture material</h2>
+<p>QM Basic ended with one variable: you estimated a mean, gave its standard error, built a confidence interval, and tested a claim about it. Earlier, in <a href="../basic/b05-joint-covariance-correlation.html">Basic Lecture 5</a>, the correlation measured how strongly two variables move together, but not by how much in their own units. A founder needs the second answer: how much more agreed valuation goes with a higher claim, in dollars. Regression gives this answer, and the rest of QM Intermediate builds on it.</p>
 <p>This section fits the regression line to the valuations in the Shark Tank data. Many straight lines can be drawn through a cloud of points. The regression line is the one that fits best by the least-squares criterion: the sum of its squared vertical distances to the points (the residuals) is as small as possible. The section explains what this line describes, how it is calculated, and how to read its slope and its intercept.</p>
 <section id="start-with-a-founders-question" class="level3">
 <h3 class="anchored" data-anchor-id="start-with-a-founders-question">Start with a founder’s question</h3>
@@ -567,10 +568,10 @@ Check your preparation
 <span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div id="fig-i01-scatter" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-i01-scatter" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Scatter plot of the agreed valuation against the claimed valuation, both from 0 to 10 million dollars. Green points rise from the lower left, most of them below a grey dashed diagonal where agreed equals claimed. An orange fitted line rises less steeply than the diagonal.">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-i01-scatter-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="i01-simple-linear-regression_files/figure-html/fig-i01-scatter-1.png" class="img-fluid figure-img" width="672">
+<img src="i01-simple-linear-regression_files/figure-html/fig-i01-scatter-1.png" class="img-fluid figure-img" alt="Scatter plot of the agreed valuation against the claimed valuation, both from 0 to 10 million dollars. Green points rise from the lower left, most of them below a grey dashed diagonal where agreed equals claimed. An orange fitted line rises less steeply than the diagonal." width="672">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-i01-scatter-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;1.1: Valuation agreed on air against the valuation claimed by the founder, for the 874 deals for a share of the company. Both axes in $ millions. The display zooms in on valuations up to $10 million (819 of 874 deals). The orange line is the fitted regression line, calculated from all 874 deals. On the grey dashed line the agreed valuation equals the claimed one.
@@ -579,7 +580,7 @@ Figure&nbsp;1.1: Valuation agreed on air against the valuation claimed by the fo
 </div>
 </div>
 </div>
-<p>Each point in <a href="#fig-i01-scatter" class="quarto-xref">Figure&nbsp;<span>1.1</span></a> is one deal. The claimed valuation is on the horizontal axis and the agreed valuation is on the vertical axis. Both axes use units of $1 million. The orange line is the regression line, the line that fits the points best by the least-squares criterion. It shows the average agreed valuation at each claimed valuation, not the result of every deal. The rest of this lecture explains this criterion and how to read the line.</p>
+<p>Each point in <a href="#fig-i01-scatter" class="quarto-xref">Figure&nbsp;<span>1.1</span></a> is one deal. The claimed valuation is on the horizontal axis and the agreed valuation is on the vertical axis. Both axes use units of $1 million. The grey dashed line is a reference line, not an estimate. It joins all points where the agreed valuation equals the claimed one, such as (1, 1) and (5, 5). A deal below this line closed at a lower valuation than the founder claimed. The orange line is the regression line, the line that fits the points best by the least-squares criterion. It shows the average agreed valuation at each claimed valuation, not the result of every deal. The rest of this lecture explains this criterion and how to read the line.</p>
 <p>The figure shows 819 of the 874 deals, so that the area with many points is easy to read. The figure leaves out the 55 deals with a valuation above $10 million on at least one axis. R still uses these deals to calculate the orange line. Always say when a graph is zoomed in, that is, when it shows only part of the data. Otherwise readers may think that the displayed range is the complete data.</p>
 <p>The code below counts the deals inside the zoomed area. It also gives the percentage of deals in which the agreed valuation is below, equal to, or above the claimed valuation.</p>
 <div class="cell">
@@ -701,10 +702,10 @@ E[Y\mid X=x]=\beta_0+\beta_1x.
 <span id="cb11-50"><a href="#cb11-50" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div id="fig-i01-error-residual" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-i01-error-residual" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Two panels with the same seven green points. Left: a grey dashed population line with blue vertical segments from each point to it, one labelled epsilon i. Right: an orange fitted line with blue vertical segments from each point to it, one labelled e i. The two lines and the segment lengths differ slightly.">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-i01-error-residual-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="i01-simple-linear-regression_files/figure-html/fig-i01-error-residual-1.png" class="img-fluid figure-img" width="768">
+<img src="i01-simple-linear-regression_files/figure-html/fig-i01-error-residual-1.png" class="img-fluid figure-img" alt="Two panels with the same seven green points. Left: a grey dashed population line with blue vertical segments from each point to it, one labelled epsilon i. Right: an orange fitted line with blue vertical segments from each point to it, one labelled e i. The two lines and the segment lengths differ slightly." width="768">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-i01-error-residual-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;1.2: The same seven observations twice. Left: the unknown population line with the error terms ε (distances to the population line). Right: the fitted line with the residuals e (distances to the fitted line). Only the right panel can be calculated from data.
@@ -714,8 +715,8 @@ Figure&nbsp;1.2: The same seven observations twice. Left: the unknown population
 </div>
 </div>
 <ul>
-<li><span class="math inline">\(\varepsilon_i = Y_i - (\beta_0+\beta_1X_i)\)</span> measures the distance to the <strong>population</strong> line. Because <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> are unknown, <span class="math inline">\(\varepsilon_i\)</span> is never observed.</li>
-<li><span class="math inline">\(e_i = Y_i - (\hat\beta_0+\hat\beta_1X_i)\)</span> measures the distance to the <strong>fitted</strong> line. It is computed from data, one number per observation.</li>
+<li><span class="math inline">\(\varepsilon_i = Y_i - (\beta_0+\beta_1X_i)\)</span> measures the distance to the population line. Because <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> are unknown, <span class="math inline">\(\varepsilon_i\)</span> is never observed.</li>
+<li><span class="math inline">\(e_i = Y_i - (\hat\beta_0+\hat\beta_1X_i)\)</span> measures the distance to the fitted line. It is computed from data, one number per observation.</li>
 </ul>
 <p>We never see the error terms. The residuals are what we can calculate in their place, so they are estimates of the error terms and not the error terms themselves. Lecture 2 uses residuals to check the model.</p>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -1068,10 +1069,10 @@ s_{XY}=\frac{1}{n-1}\sum_{i=1}^{n}(x_i-\bar x)(y_i-\bar y).
 <span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div id="fig-i01-toy" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-i01-toy" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Three green points at (1, 2), (2, 5) and (3, 5) with an orange rising line. Blue dashed vertical segments join each point to the line. An open diamond at (2, 4), labelled x bar, y bar, lies on the line.">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-i01-toy-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="i01-simple-linear-regression_files/figure-html/fig-i01-toy-1.png" class="img-fluid figure-img" width="518">
+<img src="i01-simple-linear-regression_files/figure-html/fig-i01-toy-1.png" class="img-fluid figure-img" alt="Three green points at (1, 2), (2, 5) and (3, 5) with an orange rising line. Blue dashed vertical segments join each point to the line. An open diamond at (2, 4), labelled x bar, y bar, lies on the line." width="518">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-i01-toy-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;1.3: The three-point toy dataset with its least-squares line. The open diamond marks the point of means (2, 4), which the fitted line passes through exactly.
@@ -1095,6 +1096,7 @@ Figure&nbsp;1.3: The three-point toy dataset with its least-squares line. The op
         1.0         1.5 </code></pre>
 </div>
 </div>
+<p>The first output repeats the hand calculation: covariance 1.5, variance of <span class="math inline">\(X\)</span> equal to 1, standard deviation of <span class="math inline">\(Y\)</span> about 1.732, and correlation about 0.866. The second output is what <code>lm()</code> (introduced in the next section) reports: intercept 1 and slope 1.5, the same line as by hand.</p>
 </section>
 </section>
 <section id="fit-and-read-the-shark-tank-model-in-r" class="level3">
@@ -1175,13 +1177,14 @@ Figure&nbsp;1.3: The three-point toy dataset with its least-squares line. The op
 </ol>
 </div>
 <p><strong>The slope, with units.</strong> In the Shark Tank model both valuations are in $ millions. Among the 874 deals for a share of the company, a claimed valuation that is $1 million higher is associated with an agreed valuation that is on average about $0.65 million higher. Both valuations have the same unit, so the slope also reads per dollar: each extra dollar of claimed valuation goes with about 65 cents more agreed valuation, on average. This answers the prediction question from before class. The sign is positive, the unit is millions of dollars agreed per million claimed, and the slope is clearly below 1. The slope does not mean that claiming more causes the sharks to pay more.</p>
-<p><strong>The intercept, with units.</strong> At a claimed valuation of zero, the fitted agreed valuation is about <span class="math inline">\(-\$68{,}000\)</span>. A company claimed to be worth nothing is not in the data (the smallest claimed valuation is $40,000), and a negative valuation has no meaning. The line needs an intercept so that it is at the right height. But this intercept has no useful meaning of its own.</p>
+<p>Is $0.65 million a large difference? Two benchmarks help. The average agreed valuation in these deals is $2.22 million, so $0.65 million is about 29% of it. And $1 million is half of the median claimed valuation of $2 million, so it is a sizeable step in the claim. This lecture judges the size of the slope only. Whether a slope of this size could also arise by chance in a sample of 874 deals is the question of Lecture 3. Even a slope that is clearly different from zero must still be judged by its size.</p>
+<p><strong>The intercept, with units.</strong> At a claimed valuation of zero, the fitted agreed valuation is about <span class="math inline">\(-\$68{,}000\)</span>. This is small, about 3% of the average agreed valuation of $2.22 million. A company claimed to be worth nothing is not in the data (the smallest claimed valuation is $40,000), and a negative valuation has no meaning. The line needs an intercept so that it is at the right height. But this intercept has no useful meaning of its own.</p>
 <section id="thousands-and-millions-rescaling-a-variable" class="level4">
 <h4 class="anchored" data-anchor-id="thousands-and-millions-rescaling-a-variable">Thousands and millions: rescaling a variable</h4>
 <p>Money is often reported in thousands or millions. A change of unit multiplies every value of a variable by the same number <span class="math inline">\(c\)</span>. For example, going from dollars to $1,000s divides every value by 1,000, so <span class="math inline">\(c=1/1{,}000\)</span>. The fitted line itself does not change. Only the numbers that describe it change, by a simple rule:</p>
 <ul>
-<li>multiply only the outcome by <span class="math inline">\(c\)</span>: the intercept and the slope are both multiplied by <span class="math inline">\(c\)</span></li>
-<li>multiply only the predictor by <span class="math inline">\(c\)</span>: the slope is divided by <span class="math inline">\(c\)</span>, and the intercept stays the same</li>
+<li>multiply only the outcome by <span class="math inline">\(c\)</span>: the intercept and the slope are both multiplied by <span class="math inline">\(c\)</span>,</li>
+<li>multiply only the predictor by <span class="math inline">\(c\)</span>: the slope is divided by <span class="math inline">\(c\)</span>, and the intercept stays the same,</li>
 <li>multiply both by <span class="math inline">\(c\)</span>: the intercept is multiplied by <span class="math inline">\(c\)</span>, and the slope stays the same.</li>
 </ul>
 <p>An invented example shows the second case. A web shop regresses its weekly orders on its weekly advertising spending in euros and finds a slope of 0.15 orders per euro. With spending measured in 1,000s of euros, every value of the predictor is divided by 1,000, so the slope is multiplied by 1,000: 150 orders per 1,000 euros. Both numbers say the same thing. The <a href="../intermediate/code-sheet.html#lecture-1-simple-linear-regression">code sheet</a> lists the rule as a table.</p>
@@ -1222,7 +1225,7 @@ Figure&nbsp;1.3: The three-point toy dataset with its least-squares line. The op
 </section>
 <section id="prediction-inside-the-range-of-the-data" class="level3">
 <h3 class="anchored" data-anchor-id="prediction-inside-the-range-of-the-data">Prediction inside the range of the data</h3>
-<p><span class="shark-tag">Shark Tank data</span> The function <code>predict()</code> calculates the fitted value for a new value of the predictor:</p>
+<p><span class="shark-tag">Shark Tank data</span> A founder who plans to claim $2 million wants to know at what valuation such deals closed on average. The fitted line answers this. The function <code>predict()</code> calculates the fitted value for a new value of the predictor, and <code>range()</code> gives the smallest and the largest claimed valuation in the data:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">predict</span>(val_model, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">claimed_m =</span> <span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -1234,11 +1237,12 @@ Figure&nbsp;1.3: The three-point toy dataset with its least-squares line. The op
 <pre><code>[1]  0.04 50.00</code></pre>
 </div>
 </div>
-<p>For a claimed valuation of $2 million (<code>claimed_m = 2</code>), the fitted agreed valuation is about 1.23, that is, $1.23 million. This value is the average that the model gives for such deals. It is not a guarantee for a new pitch. If such a deal was agreed on air at a valuation of $1 million, its residual would be</p>
+<p>For a claimed valuation of $2 million (<code>claimed_m = 2</code>), the fitted agreed valuation is about 1.23, that is, $1.23 million, or about 61% of the claim. This value is the average that the model gives for such deals. It is not a guarantee for a new pitch. If such a deal was agreed on air at a valuation of $1 million, its residual would be</p>
 <p><span class="math display">\[
 e = 1.00 - 1.23 = -0.23,
 \]</span></p>
-<p>about $230,000 below the fitted value. Use predictions only inside the range of the data. The claimed valuations run from $40,000 to $50 million. Outside this range there are no deals to support the line. A prediction there depends only on the assumption that the line continues.</p>
+<p>about $230,000 below the fitted value.</p>
+<p>Use predictions only inside the range of the data. The second output shows this range: the claimed valuations run from $40,000 (0.04) to $50 million (50). Outside this range there are no deals to support the line. A prediction there depends only on the assumption that the line continues.</p>
 <div class="callout callout-style-default callout-caution callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -1301,7 +1305,8 @@ Check your answer
 </section>
 <section id="answering-the-driving-question" class="level3">
 <h3 class="anchored" data-anchor-id="answering-the-driving-question">Answering the driving question</h3>
-<p>Among the 874 Shark Tank deals for a share of the company, the agreed valuation rises with the claimed valuation, but less than one for one. The slope of the regression line is 0.649. So one more dollar of claimed valuation goes with about 65 cents more agreed valuation, on average. In the units of the model: each extra $1 million of claimed valuation is associated with about $0.65 million more agreed valuation. For a founder, about two thirds of each extra claimed dollar shows up in the agreed valuation. The limits in the box “What this fitted line can and cannot say” still apply.</p>
+<p>Among the 874 Shark Tank deals for a share of the company, the agreed valuation rises with the claimed valuation, but less than one for one. The slope of the regression line is 0.649. So one more dollar of claimed valuation goes with about 65 cents more agreed valuation, on average. In the units of the model: each extra $1 million of claimed valuation is associated with about $0.65 million more agreed valuation, about 29% of the average agreed valuation of $2.22 million.</p>
+<p>As a founder who claims $2 million, you might expect a deal at about $1.23 million, and each extra dollar you add to the claim to show up as only about 65 cents in the agreed valuation. This holds under the assumption that your company is like the companies that reached a deal at such claims, and that you reach a deal at all. The limits in the box “What this fitted line can and cannot say” still apply.</p>
 <div class="founder-box">
 <p><span class="label">A founder’s decision (invented example)</span></p>
 <p>You regress weekly orders on weekly advertising spending in euros and get: fitted orders = 120 + 0.15 × spending. You earn 4 euros of margin per order. Does advertising pay for itself?</p>
@@ -1414,7 +1419,7 @@ Check your answer
 <p>Then do five more tasks. These tasks have no given steps:</p>
 <ol type="1">
 <li>Use the fitted equation of Step 1 to predict the agreed valuation for claimed valuations of $1 million and $10 million.</li>
-<li>Calculate the residual for a deal with a claimed valuation of $2 million and an agreed valuation of $1 million.</li>
+<li>Calculate the residual for a deal with a claimed valuation of $3 million and an agreed valuation of $1.5 million.</li>
 <li>Explain why <code>lm(y ~ x, data = dat)</code> treats the variable left of <code>~</code> as the outcome.</li>
 <li>In $ millions, the fitted equation of Step 1 has intercept <span class="math inline">\(-0.068\)</span> and slope 0.649. A report keeps the agreed valuation in $ millions but measures the claimed valuation in $1,000s. Which intercept and which slope does it report? Use the rule of <a href="#exm-i01-units" class="quarto-xref">Example&nbsp;<span>1.2</span></a>.</li>
 <li>Under which condition could the slope 0.649 be read as the effect of a higher claim? Name one factor outside the model that breaks this condition for the Shark Tank deals.</li>
@@ -1433,7 +1438,7 @@ Check your answers
 <div class="callout-body-container callout-body">
 <ol type="1">
 <li>Substitute <code>claimed_m = 1</code> and <code>claimed_m = 10</code>. The fitted values are about 0.58 and 6.42 in $ millions.</li>
-<li>The fitted valuation is about 1.23 in $ millions, so the residual is <span class="math inline">\(1-1.23\approx-0.23\)</span>, or about <span class="math inline">\(-\$230{,}000\)</span>.</li>
+<li>The fitted valuation is <span class="math inline">\(-0.068+0.649\times3\approx1.88\)</span> in $ millions, so the residual is <span class="math inline">\(1.5-1.88\approx-0.38\)</span>, or about <span class="math inline">\(-\$380{,}000\)</span>. The deal closed below the fitted value.</li>
 <li>R formulas use <code>outcome ~ predictors</code>: the left-hand side is what the model predicts. The right-hand side is what the model uses to predict it.</li>
 <li>Only the predictor is rescaled, by the factor 1,000. The slope is divided by 1,000: <span class="math inline">\(0.649/1000 = 0.000649\)</span> million dollars of agreed valuation per $1,000 claimed, which is $649 per $1,000. The intercept stays at <span class="math inline">\(-0.068\)</span>, because the outcome keeps its units.</li>
 <li>The condition: nothing outside the model affects both the claimed and the agreed valuation. Here it fails. A company with high sales can claim a higher valuation, and the sharks also agree to a higher valuation for it. The slope then mixes the effect of the claim with the effect of the sales.</li>
@@ -1477,7 +1482,7 @@ Check your answers
  20.4565874  -0.8241241 </code></pre>
 </div>
 </div>
-<p>The fitted intercept is about 20.46% and the slope about <span class="math inline">\(-0.824\)</span> percentage points per season. Among all 1,441 pitches, a season that is one later is associated with an initial equity offer that is on average 0.824 percentage points smaller. The outcome and the intercept are in percent. The predictor is in seasons. The slope is a difference between two percentages, so it is in percentage points per season. The intercept is the fitted value at Season 0, which is outside the data (Seasons 1 to 16), so it has no useful meaning of its own.</p>
+<p>The fitted intercept is about 20.46% and the slope about <span class="math inline">\(-0.824\)</span> percentage points per season. Among all 1,441 pitches, a season that is one later is associated with an initial equity offer that is on average 0.824 percentage points smaller. The outcome and the intercept are in percent. The predictor is in seasons. The slope is a difference between two percentages, so it is in percentage points per season. One season is a small step: 0.824 points is about 6% of the average offer of 13.2%. Over the 15 steps from Season 1 to Season 16, the fitted offer falls from about 19.6% to about 7.3%, a fall of about 12.4 percentage points. The intercept is the fitted value at Season 0, which is outside the data (Seasons 1 to 16), so it has no useful meaning of its own.</p>
 </div>
 </div>
 </div>
@@ -1585,7 +1590,7 @@ Check your answer
 <h3 class="anchored" data-anchor-id="make-it-yours">Make it yours</h3>
 <div class="utility-prompt">
 <p><span class="label">Two sentences about your own venture</span></p>
-<p>Think of your EiA3 venture, or any business you know well. Name one numerical outcome and one numerical input that you think affects it. Then write two sentences. First, state the slope you would expect (sign and units). Second, say what decision would change if the fitted slope turned out to be near zero. There is no wrong answer.</p>
+<p>Think of your own venture, or any business you know well. Name one numerical outcome and one numerical input that you think affects it. Then write two sentences. First, state the slope you would expect (sign and units). Second, say what decision would change if the fitted slope turned out to be near zero. There is no wrong answer.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">

@@ -12,10 +12,10 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 ::: {.outcomes}
 <span class="label">By the end of Lecture 6, you can</span>
 
-- interpret an interaction coefficient as a difference in slopes, also when it is not significant
-- tell a moderator from a mediator and a confounder
-- fit a quadratic term and compute a fitted change from the curve
-- test added terms jointly and avoid using a curve beyond the data
+- interpret an interaction coefficient as a difference in slopes, also when it is not significant,
+- tell a moderator from a mediator and a confounder,
+- fit a quadratic term and compute a fitted change from the curve,
+- test added terms jointly and avoid using a curve beyond the data.
 :::
 
 ::: {.driving-question}
@@ -56,6 +56,10 @@ Watch these parts of Brandon Foltz's Statistics 101 series before class.
 The videos explain key ideas in another way. The lecture material and its notation always come first.
 :::
 
+If you are not sure about products, powers, or centring, review
+[Mathematics Refresher: products, interactions, and combined effects](../resources/math-refresher.html#products-interactions-and-combined-effects)
+and [polynomial terms](../resources/math-refresher.html#polynomial-terms).
+
 **From one equation to two lines.** An invented example. A café models its
 daily sales in euros with the temperature in degrees Celsius and a dummy
 `weekend`, which is 1 on Saturdays and Sundays and 0 on other days:
@@ -84,19 +88,13 @@ $E[Y\mid X,D=1]=(\beta_0+\beta_2)+(\beta_1+\beta_3)X$. Setting $D=1$ shifts
 the intercept by $\beta_2$ and the slope by $\beta_3$.
 :::
 
-**Predict.** Answer this question before you run the R warm-up below. Over
-the 16 seasons, the equity offered to all-men teams fell by about 0.8
-percentage points per season. For teams with at least one woman, did it
-fall (a) clearly faster, (b) clearly slower, or (c) at about the same speed?
-Choose one answer. Your plot from the R warm-up and the lecture material
-show the answer.
-
 [Shark Tank data]{.shark-tag} **R warm-up.** Build the variables for the analysis. The code
 uses the same `known_gender` subset as Lecture 5: the 1,434 pitches with
 a known team classification. It adds a dummy `women`
 and a centred season `season_c`, which is the season minus the mean season.
 It then fits one line of equity offered on season for each group and draws
-both lines. Bring the plot:
+both lines. In the plot each grey point is one pitch, the blue line belongs
+to all-men teams and the orange line to teams with women. Bring the plot:
 
 ```{r}
 #| label: i06-prep-warmup
@@ -124,9 +122,12 @@ the course project open. All the code of the lecture is in this chapter,
 ready to copy. You can run each step yourself during the lecture and get the
 same numbers and figures.
 
-If you are not sure about products, powers, or centring, review
-[Mathematics Refresher: products, interactions, and combined effects](../resources/math-refresher.html#products-interactions-and-combined-effects)
-and [polynomial terms](../resources/math-refresher.html#polynomial-terms).
+**Predict.** Answer this question before you run the R warm-up above. Over
+the 16 seasons, the equity offered by all-men teams fell by about 0.8
+percentage points per season. For teams with at least one woman, did it
+fall (a) clearly faster, (b) clearly slower, or (c) at about the same speed?
+Choose one answer. Your plot from the R warm-up and the lecture material
+show the answer.
 
 :::
 
@@ -134,22 +135,22 @@ and [polynomial terms](../resources/math-refresher.html#polynomial-terms).
 
 ## Lecture material
 
-This section adds two terms to the regression model. An interaction term
-lets a slope differ between two groups, or change with the value of another
-predictor. A quadratic term lets a slope change along the predictor itself.
-
 ### Start with a founder's question
 
 Does advertising work equally well in every week? Does a trend go on in a
-straight line forever? Often the answer is "it depends". The two tools of
-this lecture let you check this in the data. An interaction lets a slope
-differ between groups. A curve lets a slope change as the predictor grows.
+straight line forever? Often the answer is "it depends". Lecture 5 used
+dummies to let the height of a regression line differ between groups, and
+the partial F-test to check several terms at once. This lecture adds two
+more terms that let you check "it depends" in the data. An interaction term
+lets a slope differ between groups, or change with the value of another
+predictor. A quadratic term lets a slope change as the predictor itself
+grows. The partial F-test of Lecture 5 then tells you whether the data
+support the extra term.
 
 ### The picture before the formula
 
-In every model so far, all groups had the same slope. Lecture 5 let the
-height of the line differ between groups. Now the slope may differ as well.
-Start with the picture in @fig-i06-two-lines:
+In every model so far, all groups had the same slope. Now the slope may
+differ as well. Start with the picture in @fig-i06-two-lines:
 
 ```{r}
 #| label: fig-i06-two-lines
@@ -212,9 +213,9 @@ $$
 
 Each coefficient is one feature of the picture:
 
-- $\beta_0$: where the $D=0$ line meets the vertical axis
-- $\beta_1$: the slope of the $D=0$ line
-- $\beta_2$: how much higher the $D=1$ line starts
+- $\beta_0$: where the $D=0$ line meets the vertical axis,
+- $\beta_1$: the slope of the $D=0$ line,
+- $\beta_2$: how much higher the $D=1$ line starts,
 - $\beta_3$: how much steeper the $D=1$ line is.
 
 The same in a table with one row per group, as in the café example before class:
@@ -282,26 +283,28 @@ You will check this in R in the after-class practice.
 ::: {.callout-caution collapse="true"}
 ## Try it: two lines from four coefficients
 
-In an invented example, a venture models
-weekly orders with advertising spend in euros, a dummy for exam weeks,
-and their interaction:
-fitted orders = 100 + 0.10 × ads + 15 × exam + 0.12 × ads × exam.
+In an invented example, a juice bar with two locations models its
+weekly sales in bottles with the price per bottle in euros, a dummy
+`campus` (1 for the location on campus, 0 for the location in town), and
+their interaction:
+fitted sales = 300 − 40 × price + 100 × campus − 20 × price × campus.
 
-*Step 1 (given).* In ordinary weeks (exam = 0) the line is 100 + 0.10 × ads.
+*Step 1 (given).* In town (campus = 0) the line is 300 − 40 × price.
 
-*Step 2 (you).* Write the line for exam weeks.
+*Step 2 (you).* Write the line for the campus location.
 
-*Step 3 (you).* Compare the fitted orders at 200 euros of advertising in the
-two kinds of weeks, and say what the coefficient 0.12 means.
+*Step 3 (you).* Compare the fitted sales at a price of 4 euros at the two
+locations, and say what the coefficient −20 means.
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-Exam weeks: (100 + 15) + (0.10 + 0.12) × ads = 115 + 0.22 × ads. At 200
-euros: 120 orders in an ordinary week and 159 in an exam week. The
-coefficient 0.12 is the difference between the two slopes: each euro of
-advertising goes with 0.12 more orders in an exam week than in an ordinary
-week.
+Campus: (300 + 100) + (−40 − 20) × price = 400 − 60 × price. At 4 euros:
+140 bottles in town and 160 on campus. The coefficient −20 is the
+difference between the two slopes: each extra euro of price goes with 20
+fewer bottles sold per week on campus than in town. The campus slope of
+−60 is 1.5 times as steep as the town slope of −40, so campus customers
+react more strongly to the price.
 :::
 :::
 
@@ -311,8 +314,13 @@ week.
 `women = 1` means that the presenting team is classified as all-women or
 mixed, and `women = 0` means all-men. This split is broader than the three
 categories of Lecture 5. It does not measure the share of women or the full
-team behind the venture. As before, we leave out the seven `unknown` records.
-The code first builds the variables, as in the R warm-up:
+team behind the venture. As before, we leave out the seven `unknown` records,
+because a pitch without a known team cannot be placed in either group.
+The code first builds the variables, as in the R warm-up. It then fits the
+equity offered on the centred season, the dummy, their product and the
+requested amount. The `*` in the formula adds the season, the dummy and
+their product in one step (more on this below). `summary()` prints one row
+per coefficient:
 
 ```{r}
 #| label: i06-interaction-fit
@@ -374,7 +382,9 @@ Step 2: one sentence per coefficient.
 - `season_c` ($-0.799$). Among all-men teams, one season later is
   associated with an equity offered that is on average 0.80 percentage points
   lower, at the same requested amount. This is the slope of the reference
-  category only.
+  category only. It is clearly significant (p below 0.001) and also large:
+  0.80 points is about 6% of the all-men level of 12.87% in the average
+  season, every season.
 - `season_c:women` ($-0.061$). Per one season more, the equity offered by
   teams with women falls 0.061 percentage points more than that of all-men
   teams. This is the difference between the two slopes. It is about 8% of
@@ -383,10 +393,15 @@ Step 2: one sentence per coefficient.
   fitted to offer about 0.81 percentage points more equity than all-men teams,
   at the same requested amount. With the interaction in the model, this
   difference holds only where $\text{season\_c}=0$. In other seasons the gap
-  is $0.807-0.061\times\text{season\_c}$.
+  is $0.807-0.061\times\text{season\_c}$. The p-value is 0.050, right at
+  the 5% border, and the gap is small (Step 3).
 - `ask_1k` ($-0.0027$). A request that is \$1,000 higher is associated with
   an equity offered that is on average 0.0027 percentage points lower, in
   both groups. Per \$100,000 more, this is about 0.27 percentage points.
+  The coefficient is clearly significant (p below 0.001), but per typical
+  difference in requests it is modest. A request that is one standard
+  deviation (about \$349,000) higher goes with about 0.93 points less
+  equity offered, about 7% of the all-men level.
 - The intercept ($13.62$) is the fitted equity offered for all-men teams in
   the average season with a requested amount of \$0. The smallest request in
   the data is \$10,000, so the intercept has no useful meaning of its own.
@@ -412,15 +427,23 @@ all-men slope (@exm-i06-reading-interaction). Draw two conclusions from
 this result. First, the model gives no
 evidence that the season trend differs between the two groups. Second, the model
 does not prove that the two slopes are equal. The estimate is imprecise
-(standard error about 0.096), so the data are consistent with a somewhat
-steeper trend and also with a somewhat flatter trend for teams with women. No evidence of a difference is
-not proof of no difference.
+(standard error about 0.096). The 95% confidence interval, from
+`confint(interaction_model)`, runs from about $-0.25$ to $0.13$. So the data
+are consistent with a trend for teams with women that is up to 31% steeper
+than the all-men slope of $-0.80$, and also with one that is up to 16%
+flatter. No evidence of a difference is not proof of no difference.
+
+@fig-i06-interaction shows the two fitted lines. They are built from the
+model, not drawn through the data. For each season from 1 to 16 and each
+group, `predict()` computes the fitted equity offered at the average
+requested amount, and the line connects these fitted values.
 
 ```{r}
 #| label: fig-i06-interaction
 #| code-fold: true
 #| code-summary: "See the R code for this figure"
 #| fig-cap: "Fitted equity offered by season for all-men teams and for teams with women, at the average requested amount. The two lines are almost parallel. The slope of a line is the fitted change per season for that group, and the vertical distance between the lines is the fitted difference between the groups in a given season."
+#| fig-alt: "Two almost parallel falling lines over seasons 1 to 16. The dashed orange line for teams with women lies slightly above the solid green line for all-men teams, and both fall from about 19 to 20 percent in season 1 to about 7 percent in season 16."
 library(ggplot2)
 sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
 sharks$ask_1k <- sharks$ask_amount_usd / 1000
@@ -471,13 +494,18 @@ ggplot(newdat, aes(x = season, y = fit,
 ```
 
 Always graph a model that contains an interaction. In @fig-i06-interaction,
-the main result is that the two lines are almost parallel. Once $XD$ is in the model,
-neither $\hat\beta_1$ nor $\hat\beta_2$ alone describes all teams.
+the main result is that the two lines are almost parallel. Both fall by about
+12 to 13 points over the 16 seasons, and the gap between them stays below 1.3
+points. Once $XD$ is in the model, neither $\hat\beta_1$ nor $\hat\beta_2$
+alone describes all teams.
 
 ### A continuous moderator
 
-The second variable of an interaction need not be a dummy. It can be any
-number $Z$, such as a price, a firm size, or a number of stores. The model is
+So far the second variable was a dummy with two groups. Many business
+questions involve a second variable that is a number. Does marketing pay
+more in larger firms? Does a discount work better at higher prices? The
+second variable of an interaction can be any number $Z$, such as a price, a
+firm size, or a number of stores. The model is
 
 $$
 E[Y\mid X,Z]=\beta_0+\beta_1X+\beta_2Z+\beta_3XZ,
@@ -520,7 +548,8 @@ An invented example. A franchise chain has 150 regions. For each region it
 records the monthly sales and the monthly marketing spending, both in
 €1,000s, and the number of stores. The question: does an extra €1,000 of
 marketing go with more sales in regions with many stores? The code below
-builds the invented data and fits the model with the interaction term:
+builds the invented data, prints a summary of each variable, and fits the
+model with the interaction term:
 
 ```{r}
 #| label: i06-moderator-fit
@@ -536,6 +565,13 @@ summary(franchise)
 moderator_model <- lm(sales ~ marketing * stores, data = franchise)
 summary(moderator_model)$coefficients
 ```
+
+The summary shows the range of the data. The number of stores runs from 1
+to 12, marketing from €2,300 to €19,900 per month, and the average region
+sells about €101,800 per month. The coefficient table shows that all four
+coefficients are significant at 5%. The interaction has a t value of about
+9, so the data show clearly that the marketing slope changes with the number
+of stores.
 
 Step 1: the slope of marketing as a function of stores. With the
 coefficients from the output,
@@ -557,7 +593,9 @@ marketing_slopes
 marketing_slopes[3] / marketing_slopes[1]
 ```
 
-In a region with 3 stores (the lower quartile), €1,000 more marketing is
+The code takes the quartiles of the number of stores, computes the marketing
+slope $1.245+0.497\times\text{stores}$ at each of them, and divides the
+largest slope by the smallest. In a region with 3 stores (the lower quartile), €1,000 more marketing is
 associated with about €2,740 more monthly sales on average. With 6 stores
 (the median) it is about €4,230, and with 10 stores (the upper quartile)
 about €6,220. The slope at the upper quartile is about 2.3 times the slope
@@ -592,14 +630,18 @@ The interaction coefficient stays 0.497. As with the dummy, centring moves
 the place of the comparison and not the fitted lines.
 :::
 
-@fig-i06-moderator draws the fitted lines at the three values of the
-moderator. The lines fan out because their slopes differ.
+@fig-i06-moderator draws the result. The grey points are the 150 regions.
+The three lines are fitted values from the model: for each of 3, 6, and 10
+stores, `predict()` computes the fitted sales over the range of marketing in
+the data. The lines fan out because their slopes differ: from about €2,740
+to about €6,220 of sales per €1,000 of marketing.
 
 ```{r}
 #| label: fig-i06-moderator
 #| code-fold: true
 #| code-summary: "See the R code for this figure"
 #| fig-cap: "Fitted monthly sales against marketing spending (invented example) in regions with 3, 6, and 10 stores, the quartiles of the number of stores. The lines become steeper as the number of stores grows: the slope of marketing depends on the moderator."
+#| fig-alt: "Scatter of 150 regions in grey with three rising fitted lines for 3, 6, and 10 stores. The gap between the lines grows with marketing spending, and the 10-store line is the steepest."
 library(ggplot2)
 set.seed(606)
 n_regions <- 150
@@ -678,26 +720,28 @@ with every extra store. A moderator can also reverse a relationship, for
 example a price cut that raises orders for students and lowers them for a
 luxury segment.
 
+A mediator plays a different role. Take marketing spending ($X$), website
+visits ($M$), and sales ($Y$). Marketing brings visitors to the website, and
+visitors buy. Marketing can also raise sales in other ways, for example
+through people who see an advert and buy in a shop. @fig-i06-mediation shows
+the two paths. The terms below name the variable in the middle and the
+effects along the paths.
+
 ::: {.definition-box}
 <span class="label">Definition</span>
 
 **Mediator.** A variable $M$ that lies on the path from $X$ to $Y$: $X$
-affects $M$, and $M$ affects $Y$. The part of the effect of $X$ on $Y$ that
-runs through $M$ is called the indirect effect.
-:::
+affects $M$, and $M$ affects $Y$.
 
-Take marketing spending ($X$), website visits ($M$), and sales ($Y$).
-Marketing brings visitors to the website, and visitors buy. Marketing can
-also raise sales in other ways, for example through people who see an
-advert and buy in a shop. @fig-i06-mediation shows the two paths. Three
-effects describe them:
+**Total effect.** How much $Y$ changes when $X$ changes, by all paths
+together.
 
-- the total effect: how much $Y$ changes when $X$ changes, by all paths
-  together
-- the direct effect: the part that does not run through $M$
-- the indirect effect: the part that runs through $M$.
+**Direct effect.** The part of the total effect that does not run through
+$M$.
 
+**Indirect effect.** The part of the total effect that runs through $M$.
 The total effect is the direct effect plus the indirect effect.
+:::
 
 ```{r}
 #| label: fig-i06-mediation
@@ -705,6 +749,7 @@ The total effect is the direct effect plus the indirect effect.
 #| code-summary: "See the R code for this figure"
 #| fig-height: 3
 #| fig-cap: "A mediation diagram (invented example). The indirect path runs from marketing spending through website visits to sales. The direct path goes from marketing spending to sales without visits. The total effect is the sum of both paths."
+#| fig-alt: "Three boxes: marketing spending on the left, website visits at the top in the middle, sales on the right. Green arrows go from marketing to visits and from visits to sales, labelled indirect path. An orange arrow goes straight from marketing to sales, labelled direct path."
 library(ggplot2)
 boxes <- data.frame(x = c(1, 3, 5), y = c(1, 2, 1),
                     label = c("Marketing\nspending (X)",
@@ -741,6 +786,9 @@ An invented example. For 120 small web shops we know the monthly marketing
 spending and the monthly sales, both in €1,000s, and the monthly website
 visits in 1,000s. The code below builds the invented data. It sets a
 direct path and a path through visits, which a real founder never knows.
+It then fits three regressions: sales on marketing alone, sales on marketing
+and visits, and visits on marketing. The last lines compute the part of the
+marketing slope that runs through visits, in two ways.
 
 ```{r}
 #| label: i06-mediation-fit
@@ -841,6 +889,11 @@ This change depends on the starting value $x$. The rule is: never read $\beta_1$
 alone while $x^2$ is in the model. Calculate fitted changes or graph the
 curve.
 
+The code fits two models of the equity offered, both with the requested
+amount as a control. The first has a straight-line season trend, the second
+adds the squared season. This question does not need the team
+classification, so the models use all 1,441 pitches in `sharks`.
+
 ```{r}
 #| label: i06-polynomial-fit
 linear_season <- lm(equity_offered_pct ~ season + ask_1k, data = sharks)
@@ -853,7 +906,9 @@ summary(poly_season)$coefficients
 part of the formula syntax and not as a square. The fitted coefficients are $\hat\beta_1 \approx -1.713$ for
 `season` and $\hat\beta_2 \approx 0.051$ for `I(season^2)`. Together they
 describe a steep decline in the early seasons that becomes flatter season by
-season.
+season. Both are significant (p below 0.001). How large the curvature is
+cannot be read from $\hat\beta_2$ alone. The worked example below turns the
+two coefficients into a fitted change per season.
 
 ::: {#exm-i06-quadratic-change}
 ## Worked example: the fitted change from Season 5 to Season 6
@@ -869,6 +924,7 @@ $$
 \text{ percentage points.}
 $$
 
+This drop of 1.15 points is about 9% of the average equity offered of 13.2%.
 Reading $\hat\beta_1=-1.713$ alone would make the drop about 0.56 points
 too large, which is about half of the fitted drop of 1.15 points. The number
 $-1.713$ is not a constant slope. It describes the slope at $x=0$, a season
@@ -884,7 +940,8 @@ unname(b["season"] + b["I(season^2)"] * (2 * 5 + 1))
 ### Is the curvature worth having? The partial F
 
 [Shark Tank data]{.shark-tag} The quadratic model and the linear model are nested, so the partial F-test
-of Lecture 5 applies to the one added term:
+of Lecture 5 applies to the one added term. `anova()` compares the residual
+sums of squares of the two models:
 
 ```{r}
 #| label: i06-partial-f
@@ -895,13 +952,17 @@ The partial F-test for adding `I(season^2)` gives $F \approx 20.1$ with a
 p-value below 0.001. The data show a curve. But the gain in fit is small:
 adjusted $R^2$ rises from about 0.186 to about 0.196, one percentage point
 more of the variation in the equity offered. So also look at the shape of
-the curve in @fig-i06-polynomial:
+the curve in @fig-i06-polynomial. Each point in the figure is the mean
+equity offered in one season. The curve is the fitted quadratic for a pitch
+with the average requested amount: `predict()` computes the fitted value at
+200 points between Season 1 and Season 16, and the line connects them.
 
 ```{r}
 #| label: fig-i06-polynomial
 #| code-fold: true
 #| code-summary: "See the R code for this figure"
 #| fig-cap: "Season means of the equity offered (points) and the fitted quadratic curve at the average requested amount. The curve becomes flatter towards the last observed seasons. Beyond Season 16 (shaded) it would turn upward, but there are no data in that region."
+#| fig-alt: "Sixteen green points for the season means fall from about 22 percent in season 1 to about 8 percent in season 16. An orange fitted curve follows them, falls steeply at first and becomes almost flat near season 16. The region beyond season 16 is shaded and marked as having no data."
 library(ggplot2)
 sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
 sharks$ask_1k <- sharks$ask_amount_usd / 1000
@@ -935,9 +996,8 @@ ggplot(season_means, aes(x = season, y = equity_offered_pct)) +
   )
 ```
 
-Each point in @fig-i06-polynomial is the mean equity offered in one season.
-The curve is the fitted quadratic for a pitch with the average requested
-amount. Use the curve only for Seasons 1 to 16, the seasons in the data.
+The season means lie close to the curve, and the curve flattens towards
+Season 16. Use the curve only for Seasons 1 to 16, the seasons in the data.
 Using a fitted model outside the range of the data is called extrapolation.
 Here it would mislead. The fitted curve reaches its lowest point at about
 Season 16.8 and rises after that. The data contain no season after 16, so
@@ -962,19 +1022,29 @@ combined results.
 ### Answering the driving question
 
 **The same trend for every kind of team?** The estimated difference in
-slopes is $-0.061$ percentage points per season (p $\approx$ 0.52). The data
-show no difference between all-men teams and teams with women. They also do
-not prove that the trends are equal, because the estimate is imprecise.
+slopes is $-0.061$ percentage points per season (p $\approx$ 0.52), about 8%
+of the all-men slope of $-0.80$. The data show no difference between
+all-men teams and teams with women. They also do not prove that the trends
+are equal, because the estimate is imprecise.
 
 **A straight line?** Not quite. The quadratic term is significant (partial
 $F \approx 20.1$, p $<$ 0.001). The fitted decline becomes flatter: from
 about $-1.56$ points per season between Seasons 1 and 2 to about $-0.64$
-between Seasons 10 and 11. Use the curve only inside Seasons 1--16.
+between Seasons 10 and 11. A straight line gives the same drop of about
+0.81 points in every season. It understates the early decline and overstates
+the late one. Use the curve only inside Seasons 1--16.
+
+As a founder who prepares a pitch, you might use recent seasons as a
+benchmark for how much equity to offer. You might expect teams with and
+without women to have followed the same downward trend, and the offers to
+have stopped falling fast, at about 8% to 9% in the last seasons. This holds
+under the assumption that the season in which you pitch follows the pattern
+of Seasons 1 to 16. The data cannot check that assumption.
 
 The founder's questions at the start of the lecture get the same two kinds
 of answer.
 Whether advertising works equally well in every week is a question about an
-interaction. In the invented example of the Try it task, advertising does not
+interaction. In the invented example of @fig-i06-two-lines, advertising does not
 work equally well: the slope is 0.10 orders per euro in ordinary weeks and 0.22 in exam weeks.
 Whether a trend goes on in a straight line is a question about a curve. The
 season trend of the equity offered does not go on in a straight line: the
@@ -1014,9 +1084,11 @@ Try it yourself first.
 :::
 :::
 
-**Next:** Tutorial 2 practises Lectures 4--6 with exam-style questions. It
-ends with one full analysis, from a research question to a conclusion of 150
-words. Your thesis asks for this kind of analysis too.
+**Next:** With dummies, interactions and curves, the regression model can
+now answer most "does it depend?" questions that a founder asks. Tutorial 2
+practises Lectures 4--6 with exam-style questions. It ends with one full
+analysis, from a research question to a conclusion of 150 words. Your thesis
+asks for this kind of analysis too.
 
 :::
 
@@ -1259,7 +1331,7 @@ Two errors. A large p-value means the data do not show a difference. It does not
 :::: {.utility-prompt}
 <span class="label">Two sentences about your own venture</span>
 
-Think of your EiA3 venture, or any business you know well. Name one
+Think of your own venture, or any business you know well. Name one
 relationship in its data whose slope could depend on something else. For
 example, the response to price may differ by customer segment, the result of
 a campaign may differ by channel, or growth may become flatter as the

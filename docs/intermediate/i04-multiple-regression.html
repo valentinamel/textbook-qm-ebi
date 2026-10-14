@@ -458,27 +458,27 @@ Where these videos differ from this book
 </details>
 <p>The videos explain key ideas in another way. The lecture material and its notation always come first.</p>
 </div>
-<p><strong>Predict.</strong> Answer this question before you come to class: once the requested amount is added, will the season coefficient move towards zero, away from zero, or barely move? Think about why the slope might change at all. If the requested amount is related to both the season and the equity offered, the simple slope mixes the two relationships. Choose one answer. You will find the answer in the lecture material.</p>
-<p><span class="shark-tag">Shark Tank data</span> <strong>R warm-up.</strong> Make the prediction above first, then run this code. In Lecture 3 you fitted the simple model of the equity offered (<code>equity_offered_pct</code>) on season and tested its slope. Fit it again. Then fit the model with two predictors, which adds the requested amount in thousands of dollars (<code>ask_1k</code>). Write down both season coefficients and bring them to class:</p>
+<p><span class="shark-tag">Shark Tank data</span> <strong>R warm-up.</strong> In Lecture 3 you fitted the simple model of the equity offered (<code>equity_offered_pct</code>) on season and tested its slope. Fit it again and write down the season coefficient. Then calculate the correlation between the season and the requested amount in thousands of dollars (<code>ask_1k</code>). Bring both numbers to class:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>sharks<span class="sc">$</span>ask_1k <span class="ot">&lt;-</span> sharks<span class="sc">$</span>ask_amount_usd <span class="sc">/</span> <span class="dv">1000</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(<span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> season, <span class="at">data =</span> sharks))</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(<span class="fu">lm</span>(equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> ask_1k, <span class="at">data =</span> sharks))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(sharks<span class="sc">$</span>season, sharks<span class="sc">$</span>ask_1k)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><strong>Code along (bring your laptop).</strong> Bring a charged laptop with RStudio and the course project open. All the code of the lecture is in this chapter, ready to copy. You can run each step yourself during the lecture and get the same numbers and figures.</p>
 <p>If you are unsure how subscripts or equations with several variables work, review <a href="../resources/math-refresher.html#subscripts-and-indices">Mathematics Refresher: subscripts and indices</a>.</p>
+<p><strong>Predict.</strong> In the lecture, the requested amount is added to the model of the equity offered on season. Will the season coefficient move towards zero, away from zero, or barely move? Choose one answer and write down one reason for it.</p>
 </section>
 <section id="lecture-material" class="level2 course-phase phase-in-class">
 <h2 class="anchored" data-anchor-id="lecture-material">Lecture material</h2>
-<p>The R task before class produced two season coefficients: about <span class="math inline">\(-0.824\)</span> without the requested amount and about <span class="math inline">\(-0.814\)</span> with it. This section explains what the second number means, why the two numbers can differ, and why they hardly differ here.</p>
 <section id="start-with-a-founders-question" class="level3">
 <h3 class="anchored" data-anchor-id="start-with-a-founders-question">Start with a founder’s question</h3>
-<p>Your sales rose after you cut the price. But it was also December. Was it the lower price or the time of year? Founders often face this problem: two factors changed at the same time, and a simple comparison cannot separate them. The Shark Tank file has the same problem. The equity offered (<code>equity_offered_pct</code>) fell over the seasons, and the requested amounts also changed over the seasons. Multiple regression solves this problem by comparing pitches that asked for the same amount.</p>
+<p>Your sales rose after you cut the price. But it was also December. Was it the lower price or the time of year? Founders often face this problem: two factors changed at the same time, and a simple comparison cannot separate them.</p>
+<p>The Shark Tank file has the same problem. In Lecture 3 you tested the season slope of the simple model. It is about <span class="math inline">\(-0.824\)</span> percentage points per season, far from zero with a t statistic of about <span class="math inline">\(-17.3\)</span>. Per season this is 6% of the mean equity offered (13.2%), and over five seasons it adds up to about 4 percentage points. But the requested amounts may also have changed over the seasons. Does the trend belong to the season, or to what founders asked for? Multiple regression separates the two by comparing pitches that asked for the same amount. This lecture shows how to fit and read such a model, when its coefficients differ from the simple slope, and what it can and cannot tell you.</p>
 </section>
 <section id="more-than-one-predictor" class="level3">
 <h3 class="anchored" data-anchor-id="more-than-one-predictor">More than one predictor</h3>
-<p>For predictors <span class="math inline">\(X_{i1},\ldots,X_{ik}\)</span>, the model is</p>
+<p>A model with one predictor compares cases that may differ in many other ways. To hold a second factor fixed, put it into the model as well. For predictors <span class="math inline">\(X_{i1},\ldots,X_{ik}\)</span>, the model is</p>
 <p><span class="math display">\[
 Y_i=\beta_0+\beta_1X_{i1}+\cdots+\beta_kX_{ik}+\varepsilon_i,
 \]</span></p>
@@ -497,7 +497,7 @@ E[Y_i\mid X_{i1}=x_1,\ldots,X_{ik}=x_k]
 </section>
 <section id="why-coefficients-change-an-invented-example" class="level3">
 <h3 class="anchored" data-anchor-id="why-coefficients-change-an-invented-example">Why coefficients change: an invented example</h3>
-<p>Start with an invented example. We build the data ourselves, so we know the true relationships. Imagine 180 small firms in three size classes: 60 small, 60 medium, and 60 large firms. The size of the firm (<code>size</code>, with the values 6, 10, and 14 in invented units) influences both advertising spend (<code>adspend</code>) and revenue (<code>revenue</code>). Advertising itself adds nothing to revenue: the line of code that builds <code>revenue</code> contains <code>size</code> but not <code>adspend</code>.</p>
+<p>Before answering the Shark Tank question, look at a case where the answer is known. In an invented example we build the data ourselves, so we know the true relationships. Imagine 180 small firms in three size classes: 60 small, 60 medium, and 60 large firms. The size of the firm (<code>size</code>, with the values 6, 10, and 14 in invented units) influences both advertising spend (<code>adspend</code>) and revenue (<code>revenue</code>). Advertising itself adds nothing to revenue: the line of code that builds <code>revenue</code> contains <code>size</code> but not <code>adspend</code>. The code builds the three variables, then fits two models: revenue on advertising alone, and revenue on advertising and size. It prints the coefficients of each.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">180</span></span>
@@ -516,13 +516,14 @@ E[Y_i\mid X_{i1}=x_1,\ldots,X_{ik}=x_k]
  4.97573838 -0.01861263  1.51629070 </code></pre>
 </div>
 </div>
-<p>The simple slope of <code>adspend</code> is about <span class="math inline">\(1.66\)</span>, clearly positive. Yet we know that advertising does nothing in these data. Once <code>size</code> is in the model, the slope of <code>adspend</code> falls to about <span class="math inline">\(-0.02\)</span>, close to the zero that we built in. The simple slope counted the effect of differences in size as an effect of <code>adspend</code>. As a description the simple slope is correct: firms that advertise more do have higher revenue on average. As an answer to the question of what advertising does, it is wrong.</p>
+<p>The simple slope of <code>adspend</code> is about <span class="math inline">\(1.66\)</span>: one more unit of advertising goes with 1.66 more units of revenue, about 8% of the mean revenue of 20. Yet we know that advertising does nothing in these data. Once <code>size</code> is in the model, the slope of <code>adspend</code> falls to about <span class="math inline">\(-0.02\)</span>, close to the zero that we built in, and the slope of <code>size</code> is about <span class="math inline">\(1.52\)</span>, close to the 1.5 that we built in. The simple slope counted the effect of differences in size as an effect of <code>adspend</code>. As a description the simple slope is correct: firms that advertise more do have higher revenue on average. As an answer to the question of what advertising does, it is wrong.</p>
 <div class="definition-box">
 <p><span class="label">Definition</span></p>
 <p><strong>Omitted variable.</strong> A variable that is related to the outcome but is left out of the model.</p>
 <p><strong>Confounder.</strong> An omitted variable that is related to both a predictor and the outcome. The slope of that predictor then also picks up the relationship between the confounder and the outcome. This distortion is the omitted variable bias of Lecture 2. In the invented example, <code>size</code> is the confounder of <code>adspend</code>.</p>
 </div>
-<p><a href="#fig-i04-ovb-scatter" class="quarto-xref">Figure&nbsp;<span>4.1</span></a> shows why. Large firms are high on both axes, and small firms are low on both. If you move from left to right through the whole cloud of points, you move from small firms to large firms. So the simple slope compares different kinds of firms. Within each size class the points form a flat cloud. The dashed lines show the fitted lines of the model with <code>size</code> at each of the three sizes, and they are flat: at a given size, more advertising does not go with more revenue.</p>
+<p><a href="#fig-i04-ovb-scatter" class="quarto-xref">Figure&nbsp;<span>4.1</span></a> shows why. Each point is one firm, coloured by its size class. The solid line is the simple regression line of revenue on advertising, fitted to all 180 firms. The three dashed lines come from the model with <code>size</code>. For each size class, the code puts 6, 10, or 14 into the fitted equation of that model. This gives one line per size class, each with the same slope of <span class="math inline">\(-0.02\)</span>.</p>
+<p>Large firms are high on both axes, and small firms are low on both. If you move from left to right through the whole cloud of points, you move from small firms to large firms. So the simple slope compares different kinds of firms. Within each size class the points form a flat cloud, and the dashed lines are flat: at a given size, more advertising does not go with more revenue.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>See the R code for this figure</summary>
@@ -590,10 +591,10 @@ E[Y_i\mid X_{i1}=x_1,\ldots,X_{ik}=x_k]
 <span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div id="fig-i04-ovb-scatter" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-i04-ovb-scatter" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Scatterplot of revenue against advertising spend for 180 invented firms in three colours: small firms at the lower left, medium firms in the middle, large firms at the upper right. A solid line rises through the whole cloud. Three short dashed lines, one through each size group, are flat.">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-i04-ovb-scatter-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="i04-multiple-regression_files/figure-html/fig-i04-ovb-scatter-1.png" class="img-fluid figure-img" width="672">
+<img src="i04-multiple-regression_files/figure-html/fig-i04-ovb-scatter-1.png" class="img-fluid figure-img" alt="Scatterplot of revenue against advertising spend for 180 invented firms in three colours: small firms at the lower left, medium firms in the middle, large firms at the upper right. A solid line rises through the whole cloud. Three short dashed lines, one through each size group, are flat." width="672">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-i04-ovb-scatter-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;4.1: Invented data: revenue against advertising spend for 180 simulated firms in three size classes. The solid line is the simple regression line. The dashed lines are the fitted lines of the model with size, one for each size class. The upward direction of the whole cloud comes from size alone. Within a size class the relationship is flat.
@@ -606,7 +607,7 @@ Figure&nbsp;4.1: Invented data: revenue against advertising spend for 180 simula
 </section>
 <section id="the-real-data-contrast-the-season-slope-barely-moves" class="level3">
 <h3 class="anchored" data-anchor-id="the-real-data-contrast-the-season-slope-barely-moves">The real-data contrast: the season slope barely moves</h3>
-<p><span class="shark-tag">Shark Tank data</span> Now make the same comparison on the Shark Tank data. From here on, money is measured in thousands of dollars: <code>ask_1k</code> is the requested amount divided by 1,000. One unit is $1,000 and 100 units are $100,000. Lecture 1 showed how a coefficient changes when the units of measurement change.</p>
+<p><span class="shark-tag">Shark Tank data</span> Now make the same comparison on the Shark Tank data. From here on, money is measured in thousands of dollars: <code>ask_1k</code> is the requested amount divided by 1,000. One unit is $1,000 and 100 units are $100,000. Lecture 1 showed how a coefficient changes when the units of measurement change. The code fits the simple model and the model with the requested amount, and prints the two season coefficients next to each other.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>sharks<span class="sc">$</span>ask_1k <span class="ot">&lt;-</span> sharks<span class="sc">$</span>ask_amount_usd <span class="sc">/</span> <span class="dv">1000</span></span>
@@ -621,17 +622,18 @@ Figure&nbsp;4.1: Invented data: revenue against advertising spend for 180 simula
              -0.8241241              -0.8143307 </code></pre>
 </div>
 </div>
-<p>The season slope moves from about <span class="math inline">\(-0.824\)</span> to about <span class="math inline">\(-0.814\)</span>. That is a change of 0.01 percentage points per season, about 1% of the slope. This answers the prediction question from before class: the coefficient barely moves. In the invented example, adding <code>size</code> removed almost the whole simple slope. Here, adding the requested amount leaves the season trend almost unchanged. In these data, the season trend does not come from differences in the requested amount.</p>
+<p>The season slope moves from about <span class="math inline">\(-0.824\)</span> to about <span class="math inline">\(-0.814\)</span>. That is a change of 0.01 percentage points per season, about 1% of the slope. This answers the prediction question from before class: the coefficient barely moves. The correlation from the warm-up explains why. The season and the requested amount have a correlation of only 0.04, so later pitches did not ask for clearly different amounts. A variable that hardly moves with the season cannot explain the season trend, even though it is related to the equity offered. In the invented example, adding <code>size</code> removed almost the whole simple slope. Here, adding the requested amount leaves the season trend almost unchanged.</p>
 <p>The stable slope tells you something useful: the requested amount does not explain the season trend. It does not rule out every other explanation. A variable that is not in the file, such as the maturity of the venture or the experience of the founder, could still play the role that <code>size</code> played in the invented data. A stable slope tells you about the variables you added. It tells you nothing about variables that are not in the file.</p>
 </section>
 <section id="a-three-predictor-shark-tank-model" class="level3">
 <h3 class="anchored" data-anchor-id="a-three-predictor-shark-tank-model">A three-predictor Shark Tank model</h3>
-<p><span class="shark-tag">Shark Tank data</span> Now add a third predictor. The outcome is the equity that the founders offered at the start of the pitch (<code>equity_offered_pct</code>), in percent. The predictors are:</p>
+<p><span class="shark-tag">Shark Tank data</span> A model can hold several factors fixed at once. To practise reading such a model, add a third predictor that describes the pitch itself. The outcome is the equity that the founders offered at the start of the pitch (<code>equity_offered_pct</code>), in percent. The predictors are:</p>
 <ul>
-<li><code>season</code>: the season number, 1 to 16</li>
-<li><code>ask_1k</code>: the requested amount in thousands of dollars</li>
-<li><code>description_words</code>: the number of words in the short description of the business in the data source.</li>
+<li><code>season</code>, the season number, 1 to 16,</li>
+<li><code>ask_1k</code>, the requested amount in thousands of dollars,</li>
+<li><code>description_words</code>, the number of words in the short description of the business in the data source.</li>
 </ul>
+<p>The description length is a rough measure of how much there is to say about a business. A longer description may point to a more developed venture, whose founders may offer less equity. The code fits the model and prints the full summary, in the same layout as in Lecture 3.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>equity_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  equity_offered_pct <span class="sc">~</span> season <span class="sc">+</span> ask_1k <span class="sc">+</span> description_words,</span>
@@ -662,15 +664,16 @@ Multiple R-squared:  0.1876,    Adjusted R-squared:  0.1859
 F-statistic: 110.6 on 3 and 1437 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 </div>
-<p>The fitted equation is approximately</p>
+<p>The output has one row for each coefficient, with its estimate, standard error, t statistic, and p-value. The column of estimates gives the fitted equation, approximately</p>
 <p><span class="math display">\[
 \widehat{\text{equity}}
 =22.025-0.836\,\text{season}-0.0029\,\text{ask\_1k}
 -0.128\,\text{description\_words}.
 \]</span></p>
+<p>The bottom lines describe the whole model. The residual standard error of 7.6 percentage points is the typical distance between an actual and a fitted offer, a little less than the standard deviation of the outcome (8.4). <span class="math inline">\(R^2\)</span> is 0.188, so the three predictors together account for about 19% of the variation in the equity offered. The F statistic of 110.6 tests whether all three slopes are zero at once, and its p-value is far below 0.05. The next step is to read each slope.</p>
 <section id="the-coefficient-interpretation-protocol" class="level4">
 <h4 class="anchored" data-anchor-id="the-coefficient-interpretation-protocol">The coefficient-interpretation protocol</h4>
-<p>Use the same five checks every time you interpret a slope:</p>
+<p>A slope helps a reader only if the reader can tell what was compared, in which units, and among which cases. Use the same five checks every time you interpret a slope:</p>
 <ol type="1">
 <li><strong>Estimate and direction:</strong> state the fitted change and its sign.</li>
 <li><strong>Predictor step and unit:</strong> say what a one-unit increase means.</li>
@@ -712,7 +715,7 @@ F-statistic: 110.6 on 3 and 1437 DF,  p-value: &lt; 2.2e-16</code></pre>
 </table>
 <p>Apply the five checks to each slope in turn. All three sentences are about the 1,441 recorded pitches:</p>
 <ul>
-<li><strong>Season.</strong> At the same requested amount and description length, one later season is associated with about <span class="math inline">\(0.836\)</span> percentage points less equity offered.</li>
+<li><strong>Season.</strong> At the same requested amount and description length, one later season is associated with about <span class="math inline">\(0.836\)</span> percentage points less equity offered. The t statistic of about <span class="math inline">\(-16.4\)</span> shows that the slope is clearly different from zero. Whether it is also large is a separate question, answered with benchmarks further below.</li>
 <li><strong>Requested amount.</strong> At the same season and description length, an additional $1,000 requested is associated with about <span class="math inline">\(0.0029\)</span> percentage points less equity offered. The number is tiny because the unit step is tiny. Per additional $100,000 the association is about <span class="math inline">\(0.29\)</span> percentage points. The t statistic (about <span class="math inline">\(-5.0\)</span>) does not depend on the unit.</li>
 <li><strong>Description length.</strong> At the same season and requested amount, one additional description word is associated with about <span class="math inline">\(0.128\)</span> percentage points less equity offered. This estimate is not statistically distinguishable from zero at 5% (p <span class="math inline">\(\approx\)</span> 0.26). Report the estimate anyway. “Not significant” does not mean “exactly zero”. It means that the data are consistent with a range of values that includes zero.</li>
 </ul>
@@ -736,7 +739,7 @@ Check: the season slope was −0.814 with two predictors and −0.836 with three
 </section>
 <section id="i04-spec-table" class="level3">
 <h3 class="anchored" data-anchor-id="i04-spec-table">Three models in one table</h3>
-<p><span class="shark-tag">Shark Tank data</span> This lecture has now fitted three models of the equity offered (<code>equity_offered_pct</code>): season alone (<code>m_simple</code>), season and requested amount (<code>m_adjusted</code>), and the three-predictor model (<code>equity_model</code>). Research papers show such models side by side in one table, with one column per model. The table needs the standard error of every coefficient and the fit of every model. <code>summary()</code> prints these numbers for the first two models below. The output for the third model is in the previous section.</p>
+<p><span class="shark-tag">Shark Tank data</span> A reader who wants to know whether a coefficient changes when predictors are added needs all models at once, not three separate outputs. This lecture has now fitted three models of the equity offered (<code>equity_offered_pct</code>): season alone (<code>m_simple</code>), season and requested amount (<code>m_adjusted</code>), and the three-predictor model (<code>equity_model</code>). Research papers show such models side by side in one table, with one column per model. The table needs the standard error of every coefficient and the fit of every model. The code below prints the summaries of the first two models. The summary of the third model is the one printed in the previous section.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(m_simple)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -865,13 +868,13 @@ F-statistic: 165.3 on 2 and 1438 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 <p>Outcome: equity offered (%). Ordinary least squares. Standard errors in parentheses. All three columns use the same 1,441 pitches. * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001.</p>
 <p>Each column is one model and each row is one predictor. An empty space means that the predictor is not in that model. The number in parentheses under a coefficient is its standard error, and the stars show the p-value of the two-sided test of that coefficient against zero. Read along a row to see how a coefficient changes when predictors are added: the season coefficient stays between <span class="math inline">\(-0.836\)</span> and <span class="math inline">\(-0.814\)</span> in all three columns. Read down a column to see one model: column (3) is <code>equity_model</code>. The bottom rows give the number of observations and the fit of each model. This is the layout to use for regression results in your thesis.</p>
-<p>The last two rows need one more term, which Lecture 3 introduced.</p>
+<p>The last two rows compare the fit of the three models. Lecture 3 introduced adjusted <span class="math inline">\(R^2\)</span> briefly. With several predictors it becomes important, so here is the definition again.</p>
 <div class="definition-box">
 <p><span class="label">Definition</span></p>
 <p><strong>Adjusted <span class="math inline">\(R^2\)</span>.</strong> <span class="math inline">\(R^2\)</span> with a small penalty for every predictor in the model. <span class="math inline">\(R^2\)</span> never falls when a predictor is added. Adjusted <span class="math inline">\(R^2\)</span> can fall when the new predictor adds almost nothing. Use adjusted <span class="math inline">\(R^2\)</span> to compare models with different numbers of predictors.</p>
 </div>
 <p>The formula is on the <a href="../intermediate/code-sheet.html#lecture-3-coefficient-inference-fit-and-the-f-test">code sheet</a>. In the table, adding the requested amount raises <span class="math inline">\(R^2\)</span> from 0.173 to 0.187. The model then accounts for 18.7% of the variation in the equity offered, up from 17.3%. Adjusted <span class="math inline">\(R^2\)</span> rises with it, from 0.172 to 0.186. Adding the description length leaves adjusted <span class="math inline">\(R^2\)</span> at 0.186: this predictor adds almost nothing to the fit.</p>
-<p>Why does adjusted <span class="math inline">\(R^2\)</span> need a penalty? Because <span class="math inline">\(R^2\)</span> rises with any added predictor, even one that has nothing to do with the outcome. The code below takes 50 random pitches and fits the model with season and the requested amount. It then adds ten columns of pure random numbers to the same model.</p>
+<p>Why does adjusted <span class="math inline">\(R^2\)</span> need a penalty? Because <span class="math inline">\(R^2\)</span> rises with any added predictor, even one that has nothing to do with the outcome. The code below takes 50 random pitches and fits the model with season and the requested amount. It then adds ten columns of pure random numbers to the same model and prints <span class="math inline">\(R^2\)</span> and adjusted <span class="math inline">\(R^2\)</span> of both models. A small sample of 50 is used because the penalty matters most when there are many predictors for few observations.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>small <span class="ot">&lt;-</span> sharks[<span class="fu">sample</span>(<span class="fu">nrow</span>(sharks), <span class="dv">50</span>),</span>
@@ -888,7 +891,7 @@ F-statistic: 165.3 on 2 and 1438 DF,  p-value: &lt; 2.2e-16</code></pre>
        0.269        0.237        0.378        0.176 </code></pre>
 </div>
 </div>
-<p><span class="math inline">\(R^2\)</span> rises from 0.269 to 0.378. Ten useless predictors seem to explain 11 percentage points more of the variation. Adjusted <span class="math inline">\(R^2\)</span> falls from 0.237 to 0.176. It shows that the random columns add nothing real. With another random draw, adjusted <span class="math inline">\(R^2\)</span> can rise a little by chance. It is a correction, not a guarantee.</p>
+<p><span class="math inline">\(R^2\)</span> rises from 0.269 to 0.378. Ten useless predictors seem to explain 11 percentage points more of the variation, a rise of 40%. Adjusted <span class="math inline">\(R^2\)</span> falls from 0.237 to 0.176. It shows that the random columns add nothing real. With another random draw, adjusted <span class="math inline">\(R^2\)</span> can rise a little by chance. It is a correction, not a guarantee.</p>
 <p>R can build such a table for you with the package <code>modelsummary</code>:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(modelsummary)</span>
@@ -967,13 +970,13 @@ Check your answer
 </section>
 <section id="what-control-variables-can-and-cannot-do" class="level3">
 <h3 class="anchored" data-anchor-id="what-control-variables-can-and-cannot-do">What control variables can and cannot do</h3>
-<p>A control variable (often just called a control) is a predictor that is included in the model so that the comparison holds it fixed. Including a control variable can:</p>
+<p>The Shark Tank models added the requested amount to check the season trend, and the invented example added firm size. Before you add variables to your own models, it helps to know what this step can achieve. A control variable (often just called a control) is a predictor that is included in the model so that the comparison holds it fixed. Including a control variable can</p>
 <ul>
-<li>make a comparison fairer, because the compared cases are alike on the measured variables</li>
-<li>reduce the residual variation, which makes confidence intervals narrower</li>
+<li>make a comparison fairer, because the compared cases are alike on the measured variables,</li>
+<li>reduce the residual variation, which makes confidence intervals narrower,</li>
 <li>show that a simple association partly came from comparing different kinds of cases.</li>
 </ul>
-<p>A control variable also has a cost when it moves closely together with the predictor that you are interested in. Take the invented example of firm size and advertising. With <code>size</code> in the model, the advertising slope compares firms of the same size. But firms of the same size differ only a little in advertising spend. In <a href="#fig-i04-ovb-scatter" class="quarto-xref">Figure&nbsp;<span>4.1</span></a>, the points of one colour cover a much narrower range of advertising spend than all points together. With so little variation in advertising, the data say less about its slope. Its standard error grows, and its confidence interval gets wider. The numbers show this:</p>
+<p>A control variable also has a cost when it moves closely together with the predictor that you are interested in. Take the invented example of firm size and advertising. With <code>size</code> in the model, the advertising slope compares firms of the same size. But firms of the same size differ only a little in advertising spend. In <a href="#fig-i04-ovb-scatter" class="quarto-xref">Figure&nbsp;<span>4.1</span></a>, the points of one colour cover a much narrower range of advertising spend than all points together. With so little variation in advertising, the data say less about its slope. Its standard error grows, and its confidence interval gets wider. The code below prints the correlation between advertising spend and size, and then the advertising slope and its standard error, first without and then with <code>size</code> in the model.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">cor</span>(demo<span class="sc">$</span>adspend, demo<span class="sc">$</span>size), <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -991,12 +994,12 @@ Check your answer
     -0.019      0.106 </code></pre>
 </div>
 </div>
-<p>Their correlation is about 0.93. The standard error of the advertising slope is about 0.06 without <code>size</code> and about 0.11 with <code>size</code> in the model, almost twice as large. Here the control is still needed, because without it the slope is biased. But the estimate that you get is less precise. The section on multicollinearity below returns to this.</p>
-<p>Including a control variable cannot:</p>
+<p>Advertising spend and size have a correlation of about 0.93, close to the maximum of 1. The standard error of the advertising slope is about 0.06 without <code>size</code> and about 0.11 with <code>size</code> in the model, almost twice as large. Here the control is still needed, because without it the slope is biased. But the estimate that you get is less precise. The section on multicollinearity below returns to this.</p>
+<p>Including a control variable cannot</p>
 <ul>
-<li>adjust for variables that were not measured</li>
-<li>fix reverse causality, where the outcome influences the predictor</li>
-<li>repair selection, where the cases in the file are not typical of the cases you want to talk about</li>
+<li>adjust for variables that were not measured,</li>
+<li>fix reverse causality, where the outcome influences the predictor,</li>
+<li>repair selection, where the cases in the file are not typical of the cases you want to talk about,</li>
 <li>remove errors in how a variable was measured.</li>
 </ul>
 <p>A control variable is simply a predictor like any other. The word “control” does not make any coefficient causal. Only the way the data were produced can make a coefficient causal, for example when the data come from an experiment.</p>
@@ -1020,7 +1023,7 @@ Check: which of these four problems does adding <code>ask_1k</code> address?
 </section>
 <section id="assumptions-extend-to-the-full-predictor-set" class="level3">
 <h3 class="anchored" data-anchor-id="assumptions-extend-to-the-full-predictor-set">Assumptions extend to the full predictor set</h3>
-<p>For multiple regression, the Lecture 2 assumption list applies to the whole set of included predictors:</p>
+<p>The standard errors, t statistics, and intervals in the table above are only reliable if the model assumptions hold. For multiple regression, the Lecture 2 assumption list applies to the whole set of included predictors:</p>
 <ol type="1">
 <li>The conditional mean is linear in the included terms (linearity).</li>
 <li>Each predictor varies, and no predictor can be calculated exactly from the others, for example as the sum of two of them (no perfect multicollinearity).</li>
@@ -1029,11 +1032,17 @@ Check: which of these four problems does adding <code>ask_1k</code> address?
 <li>In small samples, exact t and F inference also requires normally distributed errors.</li>
 <li>Zero conditional mean of the error given all included predictors. For a causal reading of a coefficient, this means that no omitted confounder drives both an included predictor and the outcome.</li>
 </ol>
-<p>A high correlation among the predictors is called <strong>multicollinearity</strong>. It does not bias the coefficients. It makes the single coefficients imprecise and unstable, because the data contain little information to separate predictors that move together. It is worse when one predictor can be calculated exactly from the others. This is called perfect multicollinearity. R then cannot estimate all coefficients and leaves one term out. Multicollinearity makes the estimates less precise. With perfect multicollinearity, one coefficient cannot be estimated at all.</p>
+<p>Assumption 2 needs two related terms.</p>
+<div class="definition-box">
+<p><span class="label">Definition</span></p>
+<p><strong>Multicollinearity.</strong> A high correlation among the predictors. It does not bias the coefficients. It makes the single coefficients imprecise and unstable, because the data contain little information to separate predictors that move together.</p>
+<p><strong>Perfect multicollinearity.</strong> One predictor can be calculated exactly from the others. Then one coefficient cannot be estimated at all, and R leaves one term out of the model.</p>
+</div>
+<p>The invented example showed multicollinearity at work: with a correlation of 0.93 between advertising and size, the standard error of the advertising slope almost doubled. In the Shark Tank model the correlations among the predictors are small. The strongest is between the season and the description length, at <span class="math inline">\(-0.38\)</span>, so multicollinearity is not a concern there.</p>
 </section>
 <section id="a-coefficient-plot-keeps-units-visible" class="level3">
 <h3 class="anchored" data-anchor-id="a-coefficient-plot-keeps-units-visible">A coefficient plot keeps units visible</h3>
-<p><span class="shark-tag">Shark Tank data</span> <a href="#fig-i04-coefplot" class="quarto-xref">Figure&nbsp;<span>4.2</span></a> shows the three slope estimates of <code>equity_model</code> with their 95% confidence intervals.</p>
+<p><span class="shark-tag">Shark Tank data</span> A table gives exact numbers, but readers often want to see at a glance which estimates are clearly different from zero. A coefficient plot shows this. <a href="#fig-i04-coefplot" class="quarto-xref">Figure&nbsp;<span>4.2</span></a> shows the three slope estimates of <code>equity_model</code> with their 95% confidence intervals. The code takes the estimates and intervals from the model, rescales the requested amount to steps of $100,000, and draws one row per predictor.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>See the R code for this figure</summary>
@@ -1075,10 +1084,10 @@ Check: which of these four problems does adding <code>ask_1k</code> address?
 <span id="cb26-36"><a href="#cb26-36" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div id="fig-i04-coefplot" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-i04-coefplot" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Coefficient plot with three rows and a dashed vertical line at zero. Season: a dot at about minus 0.84 with a short interval well left of zero. Amount requested per 100,000 dollars: a dot at about minus 0.29 with a short interval left of zero. Description length per word: a dot at about minus 0.13 with a wide interval from about minus 0.35 to plus 0.09 that crosses zero.">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-i04-coefplot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="i04-multiple-regression_files/figure-html/fig-i04-coefplot-1.png" class="img-fluid figure-img" width="672">
+<img src="i04-multiple-regression_files/figure-html/fig-i04-coefplot-1.png" class="img-fluid figure-img" alt="Coefficient plot with three rows and a dashed vertical line at zero. Season: a dot at about minus 0.84 with a short interval well left of zero. Amount requested per 100,000 dollars: a dot at about minus 0.29 with a short interval left of zero. Description length per word: a dot at about minus 0.13 with a wide interval from about minus 0.35 to plus 0.09 that crosses zero." width="672">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-i04-coefplot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;4.2: Coefficient estimates from the three-predictor model of the equity offered, with 95% confidence intervals. Each row uses its own predictor unit: per season, per $100,000 requested, and per word. The sizes cannot be compared across rows without these units.
@@ -1107,7 +1116,8 @@ Figure&nbsp;4.2: Coefficient estimates from the three-predictor model of the equ
 </section>
 <section id="answering-the-driving-question" class="level3">
 <h3 class="anchored" data-anchor-id="answering-the-driving-question">Answering the driving question</h3>
-<p>At the same requested amount and description length, the season trend remains: about <span class="math inline">\(-0.836\)</span> equity percentage points per season, against <span class="math inline">\(-0.824\)</span> without the two control variables. The requested amount does not explain the season trend. Later pitches offer less equity even when they are compared at the same requested amount.</p>
+<p>The requested amount is not the reason for the smaller offers in later seasons. At the same requested amount and description length, the season trend remains: about <span class="math inline">\(-0.836\)</span> equity percentage points per season, against <span class="math inline">\(-0.824\)</span> without the two control variables. The requested amount hardly changed over the seasons (correlation 0.04), so it cannot explain the trend. The trend is also large: five seasons go with about 4.2 percentage points less equity offered, a third of the mean offer of 13.2%.</p>
+<p>Is the season itself the reason? The data cannot say. The season stands for everything that changed over time and is not in the model, such as the experience of the founders or the choices of the producers. As a founder preparing a pitch, you might expect to open with about 4 percentage points less equity than founders did five seasons ago, under the assumption that the recorded pitches are typical of pitches like yours. So when you set your own opening offer, compare it with recent pitches rather than with the average over all seasons.</p>
 <div class="founder-box">
 <p><span class="label">A founder’s decision (invented example)</span></p>
 <p>You run a campus venture that sells meal boxes. In weeks with lower prices you get more orders: the simple slope is 60 more orders per euro of price cut. But you lowered prices mainly in exam weeks, when demand is high anyway. With exam weeks in the model as a control variable, the slope is 25 orders per euro. You sell about 150 meal boxes a week at a margin of 4 euros per box. Should you cut the price by 1 euro?</p>
@@ -1184,11 +1194,11 @@ Check your answers
 </div>
 </div>
 </section>
-<section id="finish-a-half-worked-example-interpret-the-three-slopes" class="level3">
-<h3 class="anchored" data-anchor-id="finish-a-half-worked-example-interpret-the-three-slopes">Finish a half-worked example: interpret the three slopes</h3>
-<p><span class="shark-tag">Shark Tank data</span> Take the three-predictor model <code>equity_model</code>. It regresses the equity offered by the founder, in percent, on the season, the requested amount in thousands of dollars (<code>ask_1k</code>), and the number of words in the description (<code>description_words</code>), using all 1,441 pitches. Its fitted slopes are <span class="math inline">\(-0.836\)</span> per season, <span class="math inline">\(-0.0029\)</span> per $1,000 requested, and <span class="math inline">\(-0.128\)</span> per description word. Interpret the three slopes with units and with the predictors that are held fixed.</p>
-<p>Step 1 (given). Season: holding the requested amount and the description length fixed, among the recorded pitches, one later season is associated with about 0.836 percentage points less equity offered.</p>
-<p>Step 2 (you). Write the same kind of sentence for <code>ask_1k</code> and for <code>description_words</code>.</p>
+<section id="finish-a-half-worked-example-interpret-the-two-predictor-model" class="level3">
+<h3 class="anchored" data-anchor-id="finish-a-half-worked-example-interpret-the-two-predictor-model">Finish a half-worked example: interpret the two-predictor model</h3>
+<p><span class="shark-tag">Shark Tank data</span> Take the two-predictor model <code>m_adjusted</code>, column (2) of the regression table. It regresses the equity offered by the founder, in percent, on the season and the requested amount in thousands of dollars (<code>ask_1k</code>), using all 1,441 pitches. Its fitted slopes are <span class="math inline">\(-0.814\)</span> per season and <span class="math inline">\(-0.0029\)</span> per $1,000 requested. The mean equity offered is 13.2%. Interpret both slopes with units and with the predictor that is held fixed, and judge the size of the requested-amount slope per $100,000.</p>
+<p>Step 1 (given). Season: holding the requested amount fixed, among the recorded pitches, one later season is associated with about 0.814 percentage points less equity offered. This is 6% of the mean offer per season.</p>
+<p>Step 2 (you). Write the same kind of sentence for <code>ask_1k</code>, per $100,000, and compare the result with the mean offer.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -1201,23 +1211,23 @@ Check your answer
 </div>
 <div id="callout-7" class="callout-7-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>Holding the season and the description length fixed, an additional $1,000 requested is associated with about 0.0029 percentage points less equity offered (0.29 per $100,000). Holding the season and the requested amount fixed, one additional description word is associated with about 0.128 percentage points less.</p>
+<p>Holding the season fixed, among the recorded pitches, an additional $100,000 requested is associated with about 0.29 percentage points less equity offered (<span class="math inline">\(100\times(-0.0029)\)</span>). This is about 2% of the mean offer of 13.2%, a small difference, although the coefficient is clearly different from zero (t <span class="math inline">\(\approx-5.0\)</span>).</p>
 </div>
 </div>
 </div>
 </section>
 <section id="practice" class="level3">
 <h3 class="anchored" data-anchor-id="practice">Practice</h3>
-<p><span class="shark-tag">Shark Tank data</span> All items use the three-predictor model <code>equity_model</code>. It regresses the equity offered by the founder, in percent, on the season, the requested amount in thousands of dollars (<code>ask_1k</code>), and the number of words in the description (<code>description_words</code>), using all 1,441 pitches. Items 5 to 7 use the calculations of <a href="#exm-i04-scaling" class="quarto-xref">Example&nbsp;<span>4.1</span></a>. Item 8 is the task “Try it: three seasons later and $200,000 more”, now done from start to finish.</p>
+<p><span class="shark-tag">Shark Tank data</span> All items use the three-predictor model <code>equity_model</code>. It regresses the equity offered by the founder, in percent, on the season, the requested amount in thousands of dollars (<code>ask_1k</code>), and the number of words in the description (<code>description_words</code>), using all 1,441 pitches. The mean equity offered is 13.2% and its standard deviation is 8.4 percentage points.</p>
 <ol type="1">
 <li>Calculate 95% confidence intervals with <code>confint(equity_model)</code>.</li>
 <li>Test each coefficient against zero. Explain how these three single tests differ from the one overall F-test of the model.</li>
-<li>Remove <code>description_words</code>. Compare the coefficients of season and requested amount with those of the three-predictor model.</li>
+<li>Remove <code>ask_1k</code>. Compare the coefficients of season and description length with those of the three-predictor model.</li>
 <li>Name one plausible omitted variable and explain which interpretation of the coefficients it would make questionable.</li>
-<li>Interpret a difference of five seasons with the fitted season coefficient.</li>
-<li>Interpret a difference of $500,000 in the requested amount.</li>
-<li>Interpret a difference of ten words in description length and use the 95% interval to judge <span class="math inline">\(H_0:\beta=0\)</span>.</li>
-<li>Compare two fitted pitches that are the same except that one is three seasons later and requests $200,000 more. Calculate the combined fitted difference.</li>
+<li>Interpret a difference of eight seasons with the fitted season coefficient. Judge its size with the mean of the outcome.</li>
+<li>Interpret a difference of $250,000 in the requested amount. Judge its size with the mean of the outcome.</li>
+<li>Interpret a difference of 25 words in description length and use the 95% interval to judge <span class="math inline">\(H_0:\beta=0\)</span>.</li>
+<li>Compare two fitted pitches that are the same except that one is two seasons earlier and requests $1,000,000 more. Calculate the combined fitted difference.</li>
 </ol>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
@@ -1234,12 +1244,12 @@ Check your answers
 <ol type="1">
 <li>The season interval is approximately <span class="math inline">\((-0.936, -0.736)\)</span>, the <code>ask_1k</code> interval <span class="math inline">\((-0.0040, -0.0018)\)</span>, and the description interval <span class="math inline">\((-0.351, 0.095)\)</span>.</li>
 <li>Each t-test evaluates one <span class="math inline">\(\beta_j=0\)</span> at a time. The overall F-test (F <span class="math inline">\(\approx\)</span> 110.6 on 3 and 1437 df) evaluates all three slope coefficients together.</li>
-<li>Without <code>description_words</code>, the season coefficient is about <span class="math inline">\(-0.814\)</span> and the <code>ask_1k</code> coefficient about <span class="math inline">\(-0.0029\)</span>. These are the numbers in column (2) of the table in the lecture material. Compare them with column (3). The coefficients change only slightly.</li>
+<li>Without <code>ask_1k</code>, the season coefficient is about <span class="math inline">\(-0.842\)</span> (against <span class="math inline">\(-0.836\)</span>) and the description coefficient about <span class="math inline">\(-0.106\)</span> (against <span class="math inline">\(-0.128\)</span>, still not significant, p <span class="math inline">\(\approx\)</span> 0.36). The coefficients change only slightly, because the requested amount is hardly correlated with the season or with the description length.</li>
 <li>Examples are the maturity of the venture, its revenue, the experience of the founder, or decisions of the producers about what is broadcast. If such a variable is related to both an included predictor and the equity offered, it is a confounder. The coefficient is then still a correct description, but it is not the effect of the predictor.</li>
-<li>Holding requested amount and description length fixed, a pitch five seasons later is fitted to offer about <span class="math inline">\(5(-0.836)=-4.18\)</span> equity percentage points less.</li>
-<li>$500,000 equals 500 units of <code>ask_1k</code>. Holding season and description length fixed, the fitted difference is <span class="math inline">\(500\times(-0.0029)\approx-1.45\)</span> percentage points.</li>
-<li>Ten words go with about <span class="math inline">\(-1.28\)</span> fitted percentage points, holding season and requested amount fixed. Multiplying the interval by 10 gives approximately <span class="math inline">\((-3.51, 0.95)\)</span>. The interval contains zero, so the two-sided 5% test does not reject a zero coefficient.</li>
-<li>The fitted difference is <span class="math inline">\(3(-0.836)+200(-0.0029)\approx-3.09\)</span> percentage points, holding description length fixed. The two contributions add because the model is additive.</li>
+<li>Holding requested amount and description length fixed, a pitch eight seasons later is fitted to offer <span class="math inline">\(8\times(-0.836)\approx-6.69\)</span> equity percentage points less. This is about half of the mean offer of 13.2%, a large difference.</li>
+<li>$250,000 equals 250 units of <code>ask_1k</code>. Holding season and description length fixed, the fitted difference is <span class="math inline">\(250\times(-0.0029)\approx-0.72\)</span> percentage points. This is about 5% of the mean offer, a small difference.</li>
+<li>25 words go with about <span class="math inline">\(25\times(-0.128)=-3.21\)</span> fitted percentage points, holding season and requested amount fixed. Multiplying the interval by 25 gives approximately <span class="math inline">\((-8.79, 2.37)\)</span>. The interval contains zero, so the two-sided 5% test does not reject a zero coefficient.</li>
+<li>Two seasons earlier is <span class="math inline">\(-2\)</span> seasons, and $1,000,000 is 1,000 units of <code>ask_1k</code>. The fitted difference is <span class="math inline">\(-2\times(-0.836)+1000\times(-0.0029)\approx1.67-2.90=-1.23\)</span> percentage points, holding description length fixed. The two contributions add because the model is additive, and here they partly cancel.</li>
 </ol>
 </div>
 </div>
@@ -1333,7 +1343,7 @@ Check your answer
 <h3 class="anchored" data-anchor-id="make-it-yours">Make it yours</h3>
 <div class="utility-prompt">
 <p><span class="label">Two sentences about your own venture</span></p>
-<p>Think of your EiA3 venture, or any business you know well. Name one outcome you care about and two factors that influence it and are correlated with each other (for example price and quality tier, or marketing spend and firm age). Then write two sentences. What would a regression of the outcome on only one of the two factors mix together? What would “holding the other factor fixed” let you see? There is no wrong answer.</p>
+<p>Think of your own venture, or any business you know well. Name one outcome you care about and two factors that influence it and are correlated with each other (for example price and quality tier, or marketing spend and firm age). Then write two sentences. What would a regression of the outcome on only one of the two factors mix together? What would “holding the other factor fixed” let you see? There is no wrong answer.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">

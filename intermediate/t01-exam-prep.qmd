@@ -12,16 +12,16 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 ::: {.outcomes}
 <span class="label">By the end of Tutorial 1, you can</span>
 
-- fit a simple regression in R and interpret its results with units
-- check the assumptions of a model with residual plots and influence measures
-- judge a model with its coefficient table, $R^2$, and the F-test
-- check an AI reading of a regression output and correct its errors
+- fit a simple regression in R and interpret its results with units,
+- check the assumptions of a model with residual plots and influence measures,
+- judge a model with its coefficient table, $R^2$, and the F-test,
+- check an AI reading of a regression output and correct its errors.
 :::
 
 Tutorials are exam preparation sessions. The tasks below are exam-style
-questions. You take the exam in TestVision, and R is available.
-You first try each task in pairs. You may use AI for this, following
-Attempt, Ask, Verify, Explain. Then the class discusses the solution together.
+questions. You take the exam in TestVision, and R is available. Try each
+task yourself before you look at the solution. You may use AI for this,
+following Attempt, Ask, Verify, Explain.
 
 ::: {.course-phase .phase-before}
 
@@ -38,10 +38,10 @@ and [powers, roots, and squared deviations](../resources/math-refresher.html#pow
 
 Write from memory:
 
-1. the simple linear regression model
-2. the fitted line
-3. the residual
-4. the formula for $R^2$
+1. the simple linear regression model,
+2. the fitted line,
+3. the residual,
+4. the formula for $R^2$,
 5. the null hypothesis of the overall F-test.
 
 ::: {.callout-note collapse="true"}
@@ -65,10 +65,17 @@ does five things. It names the sample, shows the calculation, and reports
 values with units. It interprets the values in context. And it states one
 important limit of the model or of the data.
 
-All tasks use the Shark Tank teaching file and the valuations of Lectures 1
-to 3, in **millions of dollars**: the valuation agreed on air (`agreed_m`)
-and the valuation claimed by the founder (`claimed_m`). Build the data once,
-in the same way as in Lectures 1--3:
+Tasks 1 to 5 and Task 7 follow one founder question through all steps of
+Lectures 1 to 3: how closely does the valuation agreed with the sharks
+follow the valuation that the founder claims? All tasks use the Shark Tank
+teaching file. The valuations are in millions of dollars: the valuation
+agreed on air (`agreed_m`) and the valuation claimed by the founder
+(`claimed_m`). The code below builds the data in the same way as in
+Lectures 1 to 3. It keeps the deals in which the sharks took a share of the
+company, and it converts both valuations from dollars to millions of
+dollars. The eight deals in which the sharks took no share of the company
+have no agreed valuation (the file records it as zero), so they are left
+out. The last line prints the number of deals that remain.
 
 ```{r}
 #| label: iep01-load
@@ -85,9 +92,9 @@ nrow(vals)   # deals for a share of the company
 claimed valuation (`claimed_m`), among the deals for a share of the company.
 Then report:
 
-1. the sample, with its number of deals
-2. the fitted equation
-3. the interpretation of the slope with units, in one sentence
+1. the sample, with its number of deals,
+2. the fitted equation,
+3. the interpretation of the slope with units, in one sentence,
 4. the limit of the intercept's meaning, in one sentence.
 
 Use (copy and paste) this structure:
@@ -109,13 +116,19 @@ val_model <- lm(agreed_m ~ claimed_m, data = vals)
 coef(val_model)
 ```
 
-1. The sample is the 874 deals for a share of the company.
-2. The fitted equation is $\widehat y = -0.068 + 0.649x$, with both
-   valuations in \$ millions.
-3. A claimed valuation that is \$1 million higher is associated with an
-   agreed valuation about \$0.65 million higher.
-4. A claimed valuation of zero is outside the observed range, so the
-   intercept (about $-\$68{,}000$) has no useful business meaning of its own.
+Filled-in structure:
+
+- R code: see the code above.
+- Sample: the 874 deals for a share of the company.
+- Fitted equation: $\widehat y = -0.068 + 0.649x$, with both valuations in
+  \$ millions.
+- Interpretation of the slope: a claimed valuation that is \$1 million
+  higher is associated with an agreed valuation that is on average about
+  \$0.65 million higher, so about two thirds of a higher claim shows up in
+  the agreed valuation.
+- Limit of the intercept's meaning: a claimed valuation of zero is outside
+  the observed range, so the intercept (about $-\$68{,}000$) has no useful
+  business meaning of its own.
 :::
 
 ### Task 2: Fitted value and residual (Lecture 1)
@@ -146,13 +159,17 @@ val_model <- lm(agreed_m ~ claimed_m, data = vals)
 unname(2.5 - predict(val_model, newdata = data.frame(claimed_m = 5)))
 ```
 
-1. With $x=5$ (in \$ millions),
-   $\widehat y = -0.068 + 0.649 \times 5 \approx 3.18$, or about \$3.18
-   million.
-2. The observed $y = 2.5$, so $e = 2.5 - 3.18 = -0.68$, about
-   $-\$680{,}000$.
-3. The negative sign means this deal was agreed below the model's fitted
-   conditional mean for a claimed valuation of \$5 million.
+Filled-in structure:
+
+- R code: see the code above. It prints the residual.
+- Fitted value: with $x=5$ (in \$ millions),
+  $\widehat y = -0.068 + 0.649 \times 5 \approx 3.18$, or about \$3.18
+  million.
+- Residual: the observed $y = 2.5$, so $e = 2.5 - 3.18 = -0.68$, about
+  $-\$680{,}000$. This is about 21% of the fitted value.
+- Meaning of the sign: the negative sign means that this deal was agreed
+  below the model's fitted conditional mean for a claimed valuation of \$5
+  million.
 :::
 
 ### Task 3: Diagnostics and influence (Lecture 2)
@@ -160,13 +177,13 @@ unname(2.5 - predict(val_model, newdata = data.frame(claimed_m = 5)))
 [Shark Tank data]{.shark-tag} Produce the residual-versus-fitted plot and the normal Q--Q plot for the
 Task 1 model of the agreed valuation on the claimed valuation.
 
-1. Name two problems with the assumptions that you can see in the plots,
-   and say for each one what in the plots shows it.
+1. Name two problems with the assumptions that you can see in the plots.
+   For each one, say in one sentence what in the plots shows it.
 2. Count the standardised residuals beyond $\pm 3$ and the observations
    with a Cook's distance above $4/n$.
 3. State the three-step rule for handling a flagged observation.
-4. Name one assumption that these plots cannot assess, and say what
-   information would assess it.
+4. Name one assumption that these plots cannot assess, and say in one
+   sentence what information would assess it.
 
 Use (copy and paste) this structure:
 
@@ -204,19 +221,24 @@ c(big_rstandard = sum(abs(rstandard(val_model)) > 3),
   cooks_flagged = sum(cooks.distance(val_model) > 4 / nobs(val_model)))
 ```
 
-1. The spread of the residuals widens with the fitted value. This fan shape
-   shows heteroskedasticity, so it challenges homoskedasticity. The Q--Q
-   plot leaves the line at both ends, with several extreme residuals on both
-   sides. This pattern challenges normality and suggests that some deals may
-   be influential.
-2. Twenty-five standardised residuals lie beyond $\pm3$, and 64
-   observations have a Cook's distance above $4/n$.
-3. The rule for flagged observations: investigate, report, never silently
-   delete.
-4. The plots cannot assess independence or the zero conditional mean
-   assumption (no omitted confounder). To assess them, you need knowledge of
-   how the data were collected, for example whether the same sharks or
-   founders appear in several rows.
+Filled-in structure:
+
+- R code: see the code above.
+- First problem, and what in the plots shows it: the spread of the
+  residuals widens with the fitted value, and this fan shape shows
+  heteroskedasticity, so it challenges homoskedasticity.
+- Second problem, and what in the plots shows it: the Q--Q plot leaves the
+  line at both ends, with several extreme residuals on both sides, which
+  challenges normality and suggests that some deals may be influential.
+- Number with a standardised residual beyond ±3: 25 deals, about 3% of
+  the 874.
+- Number with a Cook's distance above 4/n: 64 deals, about 7% of the 874.
+- Rule for flagged observations: investigate, report, never silently
+  delete.
+- Assumption the plots cannot assess, and what would assess it: the plots
+  cannot assess independence. To assess it, you need knowledge of how the
+  data were collected, for example whether the same sharks or founders
+  appear in several rows.
 :::
 
 ### Task 4: Coefficient inference (Lecture 3)
@@ -226,11 +248,12 @@ model of the agreed valuation on the claimed valuation.
 
 1. Test $H_0:\beta_1=0$ against $H_1:\beta_1\ne0$ in five steps, with the
    critical value approach at the 5% level.
-2. Report the 95% confidence interval for $\beta_1$, and verify it by hand
-   from the estimate and the standard error.
-3. Would robust standard errors ([Lecture 3](i03-inference-fit-ftest.qmd#i03-robust)) fix both
-   problems with the assumptions that you named in Task 3? Answer yes or
-   no, and explain in one or two sentences.
+2. Report the 95% confidence interval for $\beta_1$, verify it by hand
+   from the estimate and the standard error, and compare it with the
+   interval in the output.
+3. Would heteroskedasticity-robust standard errors fix both problems with
+   the assumptions that you named in Task 3? Answer yes or no, and explain
+   in one or two sentences.
 
 Use (copy and paste) this structure:
 
@@ -245,7 +268,7 @@ Interval, formula:
 Interval, given values:
 Interval, calculations:
 Interval:
-Interval, conclusion:
+Interval, comparison with the output:
 Robust standard errors, yes or no, and why:
 ```
 
@@ -259,29 +282,33 @@ summary(val_model)$coefficients
 confint(val_model)
 ```
 
-1. The test of the slope:
-   1. **Hypotheses.** $H_0:\beta_1=0$, $H_1:\beta_1\ne0$. The significance
-      level is 5%.
-   2. **Test statistic.** $T=\hat\beta_1/\operatorname{SE}(\hat\beta_1)$,
-      with $872$ degrees of freedom.
-   3. **Critical value and rejection region.** $t_{0.975,\,872}$ =
-      `qt(0.975, 872)` = 1.963. Reject $H_0$ if $|t_{obs}|\ge1.963$.
-   4. **Observed value.** The slope is $0.649$ with standard error
-      $0.0111$, so $t_{obs} \approx 58.6$.
-   5. **Conclusion.** Since $58.6\ge1.963$, reject a zero slope at the 5%
-      level. The p-value, far below 0.001, gives the same decision.
-2. The interval for the slope, by hand with one more digit to avoid
-   rounding error:
-   1. **Formula.** $\hat\beta_1\pm t_{0.975,\,872}\,\operatorname{SE}(\hat\beta_1)$.
-   2. **Given values.** $\hat\beta_1=0.6487$,
-      $\operatorname{SE}(\hat\beta_1)=0.01107$, $t_{0.975,\,872}=1.963$.
-   3. **Calculations.** $0.6487 \pm 1.963 \times 0.01107 = 0.6487 \pm 0.0217$.
-   4. **Interval.** $(0.627,\; 0.670)$, in \$ million agreed per \$ million
-      claimed.
-   5. **Conclusion.** This matches `confint()`.
-3. Robust standard errors address the heteroskedasticity only. They do not
-   help with influential observations, with the selection of pitches that
-   ended in a deal, or with a relationship that is not linear.
+Filled-in structure:
+
+- R code: see the code above.
+- Test, hypotheses: $H_0:\beta_1=0$, $H_1:\beta_1\ne0$. The significance
+  level is 5%.
+- Test, test statistic: $T=\hat\beta_1/\operatorname{SE}(\hat\beta_1)$,
+  with $874-2=872$ degrees of freedom.
+- Test, critical value and rejection region: $t_{0.975,\,872}$ =
+  `qt(0.975, 872)` = 1.963. Reject $H_0$ if $|t_{obs}|\ge1.963$.
+- Test, observed value: the slope is $0.649$ with standard error
+  $0.0111$, so $t_{obs} \approx 58.6$.
+- Test, conclusion: since $58.6\ge1.963$, reject a zero slope at the 5%
+  level. The p-value, far below 0.001, gives the same decision.
+- Interval, formula:
+  $\hat\beta_1\pm t_{0.975,\,872}\,\operatorname{SE}(\hat\beta_1)$.
+- Interval, given values: $\hat\beta_1=0.6487$,
+  $\operatorname{SE}(\hat\beta_1)=0.01107$, $t_{0.975,\,872}=1.963$. One
+  more digit than usual avoids rounding error.
+- Interval, calculations: $0.6487 \pm 1.963 \times 0.01107 = 0.6487 \pm 0.0217$.
+- Interval: $(0.627,\; 0.670)$, in \$ million agreed per \$ million
+  claimed.
+- Interval, comparison with the output: the interval by hand matches the
+  interval in the output.
+- Robust standard errors, yes or no, and why: no. Robust standard errors
+  address the heteroskedasticity only. They do not help with influential
+  observations, with the selection of pitches that ended in a deal, or
+  with a relationship that is not linear.
 :::
 
 ### Task 5: R² and F (Lecture 3)
@@ -325,37 +352,35 @@ c(R2_manual = 1 - SSE / SST,
   t_squared = summary(val_model)$coefficients["claimed_m", "t value"]^2)
 ```
 
-1. In squared \$ millions, $\text{SST}\approx11{,}926$,
-   $\text{SSE}\approx2{,}415$, and $\text{SSR}\approx9{,}512$, so
-   $\text{SST}=\text{SSR}+\text{SSE}$. Then
-   $R^2=1-2{,}415/11{,}926\approx0.798$.
-2. `R2_manual` and `R2_summary` give the same value.
-3. The overall F statistic is about 3435, equal to the squared slope t
-   statistic, as it must be in simple regression. The overall F-test
-   compares the complete model with the intercept-only model, which
-   predicts the mean agreed valuation for every deal.
-4. A sentence that does not claim more than the data show: among these
-   deals, the claimed valuation explains about 80% of the variation in the
-   agreed valuations, but this is an association in a selected set of deals,
-   partly driven by a few influential deals, and not the effect of changing
-   a claim.
+Filled-in structure:
+
+- R code: see the code above.
+- SST, SSE, and SSR: in squared \$ millions, $\text{SST}\approx11{,}926$,
+  $\text{SSE}\approx2{,}415$, and $\text{SSR}\approx9{,}512$, so
+  $\text{SST}=\text{SSR}+\text{SSE}$.
+- R-squared by hand: $R^2=1-2{,}415/11{,}926\approx0.798$.
+- R-squared in the output: 0.798, the same value.
+- F and t squared: the overall F statistic is about 3435. The t statistic
+  of the slope is about 58.6, and $58.6^2\approx3435$, as it must be in
+  simple regression.
+- The two models that the overall F-test compares: the complete model and
+  the intercept-only model, which predicts the mean agreed valuation for
+  every deal.
+- Concluding sentence: among these deals, the claimed valuation explains
+  about 80% of the variation in the agreed valuations, but this is an
+  association in a selected set of deals, partly driven by a few
+  influential deals, and not the effect of changing a claim.
 :::
 
 ### Task 6: A new question: how much more equity do the sharks take?
 
-[Shark Tank data]{.shark-tag} Lecture 1 showed that the sharks usually pay the amount that the founder
-asked for and take a larger share of the company. Model this pattern
-directly. Use the 874 deals for a share of the company. Regress the equity
-agreed in the deal (`deal_equity_pct`) on the equity that the founder first
-offered (`equity_offered_pct`), both in percent of the company. Report the
-coefficients, their 95% confidence intervals, and $R^2$. The code below
-builds the data.
-
-```{r}
-#| label: iep01-equity-data
-all_deals <- subset(sharks, deal_on_show == 1 & deal_equity_pct > 0)
-nrow(all_deals)
-```
+[Shark Tank data]{.shark-tag} On Shark Tank, the sharks often pay the
+amount that the founder asks for but take a larger share of the company
+than the founder offered. Model this pattern directly. Use the same 874
+deals for a share of the company (`vals`). Regress the equity agreed in the
+deal (`deal_equity_pct`) on the equity that the founder first offered
+(`equity_offered_pct`), both in percent of the company. Report the
+coefficients, their 95% confidence intervals, and $R^2$.
 
 1. Interpret the slope and the intercept with units, in one sentence each.
 2. A founder offers 10% of the company. Which agreed share does the model
@@ -383,29 +408,35 @@ Advice in two sentences:
 
 ```{r}
 #| label: iep01-equity
-equity_model <- lm(deal_equity_pct ~ equity_offered_pct, data = all_deals)
+equity_model <- lm(deal_equity_pct ~ equity_offered_pct, data = vals)
 summary(equity_model)$coefficients
 confint(equity_model)
 summary(equity_model)$r.squared
 ```
 
-1. The slope is about 1.21 percentage points of agreed equity per
-   percentage point offered, with a 95% interval of about 1.11 to 1.31. The
-   intercept is about 8.5%, with a 95% interval of about 7.1 to 10.0. It is
-   the fitted agreed share for an offer of 0%. No
-   founder offers 0%, so the intercept has no business meaning of its own.
-2. For a founder who offers 10%, the fitted share that the founder gives up
-   is $8.52 + 1.21\times10\approx20.6$% of the company, about twice the
-   offer.
-3. $R^2$ is about 0.40, against 0.80 for the valuations. The offered share
-   says much less about the agreed share than the claimed valuation says
-   about the agreed valuation. So single deals are spread widely around the
-   line.
-4. Advice: for an offer of 10%, expect to give up about 20%, and decide
-   before the pitch how large a share you are willing to give up. These are
-   deals that happened on a television show. They describe what founders who
-   agreed a deal on air gave up, not what would happen to you if you offered
-   a different share.
+Filled-in structure:
+
+- R code: see the code above.
+- Coefficients with their 95% intervals: slope about 1.21, with a 95%
+  interval of about 1.11 to 1.31. Intercept about 8.5, with a 95% interval
+  of about 7.1 to 10.0.
+- R-squared: about 0.40.
+- Interpretation of the slope: a founder who offers one percentage point
+  more of the company gives up on average about 1.21 percentage points more
+  in the agreed deal.
+- Interpretation of the intercept: it is the fitted agreed share for an
+  offer of 0%, and no founder offers 0%, so it has no business meaning of
+  its own.
+- Fitted agreed share for an offer of 10%:
+  $8.52 + 1.21\times10\approx20.6$% of the company, about twice the offer.
+- What the difference in R-squared tells a founder: the offered share
+  explains about 40% of the variation in the agreed share, against 80% for
+  the valuations, so single deals lie far from the fitted value more often
+  and the fitted share is a rough guide only.
+- Advice in two sentences: "For an offer of 10%, expect to give up about
+  20%, and decide before the pitch how large a share you are willing to
+  give up. These numbers describe what founders who agreed a deal on air
+  gave up, not what would happen to you if you offered a different share."
 :::
 
 ### Task 7: Check the AI (Lectures 1 to 3)
@@ -460,23 +491,21 @@ summary(val_model)$r.squared
 mean(abs(residuals(val_model)) < 0.01)   # share within $10,000 of the fitted value
 ```
 
-1. Filled-in structure:
-   - First error: $R^2$ is the share of the variation in the agreed
-     valuations that the fitted values explain, not a share of deals that
-     the model predicts correctly, and only about 2% of the deals lie
-     within \$10,000 of their fitted value.
-   - Second error: a p-value is calculated under the assumptions of the
-     model, so it cannot prove that they hold.
-2. Filled-in structure:
-   - Correct sentence about the R-squared: "Among these 874 deals, the
-     claimed valuation explains about 80% of the variation in the agreed
-     valuations."
-3. Filled-in structure:
-   - What the small p-value does show: it is strong evidence against a
-     slope of zero, if the assumptions of the model hold.
-   - A result from Task 3 to know before trusting the p-value: the residual
-     plot shows a fan shape, so the homoskedasticity assumption fails and
-     the usual standard error and p-value may be wrong.
+Filled-in structure:
+
+- First error: $R^2$ is the share of the variation in the agreed
+  valuations that the fitted values explain, not a share of deals that the
+  model predicts correctly, and only about 2% of the deals lie within
+  \$10,000 of their fitted value.
+- Second error: a p-value is calculated under the assumptions of the model,
+  so it cannot prove that they hold.
+- Correct sentence about the R-squared: "Among these 874 deals, the claimed
+  valuation explains about 80% of the variation in the agreed valuations."
+- What the small p-value does show: it is strong evidence against a slope
+  of zero, if the assumptions of the model hold.
+- A result from Task 3 to know before trusting the p-value: the residual
+  plot shows a fan shape, so the homoskedasticity assumption fails and the
+  usual standard error and p-value may be wrong.
 
 The second sentence of the AI answer is correct. It is the interpretation
 of the slope from Task 1.
@@ -490,44 +519,72 @@ of the slope from Task 1.
 
 ### Individual practice
 
-[Shark Tank data]{.shark-tag} Regress the equity offered by the founder, in percent
-(`equity_offered_pct`), on the season (`season`), using all 1,441 pitches.
+[Shark Tank data]{.shark-tag} Do the sharks pay the amount that a founder
+asks for? Use the 874 deals for a share of the company (`vals`). Regress the
+amount agreed in the deal on the amount that the founder asked for, both in
+thousands of dollars. The code below converts both amounts from dollars to
+thousands of dollars.
 
-1. Make and read the scatterplot with the fitted line.
-2. Report the fitted equation and units.
-3. Report the standard error of the slope, its t statistic, its p-value, and its
-   95% interval.
-4. Report $R^2$ and the overall F-test.
-5. Inspect the residual plots and write a conclusion of about 120 words.
+```{r}
+#| label: iep01-practice-amounts-data
+vals$ask_1k <- vals$ask_amount_usd / 1000     # amount asked, in $1,000s
+vals$deal_1k <- vals$deal_amount_usd / 1000   # amount agreed, in $1,000s
+```
+
+1. Make the scatterplot with the fitted line, and describe it in two
+   sentences.
+2. Report the fitted equation with units, and interpret the slope in one
+   sentence.
+3. Report the standard error of the slope, its t statistic, its p-value,
+   and its 95% confidence interval. Say in one sentence whether a slope of
+   exactly 1 (one dollar agreed per dollar asked) lies inside the interval.
+4. Report $R^2$ and the result of the overall F-test.
+5. Inspect the residual plot and the normal Q--Q plot, and write a
+   conclusion of about 120 words.
 
 ::: {.callout-note collapse="true"}
 ## Check a model answer
 
 ```{r}
-#| label: iep01-practice-equity
-sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
-season_model <- lm(equity_offered_pct ~ season, data = sharks)
-summary(season_model)$coefficients
-confint(season_model)
-c(r_squared = summary(season_model)$r.squared,
-  F = unname(summary(season_model)$fstatistic["value"]))
+#| label: iep01-practice-amounts
+amount_model <- lm(deal_1k ~ ask_1k, data = vals)
+summary(amount_model)$coefficients
+confint(amount_model)
+c(r_squared = summary(amount_model)$r.squared,
+  F = unname(summary(amount_model)$fstatistic["value"]))
+# deals that paid exactly, more than, and less than the amount asked
+c(same = sum(vals$deal_1k == vals$ask_1k),
+  more = sum(vals$deal_1k > vals$ask_1k),
+  less = sum(vals$deal_1k < vals$ask_1k))
 ```
 
-This model answer covers points 2 to 5.
+The code fits the model, prints the coefficient table, the 95% intervals,
+$R^2$ and the overall F statistic, and then counts how many deals paid
+exactly, more than, or less than the amount asked.
 
+1. Most deals lie on one straight line on which the amount agreed equals
+   the amount asked. A smaller group lies above that line, where the
+   sharks paid more than the founder asked for, in a few cases millions of
+   dollars more.
 2. The fitted equation is
-   $\widehat{\text{equity}}=20.457-0.824\,\text{season}$: one later season
-   is associated with about 0.824 percentage points less initial equity
-   offered on average.
-3. The standard error is about 0.048, $t\approx-17.3$, and the p-value is
-   below 0.001. The 95% interval $(-0.917,\,-0.731)$ excludes zero.
-4. $R^2\approx0.173$, so the season explains about 17.3% of the variation
-   in the equity offered, and the overall F-test ($F\approx300.7=t^2$)
-   reaches the same conclusion as the slope test.
-5. The residual plot shows sixteen vertical stripes (the season takes whole
-   numbers only) with broadly similar spread. The Q--Q plot bends upwards at
-   the right end because of some very high offers. This is a trend over time
-   among recorded pitches, not a causal effect of a later season.
+   $\widehat{\text{agreed}}=27.9+1.008\,\text{asked}$, both in \$1,000s.
+   A founder who asks \$1,000 more agrees on average about \$1,008 more.
+3. The standard error is about 0.018, $t\approx55.1$, and the p-value is
+   below 0.001. The 95% interval runs from about 0.972 to 1.044, so a slope
+   of exactly 1 lies inside it.
+4. $R^2\approx0.777$: the amount asked explains about 78% of the variation
+   in the amount agreed. The overall F-test ($F\approx3036=t^2$) rejects
+   the intercept-only model at the 5% level, as the slope test does.
+5. Conclusion: "Among the 874 deals for a share of the company, the sharks
+   paid about one dollar per dollar asked. In 720 deals (82%) they paid
+   exactly the amount asked, in 138 deals more, and in 16 deals less. The
+   residual plot shows a dense row of residuals just below zero, about
+   $-\$29{,}000$, from the deals that paid exactly the ask, and a few very
+   large positive residuals, up to about \$2.8 million. The Q--Q plot rises
+   steeply at the right end, so the residuals are far from normal. The
+   usual standard errors are therefore only a rough guide. The data contain
+   only pitches that ended in a deal on air, so they do not show that
+   asking for more money would bring more money."
 :::
 
 ### Check your understanding

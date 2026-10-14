@@ -12,15 +12,15 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 ::: {.outcomes}
 <span class="label">By the end of Tutorial 2, you can</span>
 
-- fit and interpret a multiple regression with dummies, interactions, and curves
-- compare nested models and test groups of terms with a partial F-test
-- read a regression table from a research paper and state its limits
-- check an AI answer about a regression and use a confidence interval for a decision
+- fit and interpret a multiple regression with dummies, interactions, and curves,
+- compare nested models and test groups of terms with a partial F-test,
+- read a regression table from a research paper and state its limits,
+- check an AI answer about a regression and use a confidence interval for a decision.
 :::
 
 Tutorials are exam preparation sessions. The tasks below are exam-style
-questions. You first try each task in pairs. You may use AI for this, following
-Attempt, Ask, Verify, Explain. Then the class discusses the solution together.
+questions. Try each task yourself before you look at the solution. You may
+use AI for this, following Attempt, Ask, Verify, Explain.
 
 ::: {.course-phase .phase-before}
 
@@ -57,21 +57,32 @@ Complete from memory:
 
 ## In the tutorial
 
-Try each task in R before you open the answer. Tasks 1 to 4 use the Shark
-Tank file, and money is measured in thousands of dollars (`ask_1k`). First
-build the data for the analysis. The code is the same as in Lectures 4--6.
-
-More practice for home is in the final section of this page,
+Try each task in R before you open the answer. More practice for home is in
+the final section of this page,
 [Extra practice for home](#i-ep02-home).
+
+Tasks 1 to 4 use the Shark Tank file, and money is measured in thousands of
+dollars. Tutorial 1 asked how a single predictor relates to the outcome.
+This tutorial asks what changes when several predictors are held fixed at
+the same time, when categories enter the model, and when a slope depends on
+a group or on the season. First build the data for the analysis, with the
+same steps as in Lectures 4 to 6. The code converts the requested amount to
+thousands of dollars (`ask_1k`). It keeps the 874 deals for a share of the
+company (`deals`) for Task 1. For Tasks 2 to 4 it keeps the 1,434 pitches
+with a known team classification (`known_gender`). The 7 pitches with an
+unknown team are left out, so that all models of Tasks 2 to 4 use the same
+observations. Then it makes all-men teams the reference category of the
+team variable, builds the dummy `women` (1 for all-women and mixed teams),
+and centres the season at its mean.
 
 ```{r}
 #| label: iep02-load
 sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
 sharks$ask_1k <- sharks$ask_amount_usd / 1000
+deals <- subset(sharks, deal_on_show == 1 & deal_equity_pct > 0)
 known_gender <- subset(sharks, pitcher_gender_group != "unknown")
 known_gender$gender <- relevel(factor(known_gender$pitcher_gender_group),
                                ref = "all_men")
-known_gender$ask_1k <- known_gender$ask_amount_usd / 1000
 known_gender$women <- as.integer(
   known_gender$pitcher_gender_group %in% c("all_women", "mixed")
 )
@@ -80,29 +91,34 @@ known_gender$season_c <- known_gender$season - mean(known_gender$season)
 
 ### Task 1: Multiple-regression coefficients (Lecture 4)
 
-[Shark Tank data]{.shark-tag} With all 1,441 pitches (`sharks`), fit a regression
-of the equity offered, in percent (`equity_offered_pct`), on the season
-(`season`), the requested amount in thousands of dollars (`ask_1k`), and the
-number of words in the description (`description_words`).
-Then answer these questions.
+[Shark Tank data]{.shark-tag} How much of the company do founders give up
+in a deal, once the season and the size of the request are taken into
+account? With the 874 deals for a share of the company (`deals`), fit a
+regression of the equity agreed in the deal, in percent
+(`deal_equity_pct`), on the equity that the founder first offered, in
+percent (`equity_offered_pct`), the season (`season`), and the requested
+amount in thousands of dollars (`ask_1k`). Then answer these questions.
 
 1. Interpret all three slopes with units and with the predictors that are
    held fixed, in one sentence each.
-2. Say which 95% confidence interval of a slope includes zero, and report
-   that interval.
+2. The simple regression of the agreed equity on the equity offered, with
+   the same deals, gives a slope of about 1.21. Compare it with the slope
+   of the equity offered in your model, and explain in one or two sentences
+   why the slope changed.
 3. Interpret $R^2$ and adjusted $R^2$ in one sentence each. Then name the
    two models that the overall F-test compares, and state its conclusion
    at the 5% level.
-4. Give two reasons why the coefficients cannot be read as causal effects.
+4. Give two reasons why the coefficients cannot be read as causal effects,
+   in one sentence each.
 
 Use (copy and paste) this structure:
 
 ```text
 R code:
+Interpretation of the equity-offered slope:
 Interpretation of the season slope:
 Interpretation of the requested-amount slope:
-Interpretation of the description-words slope:
-Interval that includes zero:
+Change in the equity-offered slope, and why:
 R-squared:
 Adjusted R-squared:
 Overall F-test, the two models it compares, and its conclusion:
@@ -115,97 +131,131 @@ Two reasons why the coefficients are not causal effects:
 ```{r}
 #| label: iep02-base-model
 m1 <- lm(
-  equity_offered_pct ~ season + ask_1k + description_words,
-  data = sharks
+  deal_equity_pct ~ equity_offered_pct + season + ask_1k,
+  data = deals
 )
 summary(m1)
-confint(m1)
+mean(deals$deal_equity_pct)   # benchmark: mean agreed equity
+cor(deals$season, deals[, c("equity_offered_pct", "deal_equity_pct")])
 ```
 
-1. Among the 1,441 recorded pitches, at fixed values of the other included
-   predictors:
-   - one later season is associated with about 0.836 percentage points less
-     equity offered, on average
-   - an extra \$1,000 requested is associated with about 0.0029 percentage
-     points less (about 0.29 points per \$100,000), on average
-   - one additional description word is associated with about 0.128
-     percentage points less, on average.
-2. The interval for the description words, about $(-0.351, 0.095)$
-   percentage points per word, includes zero.
-3. $R^2\approx0.188$: the model explains about 19% of the variation in the
-   equity offered among these pitches. Adjusted $R^2\approx0.186$ is almost
-   the same, because the penalty for three predictors is small with 1,441
-   pitches. The overall F-test compares the model with the intercept-only
-   model. It gives $F\approx110.6$ on 3 and 1437 degrees of freedom, with a
-   p-value below 0.001, so it rejects the null hypothesis that all three
-   slopes are zero.
-4. Any two of these: only selected pitches reach the show, the quality of
-   the venture is not measured, the equity offered may influence the amount
-   requested, and the variables may be measured with error.
+Filled-in structure:
+
+- R code: see the code above.
+- Interpretation of the equity-offered slope: among the 874 deals, at the
+  same season and requested amount, a founder who offers one percentage
+  point more gives up on average about 1.04 percentage points more in the
+  deal.
+- Interpretation of the season slope: at the same offer and requested
+  amount, one later season is associated with about 0.63 percentage points
+  less agreed equity, on average. Over ten seasons this adds up to about
+  6.3 points, about a quarter of the mean agreed share of 23.6%.
+- Interpretation of the requested-amount slope: at the same offer and
+  season, an extra \$1,000 requested is associated with about 0.0051
+  percentage points less agreed equity (about 0.51 points per \$100,000),
+  on average.
+- Change in the equity-offered slope, and why: the slope falls from about
+  1.21 to about 1.04. In early seasons founders offered larger shares and
+  the sharks also took larger shares (both correlations with the season are
+  about $-0.40$), so the simple slope partly picked up this season pattern,
+  and holding the season fixed removes that part.
+- R-squared: $R^2\approx0.433$, so the three predictors explain about 43%
+  of the variation in the agreed equity among these deals.
+- Adjusted R-squared: $0.431$, almost the same, because the penalty for
+  three predictors is small with 874 deals.
+- Overall F-test, the two models it compares, and its conclusion: it
+  compares the model with the intercept-only model. It gives
+  $F\approx221.1$ on 3 and 870 degrees of freedom, with a p-value below
+  0.001, so it rejects the null hypothesis that all three slopes are zero.
+- Two reasons why the coefficients are not causal effects: any two of
+  these. Only pitches that ended in a deal on air are in the data. The
+  quality of the venture is not measured, and it can affect both the share
+  that a founder offers and the share that the sharks take. The amounts
+  and shares may be measured with error.
 :::
 
 ### Task 2: Dummy variables and a partial F-test (Lecture 5)
 
-[Shark Tank data]{.shark-tag} Use the 1,434 pitches with a known team classification (`known_gender`).
-Fit a reduced model of the equity offered (`equity_offered_pct`) on the
-season and the requested amount (`ask_1k`). Fit a complete model that adds
-the team category `gender` (all-men, all-women, or mixed).
+[Shark Tank data]{.shark-tag} Do founders in some industries offer a
+different share of their company? Use the 1,434 pitches with a known team
+classification (`known_gender`). Fit a reduced model of the equity offered
+(`equity_offered_pct`) on the season and the requested amount (`ask_1k`).
+Fit a complete model that adds the industry of the venture (`industry`, 16
+industries), with Food and Beverage, the largest industry, as the reference
+category.
 
-1. Name the reference category.
-2. Interpret both dummy coefficients, in one sentence each.
+1. Say how many dummy coefficients the complete model has, and explain in
+   one sentence why.
+2. Interpret the coefficient of Technology/Software in one sentence. Judge
+   its size in one sentence, as a percent of the mean equity offered in
+   these pitches.
 3. Test with a partial F-test at the 5% level, with the p-value approach,
-   whether the two dummy coefficients are jointly zero.
-4. Explain in one or two sentences why the partial F-test and the
-   individual t-tests answer different questions.
+   whether all industry coefficients are jointly zero.
+4. The t-test of the Technology/Software coefficient and the partial
+   F-test lead to different conclusions. Explain in one or two sentences
+   how this can happen.
 
 Use (copy and paste) this structure:
 
 ```text
 R code:
-Reference category:
-Interpretation of the all-women coefficient:
-Interpretation of the mixed coefficient:
+Number of dummy coefficients, and why:
+Interpretation of the Technology/Software coefficient:
+Size, as a percent of the mean equity offered:
 Null hypothesis H0:          and alternative hypothesis H1:
 Test statistic formula:
 Values in the formula:
 Value of the test statistic:
 P-value:
 Conclusion:
-Why the F-test and the t-tests answer different questions:
+Why the t-test and the F-test can disagree:
 ```
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
 ```{r}
-#| label: iep02-gender-models
+#| label: iep02-industry-models
+known_gender$industry <- relevel(factor(known_gender$industry),
+                                 ref = "Food and Beverage")
 reduced <- lm(equity_offered_pct ~ season + ask_1k,
               data = known_gender)
-complete <- lm(equity_offered_pct ~ season + ask_1k + gender,
+complete <- lm(equity_offered_pct ~ season + ask_1k + industry,
                data = known_gender)
 summary(complete)
 anova(reduced, complete)
+mean(known_gender$equity_offered_pct)   # benchmark: mean equity offered
 ```
 
-1. The reference category is all-men.
-2. At the same season and requested amount, all-women presenting teams are
-   fitted to offer about 1.28 equity percentage points more than all-men
-   teams, and mixed teams about 0.12 points more. The unit is percentage
-   points, not percent. The categories are broad and the data do not come
-   from an experiment, so the result does not show a causal effect of
-   gender.
-3. $H_0$: both dummy coefficients are zero. $H_1$: at least one of them is
-   not zero. The test statistic is
-   $F=\dfrac{(\text{SSE}_R-\text{SSE}_C)/q}{\text{SSE}_C/(n-k_C-1)}$, with
-   $\text{SSE}_R=83{,}228$, $\text{SSE}_C=82{,}792$, $q=2$, and
-   $n-k_C-1=1{,}429$. So
-   $F=\dfrac{436.25/2}{82{,}792/1{,}429}\approx3.76$, with a p-value of
-   about 0.023. Since $0.023\le0.05$, reject $H_0$ at the 5% level. The two
-   terms are jointly significant.
-4. The t-test of the mixed dummy alone (p $\approx$ 0.82) is far from
-   significant, but the F-test rejects. The F-test asks whether the two
-   terms together improve the model. Each t-test asks about one comparison
-   with the reference category.
+Filled-in structure:
+
+- R code: see the code above.
+- Number of dummy coefficients, and why: 15, one for each of the 16
+  industries except the reference category Food and Beverage.
+- Interpretation of the Technology/Software coefficient: at the same
+  season and requested amount, Technology/Software pitches are fitted to
+  offer about 2.95 percentage points less equity than Food and Beverage
+  pitches (p $\approx$ 0.004).
+- Size, as a percent of the mean equity offered: 2.95 points is about 22%
+  of the mean equity offered of 13.2%, a sizeable difference for a founder.
+- Null hypothesis H0: all 15 industry coefficients are zero. Alternative
+  hypothesis H1: at least one of them is not zero.
+- Test statistic formula:
+  $F=\dfrac{(\text{SSE}_R-\text{SSE}_C)/q}{\text{SSE}_C/(n-k_C-1)}$.
+- Values in the formula: $\text{SSE}_R=83{,}228$,
+  $\text{SSE}_C=81{,}858$, $q=15$, and $n-k_C-1=1{,}434-17-1=1{,}416$.
+- Value of the test statistic:
+  $F=\dfrac{1{,}370.6/15}{81{,}858/1{,}416}=\dfrac{91.37}{57.81}\approx1.58$.
+- P-value: about 0.072.
+- Conclusion: since $0.072>0.05$, do not reject $H_0$ at the 5% level. The
+  data do not show that the industry terms together improve the model.
+  This does not prove that all industries offer the same share.
+- Why the t-test and the F-test can disagree: the F-test asks whether the
+  15 industry terms together improve the model, while each t-test asks
+  about one comparison with Food and Beverage. With 15 separate t-tests at
+  the 5% level, one p-value below 0.05 can easily occur by chance even if
+  no industry differs, because each test rejects a true null hypothesis in
+  about 1 of 20 cases.
 :::
 
 ### Task 3: Interaction (Lecture 6)
@@ -215,9 +265,11 @@ fit a regression of the equity offered (`equity_offered_pct`) on the
 centred season `season_c`, the dummy `women` (1 for all-women and mixed
 teams), their interaction, and the requested amount (`ask_1k`).
 
-1. Write the fitted line for `women = 0` and for `women = 1` at the
-   average requested amount.
-2. Calculate both season slopes.
+1. Write the fitted line for `women = 0` and for `women = 1` at a requested
+   amount of \$100,000. Give both season slopes.
+2. Calculate the fitted difference in the equity offered between a team
+   with women and an all-men team in Season 4, at the same requested
+   amount.
 3. Interpret the interaction estimate and its p-value in one or two
    sentences, without claiming too much in either direction.
 4. Explain in one or two sentences what centring the season changes and
@@ -231,6 +283,7 @@ Fitted line for women = 0:
 Fitted line for women = 1:
 Season slope for all-men teams:
 Season slope for teams with women:
+Fitted difference in Season 4:
 Interpretation of the interaction estimate and its p-value:
 What centring changes and what it does not change:
 ```
@@ -245,51 +298,64 @@ m_interaction <- lm(
   data = known_gender
 )
 summary(m_interaction)
+mean(known_gender$season)   # average season, used for centring
 ```
 
-1. At the average requested amount, the fitted line for all-men teams is
-   $12.866-0.799\,\text{season\_c}$, and for teams with women it is
-   $13.673-0.861\,\text{season\_c}$, as in Lecture 6. The intercept 12.866
-   is the intercept 13.625 plus the `ask_1k` coefficient times the average
-   requested amount, `mean(known_gender$ask_1k)`. For teams with women the
-   intercept is $12.866+0.807=13.673$.
-2. The season slope is about $-0.799$ percentage points per season for
-   all-men teams. For teams with women it is $-0.7994-0.0615\approx-0.861$.
-3. The estimated difference in slopes is $-0.061$ percentage points per
-   season, with p $\approx$ 0.520. The model gives no evidence that the
-   season trends differ between the two groups. It also does not prove that
-   the trends are equal, because the estimate is imprecise.
-4. Centring makes the `women` coefficient compare the groups at the average
-   season (about 8.8) and not at Season 0, which does not exist. It changes
-   neither the fitted values nor the interaction estimate.
+Filled-in structure:
+
+- R code: see the code above.
+- Fitted line for women = 0: the intercept at \$100,000 requested is
+  $13.625-0.00268\times100\approx13.357$, so the line is
+  $13.357-0.799\,\text{season\_c}$.
+- Fitted line for women = 1: the intercept is $13.357+0.807=14.164$, so
+  the line is $14.164-0.861\,\text{season\_c}$.
+- Season slope for all-men teams: about $-0.799$ percentage points per
+  season.
+- Season slope for teams with women: $-0.7994-0.0615\approx-0.861$
+  percentage points per season.
+- Fitted difference in Season 4: the average season is about 8.78, so
+  Season 4 is $\text{season\_c}=4-8.78=-4.78$. The difference is
+  $0.807+(-0.0615)\times(-4.78)\approx1.10$ percentage points, about 8% of
+  the mean equity offered of 13.2%.
+- Interpretation of the interaction estimate and its p-value: the
+  estimated difference in slopes is $-0.061$ percentage points per season,
+  with p $\approx$ 0.520, so the model gives no evidence that the season
+  trends differ between the two groups. It also does not prove that the
+  trends are equal, because the estimate is imprecise.
+- What centring changes and what it does not change: centring makes the
+  `women` coefficient compare the groups at the average season (about 8.8)
+  and not at Season 0, which does not exist. It changes neither the fitted
+  values nor the interaction estimate.
 :::
 
 ### Task 4: Polynomial term (Lecture 6)
 
-[Shark Tank data]{.shark-tag} With all 1,441 pitches (`sharks`), fit a linear model of the equity
-offered (`equity_offered_pct`) on the season and the requested amount
-(`ask_1k`), and a quadratic model that adds the square of the season.
+[Shark Tank data]{.shark-tag} With the 1,434 pitches with a known team
+classification (`known_gender`), fit a linear model of the equity offered
+(`equity_offered_pct`) on the season and the requested amount (`ask_1k`),
+and a quadratic model that adds the square of the season.
 
-1. In an R formula, the square of `season` is written `I(season^2)`. Why
-   is `I()` needed? Answer in one sentence.
-2. Decide with a partial F-test at the 5% level whether the quadratic term
+1. Decide with a partial F-test at the 5% level whether the quadratic term
    improves the model.
-3. Calculate the fitted change from Season 10 to Season 11, at the same
-   requested amount.
-4. State in one or two sentences why you should not extrapolate the curve
-   beyond Season 16.
+2. Calculate the fitted change from Season 2 to Season 3 and from Season
+   14 to Season 15, at the same requested amount. Say in one sentence what
+   the comparison of the two changes shows.
+3. Calculate the fitted change from Season 18 to Season 19. Explain in one
+   or two sentences why you should not use this number.
 
 Use (copy and paste) this structure:
 
 ```text
 R code:
-Why I() is needed:
 Null hypothesis H0:          and alternative hypothesis H1:
 Value of the test statistic:
 P-value:
 Conclusion:
-Fitted change from Season 10 to Season 11:
-Why not to extrapolate beyond Season 16:
+Fitted change from Season 2 to Season 3:
+Fitted change from Season 14 to Season 15:
+What the comparison shows:
+Fitted change from Season 18 to Season 19:
+Why not to use this number:
 ```
 
 ::: {.callout-note collapse="true"}
@@ -297,85 +363,93 @@ Why not to extrapolate beyond Season 16:
 
 ```{r}
 #| label: iep02-polynomial
-m_linear <- lm(equity_offered_pct ~ season + ask_1k, data = sharks)
+m_linear <- lm(equity_offered_pct ~ season + ask_1k, data = known_gender)
 m_quadratic <- lm(
   equity_offered_pct ~ season + I(season^2) + ask_1k,
-  data = sharks
+  data = known_gender
 )
 summary(m_quadratic)
 anova(m_linear, m_quadratic)
+b <- coef(m_quadratic)
+# fitted change from season x to x + 1, for x = 2, 14, and 18
+b["season"] + b["I(season^2)"] * (2 * c(2, 14, 18) + 1)
 ```
 
-1. `I()` tells R to calculate the square. Without `I()`, R would read `^`
-   as part of the formula syntax and not as a square.
-2. $H_0$: the coefficient of the quadratic term is zero. $H_1$: it is not
-   zero. The partial F-test gives $F\approx20.1$ with p $<$ 0.001, so
-   reject $H_0$ at the 5% level.
-   The quadratic term improves the model.
-3. With $\hat\beta_1\approx-1.713$ and $\hat\beta_2\approx0.051$, the
-   change from Season 10 to 11 is
-   $\hat\beta_1+\hat\beta_2(2\times10+1)=\hat\beta_1+21\hat\beta_2\approx-0.64$
-   percentage points. Never read $\hat\beta_1$ alone while the quadratic
-   term is in the model.
-4. Beyond Season 16 the fitted curve turns upward, and no data support that
-   turn. A quadratic curve can change direction sharply outside the observed
-   range.
+Filled-in structure:
+
+- R code: see the code above.
+- Null hypothesis H0: the coefficient of the quadratic term is zero.
+  Alternative hypothesis H1: it is not zero.
+- Value of the test statistic: $F\approx20.0$, on 1 and 1,430 degrees of
+  freedom.
+- P-value: below 0.001.
+- Conclusion: reject $H_0$ at the 5% level. The quadratic term improves the
+  model.
+- Fitted change from Season 2 to Season 3: with $\hat\beta_1\approx-1.713$
+  and $\hat\beta_2\approx0.0509$, the change is
+  $\hat\beta_1+\hat\beta_2(2\times2+1)=-1.713+5\times0.0509\approx-1.46$
+  percentage points, about 11% of the mean equity offered of 13.2%.
+- Fitted change from Season 14 to Season 15:
+  $-1.713+29\times0.0509\approx-0.24$ percentage points.
+- What the comparison shows: the fitted decline flattens, from about 1.5
+  points per season in the early seasons to less than a quarter point per
+  season in the late seasons.
+- Fitted change from Season 18 to Season 19:
+  $-1.713+37\times0.0509\approx+0.17$ percentage points, a rise.
+- Why not to use this number: the data contain no season after 16, so
+  nothing in the data supports this rise. A quadratic curve always turns
+  somewhere, and the rise only follows from that shape.
 :::
 
 ### The models of Tasks 2 to 4 in one table {#iep02-spec-table}
 
 [Shark Tank data]{.shark-tag} Lecture 4 showed how research papers put several models side by side in one
 regression table. The table below does this for the models of Tasks 2 to 4.
-All columns of such a table must use the same observations. Tasks 2 and 3
-use the 1,434 pitches with a known team classification (`known_gender`).
-Task 4 uses all 1,441 pitches. So first fit the quadratic model again on the
-1,434 pitches. The code then prints the two model outputs that the answers
-above do not show.
+All columns of such a table must use the same observations. Tasks 2 to 4
+all use the 1,434 pitches with a known team classification
+(`known_gender`), so their models fit in one table. The code prints the one
+model output that the answers above do not show, the reduced model of
+Task 2.
 
 ```{r}
 #| label: iep02-table-models
-m_quadratic_known <- lm(
-  equity_offered_pct ~ season + I(season^2) + ask_1k,
-  data = known_gender
-)
 summary(reduced)
-summary(m_quadratic_known)
 ```
 
 Column (1) is the reduced model of Task 2 (`reduced`), column (2) the
 complete model of Task 2 (`complete`), column (3) the interaction model of
-Task 3 (`m_interaction`), and column (4) the quadratic model
-(`m_quadratic_known`).
+Task 3 (`m_interaction`), and column (4) the quadratic model of Task 4
+(`m_quadratic`).
 
 ::: {.reg-table}
 | | (1) | (2) | (3) | (4) |
 |:---|---:|---:|---:|---:|
-| Season | −0.815\*\*\* | −0.824\*\*\* | −0.799\*\*\* | −1.713\*\*\* |
+| Season | −0.815\*\*\* | −0.819\*\*\* | −0.799\*\*\* | −1.713\*\*\* |
 | | (0.047) | (0.048) | (0.066) | (0.206) |
 | Season squared | | | | 0.051\*\*\* |
 | | | | | (0.011) |
-| Amount requested (\$1,000s) | −0.0029\*\*\* | −0.0027\*\*\* | −0.0027\*\*\* | −0.0027\*\*\* |
+| Amount requested (\$1,000s) | −0.0029\*\*\* | −0.0028\*\*\* | −0.0027\*\*\* | −0.0027\*\*\* |
 | | (0.0006) | (0.0006) | (0.0006) | (0.0006) |
-| All-women team | | 1.284\*\* | | |
-| | | (0.481) | | |
-| Mixed team | | 0.121 | | |
-| | | (0.541) | | |
+| Industry dummies (15) | | Yes | | |
 | Team with women (all-women or mixed) | | | 0.807 | |
 | | | | (0.412) | |
 | Season × team with women | | | −0.061 | |
 | | | | (0.096) | |
-| Intercept | 21.185\*\*\* | 20.839\*\*\* | 13.625\*\*\* | 24.168\*\*\* |
-| | (0.484) | (0.506) | (0.335) | (0.822) |
+| Intercept | 21.185\*\*\* | 21.265\*\*\* | 13.625\*\*\* | 24.168\*\*\* |
+| | (0.484) | (0.631) | (0.335) | (0.822) |
 | Observations | 1,434 | 1,434 | 1,434 | 1,434 |
-| $R^2$ | 0.187 | 0.191 | 0.189 | 0.198 |
-| Adjusted $R^2$ | 0.186 | 0.189 | 0.187 | 0.197 |
+| $R^2$ | 0.187 | 0.200 | 0.189 | 0.198 |
+| Adjusted $R^2$ | 0.186 | 0.191 | 0.187 | 0.197 |
 :::
 
 Outcome: equity offered (%). Ordinary least squares. Standard errors in
 parentheses. All four columns use the same 1,434 pitches with a known team
-classification. The reference category is all-men teams. In column (3) season
-is centred at its mean (about 8.8), so the intercept and the coefficient of
-"Team with women" refer to the average season.
+classification. In column (2), "Yes" means that the model contains the 15
+industry dummies, with Food and Beverage as the reference category. Many
+papers report a large set of dummies in this short way. In column (3) the
+reference category is all-men teams, and season is centred at its mean
+(about 8.8), so the intercept and the coefficient of "Team with women"
+refer to the average season.
 \* p < 0.05, \*\* p < 0.01, \*\*\* p < 0.001.
 
 Read along the Season row. The coefficient is close to $-0.8$ in
@@ -390,12 +464,12 @@ your thesis.
 
 ### Task 5: Read a regression table from a paper
 
-The table below is invented. It has the layout of a table in a research
-paper, the same layout as the table above. The outcome is
-entrepreneurial intention on a scale from 1 to 7, measured in a survey of
-265 students. Self-efficacy is a score from 1 to 7 for how confident a
-student is that he or she can start a business. The table does not show the
-intercept. Some journals do this.
+The table below has the layout of a regression table in a research paper,
+the same layout as the table above. The outcome is entrepreneurial
+intention on a scale from 1 to 7, measured in a survey of 265 students.
+Self-efficacy is a score from 1 to 7 for how confident a student is that he
+or she can start a business. The table does not show the intercept. Some
+journals do this.
 
 ::: {.reg-table}
 | | (1) | (2) |
@@ -417,15 +491,16 @@ Outcome: entrepreneurial intention (scale from 1 to 7). Ordinary least
 squares. Standard errors in parentheses.
 \* p < 0.05, \*\* p < 0.01, \*\*\* p < 0.001.
 
-1. What do the numbers in parentheses and the stars mean? Check the stars
-   of the self-efficacy coefficient with its t statistic. The critical
-   value is $t_{0.975,\,260}=1.969$.
+1. Say in one sentence each what the numbers in parentheses and the stars
+   mean. Then check the stars of the self-efficacy coefficient with its t
+   statistic. The critical value is $t_{0.975,\,260}=1.969$.
 2. The coefficient of Female changes from $-0.21$ with a star in column (1)
-   to $-0.15$ without a star in column (2). Explain what happened with the
-   ideas of Lecture 4, and say what the missing star does and does not
-   mean.
-3. $R^2$ rises from 0.03 to 0.19. What does that say, and which test would
-   show whether the two added predictors are jointly significant?
+   to $-0.15$ without a star in column (2). Explain in one or two sentences
+   why the coefficient changed. Then say in one or two sentences what the
+   missing star does and does not mean.
+3. $R^2$ rises from 0.03 to 0.19. Say in one sentence what that means, and
+   name the test that shows whether the two added predictors are jointly
+   significant.
 
 Use (copy and paste) this structure:
 
@@ -442,38 +517,45 @@ Test of the two added predictors:
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-1. The numbers in parentheses are standard errors. The stars show the
-   p-value of the two-sided t-test of each coefficient against zero. For
-   self-efficacy, $t_{obs}=0.38/0.07\approx5.4$. This is far beyond the
-   critical value $t_{0.975,\,260}$ = `qt(0.975, 260)` = 1.969, and p is
-   below 0.001, so three stars are correct.
-2. Model (2) holds two more variables fixed than model (1). The Female
-   coefficient now compares women and men with the same experience and
-   self-efficacy. In column (1), at the same age, the difference between women
-   and men was 0.21 points. Part of this difference went together with differences in experience and self-efficacy. The missing star says that the
-   confidence interval around $-0.15$ includes zero. It does not show that
-   the difference is zero.
-3. The two added predictors explain a further 16 percentage points of
-   the variation in intentions in this sample. A partial F-test of the two
-   nested models would show whether the two added predictors are jointly
-   significant. It compares model (1) with model (2) on the same 265 students. If
-   you have the data, `anova()` of the two fitted models gives this test.
+Filled-in structure:
+
+- Numbers in parentheses: the standard errors of the coefficients.
+- Stars: the p-value of the two-sided t-test of each coefficient against
+  zero, with more stars for a smaller p-value.
+- t statistic of self-efficacy, and check of its stars:
+  $t_{obs}=0.38/0.07\approx5.4$. This is far beyond the critical value
+  $t_{0.975,\,260}$ = `qt(0.975, 260)` = 1.969, and p is below 0.001, so
+  three stars are correct.
+- What happened to the Female coefficient: model (2) holds experience and
+  self-efficacy fixed as well, so the coefficient now compares women and
+  men with the same age, experience, and self-efficacy. Part of the
+  difference of 0.21 points in column (1) went together with differences in
+  experience and self-efficacy.
+- What the missing star does and does not mean: the 95% confidence
+  interval around $-0.15$ includes zero. It does not show that the
+  difference is zero.
+- What the rise in R-squared says: the two added predictors explain a
+  further 16 percentage points of the variation in intentions in this
+  sample.
+- Test of the two added predictors: a partial F-test of the two nested
+  models, model (1) against model (2) on the same 265 students. If you have
+  the data, `anova()` of the two fitted models gives this test.
 :::
 
 ### Task 6: A/B test, moderator and mediator (Lectures 5 and 6)
 
-&#40;a) An invented A/B test. An online shop for refurbished phones shows 120
-new visitors either its current product page (`new_page = 0`) or a new page
-with customer videos (`new_page = 1`). Chance decides which page each
-visitor sees, 60 visitors per page. The outcome is the value of the first
-order in euros.
+&#40;a) An online shop for refurbished phones shows 120 new visitors either
+its current product page (`new_page = 0`) or a new page with customer
+videos (`new_page = 1`). Chance decides which page each visitor sees, 60
+visitors per page. The outcome is the value of the first order in euros.
+The code below creates the data.
 
 ```{r}
 #| label: iep02-ab-test
 set.seed(21)
 # random assignment: 60 zeros (old page) and 60 ones (new page)
 new_page <- sample(rep(c(0, 1), each = 60))
-# invented order values in euros, with a true effect of 3 euros
+# order values in euros, simulated with a true effect of 3 euros
 order_value <- round(40 + 3 * new_page + rnorm(120, mean = 0, sd = 8), 2)
 ab_shop <- data.frame(new_page, order_value)
 ```
@@ -501,9 +583,9 @@ Size, as a percent of the mean order value with the old page:
 customers. Customers with the coupon order more meal kits. The coupon raises
 orders more for students than for other customers. The coupon also brings
 customers to the website more often, and more visits go with more orders.
-Which variable is a moderator, and which is a mediator? How does each one
-appear in a regression of orders on the coupon dummy? Use (copy and paste)
-this structure:
+Which variable is a moderator, and which is a mediator? Say in one or two
+sentences each how it appears in a regression of orders on the coupon
+dummy. Use (copy and paste) this structure:
 
 ```text
 Moderator, and how it appears in the regression:
@@ -522,45 +604,50 @@ summary(ab_fit)$coefficients
 qt(0.975, df = 118)
 ```
 
-The mean order value is 39.09 euros with the old page (the intercept)
-and $39.09+3.41=42.50$ euros with the new page.
+Filled-in structure:
 
-1. **Hypotheses.** $H_0:\beta_1=0$, the new page has no effect on the mean
-   order value. $H_1:\beta_1\ne0$. The significance level is 5%.
-2. **Test statistic.** $T=\hat\beta_1/\operatorname{SE}(\hat\beta_1)$, with
-   $df=n-k-1=118$.
-3. **Critical value and rejection region.** $t_{0.975,\,118}=1.980$, from
-   `qt(0.975, df = 118)`. Reject $H_0$ if $|t_{obs}|\ge1.980$.
-4. **Observed value.** $t_{obs}=3.409/1.341\approx2.54$.
-5. **Conclusion.** $2.54\ge1.980$, so reject $H_0$ (p $\approx$ 0.012). At
-   the 5% level, the new page raises the mean order value.
-
-Chance decided who saw the new page. So the two groups are alike on average
-in everything else, measured or not, and the only systematic difference is
-the page. That is why $\hat\beta_1\approx3.41$ euros estimates the average
-treatment effect of the new page. It is about 8.7% of the mean order value
-with the old page.
+- R code: see the code above.
+- Hypotheses: $H_0:\beta_1=0$, the new page has no effect on the mean
+  order value. $H_1:\beta_1\ne0$. The significance level is 5%.
+- Test statistic: $T=\hat\beta_1/\operatorname{SE}(\hat\beta_1)$, with
+  $df=n-k-1=118$.
+- Critical value and rejection region: $t_{0.975,\,118}=1.980$. Reject
+  $H_0$ if $|t_{obs}|\ge1.980$.
+- Observed value: $t_{obs}=3.409/1.341\approx2.54$.
+- Conclusion: $2.54\ge1.980$, so reject $H_0$ (p $\approx$ 0.012). At the
+  5% level, the new page raises the mean order value.
+- Why the coefficient estimates the average treatment effect: chance
+  decided who saw the new page, so the two groups are alike on average in
+  everything else, measured or not, and the only systematic difference is
+  the page.
+- Size, as a percent of the mean order value with the old page: the mean
+  order value is 39.09 euros with the old page (the intercept) and
+  $39.09+3.41=42.50$ euros with the new page. The effect of about 3.41
+  euros is about 8.7% of 39.09 euros.
 
 &#40;b)
 
-- Student status is the moderator: it changes the slope of the coupon.
-  It enters as an interaction, `lm(orders ~ coupon * student)`, and the
-  coefficient of `coupon:student` is the difference in the coupon effect
-  between students and other customers.
-- Website visits are the mediator: they lie on the path from the coupon to
-  orders. Adding visits, `lm(orders ~ coupon + visits)`, shrinks the coupon
-  coefficient to the direct part. For the total effect of the coupon, leave
-  visits out of the model.
+Filled-in structure:
+
+- Moderator, and how it appears in the regression: student status is the
+  moderator, because it changes the slope of the coupon. It enters as an
+  interaction, `lm(orders ~ coupon * student)`, and the coefficient of
+  `coupon:student` is the difference in the coupon effect between students
+  and other customers.
+- Mediator, and how it appears in the regression: website visits are the
+  mediator, because they lie on the path from the coupon to orders. Adding
+  visits, `lm(orders ~ coupon + visits)`, shrinks the coupon coefficient to
+  the direct part, so for the total effect of the coupon, leave visits out
+  of the model.
 :::
 
 ### Task 7: Check the AI (Lectures 4 to 6)
 
-An invented example. Lisa runs a café on campus. On 150 days she recorded
-the daily sales in euros, the number of flyers that she handed out that day,
-the temperature, and whether the day was in an exam week. The data are
-observational: Lisa decided herself on which days she handed out how many
-flyers. She fitted a multiple regression and gave its output to an AI
-assistant:
+Lisa runs a café on campus. On 150 days she recorded the daily sales in
+euros, the number of flyers that she handed out that day, the temperature,
+and whether the day was in an exam week. The data are observational: Lisa
+decided herself on which days she handed out how many flyers. She fitted a
+multiple regression and gave its output to an AI assistant:
 
 ```text
 Outcome: daily sales (€), 150 days       Estimate  Std. Error
@@ -626,34 +713,32 @@ ci_flyers
 0.5 * ci_flyers   # extra margin per day at both ends
 ```
 
-1. Filled-in structure:
-   - First error: the controls hold fixed only the temperature and exam
-     weeks, and Lisa chose the flyer days herself, so other things on those
-     days, for example an event on campus, can raise sales as well and the
-     coefficient is not a causal effect.
-   - Second error: the exam-week coefficient compares exam-week days with
-     the reference category, days outside exam weeks, and not with an
-     average day.
-2. Filled-in structure:
-   - Correct sentence about the flyer coefficient: "On days with the same
-     temperature and exam-week status, 100 more flyers go with on average
-     €18 higher fitted daily sales."
-   - Correct sentence about the exam-week coefficient: "Days in an exam
-     week have on average €85 lower fitted daily sales than days outside
-     exam weeks with the same number of flyers and the same temperature."
-3. Filled-in structure:
-   - Interval, calculation: $18.0\pm1.976\times5.0=18.0\pm9.88$
-   - Interval: from €8.12 to €27.88 of daily sales per 100 flyers
-   - Extra margin at both ends: at 50 cents per euro,
-     $0.5\times\text{€}8.12=\text{€}4.06$ and
-     $0.5\times\text{€}27.88=\text{€}13.94$ per day.
-4. Filled-in structure:
-   - Decision and reason: hand out the extra flyers on this evidence. Even
-     at the lower end of the interval, the extra margin of €4.06 is above
-     the €3 that 100 flyers cost.
-   - Why her true gain could differ: the coefficient is an association in
-     observational data, and if Lisa handed out more flyers on days that
-     were busy anyway, the true effect of extra flyers can be smaller.
+Filled-in structure:
+
+- First error: the controls hold fixed only the temperature and exam
+  weeks, and Lisa chose the flyer days herself, so other things on those
+  days, for example an event on campus, can raise sales as well and the
+  coefficient is not a causal effect.
+- Second error: the exam-week coefficient compares exam-week days with the
+  reference category, days outside exam weeks, and not with an average
+  day.
+- Correct sentence about the flyer coefficient: "On days with the same
+  temperature and exam-week status, 100 more flyers go with on average €18
+  higher fitted daily sales."
+- Correct sentence about the exam-week coefficient: "Days in an exam week
+  have on average €85 lower fitted daily sales than days outside exam weeks
+  with the same number of flyers and the same temperature."
+- Interval, calculation: $18.0\pm1.976\times5.0=18.0\pm9.88$.
+- Interval: from €8.12 to €27.88 of daily sales per 100 flyers.
+- Extra margin at both ends: at 50 cents per euro,
+  $0.5\times\text{€}8.12=\text{€}4.06$ and
+  $0.5\times\text{€}27.88=\text{€}13.94$ per day.
+- Decision and reason: hand out the extra flyers on this evidence, because
+  even at the lower end of the interval the extra margin of €4.06 is above
+  the €3 that 100 flyers cost.
+- Why her true gain could differ: the coefficient is an association in
+  observational data, and if Lisa handed out more flyers on days that were
+  busy anyway, the true effect of extra flyers can be smaller.
 
 The third sentence of the AI answer is correct: the interval from €8.12 to
 €27.88 does not include zero.
@@ -666,23 +751,25 @@ The third sentence of the AI answer is correct: the interval from €8.12 to
 
 ### Individual practice
 
-[Shark Tank data]{.shark-tag} Build one model of the equity offered (`equity_offered_pct`) in the Shark
-Tank file. Use season, the requested amount in \$1,000s, the presenting
-team, and one extension that you can justify: an interaction of season with
-the dummy `women` (1 for all-women and mixed teams), or a quadratic term in season next to the three known
-team categories (`gender`).
+[Shark Tank data]{.shark-tag} Build one model of the equity agreed in the
+deal (`deal_equity_pct`) for the deals for a share of the company with a
+known team classification. Use the equity offered, the season, the
+requested amount in \$1,000s, the presenting team, and one extension that
+you can justify: an interaction of the equity offered with the dummy
+`women` (1 for all-women and mixed teams), or a quadratic term in season
+next to the three team categories (`gender`).
 
 Your answer must include:
 
-1. a precise research question
-2. the code that prepares the data, so that someone else can repeat it
-3. one graph of the data before you fit the model
-4. the R formula and the model summary. If you compare several models, show
-   them in one regression table in the layout of this tutorial
-5. interpretations of the coefficients with units and reference categories
-6. a t-test of one coefficient and an overall or partial F-test
-7. $R^2$, adjusted $R^2$, and residual diagnostics
-8. one graph of fitted values from the model
+1. a precise research question,
+2. the code that prepares the data, so that someone else can repeat it,
+3. one graph of the data before you fit the model,
+4. the R formula and the model summary, and, if you compare several models,
+   one regression table in the layout of this tutorial,
+5. interpretations of the coefficients with units and reference categories,
+6. a t-test of one coefficient and an overall or partial F-test,
+7. $R^2$, adjusted $R^2$, and residual diagnostics,
+8. one graph of fitted values from the model,
 9. a conclusion of 150 words that clearly separates three things: the
    association, its uncertainty, and the reasons why it is not causal.
 
@@ -694,23 +781,27 @@ This model structure covers points 4 to 9.
 4. A good solution could fit
 
    ```r
+   known_deals <- subset(known_gender,
+                         deal_on_show == 1 & deal_equity_pct > 0)
    m <- lm(
-     equity_offered_pct ~ season_c * women + ask_1k,
-     data = known_gender
+     deal_equity_pct ~ equity_offered_pct * women + season + ask_1k,
+     data = known_deals
    )
    ```
 
-   or a model with a quadratic term for season and the group dummies. Keep
-   `season_c` and `women` in the model next to their interaction (the
-   hierarchy principle).
+   or a model with a quadratic term for season and the team dummies. Keep
+   `equity_offered_pct` and `women` in the model next to their interaction
+   (the hierarchy principle).
 5. Name the reference category. Interpret slopes that combine several
    coefficients, or differences between fitted values.
 6. Use `anova()` to compare the model with a nested reduced model.
 7. Inspect the residuals, including `rstandard()` and Cook's distance.
-8. Plot fitted values inside Seasons 1--16.
+8. Plot fitted values only inside the observed range of the predictor on
+   the horizontal axis.
 9. The conclusion must say that the team categories are broad, that only
-   broadcast pitches are in the file, and that the results therefore do not
-   show a causal effect of gender or season.
+   pitches that ended in a deal on air are in the data, and that the results
+   therefore do not show a causal effect of gender, of the offer, or of the
+   season.
 :::
 
 ### Check your understanding
@@ -774,13 +865,13 @@ I send my answer."
 
 ## Extra practice for home {#i-ep02-home}
 
-This task practises the ANOVA table of Lecture 5 at home with an invented
-example.
+This task practises the one-way ANOVA table at home.
 
 ### Task 8: A one-way ANOVA (Lecture 5)
 
-An invented one-way ANOVA. The online shop for refurbished phones of Task 6
-records the delivery time in hours of 20 orders for each of three couriers.
+The online shop for refurbished phones of Task 6 records the delivery time
+in hours of 20 orders for each of three couriers. The code below creates
+the data.
 
 ```{r}
 #| label: iep02-anova
@@ -792,11 +883,11 @@ deliveries <- data.frame(courier, delivery_hours)
 ```
 
 Fit the regression of `delivery_hours` on `courier` and make its ANOVA
-table. Which dummies does this regression use? What do its two dummy
-coefficients say? Test in five steps, with the critical value approach at
-the 5% level, whether the mean delivery time is the same for the three
-couriers. The critical value of this F-test is 3.16. Use (copy and paste)
-this structure:
+table. Say which dummies this regression uses, and say in one sentence
+each what its two dummy coefficients mean. Test in five steps, with the
+critical value approach at the 5% level, whether the mean delivery time is
+the same for the three couriers. The critical value of this F-test is 3.16.
+Use (copy and paste) this structure:
 
 ```text
 R code:
@@ -821,26 +912,27 @@ mean(deliveries$delivery_hours)   # overall mean
 qf(0.95, 2, 57)
 ```
 
-The ANOVA table comes from the regression of `delivery_hours` on two
-dummies, `post` and `van`, with `cycle` as the reference category. The
-intercept 22.65 hours is the mean of the cycle courier. The post courier
-takes on average 3.94 hours longer, and the van courier 0.02 hours less.
+Filled-in structure:
 
-1. **Hypotheses.**
-   $H_0:\mu_{\text{cycle}}=\mu_{\text{post}}=\mu_{\text{van}}$.
-   $H_1$: at least one mean differs. The significance level is 5%.
-2. **Test statistic.** $F$ = mean square of `courier` divided by the mean
-   square of the residuals, with $G-1=2$ and $n-G=57$ degrees of freedom.
-3. **Critical value and rejection region.** The critical value is 3.16,
-   from `qf(0.95, 2, 57)`. Reject $H_0$ if $F_{obs}\ge3.16$.
-4. **Observed value.** $F_{obs}=103.62/35.11\approx2.95$.
-5. **Conclusion.** $2.95<3.16$ (p $\approx$ 0.060), so do not reject
-   $H_0$. At the 5% level, the data do not show that the mean delivery time
-   differs between the couriers. This does not prove that the means are
-   equal.
-
-The largest difference, 3.95 hours between the post and the van courier,
-is about 16% of the overall mean of 23.96 hours.
+- R code: see the code above.
+- Dummies in the regression: `post` and `van`, with `cycle` as the
+  reference category.
+- Meaning of the two dummy coefficients: the intercept, 22.65 hours, is
+  the mean delivery time of the cycle courier. The post courier takes on
+  average 3.94 hours longer, and the van courier 0.02 hours less.
+- Hypotheses: $H_0:\mu_{\text{cycle}}=\mu_{\text{post}}=\mu_{\text{van}}$.
+  $H_1$: at least one mean differs. The significance level is 5%.
+- Test statistic, with both degrees of freedom: $F$ = mean square of
+  `courier` divided by the mean square of the residuals, with $G-1=2$ and
+  $n-G=57$ degrees of freedom.
+- Critical value and rejection region: the critical value is 3.16. Reject
+  $H_0$ if $F_{obs}\ge3.16$.
+- Observed value: $F_{obs}=103.62/35.11\approx2.95$.
+- Conclusion: $2.95<3.16$ (p $\approx$ 0.060), so do not reject $H_0$. At
+  the 5% level, the data do not show that the mean delivery time differs
+  between the couriers. This does not prove that the means are equal. The
+  largest difference, 3.95 hours between the post and the van courier, is
+  about 16% of the overall mean of 23.96 hours.
 :::
 
 This is the end of the QM Intermediate lectures and tutorials. Review the

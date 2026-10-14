@@ -12,10 +12,10 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 ::: {.outcomes}
 <span class="label">By the end of Lecture 3, you can</span>
 
-- build and read a confidence interval for a regression coefficient
-- test whether a coefficient differs from zero and read the p-value carefully
-- interpret $R^2$ as the share of variation the model explains
-- use the F-test to judge whether a model is useful at all
+- build and read a confidence interval for a regression coefficient,
+- test whether a coefficient differs from zero and read the p-value carefully,
+- interpret $R^2$ as the share of variation the model explains,
+- use the F-test to judge whether a model is useful at all.
 :::
 
 ::: {.driving-question}
@@ -78,14 +78,14 @@ Reject the benchmark if $|t_{obs}|$ is at least the critical value
 $t_{0.975,\,df}$. The p-value gives the same decision.
 :::
 
-**Classify.** Answer this question before you come to class. Three quantities measure how well a line
+**Classify.** Three quantities measure how well a line
 fits. SSE
 is the sum of squared residuals from Lecture 1. SSR is the part of the
 variation in the outcome that the line explains. $R^2$ is the share of the
 variation that the line explains. For a useful model, decide whether each of
-the three should be relatively small or relatively large. Choose your
-three answers before class. The lecture material defines all three
-quantities precisely and gives the correct answers.
+the three should be relatively small or relatively large. The videos above
+give you enough to answer, and the lecture material defines all three
+quantities precisely.
 
 ::: {.callout-note collapse="true"}
 ## Check your preparation
@@ -121,6 +121,13 @@ review
 [Mathematics Refresher: powers, roots, and squared deviations](../resources/math-refresher.html#powers-roots-and-squared-deviations)
 and [degrees of freedom and t critical values](../resources/math-refresher.html#degrees-of-freedom-and-t-critical-values).
 
+**Predict.** Answer this question before you come to class. Your warm-up
+table shows a slope of about 0.65 with a very small p-value. How much of the
+variation in agreed valuations does the claimed valuation explain: less than
+a quarter, about half, or more than three quarters? Choose one answer and
+write one sentence explaining why. The lecture material gives the correct
+answer.
+
 :::
 
 ::: {.course-phase .phase-in-class}
@@ -134,11 +141,16 @@ the model is useful at all, with the F-test.
 
 ### Start with a founder's question
 
-[Shark Tank data]{.shark-tag} The slope says 65 cents per claimed dollar. Would another set of deals give
+[Shark Tank data]{.shark-tag} Lecture 1 estimated the valuation line and
+Lecture 2 checked the assumptions behind it. The slope says 65 cents per
+claimed dollar. Would another set of deals give
 50 cents, or 80? A founder who negotiates with this number wants to know how
 far the number can be from the true value. R and AI assistants usually answer with a table of standard
 errors, t statistics, and p-values. This lecture shows how to read that table
-and how to check what R or an AI assistant says about it.
+and how to check what R or an AI assistant says about it. It then asks two
+further questions that a precise slope does not answer: how close the line
+comes to single deals, and whether the model beats the simplest prediction,
+the mean.
 
 ### How precisely do we know the slope?
 
@@ -146,7 +158,7 @@ and how to check what R or an AI assistant says about it.
 Lecture 1: the valuation agreed on air (`agreed_m`) regressed on the
 valuation claimed by the founder (`claimed_m`), both in \$ millions, for the
 874 Shark Tank deals for a share of the company. It then prints the
-coefficient table.
+coefficient table: one row per coefficient, one column per quantity.
 
 ```{r}
 #| label: i03-build-model
@@ -171,6 +183,13 @@ estimated: a slope.
 | t statistic | `t value` column | $t = 58.6$ |
 | p-value | `Pr(>|t|)` column | $< 0.001$ |
 | confidence interval | `confint()` | computed below |
+
+First the size. A slope of 0.649 means that each extra dollar of claimed
+valuation goes with about 65 cents of agreed valuation, a discount of about
+35% at the margin. One extra million claimed goes with about \$0.65 million
+more agreed, about 29% of the mean agreed valuation of \$2.22 million. So the
+association is large in business terms. The rest of this section asks how
+precisely we know it.
 
 The file contains all 874 deals for a share of the company. So these deals
 are not a sample drawn from the file. We treat them as one possible result of the show.
@@ -238,17 +257,24 @@ $$
 
 In words: under the model assumptions, the data are consistent with a
 population slope between about 63 and 67 cents of agreed valuation per dollar
-of claimed valuation. A slope of 1, which would mean that the sharks accept
+of claimed valuation. The interval is about 4 cents wide, about 7% of the
+estimate, so the slope is known precisely. A slope of 1, which would mean that the sharks accept
 the claimed valuation, is far outside this range. The endpoints of the
 interval have the units of the slope. The estimate, its standard error, and
 the interval have the same units. The t statistic and the p-value have no units.
 
-R agrees:
+The function `confint()` computes the same interval in R, for every
+coefficient of the model:
 
 ```{r}
 #| label: i03-confint
 confint(val_model)
 ```
+
+The row `claimed_m` gives the same endpoints, 0.627 and 0.670. The columns
+`2.5 %` and `97.5 %` are the lower and the upper end of the 95% interval.
+The first row is the interval for the intercept, which says little here
+because a claimed valuation of zero lies outside the observed claims.
 :::
 
 The interval describes only the variation from sample to sample, under the
@@ -292,6 +318,11 @@ c(estimate = b1, standard_error = se_b1,
   t_statistic = t_value, p_value = p_value)
 ```
 
+The code takes the estimate and the standard error from the coefficient
+table, divides them, and turns the t statistic into a two-sided p-value. The
+output repeats the table: $t \approx 58.6$ and a p-value of about
+$10^{-304}$, far below the 5% level.
+
 What the tiny p-value does say: if the population slope were zero and the
 model assumptions held, a sample slope this far from zero would practically
 never occur. This is strong evidence against a zero slope among these deals.
@@ -301,7 +332,9 @@ What it does not say:
 - It does not say that the model is correct. The heteroskedasticity and the
   influential deals of Lecture 2 limit how much you can trust every number in this table.
 - It does not say that the association is large or important. With 874
-  observations, even a very small slope can have a tiny p-value.
+  observations, even a very small slope can have a tiny p-value. The size
+  comes from the estimate and a benchmark, here about 29% of the mean
+  agreed valuation per extra million claimed.
 - It does not say that claiming more causes a higher agreed valuation. No
   test can turn observed deals into an experiment.
 
@@ -366,7 +399,9 @@ and gives the parts of the interval and the steps of the test in this order.</p>
 
 ### Decomposing variation
 
-[Shark Tank data]{.shark-tag} The second part of the driving question asks how much the line explains.
+[Shark Tank data]{.shark-tag} A precise slope says how well we know the
+average relationship. It does not say how close the line comes to single
+deals, which matters when you use the line to predict one valuation. The second part of the driving question asks how much the line explains.
 To answer it, we need a point of comparison. Without a predictor, the best single
 prediction for every deal is the mean agreed valuation $\bar y$. A
 regression is useful when its fitted values $\widehat y_i$ come closer to
@@ -399,6 +434,7 @@ height as the two bars together.
 #| fig-width: 7.5
 #| fig-height: 4.8
 #| fig-cap: "One observation of an invented example. The dotted lines mark the fitted value and the observed value. Left: the part explained by the line (green, from the mean of Y to the fitted value) and the residual (blue, from the fitted value to the observed value). Right: the total deviation from the mean (navy). The green bar and the blue bar together are exactly as long as the navy bracket."
+#| fig-alt: "Scatter plot of eight invented points with a rising fitted line and a dashed horizontal line at the mean of Y. One point at X equal to 7 is highlighted. Left of it, a green bar runs from the mean up to the fitted value and a blue bar continues from the fitted value up to the observed value. Right of it, a navy bracket runs from the mean to the observed value and has the same total height."
 library(ggplot2)
 # Invented data: eight points, the sixth one is highlighted
 x_d <- c(1, 2, 3, 4, 5, 7, 8.6, 9.6)
@@ -473,10 +509,25 @@ ggplot(decomp_df, aes(x = x, y = y)) +
   )
 ```
 
-Now square each of the three pieces and add up over all observations. This
-gives three sums of squares. SST is the total sum of squares, SSR is the
-regression sum of squares (the part explained by the regression), and SSE is
-the sum of squared residuals from Lecture 1. For a least-squares line with an intercept, the
+One observation shows the idea, but the fit of a line concerns all
+observations together. So square each of the three pieces and add up over
+all observations. This gives three sums of squares.
+
+::: {.definition-box}
+<span class="label">Definition</span>
+
+**SST**, the total sum of squares. The sum of squared distances of the
+observed values from their mean: all the variation in the outcome.
+
+**SSR**, the regression sum of squares. The sum of squared distances of the
+fitted values from the mean: the variation that the line explains.
+
+**SSE**, the sum of squared residuals from Lecture 1. The sum of squared
+distances of the observed values from the fitted values: the variation that
+the line leaves unexplained.
+:::
+
+For a least-squares line with an intercept, the
 same split holds for the sums:
 
 $$
@@ -503,9 +554,31 @@ SSE <- sum((y - yhat)^2)
 c(SST = SST, SSR = SSR, SSE = SSE, check = SSR + SSE)
 ```
 
-The units are squared millions of dollars, so the raw numbers (SST is about
-12,000) mean little on their own. The sums of squares matter only relative
-to each other.
+The first number is the mean agreed valuation, \$2.22 million, the
+prediction without a predictor. The next three are SST, SSR, and SSE, and
+the last one confirms that SSR and SSE add up to SST. The units are squared
+millions of dollars, so the raw numbers (SST is about 11,900) mean little on
+their own. The sums of squares matter only relative to each other. SSR is
+about 9,500, about 80% of SST. SSE is about 2,400, the remaining 20%. So
+SSE is relatively small and SSR relatively large, as they should be for a
+useful model.
+
+### R²: what 0.798 means, and four wrong readings
+
+::: {.definition-box}
+<span class="label">Definition</span>
+
+**$R^2$** (R-squared, also called the coefficient of determination). The
+share of the variation of the outcome in the
+sample that the fitted line explains:
+
+$$
+R^2=\frac{\text{SSR}}{\text{SST}}
+=1-\frac{\text{SSE}}{\text{SST}}.
+$$
+
+It lies between 0 and 1.
+:::
 
 ::: {#exm-i03-sst-sse}
 ## Worked example: from SST and SSE to SSR and R²
@@ -531,24 +604,9 @@ The fitted values explain 75% of the variation of the outcome in the
 sample. The other 25% remains as residual variation around the line.
 :::
 
-### R²: what 0.798 means, and four wrong readings
-
-::: {.definition-box}
-<span class="label">Definition</span>
-
-**$R^2$** (R-squared, also called the coefficient of determination). The
-share of the variation of the outcome in the
-sample that the fitted line explains:
-
-$$
-R^2=\frac{\text{SSR}}{\text{SST}}
-=1-\frac{\text{SSE}}{\text{SST}}.
-$$
-
-It lies between 0 and 1.
-:::
-
-[Shark Tank data]{.shark-tag} For the valuation model:
+[Shark Tank data]{.shark-tag} For the valuation model, the code below
+calculates $R^2$ in three ways: from SSE and SST above, as stored by R, and
+as the square of the correlation of 0.893 from Lecture 1.
 
 ```{r}
 #| label: i03-r-squared
@@ -559,9 +617,9 @@ c(
 )
 ```
 
-Here $R^2 \approx 0.798$. Among these deals, the linear association with the
+All three give $R^2 \approx 0.798$. Among these deals, the linear association with the
 claimed valuation explains about 80% of the variation in the agreed
-valuations. The third number in the output shows a fact that holds
+valuations, more than three quarters. The third number in the output shows a fact that holds
 in simple regression: $R^2$ is the squared correlation of $X$ and $Y$,
 $R^2 = r_{XY}^2$. Squaring removes the sign, so look at the slope or the
 correlation for the direction of the association.
@@ -660,7 +718,7 @@ the standard deviation of the residuals in the units of the outcome:
 $s=\sqrt{\text{SSE}/(n-2)}$, here about \$1.66 million. This number is large
 mainly because of a few very large residuals: Lecture 2 showed that half of the
 residuals lie between $-0.40$ and $0.17$. Still, it is large compared with
-the mean agreed valuation of \$2.22 million. So single deals can lie far from
+the mean agreed valuation of \$2.22 million, about 75% of it. So single deals can lie far from
 the line even though $R^2$ is high. **Adjusted $R^2$** is $R^2$ with a small
 penalty for every predictor in the model, $1-(1-R^2)(n-1)/(n-k-1)$. It is
 below $R^2$, and it can even be negative when the predictors add almost
@@ -669,7 +727,9 @@ predictor that explains almost nothing. This property makes it the fairer
 number for comparing models with different numbers of predictors. With one predictor
 and 874 observations the two hardly differ (0.7975 and 0.7973).
 
-The last line reports $F \approx 3435$ on 1 and 872 degrees of freedom. The
+The last line reports $F \approx 3435$ on 1 and 872 degrees of freedom.
+Without any relationship, F would be near 1, so 3435 is very far from what
+a useless model gives. The
 p-value is printed as `< 2.2e-16`, which means practically zero. The test
 rejects the null hypothesis: under the model assumptions, the model with the
 claimed valuation fits better than a model with only an intercept.
@@ -681,6 +741,9 @@ as in the two-sided t-test of the slope, and
 $$
 F = t^2.
 $$
+
+The code below takes the t statistic of the slope from the coefficient
+table, squares it, and prints it next to the F statistic from `summary()`.
 
 ```{r}
 #| label: i03-f-t-link
@@ -721,12 +784,20 @@ invented:
 
 Always judge a model by its goal: explanation, prediction, or support for a
 decision. A clearly significant coefficient can also describe a
-small association. Lecture 4 shows how to judge the size of a coefficient
-with benchmarks such as the mean and the standard deviation of the outcome.
+small association, as in the loyalty-programme example. So always judge the
+size of a coefficient with a benchmark, as we did for the valuation slope
+with the mean agreed valuation. Lecture 4 adds the standard deviation of
+the outcome as a second benchmark.
 
 ### Robust standard errors: what they fix {#i03-robust}
 
-[Shark Tank data]{.shark-tag} Heteroskedasticity-consistent standard errors, called **robust** standard
+[Shark Tank data]{.shark-tag} Every standard error so far assumed a
+constant error variance. Lecture 2 showed that this assumption fails for
+the valuation model, so the precision we reported may be too optimistic. A
+founder who relies on the narrow interval needs a standard error that does
+not depend on this assumption.
+
+Heteroskedasticity-consistent standard errors, called **robust** standard
 errors for short, do not need the homoskedasticity assumption. The fitted
 coefficients stay the ordinary least-squares values. Only the standard
 errors change, and with them the t statistics, p-values, and intervals. Lecture 2
@@ -745,10 +816,14 @@ coefci(val_model, vcov. = vcovHC(val_model, type = "HC1"))
 The function `coeftest()` prints the coefficient table with robust standard
 errors, and `coefci()` prints the robust 95% confidence intervals. The
 option `type = "HC1"` selects one common version of the robust formula. You
-do not need the other versions in this course. The robust standard error of
-the slope is 0.034, about three times the usual 0.0111. The robust 95%
+do not need the other versions in this course. The estimates are the same
+as before. The robust standard error of
+the slope is 0.034, about three times the usual 0.0111, so the t statistic
+falls from 58.6 to 19.1. The robust 95%
 interval runs from about 0.58 to 0.72. It is three times as wide as the
-usual interval and still lies far below 1.
+usual interval, about 13 cents or 21% of the slope, and still lies far below 1.
+The slope is less precise than the usual table suggests, but still clearly
+different from zero and from 1.
 
 Robust standard errors fix exactly one problem: heteroskedasticity, an error
 variance that is not constant. They
@@ -787,6 +862,15 @@ model fits better than the mean alone. All of these statements depend on the
 assumptions checked in Lecture 2, where the residuals showed heteroskedasticity and a few
 influential deals.
 
+What does this mean for a founder? If you claim one million dollars more,
+you might expect about \$0.58 to \$0.72 million more agreed valuation on
+average, under the assumption that deals like yours follow the same line as
+these televised deals. For a single negotiation, though, the line can miss
+by much more: the residual standard error of \$1.66 million is about 75% of
+the mean agreed valuation. And because the claims were not randomly assigned,
+this is an association, not a promise that a higher claim raises your own
+valuation.
+
 ::: {.founder-box}
 <span class="label">A founder's decision (invented example)</span>
 
@@ -820,6 +904,9 @@ Try it yourself first.
 **Next:** Tutorial 1 practises Lectures 1--3 with exam-style questions: fit a
 model in R, check its residuals, and report its coefficients with intervals,
 tests, and $R^2$. You take the exam in TestVision, and R is available during the exam.
+Lecture 4 then adds a second predictor. A slope from one predictor can mix
+several relationships, and the intervals, tests, and $R^2$ of this lecture
+are the tools you need to read a model with several predictors.
 
 :::
 
@@ -941,9 +1028,12 @@ c(r_squared = summary(equity_model)$r.squared,
   F = unname(summary(equity_model)$fstatistic["value"]))
 ```
 
-A complete conclusion has four parts. Estimate: one later season
+The code fits the model and prints the coefficient table, the 95%
+intervals, $R^2$, and F. A complete conclusion has four parts. Estimate: one later season
 (`season`) is associated with about 0.824 percentage points less equity
-offered (`equity_offered_pct`), with standard error 0.048. Uncertainty: the
+offered (`equity_offered_pct`), with standard error 0.048. This is about 6%
+of the mean offer of 13.2% per season, and about 12 percentage points from
+season 1 to season 16, almost the size of the mean offer. Uncertainty: the
 95% interval $(-0.917, -0.731)$ excludes zero, and the t-test rejects a zero
 slope ($t\approx-17.3$, p $<$ 0.001). Fit: the season explains about 17.3%
 of the variation in the equity offered, and the overall F-test
@@ -1016,7 +1106,7 @@ Two errors. R-squared is the share of the variation that the line explains, not 
 :::: {.utility-prompt}
 <span class="label">Two sentences about your own venture</span>
 
-Think of your EiA3 venture, or any business you know well. Think of one
+Think of your own venture, or any business you know well. Think of one
 regression you might run on its data. Write two sentences. First, say which
 you would rather have for your next decision, a precise slope (narrow
 interval) or a high $R^2$, and why. Then name the meaning of "useful" from
