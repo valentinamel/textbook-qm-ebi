@@ -74,7 +74,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-9625fb8afdc25f0504cb337f379810a0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-d13a011d2bf4f58ad02ec87b837429ca.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -395,6 +395,7 @@ window.Quarto = {
   <ul class="collapse">
   <li><a href="#before-class" id="toc-before-class" class="nav-link active" data-scroll-target="#before-class">Before class</a></li>
   <li><a href="#in-the-tutorial" id="toc-in-the-tutorial" class="nav-link" data-scroll-target="#in-the-tutorial">In the tutorial</a></li>
+  <li><a href="#after-class" id="toc-after-class" class="nav-link" data-scroll-target="#after-class">After class</a></li>
   </ul>
 </nav>
     </div>
@@ -423,13 +424,13 @@ window.Quarto = {
 <div class="outcomes">
 <p><span class="label">By the end of Tutorial 2, you can</span></p>
 <ul>
-<li>calculate conditional probabilities and apply Bayes’ rule and independence</li>
-<li>find covariance and correlation from a joint table and interpret them without causal claims</li>
-<li>read a correlation table in a research paper and check an AI answer</li>
-<li>calculate probabilities and values from uniform and normal models</li>
+<li>calculate conditional probabilities and apply Bayes’ rule and independence,</li>
+<li>find covariance and correlation from a joint table and interpret them without causal claims,</li>
+<li>read a correlation table in a research paper and check an AI answer,</li>
+<li>calculate probabilities and values from uniform and normal models.</li>
 </ul>
 </div>
-<p>Tutorials are exam preparation sessions. The tasks below are exam-style questions. You first try each task in pairs. You may use AI for this, following Attempt, Ask, Verify, Explain. Then the class discusses the solution together.</p>
+<p>Tutorials are exam preparation sessions. The tasks below are exam-style questions. Attempt each task before you open its answer. You may use AI, following Attempt, Ask, Verify, Explain.</p>
 <section id="before-class" class="level2 course-phase phase-before">
 <h2 class="anchored" data-anchor-id="before-class">Before class</h2>
 <p>Bring your after-class work from Lectures 4 to 6. Complete these statements without looking at the chapters again:</p>
@@ -471,32 +472,51 @@ Check your preparation
 </section>
 <section id="in-the-tutorial" class="level2 course-phase phase-in-class">
 <h2 class="anchored" data-anchor-id="in-the-tutorial">In the tutorial</h2>
-<p>Try each task before you open its answer. In every answer, name the formula and the reference class, check the value, interpret it in context, and say what the result does not show.</p>
+<p>In every answer, name the formula and the reference class, check the value, interpret it in context, and say what the result does not show.</p>
 <p>More tasks to practise at home are in the final section of this page, <a href="#b-ep02-home">Extra practice for home</a>.</p>
-<p>Tasks 1 to 3 use the Shark Tank file and the two events from Lectures 4 and 5, defined in the same way:</p>
+<p>Task 1 uses the Shark Tank file. The event <span class="math inline">\(D\)</span> is an on-air deal. The event <span class="math inline">\(M\)</span> is a modest offer: the founders offered at most 10% of their company (<code>equity_offered_pct</code> of 10 or less, the median offer in the file).</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>D <span class="ot">&lt;-</span> sharks<span class="sc">$</span>deal_on_show <span class="sc">==</span> <span class="dv">1</span>   <span class="co"># on-air deal</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>L <span class="ot">&lt;-</span> sharks<span class="sc">$</span>season <span class="sc">&gt;=</span> <span class="dv">9</span>         <span class="co"># late season: Seasons 9-16</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>D <span class="ot">&lt;-</span> sharks<span class="sc">$</span>deal_on_show <span class="sc">==</span> <span class="dv">1</span>           <span class="co"># on-air deal</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>M <span class="ot">&lt;-</span> sharks<span class="sc">$</span>equity_offered_pct <span class="sc">&lt;=</span> <span class="dv">10</span>    <span class="co"># modest offer: at most 10%</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<section id="task-1-conditional-probability-and-bayes" class="level3">
-<h3 class="anchored" data-anchor-id="task-1-conditional-probability-and-bayes">Task 1: Conditional probability and Bayes</h3>
-<p><span class="shark-tag">Shark Tank data</span> One of the 1,441 pitches is selected at random. <span class="math inline">\(D\)</span> is the event of an on-air deal, and <span class="math inline">\(L\)</span> is the event of a late season (Seasons 9–16). R reports the counts of the 1,441 pitches by deal and by period:</p>
+<section id="task-1-two-events-bayes-rule-and-covariance" class="level3">
+<h3 class="anchored" data-anchor-id="task-1-two-events-bayes-rule-and-covariance">Task 1: Two events, Bayes’ rule, and covariance</h3>
+<p><span class="shark-tag">Shark Tank data</span> One of the 1,441 pitches is selected at random, each with the same probability. R reports the counts of the pitches by deal and by offer:</p>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
-<pre><code>                Period
-Deal             Seasons 1-8 Seasons 9-16
-  No on-air deal         330          229
-  On-air deal            377          505</code></pre>
+<pre><code>                Offer
+Deal             Above 10% At most 10%  Sum
+  No on-air deal       263         296  559
+  On-air deal          325         557  882
+  Sum                  588         853 1441</code></pre>
+</div>
+</div>
+<p>Let <span class="math inline">\(X\)</span> be the 0/1 deal indicator and <span class="math inline">\(Y\)</span> the 0/1 modest-offer indicator. R also reports their joint PMF and a few summaries:</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>   Y
+X       0     1
+  0 0.183 0.205
+  1 0.226 0.387</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>        E_X         E_Y        E_XY  covariance correlation 
+     0.6121      0.5920      0.3865      0.0242      0.1011 </code></pre>
 </div>
 </div>
 <ol type="1">
-<li>Calculate and interpret <span class="math inline">\(P(D\mid L)\)</span>.</li>
-<li>Calculate and interpret <span class="math inline">\(P(L\mid D)\)</span>.</li>
-<li>Verify <span class="math inline">\(P(D\cap L)=P(D\mid L)P(L)\)</span>.</li>
-<li>Use the law of total probability with the partition <span class="math inline">\(L^c\)</span> and <span class="math inline">\(L\)</span> to recover <span class="math inline">\(P(D)\)</span>.</li>
-<li>Show how Bayes’ rule gives <span class="math inline">\(P(L\mid D)\)</span> from <span class="math inline">\(P(D\mid L)\)</span>.</li>
+<li><p>Calculate <span class="math inline">\(P(D\mid M)\)</span> and <span class="math inline">\(P(M\mid D)\)</span>. Name the reference class of each and interpret each in one sentence.</p></li>
+<li><p>Show how Bayes’ rule gives <span class="math inline">\(P(M\mid D)\)</span> from <span class="math inline">\(P(D\mid M)\)</span>.</p></li>
+<li><p>Use the law of total probability with the partition <span class="math inline">\(M^c\)</span> and <span class="math inline">\(M\)</span> to recover <span class="math inline">\(P(D)\)</span>.</p></li>
+<li><p>Verify <span class="math inline">\(\operatorname{Cov}(X,Y)=E[XY]-E[X]E[Y]\)</span> from the output and interpret its sign in one sentence.</p></li>
+<li><p>You asked an AI assistant about <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>. It answered:</p>
+<blockquote class="blockquote">
+<p>“The covariance of deal and modest offer is only 0.024, so the two are almost independent. The correlation of 0.10 shows that a modest offer causes a deal for 10% of the pitches.”</p>
+</blockquote>
+<p>The answer contains two errors. Name and explain each error in at most three sentences. Then write the corrected answer in at most two sentences.</p></li>
 </ol>
+<p>Answer structure for parts 1 to 4: formula, numbers inserted, result, and one sentence of interpretation.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -510,56 +530,37 @@ Check your answer
 <div id="callout-2" class="callout-2-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ol type="1">
-<li><span class="math inline">\(P(D\mid L)=505/734\approx 0.688\)</span>: among late-season records, 68.8% reached an on-air deal.</li>
-<li><span class="math inline">\(P(L\mid D)=505/882\approx 0.573\)</span>: among deal records, 57.3% came from late seasons.</li>
-<li>The joint probability is <span class="math inline">\(P(D\mid L)P(L)=(505/734)(734/1441)=505/1441\approx 0.350\)</span>.</li>
-<li>The law of total probability gives <span class="math display">\[
-P(D)=\frac{377}{707}\frac{707}{1441}
-     +\frac{505}{734}\frac{734}{1441}
-     =\frac{882}{1441}\approx 0.612.
-\]</span></li>
+<li><span class="math inline">\(P(D\mid M)=557/853\approx0.653\)</span>. The reference class is the 853 pitches with a modest offer: 65.3% of them reached an on-air deal. <span class="math inline">\(P(M\mid D)=557/882\approx0.632\)</span>. The reference class is the 882 deals: 63.2% of them came from pitches that offered at most 10%. The two numbers answer different questions, because the denominators differ.</li>
 <li>Bayes’ rule gives <span class="math display">\[
-P(L\mid D)=\frac{P(D\mid L)P(L)}{P(D)}
-=\frac{(505/734)(734/1441)}{882/1441}
-=\frac{505}{882}\approx 0.573.
+P(M\mid D)=\frac{P(D\mid M)P(M)}{P(D)}
+=\frac{(557/853)(853/1441)}{882/1441}
+=\frac{557}{882}\approx0.632.
 \]</span></li>
+<li>The law of total probability gives <span class="math display">\[
+P(D)=\frac{325}{588}\frac{588}{1441}
+     +\frac{557}{853}\frac{853}{1441}
+     =\frac{882}{1441}\approx0.612.
+\]</span></li>
+<li><span class="math inline">\(E[XY]=P(X=1,Y=1)\approx0.3865\)</span> and <span class="math inline">\(E[X]E[Y]\approx0.6121\times0.5920\approx0.3623\)</span>. The difference is about 0.0242, as in the output. The covariance is positive: deals and modest offers occur together a little more often than they would under independence.</li>
+<li>The first sentence is wrong. The size of a covariance depends on the units of the two variables, so a small number does not mean a weak association. Independence needs <span class="math inline">\(P(X=1,Y=1)=P(X=1)P(Y=1)\)</span>, and here 0.387 differs from 0.362, so <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are not independent. The second sentence is also wrong. A correlation is not a share of pitches, and it does not show a cause. Corrected answer: deals and modest offers go together, with a weak positive linear association (<span class="math inline">\(r\approx0.10\)</span>). The records do not show that a modest offer causes a deal, because the founders chose their offers themselves.</li>
 </ol>
 </div>
 </div>
 </div>
 </section>
-<section id="task-2-joint-pmf-covariance-and-correlation" class="level3">
-<h3 class="anchored" data-anchor-id="task-2-joint-pmf-covariance-and-correlation">Task 2: Joint PMF, covariance, and correlation</h3>
-<p><span class="shark-tag">Shark Tank data</span> Let <span class="math inline">\(X\)</span> be the 0/1 deal indicator and <span class="math inline">\(Y\)</span> the 0/1 late-period indicator, defined from the same events:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(D)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(L)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>R reports:</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>   Y
-X           0         1
-  0 0.2290076 0.1589174
-  1 0.2616239 0.3504511</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>        E_X         E_Y       Var_X       Var_Y        E_XY  covariance 
- 0.61207495  0.50936849  0.23743921  0.24991223  0.35045108  0.03867938 
-correlation 
- 0.15878503 </code></pre>
-</div>
-</div>
+<section id="task-2-total-probability-and-bayes-rule-from-given-rates" class="level3">
+<h3 class="anchored" data-anchor-id="task-2-total-probability-and-bayes-rule-from-given-rates">Task 2: Total probability and Bayes’ rule from given rates</h3>
+<p>A start-up prints spare parts for household appliances on two 3D printers. The old printer makes 60% of all parts and the new printer makes 40%. Of the parts from the old printer, 5% fail the quality check. Of the parts from the new printer, 10% fail, because the team is still learning how to set up the new printer. One part is selected at random. Let <span class="math inline">\(N\)</span> be the event that the part comes from the new printer, and <span class="math inline">\(F\)</span> the event that the part fails the check.</p>
 <ol type="1">
-<li>Verify that the joint PMF sums to 1.</li>
-<li>Recover the marginal PMF of <span class="math inline">\(X\)</span> by summing rows.</li>
-<li>Verify <span class="math inline">\(\operatorname{Var}(X)=E[X^2]-\left(E[X]\right)^2\)</span>.</li>
-<li>Verify <span class="math inline">\(\operatorname{Cov}(X,Y)=E[XY]-E[X]E[Y]\)</span>.</li>
-<li>Interpret the sign of the covariance.</li>
-<li>Explain what the correlation adds to the covariance. Then say what it does not prove.</li>
-<li>Calculate the conditional means <span class="math inline">\(E[X\mid Y=1]\)</span> and <span class="math inline">\(E[X\mid Y=0]\)</span> from the joint PMF. Say what they mean.</li>
-<li>The sum <span class="math inline">\(X+Y\)</span> counts how many of the two events, deal and late season, happened for a pitch. Calculate <span class="math inline">\(E[X+Y]\)</span> and <span class="math inline">\(\operatorname{Var}(X+Y)\)</span> from the values in the output.</li>
+<li>Write the four given numbers as probabilities, with the symbols <span class="math inline">\(N\)</span>, <span class="math inline">\(N^c\)</span>, and <span class="math inline">\(F\)</span>. Name the reference class of <span class="math inline">\(P(F\mid N)\)</span>.</li>
+<li>Calculate <span class="math inline">\(P(F\cap N)\)</span> and <span class="math inline">\(P(F\cap N^c)\)</span> with the multiplication rule.</li>
+<li>Calculate <span class="math inline">\(P(F)\)</span> with the law of total probability.</li>
+<li>Draw the tree for 1,000 parts and state the four counts at its end. Use the counts to calculate <span class="math inline">\(P(N\mid F)\)</span>.</li>
+<li>Calculate <span class="math inline">\(P(N\mid F)\)</span> again with the formula of Bayes’ rule.</li>
+<li>Decide whether <span class="math inline">\(N\)</span> and <span class="math inline">\(F\)</span> are independent. Show the comparison that you use.</li>
+<li>A colleague reads your result and says: “So 57% of the parts from the new printer fail.” Explain in one sentence what is wrong, and write the correct sentence.</li>
 </ol>
+<p>Answer structure for each calculation: formula, numbers inserted, result, and one sentence of interpretation.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -571,69 +572,6 @@ Check your answer
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
 <div id="callout-3" class="callout-3-contents callout-collapse collapse">
-<div class="callout-body-container callout-body">
-<ol type="1">
-<li>The four joint probabilities sum to 1: <span class="math inline">\(0.229+0.159+0.262+0.350=1\)</span>.</li>
-<li>Summing each row across the two <span class="math inline">\(Y\)</span> columns gives <span class="math inline">\(P(X=0)=0.229+0.159=0.388\)</span> and <span class="math inline">\(P(X=1)=0.262+0.350=0.612\)</span>. As counts, these are <span class="math inline">\(559/1441\)</span> and <span class="math inline">\(882/1441\)</span>.</li>
-<li>Because <span class="math inline">\(X\)</span> takes only the values 0 and 1, <span class="math inline">\(X^2=X\)</span> and <span class="math inline">\(E[X^2]=E[X]\)</span>. So <span class="math inline">\(\operatorname{Var}(X)=E[X]-\left(E[X]\right)^2=0.612-0.612^2\approx 0.237\)</span>, as in the output.</li>
-<li><span class="math inline">\(E[XY]=P(X=1,Y=1)\approx 0.3505\)</span>, and <span class="math inline">\(E[X]E[Y]\approx 0.6121\times0.5094\approx 0.3118\)</span>. The difference is about 0.0387, as in the output.</li>
-<li>The covariance is positive. The value 1 occurs for both variables together a little more often than it would under independence: deals and late seasons go together.</li>
-<li>The correlation divides the covariance by both standard deviations. The result, about 0.16, has no units and lies between <span class="math inline">\(-1\)</span> and <span class="math inline">\(1\)</span>: a weak positive linear association. It does not show a cause, and it does not say how important the association is in practice. A correlation of zero would not always mean independence, as the U-shaped pattern in Lecture 5 shows.</li>
-<li>Divide each column of the joint PMF by its sum. The column sums are <span class="math inline">\(P(Y=1)\approx 0.5094\)</span> and <span class="math inline">\(P(Y=0)\approx 0.4906\)</span>. Because <span class="math inline">\(X\)</span> is 0 or 1, only the <span class="math inline">\(X=1\)</span> entry counts: <span class="math inline">\(E[X\mid Y=1]\approx 0.3505/0.5094\approx 0.688\)</span> and <span class="math inline">\(E[X\mid Y=0]\approx 0.2616/0.4906\approx 0.533\)</span>. Among late-season pitches the average of the deal indicator is 0.688, so 68.8% reached a deal. Among early-season pitches it is 53.3%.</li>
-<li><span class="math inline">\(E[X+Y]=E[X]+E[Y]=0.612+0.509=1.121\)</span>. <span class="math inline">\(\operatorname{Var}(X+Y)=\operatorname{Var}(X)+\operatorname{Var}(Y)
-+2\operatorname{Cov}(X,Y)=0.237+0.250+2\times0.039\approx 0.565\)</span>. Without the covariance term the result would be 0.487. The sum varies more because deals and late seasons go together.</li>
-</ol>
-</div>
-</div>
-</div>
-</section>
-<section id="task-3-check-the-ai" class="level3">
-<h3 class="anchored" data-anchor-id="task-3-check-the-ai">Task 3: Check the AI</h3>
-<p><span class="shark-tag">Shark Tank data</span> You asked an AI assistant about the deal indicator <span class="math inline">\(X\)</span> and the late-season indicator <span class="math inline">\(Y\)</span> of Task 2. It answered:</p>
-<blockquote class="blockquote">
-<p>“The covariance of deal and late season is only 0.039, so the two are almost independent. The correlation of 0.16 shows that a late season causes a deal for 16% of the pitches.”</p>
-</blockquote>
-<p>The answer contains two errors. Check it sentence by sentence and name each error and explain it in at most three sentences. Then write the corrected answer in at most two sentences.</p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Check your answer
-</div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
-</div>
-<div id="callout-4" class="callout-4-contents callout-collapse collapse">
-<div class="callout-body-container callout-body">
-<p>The first sentence is wrong. The size of a covariance depends on the units of the two variables, so a small number does not mean a weak association. Independence needs <span class="math inline">\(P(X=1,Y=1)=P(X=1)P(Y=1)\)</span>, and here 0.350 differs from 0.312, so <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are not independent. The second sentence is also wrong. A correlation is not a share of pitches, and it does not show a cause. Corrected answer: deals and late seasons go together, with a weak positive linear association (<span class="math inline">\(r\approx0.16\)</span>). The records do not show that the season causes deals.</p>
-</div>
-</div>
-</div>
-</section>
-<section id="task-4-total-probability-and-bayes-rule-from-given-rates" class="level3">
-<h3 class="anchored" data-anchor-id="task-4-total-probability-and-bayes-rule-from-given-rates">Task 4: Total probability and Bayes’ rule from given rates</h3>
-<p>An invented example. A start-up prints spare parts for household appliances on two 3D printers. The old printer makes 60% of all parts and the new printer makes 40%. Of the parts from the old printer, 5% fail the quality check. Of the parts from the new printer, 10% fail, because the team is still learning how to set up the new printer. One part is selected at random. Let <span class="math inline">\(N\)</span> be the event that the part comes from the new printer, and <span class="math inline">\(F\)</span> the event that the part fails the check.</p>
-<ol type="1">
-<li>Write the four given numbers as probabilities, with the symbols <span class="math inline">\(N\)</span>, <span class="math inline">\(N^c\)</span>, and <span class="math inline">\(F\)</span>. Name the reference class of <span class="math inline">\(P(F\mid N)\)</span>.</li>
-<li>Calculate <span class="math inline">\(P(F\cap N)\)</span> and <span class="math inline">\(P(F\cap N^c)\)</span> with the multiplication rule.</li>
-<li>Calculate <span class="math inline">\(P(F)\)</span> with the law of total probability.</li>
-<li>Draw the tree for 1,000 parts and state the four counts at its end. Use the counts to calculate <span class="math inline">\(P(N\mid F)\)</span>.</li>
-<li>Calculate <span class="math inline">\(P(N\mid F)\)</span> again with the formula of Bayes’ rule.</li>
-<li>Decide whether <span class="math inline">\(N\)</span> and <span class="math inline">\(F\)</span> are independent. Show the comparison that you use.</li>
-<li>A colleague reads your result and says: “So 57% of the parts from the new printer fail.” Explain what is wrong, and write the correct sentence.</li>
-</ol>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Check your answer
-</div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
-</div>
-<div id="callout-5" class="callout-5-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ol type="1">
 <li><span class="math inline">\(P(N)=0.40\)</span>, <span class="math inline">\(P(N^c)=0.60\)</span>, <span class="math inline">\(P(F\mid N)=0.10\)</span>, and <span class="math inline">\(P(F\mid N^c)=0.05\)</span>. The reference class of <span class="math inline">\(P(F\mid N)\)</span> is the parts from the new printer.</li>
@@ -650,22 +588,22 @@ P(N\mid F)=\frac{P(F\mid N)\,P(N)}
 </ol>
 <p>Verification in R:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>p_new <span class="ot">&lt;-</span> <span class="fl">0.40</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>fail_new <span class="ot">&lt;-</span> <span class="fl">0.10</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>fail_old <span class="ot">&lt;-</span> <span class="fl">0.05</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>printer_tree <span class="ot">&lt;-</span> <span class="dv">1000</span> <span class="sc">*</span> <span class="fu">c</span>(<span class="at">new_fail =</span> p_new <span class="sc">*</span> fail_new,</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>                         <span class="at">new_pass =</span> p_new <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> fail_new),</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>                         <span class="at">old_fail =</span> (<span class="dv">1</span> <span class="sc">-</span> p_new) <span class="sc">*</span> fail_old,</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>                         <span class="at">old_pass =</span> (<span class="dv">1</span> <span class="sc">-</span> p_new) <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> fail_old))</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>printer_tree</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>p_new <span class="ot">&lt;-</span> <span class="fl">0.40</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>fail_new <span class="ot">&lt;-</span> <span class="fl">0.10</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>fail_old <span class="ot">&lt;-</span> <span class="fl">0.05</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>printer_tree <span class="ot">&lt;-</span> <span class="dv">1000</span> <span class="sc">*</span> <span class="fu">c</span>(<span class="at">new_fail =</span> p_new <span class="sc">*</span> fail_new,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>                         <span class="at">new_pass =</span> p_new <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> fail_new),</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>                         <span class="at">old_fail =</span> (<span class="dv">1</span> <span class="sc">-</span> p_new) <span class="sc">*</span> fail_old,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>                         <span class="at">old_pass =</span> (<span class="dv">1</span> <span class="sc">-</span> p_new) <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> fail_old))</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>printer_tree</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>new_fail new_pass old_fail old_pass 
       40      360       30      570 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>p_fail <span class="ot">&lt;-</span> fail_new <span class="sc">*</span> p_new <span class="sc">+</span> fail_old <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> p_new)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">P_F_and_N =</span> fail_new <span class="sc">*</span> p_new, <span class="at">P_F_and_not_N =</span> fail_old <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> p_new),</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">P_F =</span> p_fail, <span class="at">P_N_given_F =</span> fail_new <span class="sc">*</span> p_new <span class="sc">/</span> p_fail,</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">P_F_times_P_N =</span> p_fail <span class="sc">*</span> p_new)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>p_fail <span class="ot">&lt;-</span> fail_new <span class="sc">*</span> p_new <span class="sc">+</span> fail_old <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> p_new)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">P_F_and_N =</span> fail_new <span class="sc">*</span> p_new, <span class="at">P_F_and_not_N =</span> fail_old <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> p_new),</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">P_F =</span> p_fail, <span class="at">P_N_given_F =</span> fail_new <span class="sc">*</span> p_new <span class="sc">/</span> p_fail,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">P_F_times_P_N =</span> p_fail <span class="sc">*</span> p_new)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>    P_F_and_N P_F_and_not_N           P_F   P_N_given_F P_F_times_P_N 
     0.0400000     0.0300000     0.0700000     0.5714286     0.0280000 </code></pre>
@@ -675,9 +613,9 @@ P(N\mid F)=\frac{P(F\mid N)\,P(N)}
 </div>
 </div>
 </section>
-<section id="task-5-covariance-and-correlation-from-the-same-table" class="level3">
-<h3 class="anchored" data-anchor-id="task-5-covariance-and-correlation-from-the-same-table">Task 5: Covariance and correlation from the same table</h3>
-<p>An invented example. A founder sells houseplants online. One order is selected at random. <span class="math inline">\(X\)</span> is the number of plants in the order (1, 2, or 3) and <span class="math inline">\(Y\)</span> is the number of decorative pots in the order (0, 1, or 2). The joint PMF is:</p>
+<section id="task-3-covariance-and-correlation-from-the-same-table" class="level3">
+<h3 class="anchored" data-anchor-id="task-3-covariance-and-correlation-from-the-same-table">Task 3: Covariance and correlation from the same table</h3>
+<p>A founder sells houseplants online. One order is selected at random. <span class="math inline">\(X\)</span> is the number of plants in the order (1, 2, or 3) and <span class="math inline">\(Y\)</span> is the number of decorative pots in the order (0, 1, or 2). The joint PMF is:</p>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -715,10 +653,11 @@ P(N\mid F)=\frac{P(F\mid N)\,P(N)}
 <li>Calculate <span class="math inline">\(\operatorname{Cov}(X,Y)\)</span> with <span class="math inline">\(E[XY]-E[X]\,E[Y]\)</span> and interpret its sign.</li>
 <li>Calculate <span class="math inline">\(\operatorname{Var}(X)\)</span> and <span class="math inline">\(\operatorname{Var}(Y)\)</span> with the computational form.</li>
 <li>Calculate the correlation of <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>. Interpret its direction and its strength.</li>
-<li>The founder says: “An order with three plants always has a pot in it.” Use the joint PMF to show that this is wrong. Then say what the correlation of part 5 can and cannot tell you about one order.</li>
+<li>The founder says: “An order with three plants always has a pot in it.” Use the joint PMF to show that this is wrong. Then say in one sentence what the correlation of part 5 can and cannot tell you about one order.</li>
 </ol>
+<p>Answer structure for each calculation: formula, numbers inserted, result, and one sentence of interpretation.</p>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -727,13 +666,22 @@ Check your answer
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ol type="1">
 <li><span class="math inline">\(E[X]=1(0.40)+2(0.30)+3(0.30)=1.9\)</span> plants and <span class="math inline">\(E[Y]=0(0.40)+1(0.40)+2(0.20)=0.8\)</span> pots.</li>
-<li>The three cells with <span class="math inline">\(y=0\)</span> give the product 0. The other six cells give <span class="math inline">\(1\times1\times0.10=0.10\)</span>, <span class="math inline">\(1\times2\times0.05=0.10\)</span>, <span class="math inline">\(2\times1\times0.15=0.30\)</span>, <span class="math inline">\(2\times2\times0.05=0.20\)</span>, <span class="math inline">\(3\times1\times0.15=0.45\)</span>, and <span class="math inline">\(3\times2\times0.10=0.60\)</span>. Their sum is <span class="math inline">\(E[XY]=0.10+0.10+0.30+0.20+0.45+0.60=1.75\)</span>.</li>
+<li>The three cells with <span class="math inline">\(y=0\)</span> give the product 0. The other six cells give <span class="math inline">\(1\times1\times0.10=0.10\)</span>, <span class="math inline">\(1\times2\times0.05=0.10\)</span>, <span class="math inline">\(2\times1\times0.15=0.30\)</span>, <span class="math inline">\(2\times2\times0.05=0.20\)</span>, <span class="math inline">\(3\times1\times0.15=0.45\)</span>, and <span class="math inline">\(3\times2\times0.10=0.60\)</span>. Their sum is <span class="math display">\[
+E[XY]=0.10+0.10+0.30+0.20+0.45+0.60=1.75.
+\]</span></li>
 <li><span class="math inline">\(\operatorname{Cov}(X,Y)=1.75-1.9\times0.8=1.75-1.52=0.23\)</span>. The sign is positive: orders with more plants than average tend to have more pots than average.</li>
-<li><span class="math inline">\(E[X^2]=1(0.40)+4(0.30)+9(0.30)=0.40+1.20+2.70=4.30\)</span>, so <span class="math inline">\(\operatorname{Var}(X)=4.30-1.9^2=4.30-3.61=0.69\)</span>. <span class="math inline">\(E[Y^2]=0(0.40)+1(0.40)+4(0.20)=1.20\)</span>, so <span class="math inline">\(\operatorname{Var}(Y)=1.20-0.8^2=1.20-0.64=0.56\)</span>.</li>
+<li>The computational form gives <span class="math display">\[
+\begin{aligned}
+E[X^2]&amp;=1(0.40)+4(0.30)+9(0.30)=0.40+1.20+2.70=4.30,\\
+\operatorname{Var}(X)&amp;=4.30-1.9^2=4.30-3.61=0.69,\\
+E[Y^2]&amp;=0(0.40)+1(0.40)+4(0.20)=1.20,\\
+\operatorname{Var}(Y)&amp;=1.20-0.8^2=1.20-0.64=0.56.
+\end{aligned}
+\]</span></li>
 <li>The standard deviations are <span class="math inline">\(\operatorname{SD}(X)=\sqrt{0.69}\approx0.831\)</span> and <span class="math inline">\(\operatorname{SD}(Y)=\sqrt{0.56}\approx0.748\)</span>. The correlation is <span class="math display">\[
 \rho_{XY}=\frac{0.23}{0.831\times0.748}=\frac{0.23}{0.6216}\approx0.37.
 \]</span> It is a moderate positive linear association, and it has no units.</li>
@@ -741,25 +689,25 @@ Check your answer
 </ol>
 <p>Verification in R:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>plant_pot <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="fl">0.25</span>, <span class="fl">0.10</span>, <span class="fl">0.05</span>,</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>                      <span class="fl">0.10</span>, <span class="fl">0.15</span>, <span class="fl">0.05</span>,</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>                      <span class="fl">0.05</span>, <span class="fl">0.15</span>, <span class="fl">0.10</span>), <span class="at">nrow =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="at">plants =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="at">pots =</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">2</span>))</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>plants <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>pots <span class="ot">&lt;-</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">2</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>p_plants <span class="ot">&lt;-</span> <span class="fu">rowSums</span>(plant_pot)</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>p_pots <span class="ot">&lt;-</span> <span class="fu">colSums</span>(plant_pot)</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>mean_plants <span class="ot">&lt;-</span> <span class="fu">sum</span>(plants <span class="sc">*</span> p_plants)</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>mean_pots <span class="ot">&lt;-</span> <span class="fu">sum</span>(pots <span class="sc">*</span> p_pots)</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>var_plants <span class="ot">&lt;-</span> <span class="fu">sum</span>(plants<span class="sc">^</span><span class="dv">2</span> <span class="sc">*</span> p_plants) <span class="sc">-</span> mean_plants<span class="sc">^</span><span class="dv">2</span></span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>var_pots <span class="ot">&lt;-</span> <span class="fu">sum</span>(pots<span class="sc">^</span><span class="dv">2</span> <span class="sc">*</span> p_pots) <span class="sc">-</span> mean_pots<span class="sc">^</span><span class="dv">2</span></span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>cov_plants_pots <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">outer</span>(plants, pots) <span class="sc">*</span> plant_pot) <span class="sc">-</span> mean_plants <span class="sc">*</span> mean_pots</span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">E_X =</span> mean_plants, <span class="at">E_Y =</span> mean_pots,</span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">E_XY =</span> <span class="fu">sum</span>(<span class="fu">outer</span>(plants, pots) <span class="sc">*</span> plant_pot),</span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">Cov =</span> cov_plants_pots, <span class="at">Var_X =</span> var_plants, <span class="at">Var_Y =</span> var_pots,</span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">SD_X =</span> <span class="fu">sqrt</span>(var_plants), <span class="at">SD_Y =</span> <span class="fu">sqrt</span>(var_pots),</span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">correlation =</span> cov_plants_pots <span class="sc">/</span> <span class="fu">sqrt</span>(var_plants <span class="sc">*</span> var_pots),</span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">no_pot_given_3_plants =</span> plant_pot[<span class="st">"3"</span>, <span class="st">"0"</span>] <span class="sc">/</span> p_plants[[<span class="st">"3"</span>]])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>plant_pot <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="fl">0.25</span>, <span class="fl">0.10</span>, <span class="fl">0.05</span>,</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>                      <span class="fl">0.10</span>, <span class="fl">0.15</span>, <span class="fl">0.05</span>,</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>                      <span class="fl">0.05</span>, <span class="fl">0.15</span>, <span class="fl">0.10</span>), <span class="at">nrow =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="at">plants =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="at">pots =</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">2</span>))</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>plants <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>pots <span class="ot">&lt;-</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">2</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>p_plants <span class="ot">&lt;-</span> <span class="fu">rowSums</span>(plant_pot)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>p_pots <span class="ot">&lt;-</span> <span class="fu">colSums</span>(plant_pot)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>mean_plants <span class="ot">&lt;-</span> <span class="fu">sum</span>(plants <span class="sc">*</span> p_plants)</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>mean_pots <span class="ot">&lt;-</span> <span class="fu">sum</span>(pots <span class="sc">*</span> p_pots)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>var_plants <span class="ot">&lt;-</span> <span class="fu">sum</span>(plants<span class="sc">^</span><span class="dv">2</span> <span class="sc">*</span> p_plants) <span class="sc">-</span> mean_plants<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>var_pots <span class="ot">&lt;-</span> <span class="fu">sum</span>(pots<span class="sc">^</span><span class="dv">2</span> <span class="sc">*</span> p_pots) <span class="sc">-</span> mean_pots<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>cov_plants_pots <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">outer</span>(plants, pots) <span class="sc">*</span> plant_pot) <span class="sc">-</span> mean_plants <span class="sc">*</span> mean_pots</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">E_X =</span> mean_plants, <span class="at">E_Y =</span> mean_pots,</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">E_XY =</span> <span class="fu">sum</span>(<span class="fu">outer</span>(plants, pots) <span class="sc">*</span> plant_pot),</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">Cov =</span> cov_plants_pots, <span class="at">Var_X =</span> var_plants, <span class="at">Var_Y =</span> var_pots,</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">SD_X =</span> <span class="fu">sqrt</span>(var_plants), <span class="at">SD_Y =</span> <span class="fu">sqrt</span>(var_pots),</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">correlation =</span> cov_plants_pots <span class="sc">/</span> <span class="fu">sqrt</span>(var_plants <span class="sc">*</span> var_pots),</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">no_pot_given_3_plants =</span> plant_pot[<span class="st">"3"</span>, <span class="st">"0"</span>] <span class="sc">/</span> p_plants[[<span class="st">"3"</span>]])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>                  E_X                   E_Y                  E_XY 
             1.9000000             0.8000000             1.7500000 
@@ -775,9 +723,9 @@ no_pot_given_3_plants
 </div>
 </div>
 </section>
-<section id="task-6-a-normal-model-in-both-directions" class="level3">
-<h3 class="anchored" data-anchor-id="task-6-a-normal-model-in-both-directions">Task 6: A normal model in both directions</h3>
-<p>An invented example. A founder runs an escape room. The time that a team needs to solve the room, <span class="math inline">\(Y\)</span>, is modelled as <span class="math inline">\(Y\sim N(45,5^2)\)</span>, in minutes. The standard deviation is 5 minutes.</p>
+<section id="task-4-a-normal-model-in-both-directions" class="level3">
+<h3 class="anchored" data-anchor-id="task-4-a-normal-model-in-both-directions">Task 4: A normal model in both directions</h3>
+<p>A founder runs an escape room. The time that a team needs to solve the room, <span class="math inline">\(Y\)</span>, is modelled as <span class="math inline">\(Y\sim N(45,5^2)\)</span>, in minutes. The standard deviation is 5 minutes.</p>
 <p>Supplied values: <span class="math inline">\(P(Z\le0.8)=0.7881\)</span>, <span class="math inline">\(P(Z\le1.2)=0.8849\)</span>, and the 0.95 quantile <span class="math inline">\(z_{0.95}=1.645\)</span>.</p>
 <ol type="1">
 <li>Calculate the probability that a team needs at most 49 minutes.</li>
@@ -785,8 +733,9 @@ no_pot_given_3_plants
 <li>The founder wants a time limit that 5% of the teams exceed. Calculate this limit.</li>
 <li>Say in one sentence what the supplied quantile 1.645 means for a standard normal variable <span class="math inline">\(Z\)</span>.</li>
 </ol>
+<p>Answer structure for each calculation: formula, numbers inserted, result, and one sentence of interpretation.</p>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -795,7 +744,7 @@ Check your answer
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ol type="1">
 <li><p>Standardise: <span class="math inline">\(z=(49-45)/5=0.8\)</span>. So <span class="math inline">\(P(Y\le49)=P(Z\le0.8)=0.7881\)</span>. About 79% of the teams need at most 49 minutes.</p></li>
@@ -810,11 +759,11 @@ P(39\le Y\le49)=P(Z\le0.8)-P(Z\le-1.2)=0.7881-0.1151=0.6730.
 <p>Parts 1 and 2 go from a value to a probability. Part 3 goes from a probability to a value. One limit: the normal curve is a model. The answers are only as good as the fit of this model to the recorded times.</p>
 <p>Verification in R:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">p_at_most_49 =</span> <span class="fu">pnorm</span>(<span class="dv">49</span>, <span class="at">mean =</span> <span class="dv">45</span>, <span class="at">sd =</span> <span class="dv">5</span>),</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">p_39_to_49 =</span> <span class="fu">pnorm</span>(<span class="dv">49</span>, <span class="at">mean =</span> <span class="dv">45</span>, <span class="at">sd =</span> <span class="dv">5</span>) <span class="sc">-</span> <span class="fu">pnorm</span>(<span class="dv">39</span>, <span class="at">mean =</span> <span class="dv">45</span>, <span class="at">sd =</span> <span class="dv">5</span>),</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">by_hand =</span> <span class="fl">0.7881</span> <span class="sc">-</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="fl">0.8849</span>),</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">limit =</span> <span class="fu">qnorm</span>(<span class="fl">0.95</span>, <span class="at">mean =</span> <span class="dv">45</span>, <span class="at">sd =</span> <span class="dv">5</span>),</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">limit_by_hand =</span> <span class="dv">45</span> <span class="sc">+</span> <span class="fl">1.645</span> <span class="sc">*</span> <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">p_at_most_49 =</span> <span class="fu">pnorm</span>(<span class="dv">49</span>, <span class="at">mean =</span> <span class="dv">45</span>, <span class="at">sd =</span> <span class="dv">5</span>),</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">p_39_to_49 =</span> <span class="fu">pnorm</span>(<span class="dv">49</span>, <span class="at">mean =</span> <span class="dv">45</span>, <span class="at">sd =</span> <span class="dv">5</span>) <span class="sc">-</span> <span class="fu">pnorm</span>(<span class="dv">39</span>, <span class="at">mean =</span> <span class="dv">45</span>, <span class="at">sd =</span> <span class="dv">5</span>),</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">by_hand =</span> <span class="fl">0.7881</span> <span class="sc">-</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="fl">0.8849</span>),</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">limit =</span> <span class="fu">qnorm</span>(<span class="fl">0.95</span>, <span class="at">mean =</span> <span class="dv">45</span>, <span class="at">sd =</span> <span class="dv">5</span>),</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">limit_by_hand =</span> <span class="dv">45</span> <span class="sc">+</span> <span class="fl">1.645</span> <span class="sc">*</span> <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> p_at_most_49    p_39_to_49       by_hand         limit limit_by_hand 
     0.7881446     0.6730749     0.6730000    53.2242681    53.2250000 </code></pre>
@@ -825,21 +774,22 @@ P(39\le Y\le49)=P(Z\le0.8)-P(Z\le-1.2)=0.7881-0.1151=0.6730.
 </div>
 </section>
 </section>
-<div class="course-phase phase-after">
-<section id="after-class" class="level2">
+<section id="after-class" class="level2 course-phase phase-after">
 <h2 class="anchored" data-anchor-id="after-class">After class</h2>
 <section id="individual-practice" class="level3">
 <h3 class="anchored" data-anchor-id="individual-practice">Individual practice</h3>
-<p><span class="shark-tag">Shark Tank data</span> R reports four values from the Shark Tank file. The first two are the shares of pitches with an on-air deal in Seasons 1 to 8 and in Seasons 9 to 16. The third is the correlation between <code>season</code> and the equity offered (<code>equity_offered_pct</code>). The fourth is the correlation between the equity offered and the deal indicator (<code>deal_on_show</code>).</p>
+<p><span class="shark-tag">Shark Tank data</span> R reports four values from the Shark Tank file. The first two are the shares of pitches with an on-air deal among pitches by one entrepreneur and among pitches by more than one entrepreneur (<code>multiple_entrepreneurs</code>, recorded for 1,014 pitches). The third is the correlation between <code>season</code> and the amount asked (<code>ask_amount_usd</code>). The fourth is the correlation between the amount asked and the deal indicator (<code>deal_on_show</code>).</p>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
-<pre><code>  early_deal_rate    late_deal_rate cor_season_equity   cor_equity_deal 
-        0.5332390         0.6880109        -0.4157650        -0.1128703 </code></pre>
+<pre><code>deal_rate_one_entrepreneur    deal_rate_more_than_one 
+                    0.5608                     0.6825 
+            cor_season_ask               cor_ask_deal 
+                    0.0417                    -0.0785 </code></pre>
 </div>
 </div>
 <p>Write at most 120 words that interpret all four values. For the two rates, name the reference class. For the two correlations, give the direction and the rough strength. Say how the outcome is measured and what you cannot conclude about cause.</p>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -848,9 +798,9 @@ Check a model answer
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>Among the pitches in Seasons 1 to 8, 53.3% reached an on-air deal. Among the pitches in Seasons 9 to 16, 68.8% did. The difference of 15.5 percentage points describes these records. It does not show a causal effect of the season. Season and equity initially offered have a moderate negative linear association (<span class="math inline">\(r\approx-0.42\)</span>). Equity offered and the deal indicator have a weak negative linear association (<span class="math inline">\(r\approx-0.11\)</span>). The entrepreneurs chose their offers themselves, so pitches with low and high offers may differ in other ways too. The outcome is a deal on air, not a completed investment.</p>
+<p>Among the pitches by one entrepreneur, 56.1% reached an on-air deal. Among the pitches by more than one entrepreneur, 68.3% did. The difference of 12.2 percentage points describes these records. It does not show that teams cause deals. Season and the amount asked have almost no linear association (<span class="math inline">\(r\approx0.04\)</span>). The amount asked and the deal indicator have a very weak negative linear association (<span class="math inline">\(r\approx-0.08\)</span>): larger asks end in a deal slightly less often. The founders chose their asks themselves, so pitches with small and large asks may differ in other ways too. The outcome is a deal on air, not a completed investment.</p>
 </div>
 </div>
 </div>
@@ -865,7 +815,7 @@ Check a model answer
 <li>Correlation standardises …</li>
 </ol>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -874,7 +824,7 @@ Check your answers
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ol type="1">
 <li>The conditioning event gives the denominator or reference class.</li>
@@ -892,7 +842,7 @@ Check your answers
 <p><span class="label">Two sentences about your own venture</span></p>
 <p>Think of your own venture, or any business you know well. Name two events that both matter for it, for example “customer returns” (comes back for a second order) and “customer bought on discount”. Write two sentences. First, state which conditional probability you would most want to know, and why the direction of conditioning matters. Then say whether you would expect the two events to be independent, and what a dependence would, and would not, tell you.</p>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -901,7 +851,7 @@ See an example, then write your own
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>Take a student-run campus venture that sells boxes of prepared meals. “I most want <span class="math inline">\(P(\text{returns} \mid \text{bought on discount})\)</span>, not the reverse, because I choose whether to run discounts, and this direction tells me about the customers a discount attracts. I expect dependence (discount buyers come back less often), but dependence alone would not show that the discount causes it: customers who look for low prices may be different from the start.”</p>
 </div>
@@ -914,33 +864,24 @@ See an example, then write your own
 <h3 class="anchored" data-anchor-id="more-practice">More practice</h3>
 <p>For extra exercises on the lectures of this tutorial, with worked solutions, ask Tilly for QM Basic, the course AI assistant. For example: “Give me an extra exercise for Tutorial 2. Show the solution only after I send my answer.”</p>
 </section>
-</section>
-<section id="b-ep02-home" class="level2">
-<h2 class="anchored" data-anchor-id="b-ep02-home">Extra practice for home</h2>
-<p>These tasks practise Lectures 4 to 6 at home. Task 7 uses the Shark Tank file, and Tasks 8 to 12 use invented examples. You need a simple calculator and the formula sheet.</p>
-<section id="task-7-independence-of-events" class="level3">
-<h3 class="anchored" data-anchor-id="task-7-independence-of-events">Task 7: Independence of events</h3>
-<p><span class="shark-tag">Shark Tank data</span> This task uses the deal event <span class="math inline">\(D\)</span> and the late-season event <span class="math inline">\(L\)</span> of Task 1. If you start in a new R session, load the file and define the two events again:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>D <span class="ot">&lt;-</span> sharks<span class="sc">$</span>deal_on_show <span class="sc">==</span> <span class="dv">1</span>   <span class="co"># on-air deal</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>L <span class="ot">&lt;-</span> sharks<span class="sc">$</span>season <span class="sc">&gt;=</span> <span class="dv">9</span>         <span class="co"># late season: Seasons 9-16</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Lecture 4 defined independence of events in two equivalent ways: through conditioning and through the product form. R reports:</p>
+<section id="b-ep02-home" class="level3">
+<h3 class="anchored" data-anchor-id="b-ep02-home">Extra practice for home</h3>
+<p>These tasks practise Lectures 4 to 6 at home. Tasks 5 and 6 use the Shark Tank file, and Tasks 7 to 11 use invented examples. You need a simple calculator and the formula sheet.</p>
+<section id="task-5-conditional-means-and-the-sum-of-two-indicators" class="level4">
+<h4 class="anchored" data-anchor-id="task-5-conditional-means-and-the-sum-of-two-indicators">Task 5: Conditional means and the sum of two indicators</h4>
+<p><span class="shark-tag">Shark Tank data</span> Take the deal indicator <span class="math inline">\(X\)</span>, the modest-offer indicator <span class="math inline">\(Y\)</span>, and the R output of Task 1 again. R also reports the two variances:</p>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
-<pre><code>          P_D   P_D_given_L     P_D_and_L P_D_times_P_L 
-    0.6120749     0.6880109     0.3504511     0.3117717 </code></pre>
+<pre><code> Var_X  Var_Y 
+0.2374 0.2415 </code></pre>
 </div>
 </div>
 <ol type="1">
-<li>Use the definition with conditioning to decide whether <span class="math inline">\(D\)</span> and <span class="math inline">\(L\)</span> are independent in these records.</li>
-<li>Use the product form to reach the same conclusion.</li>
-<li>Explain why “not independent” does not mean “late season causes a deal.”</li>
-<li>Explain why the early-season event <span class="math inline">\(L^c\)</span> (Seasons 1–8) and the late-season event <span class="math inline">\(L\)</span> are disjoint but not independent.</li>
+<li>Calculate the conditional means <span class="math inline">\(E[X\mid Y=1]\)</span> and <span class="math inline">\(E[X\mid Y=0]\)</span> from the joint PMF. Say in one sentence what they mean.</li>
+<li>The sum <span class="math inline">\(X+Y\)</span> counts how many of the two events, deal and modest offer, happened for a pitch. Calculate <span class="math inline">\(E[X+Y]\)</span> and <span class="math inline">\(\operatorname{Var}(X+Y)\)</span> from the values in the output.</li>
 </ol>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -949,25 +890,72 @@ Check your answer
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-11" class="callout-11-contents callout-collapse collapse">
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ol type="1">
-<li>The deal probability is about 0.612 overall and 0.688 within late seasons, so conditioning on <span class="math inline">\(L\)</span> changes it.</li>
-<li>In the same way, the observed joint probability is about 0.350, while the product <span class="math inline">\(P(D)P(L)\)</span> is about 0.312. So <span class="math inline">\(D\)</span> and <span class="math inline">\(L\)</span> are not independent in these records.</li>
-<li>This is an association in televised pitches that the producers selected. It does not show that the season causes deals, because other factors also changed over the seasons.</li>
-<li>Early and late are disjoint because they cannot occur together. Observing one makes the other impossible, so disjoint events with positive probability are dependent.</li>
+<li>Divide each column of the joint PMF by its sum. The column sums are <span class="math inline">\(P(Y=1)\approx0.5920\)</span> and <span class="math inline">\(P(Y=0)\approx0.4080\)</span>. Because <span class="math inline">\(X\)</span> is 0 or 1, only the <span class="math inline">\(X=1\)</span> entry counts: <span class="math display">\[
+E[X\mid Y=1]\approx\frac{0.3865}{0.5920}\approx0.653,\qquad
+E[X\mid Y=0]\approx\frac{0.2255}{0.4080}\approx0.553.
+\]</span> Among pitches with a modest offer, 65.3% reached a deal. Among pitches that offered more than 10%, 55.3% did.</li>
+<li><span class="math inline">\(E[X+Y]=E[X]+E[Y]=0.612+0.592=1.204\)</span>. The variance is <span class="math display">\[
+\operatorname{Var}(X+Y)=\operatorname{Var}(X)+\operatorname{Var}(Y)
++2\operatorname{Cov}(X,Y)=0.237+0.242+2\times0.024\approx0.527.
+\]</span> Without the covariance term the result would be 0.479, about 9% less. The sum varies more because deals and modest offers go together.</li>
 </ol>
 </div>
 </div>
 </div>
 </section>
-<section id="task-8-read-a-correlation-table-from-a-paper" class="level3">
-<h3 class="anchored" data-anchor-id="task-8-read-a-correlation-table-from-a-paper">Task 8: Read a correlation table from a paper</h3>
+<section id="task-6-independence-of-events" class="level4">
+<h4 class="anchored" data-anchor-id="task-6-independence-of-events">Task 6: Independence of events</h4>
+<p><span class="shark-tag">Shark Tank data</span> This task uses the deal event <span class="math inline">\(D\)</span> and the modest-offer event <span class="math inline">\(M\)</span> of Task 1. If you start in a new R session, load the file and define the two events again:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>sharks <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/shark_tank_teaching.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>D <span class="ot">&lt;-</span> sharks<span class="sc">$</span>deal_on_show <span class="sc">==</span> <span class="dv">1</span>           <span class="co"># on-air deal</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>M <span class="ot">&lt;-</span> sharks<span class="sc">$</span>equity_offered_pct <span class="sc">&lt;=</span> <span class="dv">10</span>    <span class="co"># modest offer: at most 10%</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Lecture 4 defined independence of events in two equivalent ways: through conditioning and through the product form. R reports:</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>          P_D   P_D_given_M     P_D_and_M P_D_times_P_M 
+    0.6120749     0.6529894     0.3865371     0.3623178 </code></pre>
+</div>
+</div>
+<ol type="1">
+<li>Use the definition with conditioning to decide whether <span class="math inline">\(D\)</span> and <span class="math inline">\(M\)</span> are independent in these records.</li>
+<li>Use the product form to reach the same conclusion.</li>
+<li>Explain why “not independent” does not mean “a modest offer causes a deal.”</li>
+<li>Explain why the event <span class="math inline">\(M^c\)</span> (an offer above 10%) and the event <span class="math inline">\(M\)</span> are disjoint but not independent.</li>
+</ol>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check your answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>The deal probability is about 0.612 overall and 0.653 among modest offers, so conditioning on <span class="math inline">\(M\)</span> changes it.</li>
+<li>In the same way, the observed joint probability is about 0.387, while the product <span class="math inline">\(P(D)P(M)\)</span> is about 0.362. So <span class="math inline">\(D\)</span> and <span class="math inline">\(M\)</span> are not independent in these records.</li>
+<li>This is an association in televised pitches that the producers selected. It does not show that a modest offer causes deals, because founders who offer less equity may differ in other ways, for example in the stage or the quality of their venture.</li>
+<li><span class="math inline">\(M\)</span> and <span class="math inline">\(M^c\)</span> are disjoint because they cannot occur together. Observing one makes the other impossible, so disjoint events with positive probability are dependent.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="task-7-read-a-correlation-table-from-a-paper" class="level4">
+<h4 class="anchored" data-anchor-id="task-7-read-a-correlation-table-from-a-paper">Task 7: Read a correlation table from a paper</h4>
 <p>Research papers in management usually start their results with one table of means, standard deviations (SD), and correlations. The table below is an invented example in the layout of such a table. It does not come from a real study. It describes a survey of 240 employees with four variables:</p>
 <ul>
-<li>creative self-efficacy: how much an employee believes in his or her own ability to be creative, rated from 1 to 7.</li>
-<li>job tenure: the number of years in the current job.</li>
-<li>supervisor support: how much support the employee gets from the supervisor, rated from 1 to 7.</li>
+<li>creative self-efficacy: how much an employee believes in his or her own ability to be creative, rated from 1 to 7,</li>
+<li>job tenure: the number of years in the current job,</li>
+<li>supervisor support: how much support the employee gets from the supervisor, rated from 1 to 7,</li>
 <li>creative performance: how creative the employee’s work is, rated from 1 to 7.</li>
 </ul>
 <p>The columns “Mean” and “SD” describe each variable alone. The columns 1, 2, and 3 contain correlations. Each number is the correlation between the variable in that row and the variable with that number. For example, the 0.31 in row 3 and column 1 is the correlation between supervisor support and creative self-efficacy.</p>
@@ -1024,6 +1012,38 @@ Check your answer
 <li>State one thing this table cannot tell you about an individual employee.</li>
 </ol>
 <div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check your answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>The correlation is 0.36, in row 4 and column 1: a moderate positive linear association. Employees with higher creative self-efficacy tended to be rated higher on creative performance in this sample.</li>
+<li>The weakest association is between job tenure and supervisor support, with a correlation of 0.05.</li>
+<li>Several other explanations fit the same number. Employees in creative roles may get more support and also perform more creatively. Or supervisors may give more support to employees who already perform well. A correlation table cannot separate these explanations.</li>
+<li>The table describes how the variables move together across 240 employees. It says nothing certain about any single employee. With a correlation of 0.36, many employees with high self-efficacy will still have average performance ratings.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="task-8-read-a-joint-pmf-with-three-values-per-variable" class="level4">
+<h4 class="anchored" data-anchor-id="task-8-read-a-joint-pmf-with-three-values-per-variable">Task 8: Read a joint PMF with three values per variable</h4>
+<p>Take the houseplant table of Task 3 again.</p>
+<ol type="1">
+<li>Check that the table is a valid joint PMF.</li>
+<li>Calculate <span class="math inline">\(P(X\le2,\ Y=2)\)</span>, the probability that an order has at most two plants and two pots. Then calculate <span class="math inline">\(P(X\le2\text{ or }Y=2)\)</span> with the addition rule.</li>
+<li>Find the conditional PMF of <span class="math inline">\(X\)</span> given <span class="math inline">\(Y=0\)</span>, and check that it sums to 1.</li>
+<li>Calculate the conditional mean <span class="math inline">\(E[X\mid Y=0]\)</span> and the mean <span class="math inline">\(E[X]\)</span>. Interpret the difference in one sentence.</li>
+<li>Check the product form of independence in the cell <span class="math inline">\((x,y)=(1,0)\)</span>. What do you conclude, and why is one cell enough here?</li>
+</ol>
+<div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
@@ -1036,74 +1056,15 @@ Check your answer
 <div id="callout-12" class="callout-12-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ol type="1">
-<li>The correlation is 0.36, in row 4 and column 1: a moderate positive linear association. Employees with higher creative self-efficacy tended to be rated higher on creative performance in this sample.</li>
-<li>The weakest association is between job tenure and supervisor support, with a correlation of 0.05.</li>
-<li>Several other explanations fit the same number. Employees in creative roles may get more support and also perform more creatively. Or supervisors may give more support to employees who already perform well. A correlation table cannot separate these explanations.</li>
-<li>The table describes how the variables move together across 240 employees. It says nothing certain about any single employee. Many employees with high self-efficacy have average performance ratings.</li>
-</ol>
-</div>
-</div>
-</div>
-</section>
-<section id="task-9-read-a-joint-pmf-with-three-values-per-variable" class="level3">
-<h3 class="anchored" data-anchor-id="task-9-read-a-joint-pmf-with-three-values-per-variable">Task 9: Read a joint PMF with three values per variable</h3>
-<p>An invented example. A founder sells houseplants online. One order is selected at random. <span class="math inline">\(X\)</span> is the number of plants in the order (1, 2, or 3) and <span class="math inline">\(Y\)</span> is the number of decorative pots in the order (0, 1, or 2). The joint PMF is:</p>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th><span class="math inline">\(p_{X,Y}(x,y)\)</span></th>
-<th style="text-align: right;"><span class="math inline">\(Y=0\)</span></th>
-<th style="text-align: right;"><span class="math inline">\(Y=1\)</span></th>
-<th style="text-align: right;"><span class="math inline">\(Y=2\)</span></th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><span class="math inline">\(X=1\)</span></td>
-<td style="text-align: right;">0.25</td>
-<td style="text-align: right;">0.10</td>
-<td style="text-align: right;">0.05</td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(X=2\)</span></td>
-<td style="text-align: right;">0.10</td>
-<td style="text-align: right;">0.15</td>
-<td style="text-align: right;">0.05</td>
-</tr>
-<tr class="odd">
-<td><span class="math inline">\(X=3\)</span></td>
-<td style="text-align: right;">0.05</td>
-<td style="text-align: right;">0.15</td>
-<td style="text-align: right;">0.10</td>
-</tr>
-</tbody>
-</table>
-<ol type="1">
-<li>Check that the table is a valid joint PMF.</li>
-<li>Find the marginal PMF of <span class="math inline">\(X\)</span> and the marginal PMF of <span class="math inline">\(Y\)</span>.</li>
-<li>Calculate <span class="math inline">\(P(X\le2,\ Y=2)\)</span>, the probability that an order has at most two plants and two pots. Then calculate <span class="math inline">\(P(X\le2\text{ or }Y=2)\)</span> with the addition rule.</li>
-<li>Find the conditional PMF of <span class="math inline">\(X\)</span> given <span class="math inline">\(Y=0\)</span>, and check that it sums to 1.</li>
-<li>Calculate the conditional mean <span class="math inline">\(E[X\mid Y=0]\)</span> and the mean <span class="math inline">\(E[X]\)</span>. Interpret the difference in one sentence.</li>
-<li>Check the product form of independence in the cell <span class="math inline">\((x,y)=(1,0)\)</span>. What do you conclude, and why is one cell enough here?</li>
-</ol>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Check your answer
-</div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
-</div>
-<div id="callout-13" class="callout-13-contents callout-collapse collapse">
-<div class="callout-body-container callout-body">
-<ol type="1">
 <li>All nine entries are at least 0. The three rows sum to 0.40, 0.30, and 0.30, so all entries together sum to 1.</li>
-<li>Sum along each row for <span class="math inline">\(X\)</span>: <span class="math inline">\(p_X(1)=0.25+0.10+0.05=0.40\)</span>, <span class="math inline">\(p_X(2)=0.10+0.15+0.05=0.30\)</span>, and <span class="math inline">\(p_X(3)=0.05+0.15+0.10=0.30\)</span>. Sum down each column for <span class="math inline">\(Y\)</span>: <span class="math inline">\(p_Y(0)=0.25+0.10+0.05=0.40\)</span>, <span class="math inline">\(p_Y(1)=0.10+0.15+0.15=0.40\)</span>, and <span class="math inline">\(p_Y(2)=0.05+0.05+0.10=0.20\)</span>.</li>
 <li>The event “at most two plants and two pots” covers the cells <span class="math inline">\((1,2)\)</span> and <span class="math inline">\((2,2)\)</span>, so <span class="math inline">\(P(X\le2,\ Y=2)=0.05+0.05=0.10\)</span>. With <span class="math inline">\(P(X\le2)=0.40+0.30=0.70\)</span> and <span class="math inline">\(P(Y=2)=0.20\)</span>, the addition rule gives <span class="math inline">\(P(X\le2\text{ or }Y=2)=0.70+0.20-0.10=0.80\)</span>. Check: only the cells <span class="math inline">\((3,0)\)</span> and <span class="math inline">\((3,1)\)</span> are outside this event, and <span class="math inline">\(1-0.05-0.15=0.80\)</span>.</li>
 <li>Divide the <span class="math inline">\(Y=0\)</span> column by its sum, 0.40: <span class="math inline">\(p_{X\mid Y}(1\mid0)=0.25/0.40=0.625\)</span>, <span class="math inline">\(p_{X\mid Y}(2\mid0)=0.10/0.40=0.25\)</span>, and <span class="math inline">\(p_{X\mid Y}(3\mid0)=0.05/0.40=0.125\)</span>. The three values sum to 1.</li>
-<li><span class="math inline">\(E[X\mid Y=0]=1(0.625)+2(0.25)+3(0.125)=0.625+0.50+0.375=1.5\)</span> plants. <span class="math inline">\(E[X]=1(0.40)+2(0.30)+3(0.30)=0.40+0.60+0.90=1.9\)</span> plants. Orders without a pot contain 1.5 plants on average. That is 0.4 plants fewer than the average of all orders, about 21% fewer.</li>
+<li>The two means are <span class="math display">\[
+\begin{aligned}
+E[X\mid Y=0]&amp;=1(0.625)+2(0.25)+3(0.125)=0.625+0.50+0.375=1.5,\\
+E[X]&amp;=1(0.40)+2(0.30)+3(0.30)=0.40+0.60+0.90=1.9,
+\end{aligned}
+\]</span> in plants. Orders without a pot contain 1.5 plants on average. That is 0.4 plants fewer than the average of all orders, about 21% fewer.</li>
 <li>The entry is <span class="math inline">\(p_{X,Y}(1,0)=0.25\)</span>. The product of its margins is <span class="math inline">\(p_X(1)\,p_Y(0)=0.40\times0.40=0.16\)</span>. The two numbers differ, so <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are not independent. Independence needs the product form in every cell, so one cell that does not match is enough to show dependence.</li>
 </ol>
 <p>Verification in R:</p>
@@ -1147,9 +1108,9 @@ Check your answer
 </div>
 </div>
 </section>
-<section id="task-10-two-independent-variables" class="level3">
-<h3 class="anchored" data-anchor-id="task-10-two-independent-variables">Task 10: Two independent variables</h3>
-<p>An invented example. A founder makes soap and sells it in gift sets through two shops: a concept store in Tilburg and a museum shop in Groningen. <span class="math inline">\(X\)</span> is the number of gift sets sold on a Saturday in Tilburg, and <span class="math inline">\(Y\)</span> is the number sold on the same Saturday in Groningen. The two shops have different customers, so the founder assumes that <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are independent. The marginal PMFs are:</p>
+<section id="task-9-two-independent-variables" class="level4">
+<h4 class="anchored" data-anchor-id="task-9-two-independent-variables">Task 9: Two independent variables</h4>
+<p>A founder makes soap and sells it in gift sets through two shops: a concept store in Tilburg and a museum shop in Groningen. <span class="math inline">\(X\)</span> is the number of gift sets sold on a Saturday in Tilburg, and <span class="math inline">\(Y\)</span> is the number sold on the same Saturday in Groningen. The two shops have different customers, so the founder assumes that <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are independent. The marginal PMFs are:</p>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -1182,7 +1143,7 @@ Check your answer
 <li>A friend suggests another joint table with the same two marginal PMFs. In the friend’s table, <span class="math inline">\(p_{X,Y}(2,2)=0.03\)</span>. Can <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> be independent in the friend’s table? Explain.</li>
 </ol>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -1191,7 +1152,7 @@ Check your answer
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-14" class="callout-14-contents callout-collapse collapse">
+<div id="callout-13" class="callout-13-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ol type="1">
 <li><p>For independent variables, every cell is the product of its two margins. For the cell <span class="math inline">\((1,1)\)</span>: <span class="math inline">\(p_X(1)\,p_Y(1)=0.5\times0.4=0.20\)</span>.</p>
@@ -1237,8 +1198,12 @@ Check your answer
 </tbody>
 </table>
 <p>The three rows sum to 0.4, 0.5, and 0.1, so the nine entries sum to 1.</p></li>
-<li><p><span class="math inline">\(E[X]=0(0.4)+1(0.5)+2(0.1)=0.7\)</span> and <span class="math inline">\(E[Y]=0(0.5)+1(0.4)+2(0.1)=0.6\)</span> gift sets. In the double sum, every cell with <span class="math inline">\(x=0\)</span> or <span class="math inline">\(y=0\)</span> gives the product 0. The other four cells give <span class="math inline">\(E[XY]=1\times1\times0.20+1\times2\times0.05+2\times1\times0.04+
-2\times2\times0.01=0.20+0.10+0.08+0.04=0.42\)</span>.</p></li>
+<li><p><span class="math inline">\(E[X]=0(0.4)+1(0.5)+2(0.1)=0.7\)</span> and <span class="math inline">\(E[Y]=0(0.5)+1(0.4)+2(0.1)=0.6\)</span> gift sets. In the double sum, every cell with <span class="math inline">\(x=0\)</span> or <span class="math inline">\(y=0\)</span> gives the product 0. The other four cells give <span class="math display">\[
+\begin{aligned}
+E[XY]&amp;=1\times1\times0.20+1\times2\times0.05+2\times1\times0.04+2\times2\times0.01\\
+&amp;=0.20+0.10+0.08+0.04=0.42.
+\end{aligned}
+\]</span></p></li>
 <li><p><span class="math inline">\(\operatorname{Cov}(X,Y)=0.42-0.7\times0.6=0.42-0.42=0\)</span>. Lecture 5 states that independence implies zero covariance, because <span class="math inline">\(E[XY]=E[X]\,E[Y]\)</span> for independent variables.</p></li>
 <li><p><span class="math inline">\(E[X+Y]=0.7+0.6=1.3\)</span> gift sets. <span class="math inline">\(\operatorname{Var}(X+Y)=0.41+0.44+2\times0=0.85\)</span>. For independent variables the variances add.</p></li>
 <li><p>No.&nbsp;Independence needs <span class="math inline">\(p_{X,Y}(2,2)=p_X(2)\,p_Y(2)=0.1\times0.1=0.01\)</span>. The friend’s entry of 0.03 is three times as large. One cell that does not match is enough, so <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are dependent in the friend’s table. The two marginal PMFs alone do not determine the joint PMF.</p></li>
@@ -1276,9 +1241,9 @@ X      0    1    2
 </div>
 </div>
 </section>
-<section id="task-11-the-sum-of-two-variables-with-positive-and-negative-covariance" class="level3">
-<h3 class="anchored" data-anchor-id="task-11-the-sum-of-two-variables-with-positive-and-negative-covariance">Task 11: The sum of two variables, with positive and negative covariance</h3>
-<p>An invented example. A founder sells ice cream from a cart in the park. Her daily revenue from ice cream, <span class="math inline">\(X\)</span>, has a mean of 320 euros and a standard deviation of 50 euros. She wants to add a second product and compares two options. With each option, the daily revenue from the second product, <span class="math inline">\(Y\)</span>, has a mean of 180 euros and a standard deviation of 30 euros.</p>
+<section id="task-10-the-sum-of-two-variables-with-positive-and-negative-covariance" class="level4">
+<h4 class="anchored" data-anchor-id="task-10-the-sum-of-two-variables-with-positive-and-negative-covariance">Task 10: The sum of two variables, with positive and negative covariance</h4>
+<p>A founder sells ice cream from a cart in the park. Her daily revenue from ice cream, <span class="math inline">\(X\)</span>, has a mean of 320 euros and a standard deviation of 50 euros. She wants to add a second product and compares two options. With each option, the daily revenue from the second product, <span class="math inline">\(Y\)</span>, has a mean of 180 euros and a standard deviation of 30 euros.</p>
 <ul>
 <li>Lemonade sells well on the hot days on which ice cream also sells well: <span class="math inline">\(\operatorname{Cov}(X,Y)=600\)</span>.</li>
 <li>Hot chocolate sells well on the cool days on which ice cream sells badly: <span class="math inline">\(\operatorname{Cov}(X,Y)=-600\)</span>.</li>
@@ -1292,7 +1257,7 @@ X      0    1    2
 <li>Which option gives the more stable total revenue? Explain in one or two sentences why the two options have the same expected total and a different spread.</li>
 </ol>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-15-contents" aria-controls="callout-15" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -1301,7 +1266,7 @@ Check your answer
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-15" class="callout-15-contents callout-collapse collapse">
+<div id="callout-14" class="callout-14-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ol type="1">
 <li><span class="math inline">\(\operatorname{Var}(X)=50^2=2{,}500\)</span> and <span class="math inline">\(\operatorname{Var}(Y)=30^2=900\)</span>.</li>
@@ -1334,9 +1299,9 @@ Check your answer
 </div>
 </div>
 </section>
-<section id="task-12-a-uniform-model" class="level3">
-<h3 class="anchored" data-anchor-id="task-12-a-uniform-model">Task 12: A uniform model</h3>
-<p>An invented example. A founder runs a studio that prints T-shirts for student associations. The time to print one order, <span class="math inline">\(X\)</span>, is equally likely to be anywhere between 20 and 60 minutes: <span class="math inline">\(X\sim U(20,60)\)</span>.</p>
+<section id="task-11-a-uniform-model" class="level4">
+<h4 class="anchored" data-anchor-id="task-11-a-uniform-model">Task 11: A uniform model</h4>
+<p>A founder runs a studio that prints T-shirts for student associations. The time to print one order, <span class="math inline">\(X\)</span>, is equally likely to be anywhere between 20 and 60 minutes: <span class="math inline">\(X\sim U(20,60)\)</span>.</p>
 <ol type="1">
 <li>A colleague sketches the density as a flat line at height 0.02 between 20 and 60 minutes, and zero elsewhere. Show that this is not a valid density, and give the correct height.</li>
 <li>Calculate <span class="math inline">\(P(30\le X\le45)\)</span>.</li>
@@ -1345,7 +1310,7 @@ Check your answer
 <li>State <span class="math inline">\(P(X=40)\)</span>. Then explain why the height of the density is not a probability.</li>
 </ol>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-16-contents" aria-controls="callout-16" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-15-contents" aria-controls="callout-15" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -1354,7 +1319,7 @@ Check your answer
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-16" class="callout-16-contents callout-collapse collapse">
+<div id="callout-15" class="callout-15-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ol type="1">
 <li>A valid density is never negative and has a total area of 1. The sketch is never negative, but its area is <span class="math inline">\((60-20)\times0.02=0.8\)</span>, not 1. The correct height is <span class="math inline">\(1/(60-20)=0.025\)</span> per minute. Then the area is <span class="math inline">\(40\times0.025=1\)</span>.</li>
@@ -1381,7 +1346,7 @@ Check your answer
 <p><a href="../basic/b07-samples-estimators.html">Continue to Lecture 7: Samples, parameters, and estimators</a>.</p>
 </section>
 </section>
-</div>
+</section>
 
 
 

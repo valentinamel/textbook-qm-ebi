@@ -75,6 +75,31 @@ abline(h = 0, lty = 2)
 the course project open, so that you can run the code of this chapter
 yourself during the lecture and get the same numbers and figures.
 
+**Check the videos and the warm-up.** Answer these three quick questions
+before you open the answers.
+
+1. In a residual-versus-fitted plot, which pattern challenges linearity,
+   and which pattern challenges constant variance?
+2. What is the difference between an outlier and an influential
+   observation?
+3. In your warm-up plot, how does the vertical spread of the residuals
+   change from small to large fitted values?
+
+::: {.callout-note collapse="true"}
+## Check your preparation
+
+1. A curve in the residuals, for example below zero at both ends and above
+   zero in the middle, challenges linearity. A spread that grows or shrinks
+   from left to right, like a funnel, challenges constant variance.
+2. An outlier has an unusually large residual: its outcome lies far from
+   the fitted line. An influential observation changes the fitted line
+   noticeably when you remove it. An outlier is not always influential,
+   and an influential observation does not always have a large residual.
+3. At small fitted values the residuals stay close to zero. At large fitted
+   values they spread over several million dollars, like a funnel. The
+   lecture material explains what this pattern means.
+:::
+
 [Shark Tank data]{.shark-tag} **Predict.** Answer this question before you come to class. The agreed
 valuations are strongly right-skewed (most are small and a few are very
 large), far from a normal distribution. Does that alone make the Lecture 1
@@ -214,7 +239,7 @@ and produced.
 |---|---|---|---|
 | Linearity | The average of $Y$ at each value of $X$ lies on a straight line: $E[Y\mid X=x]=\beta_0+\beta_1x$ | Residual plot. Holds: the residuals scatter around zero in every part of the range of fitted values. Fails: the residuals follow a curve, for example below zero at both ends and above zero in the middle | One slope misses part of the pattern, and the line is wrong in some parts of the range |
 | Homoskedasticity (constant variance) | The errors have the same variance at every value of $X$: $\operatorname{Var}(\varepsilon_i\mid X_i)=\sigma^2$ | Residual plot. Holds: the vertical spread of the residuals is about the same from left to right, an even band. Fails: the vertical spread grows or shrinks along the fitted values, like a funnel | The slope stays unbiased, but the usual standard errors, tests, and intervals are wrong |
-| Normality of the errors | At each value of $X$, the errors follow a normal distribution | Normal Q--Q plot of the standardised residuals. Holds: the points lie close to the straight reference line. Fails: the points bend away from the line, usually at one or both ends | In small samples the t and F distributions of Lecture 3 are no longer exact. In large samples this matters little |
+| Normality of the errors | At each value of $X$, the errors follow a normal distribution | Normal Q-Q plot of the standardised residuals. Holds: the points lie close to the straight reference line. Fails: the points bend away from the line, usually at one or both ends | In small samples the t and F distributions of Lecture 3 are no longer exact. In large samples this matters little |
 | Independence (random sampling) | The observations are drawn independently: the error of one row says nothing about the error of another row | No plot. Check how the data were collected. Holds: each row was drawn separately, for example customers drawn at random from a long list. Fails: rows share something that affects the outcome, such as the same shop, week, or episode | The usual standard errors are often too small, so intervals are too narrow. A sample that is not random can also bias the line |
 | Zero conditional mean (exogeneity): no omitted confounder | The error averages zero at every value of $X$: $E[\varepsilon_i\mid X_i]=0$. For a causal reading: no other cause of $Y$ that is missing from the model is related to $X$ | No plot. Check how the values of $X$ came about. Holds: $X$ is unrelated to other causes of $Y$, for example because $X$ was set at random. Fails: another cause of $Y$ that is missing from the model is related to $X$ | The slope is not the effect of changing $X$. It still describes how average outcomes differ across values of $X$ |
 
@@ -358,7 +383,7 @@ Homoskedasticity is about the vertical spread of the errors. It says that
 the errors scatter equally widely at every value of the predictor. It does
 not say that all residuals have the same size. When the spread changes with
 the predictor, this is called **heteroskedasticity**. Business data often
-show it. Take shops of different sizes: the monthly revenue of a small shop
+show it. Take shops of different sizes. The monthly revenue of a small shop
 may differ from its fitted value by a few thousand euros, and that of a
 large shop by tens of thousands. @fig-i02-spread shows both situations with
 invented data for 90 shops, with monthly revenue regressed on floor space.
@@ -422,15 +447,16 @@ group:
 ```{r}
 #| label: i02-spread-by-fifth
 round(tapply(residuals(val_model), fifth, sd), 2)   # spread of the residuals
+round(tapply(vals$agreed_m, fifth, mean), 2)         # average agreed valuation
 ```
 
-The numbers below the labels are the standard deviations of the residuals,
-in \$ millions. They are \$0.14 million in the fifth with the smallest
+The first output gives the standard deviations of the residuals, in
+\$ millions. They are \$0.14 million in the fifth with the smallest
 claims, then \$0.36, \$1.19, and \$1.08 million, and \$3.61 million in the
 fifth with the largest claims. The last is about 25 times the first. So the
-spread broadly grows with the size of the claim, like a funnel. The deals
-also get larger: the average agreed valuation from the linearity check rises
-from \$0.28 million to \$7.83 million. Relative to the size of the deals the
+spread broadly grows with the size of the claim, like a funnel. The second
+output shows that the deals also get larger: the average agreed valuation
+rises from \$0.28 million in the first fifth to \$7.83 million in the last. Relative to the size of the deals the
 spread is more stable: in every fifth the standard deviation lies between
 0.46 and 0.89 times the average agreed valuation of that fifth. This makes
 economic sense: founders and sharks can disagree by much more money about a
@@ -480,7 +506,7 @@ The third row of the table is normality of the errors. It matters most when
 you have few observations, for example a young venture with 20 weeks of
 sales data. The tests and intervals of Lecture 3 then rely on it. A
 histogram of the residuals gives a first impression, but it is hard to judge
-the ends of a distribution from a histogram. A **normal Q--Q plot**
+the ends of a distribution from a histogram. A **normal Q-Q plot**
 (quantile-quantile plot) shows the ends more clearly. It puts the
 standardised residuals in order and compares them with the values that a
 normal distribution would give. A standardised residual is a residual
@@ -499,7 +525,7 @@ number of observations, 874, so that the two panels are easy to compare.
 #| code-fold: true
 #| code-summary: "See the R code for this figure"
 #| fig-height: 4
-#| fig-cap: "Normal Q--Q plots of standardised residuals. Left: an invented regression with 874 observations and normal errors, so normality holds. Right: the Shark Tank valuation model. Both ends leave the line, so normality fails: a few deals were agreed far above and far below their fitted valuation."
+#| fig-cap: "Normal Q-Q plots of standardised residuals. Left: an invented regression with 874 observations and normal errors, so normality holds. Right: the Shark Tank valuation model. Both ends leave the line, so normality fails: a few deals were agreed far above and far below their fitted valuation."
 #| fig-alt: "Two normal Q-Q plots with theoretical quantiles from about minus 3 to plus 3 on the horizontal axis and standardised residuals on the vertical axis. Left: the points follow the rising reference line from end to end. Right: in the middle the points follow the line, but at the left end they fall below it, down to about minus 5, and at the right end they rise far above it, up to about 8."
 library(ggplot2)
 sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
@@ -536,7 +562,7 @@ ggplot(qq_df, aes(sample = rs)) +
 
 In the left panel the points follow the reference line from one end to the
 other. Small departures at the very ends are normal in any sample. This is
-what a Q--Q plot looks like when normality holds. In the right panel the
+what a Q-Q plot looks like when normality holds. In the right panel the
 middle of the distribution is close to the line, but both ends bend away
 from it, the upper end more strongly. The Shark Tank residuals have more
 extreme values on both sides than a normal distribution has. We say that
@@ -549,7 +575,8 @@ Two base R commands draw the Shark Tank panel without the styling of the
 figure:
 
 ```{r}
-#| label: i02-qq-base
+#| label: fig-i02-qq-base
+#| fig-cap: "Normal Q-Q plot of the standardised residuals of the valuation model, drawn with base R."
 #| fig-alt: "Base R version of the normal Q-Q plot of the standardised residuals of the valuation model, with the same shape: points on the reference line in the middle and far from it at both ends."
 qqnorm(rstandard(val_model))
 qqline(rstandard(val_model))
@@ -657,9 +684,9 @@ change without them, which is called a sensitivity analysis.
 A first check needs no plot. The function `summary()` gives the smallest
 residual, the largest residual, the mean, the median, and the two quartiles.
 [Basic Lecture 1](../basic/b01-introduction-data-analysis.qmd#b01-quartiles)
-defines the median and the quartiles: a quarter of the values lie below the
-first quartile, half below the median, and three quarters below the third
-quartile.
+defines the median and the quartiles: at least a quarter of the values lie
+at or below the first quartile, half at or below the median, and at least
+three quarters at or below the third quartile.
 
 ```{r}
 #| label: i02-residual-line
@@ -671,11 +698,11 @@ summary(residuals(val_model))
 
 [Shark Tank data]{.shark-tag} Read the numbers one by one, all in \$ millions:
 
-- The **median** residual is about $-0.01$: the typical deal lies almost
+- The median residual is about $-0.01$: the typical deal lies almost
   exactly on the fitted line.
 - The middle half of all residuals, from the first to the third quartile,
   runs from $-0.40$ to $0.17$: a band about \$570,000 wide.
-- The **minimum** is about $-7.8$ and the **maximum** about $13.4$: one deal
+- The minimum is about $-7.8$ and the maximum about $13.4$: one deal
   was agreed \$7.8 million below its fitted valuation and another \$13.4 million
   above. As a benchmark, the average agreed valuation is \$2.2 million, so
   each of these misses is several times the size of an average deal.
@@ -904,11 +931,8 @@ comes to the valuation of a single deal. Lecture 3 answers both questions:
 it measures how precise the slope is and how much of the variation in agreed
 valuations the line explains.
 
-**Next:** The slope is an estimate from one set of deals. Lecture 3 shows
-how precise it is, with its standard error, its confidence interval, and a
-t-test. It also shows how much of the variation in the outcome the line
-explains ($R^2$) and how to test whether the model is useful at all (the
-F-test).
+**Next:** Lecture 3 adds the standard error, the confidence interval, the
+t-test, $R^2$, and the F-test to the fitted line.
 
 :::
 
@@ -1032,7 +1056,7 @@ produced.
 
 [Shark Tank data]{.shark-tag} Regress the equity offered by the founder, in percent
 (`equity_offered_pct`), on the season (`season`), using all 1,441 pitches.
-Produce the residual-versus-fitted plot and the normal Q--Q plot. Interpret
+Produce the residual-versus-fitted plot and the normal Q-Q plot. Interpret
 each in one or two sentences. Then count the standardised residuals beyond $\pm 3$
 and the observations with a Cook's distance above $4/n$.
 
@@ -1042,6 +1066,7 @@ and the observations with a Cook's distance above $4/n$.
 ```{r}
 #| label: i02-practice-equity
 #| fig-height: 3.6
+#| fig-cap: "Residuals against fitted values (left) and normal Q-Q plot of the standardised residuals (right) for the regression of equity offered on season."
 #| fig-alt: "Two panels. Left: residuals of equity offered against fitted values, in sixteen vertical stripes between about 7 and 20 percent fitted equity, most residuals between about minus 10 and plus 15 points and a few up to about 83 points. Right: normal Q-Q plot whose points follow the line in the middle and bend sharply upwards at the right end."
 sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
 equity_model <- lm(equity_offered_pct ~ season, data = sharks)
@@ -1049,7 +1074,7 @@ old_par <- par(no.readonly = TRUE)
 par(mfrow = c(1, 2), mar = c(4.5, 4.4, 1.3, 0.7), las = 1)
 plot(fitted(equity_model), residuals(equity_model),
      pch = 16, col = grDevices::adjustcolor("#0072B2", alpha.f = 0.30),
-     bty = "n", xlab = "Fitted equity offered (pp)",
+     bty = "n", xlab = "Fitted equity offered (%)",
      ylab = "Residual (pp)")
 abline(h = 0, lty = 2, lwd = 2, col = "#D55E00")
 qqnorm(rstandard(equity_model), pch = 16,
@@ -1071,7 +1096,7 @@ The residual plot shows sixteen vertical stripes. The season
 exist. That is a feature of the predictor, not a violation. The vertical
 spread is broadly similar across the stripes, so there is no strong
 heteroskedasticity. The
-Q--Q plot bends upwards at the right end: some pitches offered far more
+Q-Q plot bends upwards at the right end: some pitches offered far more
 equity than the fitted trend. The largest residual is about 83 percentage
 points, from a founder who offered the whole company. As a benchmark, the
 average offer is 13% of the company with a standard deviation of about 8
@@ -1100,7 +1125,7 @@ model's fitted conditional mean, by about 20% of the fitted value.
 
 ### Worked exam interpretation
 
-**Exam-style question.** An invented example. A regression
+**Exam-style question.** A regression
 describes the monthly revenue of cafés by their opening hours per week. Its
 residual-versus-fitted plot shows vertical spread increasing with the fitted
 value. Name the pattern and the assumption it challenges. Then state one
@@ -1123,7 +1148,7 @@ belong to the same chain.
 
 > "The agreed valuations are not normally distributed, so the regression is invalid. I removed the 25 outliers and now the model is fine."
 
-Find what is wrong and write the corrected answer. This task is the **Verify**
+Find what is wrong and write the corrected answer. This task is the Verify
 step of Attempt → Ask → Verify → Explain.
 
 ::: {.callout-note collapse="true"}
@@ -1163,12 +1188,12 @@ QM Intermediate, the course AI assistant. For example: "Give me an extra
 exercise for Intermediate Lecture 2. Show the solution only after I send my
 answer."
 
-[Continue to Lecture 3: Coefficient inference, fit, and the F-test](i03-inference-fit-ftest.qmd).
-
 [Code sheet: Lecture 2 commands and formulas](code-sheet.qmd#lecture-2-assumptions-residual-diagnostics-and-influence).
 
 For a more formal treatment, see
 [Nieuwenhuis, *Statistical Methods for Business and Economics*](https://tilburguniversity.on.worldcat.org/oclc/317545871),
 Chapters 19 and 22.
+
+[Continue to Lecture 3: Coefficient inference, fit, and the F-test](i03-inference-fit-ftest.qmd).
 
 :::

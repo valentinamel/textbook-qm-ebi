@@ -74,7 +74,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-9625fb8afdc25f0504cb337f379810a0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-d13a011d2bf4f58ad02ec87b837429ca.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -424,10 +424,10 @@ window.Quarto = {
 <div class="outcomes">
 <p><span class="label">By the end of Lecture 6, you can</span></p>
 <ul>
-<li>tell continuous variables apart from discrete ones and read probabilities as areas</li>
-<li>calculate probabilities for a uniform model from interval lengths</li>
-<li>compute normal probabilities and quantiles by hand and in R</li>
-<li>check a normal model against data and say when it fails</li>
+<li>tell continuous variables apart from discrete ones and read probabilities as areas,</li>
+<li>calculate probabilities for a uniform model from interval lengths,</li>
+<li>compute normal probabilities and quantiles by hand and in R,</li>
+<li>check a normal model against data and say when it fails.</li>
 </ul>
 </div>
 <div class="driving-question">
@@ -461,9 +461,9 @@ Where these videos differ from this book
 </div>
 <p><strong>Warm up.</strong> A discrete random variable has separate possible values with gaps between them (Lecture 3 attached a PMF and a CDF to such variables). A continuous random variable can take every real value in an interval. Match each variable to the better description:</p>
 <ol type="1">
-<li>number of sharks in an on-air deal</li>
-<li>equity offered, as an exact percentage of the company</li>
-<li>season number</li>
+<li>number of sharks in an on-air deal,</li>
+<li>equity offered, as an exact percentage of the company,</li>
+<li>season number,</li>
 <li>exact amount invested, before rounding to dollars.</li>
 </ol>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -487,7 +487,7 @@ Check your preparation
 </section>
 <section id="lecture-material" class="level2 course-phase phase-in-class">
 <h2 class="anchored" data-anchor-id="lecture-material">Lecture material</h2>
-<p>This section builds probability models for quantities that can take any value in a range. It uses them to answer one question about the equity offered in the Shark Tank file.</p>
+<p>Lectures 3 to 5 described variables with a few separate values, such as the deal indicator or the number of sharks in a deal. This lecture builds probability models for quantities that can take any value in a range, such as the equity offered, a delivery time, or next month’s revenue. It uses them to answer one question about the equity offered in the Shark Tank file, and it ends with the model that the rest of the course relies on, the normal distribution.</p>
 <section id="start-with-a-founders-question" class="level3">
 <h3 class="anchored" data-anchor-id="start-with-a-founders-question">Start with a founder’s question</h3>
 <p><span class="shark-tag">Shark Tank data</span> You plan to offer the sharks 30% of your company. Is that unusual? The Shark Tank file records the equity offered in each pitch (<code>equity_offered_pct</code>). The code below reads the file and counts the pitches that offered 30% or more.</p>
@@ -534,7 +534,7 @@ Check your preparation
 </p>
 <p><span class="shark-tag">Shark Tank data</span> For a discrete random variable, the PMF gives a probability to each single value. For a continuous variable that no longer helps, because every single value has probability zero. We need something else, and the histogram already contains the idea.</p>
 <p>Imagine a histogram of the equity offered, like the one in <a href="../basic/b01-introduction-data-analysis.html">Lecture 1</a>, but for offers that are recorded exactly, without rounding. The intervals of a histogram are also called bins. The height of each bar is the share of offers in its bin. With bins 5 percentage points wide, the bars have a reasonable size. Now make the bins 1 point wide. Each new bar holds about a fifth of what the old bar held, so all bars shrink. With bins 0.1 wide they shrink again, by another factor of ten. The whole histogram sinks towards the axis. This is the shrinking window of the previous section, now for all bins at once. A histogram with the share in the bin as its height is not useful once the bins are narrow.</p>
-<p>The Shark Tank file records rounded percentages, so it cannot show what happens in very narrow bins. The two figures of this section therefore use 100,000 invented offers. A computer drew them, without rounding, from a smooth model with the same mean and standard deviation as the equity offered in the file. <a href="#fig-b06-shrinking-bins" class="quarto-xref">Figure&nbsp;<span>6.1</span></a> shows the three histograms on the same vertical scale.</p>
+<p>The Shark Tank file records rounded percentages, so it cannot show what happens in very narrow bins. The two figures of this section therefore use 100,000 invented offers. A computer drew them, without rounding, from a smooth, right-skewed model with the same mean and standard deviation as the equity offered in the file, so that its shape resembles the real offers. <a href="#fig-b06-shrinking-bins" class="quarto-xref">Figure&nbsp;<span>6.1</span></a> shows the three histograms on the same vertical scale.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>See the R code for this figure</summary>
@@ -604,7 +604,7 @@ Figure&nbsp;6.1: The same 100,000 invented offers that are not rounded, in bins 
 </div>
 </div>
 </div>
-<p>There is a second way to draw the heights. Divide the share in each bin by the width of the bin. The height is then the share per percentage point. Now the picture does not sink when the bins get narrower. A bar 1 point wide that holds 2% of the offers has the height <span class="math inline">\(0.02/1=0.02\)</span> per point. A bar 0.1 wide that holds 0.2% of the offers has the height <span class="math inline">\(0.002/0.1=0.02\)</span> per point as well. With narrower bins, the bars stop shrinking and form a smooth curve, as <a href="#fig-b06-density-bins" class="quarto-xref">Figure&nbsp;<span>6.2</span></a> shows. The figure uses bins 5, 1, and 0.25 wide. This curve is the probability density, written <span class="math inline">\(f_X(x)\)</span>. Its height at 30 is the share per percentage point near 30. The share in a bin is the height of the bar times its width, which is the area of the bar. Probability has become area.</p>
+<p>There is a second way to draw the heights. Divide the share in each bin by the width of the bin. The height is then the share per percentage point. Now the picture does not sink when the bins get narrower. A bar 1 point wide that holds 2% of the offers has the height <span class="math inline">\(0.02/1=0.02\)</span> per point. A bar 0.1 wide that holds 0.2% of the offers has the height <span class="math inline">\(0.002/0.1=0.02\)</span> per point as well. With narrower bins, the bars stop shrinking and form a smooth curve, as <a href="#fig-b06-density-bins" class="quarto-xref">Figure&nbsp;<span>6.2</span></a> shows. The figure uses bins 5, 1, and 0.25 wide. Bins 0.1 wide would be too noisy to see on this scale, but the idea is the same. This curve is the probability density, written <span class="math inline">\(f_X(x)\)</span>. Its height at 30 is the share per percentage point near 30. The share in a bin is the height of the bar times its width, which is the area of the bar. Probability has become area.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>See the R code for this figure</summary>
@@ -673,10 +673,10 @@ Figure&nbsp;6.1: The same 100,000 invented offers that are not rounded, in bins 
 <span id="cb10-63"><a href="#cb10-63" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div id="fig-b06-density-bins" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-b06-density-bins" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Three histogram panels side by side of 100,000 invented equity offers, with bins 5, 1, and 0.25 points wide and the share per percentage point on the vertical axis. In all three panels the bars follow the same right-skewed navy curve, which peaks at about 8 percent and falls slowly to the right. The narrower the bins, the closer the bars lie to the curve.">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-b06-density-bins-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="b06-continuous-normal_files/figure-html/fig-b06-density-bins-1.png" class="img-fluid figure-img" width="672">
+<img src="b06-continuous-normal_files/figure-html/fig-b06-density-bins-1.png" class="img-fluid figure-img" alt="Three histogram panels side by side of 100,000 invented equity offers, with bins 5, 1, and 0.25 points wide and the share per percentage point on the vertical axis. In all three panels the bars follow the same right-skewed navy curve, which peaks at about 8 percent and falls slowly to the right. The narrower the bins, the closer the bars lie to the curve." width="672">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-b06-density-bins-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;6.2: Narrowing the bins, for 100,000 invented offers that are not rounded. The height of a bar is the share of offers in the bin divided by the bin width. With this height the histogram does not sink. It comes closer and closer to the same navy curve, the density. The horizontal axis stops at 50%, which leaves out 196 of the 100,000 offers (0.2%), so that the shape of the bulk stays visible.
@@ -822,10 +822,10 @@ Check: is a rectangle of width 0.5 and height 2 a valid density?
 <span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div id="fig-b06-uniform-session" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-b06-uniform-session" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A flat navy line at constant height over a session from 0 to 90 minutes, which is the uniform density. The area under the line between minute 30 and minute 48 is shaded green and has probability 18/90 = 0.20.">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-b06-uniform-session-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="b06-continuous-normal_files/figure-html/fig-b06-uniform-session-1.png" class="img-fluid figure-img" width="672">
+<img src="b06-continuous-normal_files/figure-html/fig-b06-uniform-session-1.png" class="img-fluid figure-img" alt="A flat navy line at constant height over a session from 0 to 90 minutes, which is the uniform density. The area under the line between minute 30 and minute 48 is shaded green and has probability 18/90 = 0.20." width="672">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-b06-uniform-session-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;6.3: The uniform density for a pitch start time over a 90-minute session. The navy line is the density. The shaded green area is the probability of the 18-minute window, 18/90 = 0.20.
@@ -885,10 +885,10 @@ Figure&nbsp;6.3: The uniform density for a pitch start time over a 90-minute ses
 <span id="cb14-40"><a href="#cb14-40" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div id="fig-b06-uniform-cdf" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-b06-uniform-cdf" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A navy straight line that rises from 0 at minute 0 to 1 at minute 90, the CDF of the uniform start time. Gold dashed lines read off the values at minutes 30 and 48, and a green bar on the vertical axis shows their difference, 0.20.">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-b06-uniform-cdf-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="b06-continuous-normal_files/figure-html/fig-b06-uniform-cdf-1.png" class="img-fluid figure-img" width="672">
+<img src="b06-continuous-normal_files/figure-html/fig-b06-uniform-cdf-1.png" class="img-fluid figure-img" alt="A navy straight line that rises from 0 at minute 0 to 1 at minute 90, the CDF of the uniform start time. Gold dashed lines read off the values at minutes 30 and 48, and a green bar on the vertical axis shows their difference, 0.20." width="672">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-b06-uniform-cdf-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;6.4: The CDF of the pitch start time in the 90-minute session model. The navy line rises from 0 to 1 and never falls. The gold dashed lines read off F(30) and F(48). Their difference, the green bar, is the probability of the 18-minute window, 0.20.
@@ -987,10 +987,10 @@ Check your answer
 <span id="cb15-40"><a href="#cb15-40" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div id="fig-b06-pushes" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-b06-pushes" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Bar chart of the total of ten small pushes in 10,000 repetitions, with totals from minus 10 to 10 on the horizontal axis. The bars are tallest near 0 and fall symmetrically on both sides, forming a bell shape. The totals 10 and minus 10 are marked as rare.">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-b06-pushes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="b06-continuous-normal_files/figure-html/fig-b06-pushes-1.png" class="img-fluid figure-img" width="672">
+<img src="b06-continuous-normal_files/figure-html/fig-b06-pushes-1.png" class="img-fluid figure-img" alt="Bar chart of the total of ten small pushes in 10,000 repetitions, with totals from minus 10 to 10 on the horizontal axis. The bars are tallest near 0 and fall symmetrically on both sides, forming a bell shape. The totals 10 and minus 10 are marked as rare." width="672">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-b06-pushes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;6.5: Ten small pushes, added up, in 10,000 repetitions. Totals near zero can arise in many ways, so they are common. A total of 10 or of -10 can arise in only one way, so it is rare. The bars form a bell around 0.
@@ -1001,7 +1001,7 @@ Figure&nbsp;6.5: Ten small pushes, added up, in 10,000 repetitions. Totals near 
 </div>
 <p>The same explanation fits many quantities. The weight of a filled package is the sum of the weights of everything in it. An exam score adds up many small successes and small mistakes. Suppose a quantity is the sum of many small, independent influences, and no single influence is much larger than the others. Then its distribution tends to be bell-shaped. The normal distribution is the mathematical model for this shape.</p>
 <p>The normal distribution is a model, not a law. The explanation above also tells you when to doubt it. If one influence is much larger than the others, for example an upper limit, a cut-off, or one large cause, the bell shape is lost. If the influences multiply and do not add, as with growth rates, the distribution is skewed and not symmetric. Many business variables are like this. Revenues, firm sizes, and the equity offered in the Shark Tank file are strongly skewed, and the normal model does not fit them. The section on checking the normal model against data comes back to this.</p>
-<p>A normal model needs two numbers. The first is its mean <span class="math inline">\(\mu\)</span>. The second is its standard deviation <span class="math inline">\(\sigma\)</span>. Lecture 3 introduced both symbols.</p>
+<p>A normal model needs two numbers: its mean <span class="math inline">\(\mu\)</span> and its standard deviation <span class="math inline">\(\sigma\)</span>. Lecture 3 introduced both symbols.</p>
 <div class="definition-box">
 <p><span class="label">Definition</span></p>
 <p><strong>Normal distribution.</strong> A continuous distribution with a symmetric, bell-shaped density. Its centre is the mean <span class="math inline">\(\mu\)</span>, and its spread is the standard deviation <span class="math inline">\(\sigma&gt;0\)</span>. We write <span class="math inline">\(X\sim N(\mu,\sigma^2)\)</span>.</p>
@@ -1082,10 +1082,10 @@ Optional: the formula of the normal density
 <span id="cb16-48"><a href="#cb16-48" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div id="fig-b06-normal-parameters" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-b06-normal-parameters" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Two panels side by side with normal density curves. In the left panel the orange curve with mean 3 has the same shape as the navy curve with mean 0, shifted to the right. In the right panel the orange curve with standard deviation 2 is wider and lower than the navy curve with standard deviation 1, and both are centred at 0.">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-b06-normal-parameters-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="b06-continuous-normal_files/figure-html/fig-b06-normal-parameters-1.png" class="img-fluid figure-img" width="672">
+<img src="b06-continuous-normal_files/figure-html/fig-b06-normal-parameters-1.png" class="img-fluid figure-img" alt="Two panels side by side with normal density curves. In the left panel the orange curve with mean 3 has the same shape as the navy curve with mean 0, shifted to the right. In the right panel the orange curve with standard deviation 2 is wider and lower than the navy curve with standard deviation 1, and both are centred at 0." width="672">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-b06-normal-parameters-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;6.6: The two parameters of the normal model. Left: a larger mean (orange, μ = 3 in place of 0) shifts the curve to the right and leaves its shape unchanged. Right: a larger standard deviation (orange, σ = 2 in place of 1) makes the curve wider and lower.
@@ -1130,10 +1130,10 @@ Figure&nbsp;6.6: The two parameters of the normal model. Left: a larger mean (or
 <span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div id="fig-b06-normal-shape" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-b06-normal-shape" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A symmetric bell-shaped normal density curve. A gold dashed line marks the mean in the centre. The area between one standard deviation below and one above the mean, bounded by two grey dashed lines, is shaded and contains about 68 percent of the distribution.">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-b06-normal-shape-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="b06-continuous-normal_files/figure-html/fig-b06-normal-shape-1.png" class="img-fluid figure-img" width="672">
+<img src="b06-continuous-normal_files/figure-html/fig-b06-normal-shape-1.png" class="img-fluid figure-img" alt="A symmetric bell-shaped normal density curve. A gold dashed line marks the mean in the centre. The area between one standard deviation below and one above the mean, bounded by two grey dashed lines, is shaded and contains about 68 percent of the distribution." width="672">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-b06-normal-shape-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;6.7: The normal density. The shaded central area between the two grey dashed lines runs from one standard deviation below the mean to one above and contains about 68% of the distribution. The gold dashed line marks the mean μ.
@@ -1189,10 +1189,10 @@ Figure&nbsp;6.7: The normal density. The shaded central area between the two gre
 <span id="cb18-38"><a href="#cb18-38" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div id="fig-b06-equity-normal-area" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-b06-equity-normal-area" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A normal density curve with the mean and standard deviation of the equity offered, centred at about 13 percent and marked with a gold dashed line. The small area under the right tail beyond 30 percent is shaded orange and has probability of about 2 percent.">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-b06-equity-normal-area-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="b06-continuous-normal_files/figure-html/fig-b06-equity-normal-area-1.png" class="img-fluid figure-img" width="672">
+<img src="b06-continuous-normal_files/figure-html/fig-b06-equity-normal-area-1.png" class="img-fluid figure-img" alt="A normal density curve with the mean and standard deviation of the equity offered, centred at about 13 percent and marked with a gold dashed line. The small area under the right tail beyond 30 percent is shaded orange and has probability of about 2 percent." width="672">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-b06-equity-normal-area-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;6.8: The normal model with the mean and the standard deviation of the equity offered (<code>equity_offered_pct</code>) in the Shark Tank file. The gold dashed line marks the mean. The orange area to the right of 30% is the probability that this model gives to an offer of 30% or more, about 2%.
@@ -1340,10 +1340,10 @@ z_{\text{high}}=\frac{60-50}{10}=1.0,\]</span></p>
 <span id="cb34-36"><a href="#cb34-36" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div id="fig-b06-quantile" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-b06-quantile" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A bell-shaped density curve with one value on the horizontal axis marked as the q quantile. The area to the left of this value is shaded green and labelled q. The area to the right is labelled 1 minus q.">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-b06-quantile-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="b06-continuous-normal_files/figure-html/fig-b06-quantile-1.png" class="img-fluid figure-img" width="672">
+<img src="b06-continuous-normal_files/figure-html/fig-b06-quantile-1.png" class="img-fluid figure-img" alt="A bell-shaped density curve with one value on the horizontal axis marked as the q quantile. The area to the left of this value is shaded green and labelled q. The area to the right is labelled 1 minus q." width="672">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-b06-quantile-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;6.9: The q quantile of a distribution, marked on the axis as x with the subscript q. The green area to the left of this value is the probability q. The area to the right of it is 1 - q.
@@ -1379,7 +1379,8 @@ Figure&nbsp;6.9: The q quantile of a distribution, marked on the axis as x with 
 </section>
 <section id="b06-central" class="level4">
 <h4 class="anchored" data-anchor-id="b06-central">The central part of the standard normal</h4>
-<p>One pair of quantiles is used again and again in later lectures: the two values that enclose the central part of the standard normal. Start with the probability that is left outside the central part, and call it <span class="math inline">\(\alpha\)</span> (the Greek letter alpha). The central part then holds the probability <span class="math inline">\(1-\alpha\)</span>. For example, <span class="math inline">\(\alpha=0.05\)</span> gives a central part of 0.95.</p>
+<p>One pair of quantiles is used again and again in later lectures: the two values that enclose the central part of the standard normal. A founder asks for such a central part when she wants a range that covers 95% of delivery times, or the revenue band that a normal week falls in. The same two boundaries are the basis of the confidence intervals of Lecture 9.</p>
+<p>Start with the probability that is left outside the central part, and call it <span class="math inline">\(\alpha\)</span> (the Greek letter alpha). The central part then holds the probability <span class="math inline">\(1-\alpha\)</span>. For example, <span class="math inline">\(\alpha=0.05\)</span> gives a central part of 0.95.</p>
 <p>The probability <span class="math inline">\(\alpha\)</span> lies in two tails, one on the left and one on the right. The standard normal is symmetric around 0, so the two tails are equally large. Each tail holds <span class="math inline">\(\alpha/2\)</span>, as <a href="#fig-b06-central-general" class="quarto-xref">Figure&nbsp;<span>6.10</span></a> shows.</p>
 <p>Now find the two boundaries. To the left of the upper boundary lie the central part and the lower tail. The probability at or below it is therefore <span class="math inline">\((1-\alpha)+\alpha/2=1-\alpha/2\)</span>. The upper boundary is the <span class="math inline">\(1-\alpha/2\)</span> quantile, <span class="math inline">\(z_{1-\alpha/2}\)</span>. The lower boundary needs no new number. By symmetry it lies as far below 0 as the upper boundary lies above 0, so it is <span class="math inline">\(-z_{1-\alpha/2}\)</span>. Together:</p>
 <p><span class="math display">\[P\!\left(-z_{1-\alpha/2}\le Z\le z_{1-\alpha/2}\right)=1-\alpha.\]</span></p>
@@ -1429,10 +1430,10 @@ Figure&nbsp;6.9: The q quantile of a distribution, marked on the axis as x with 
 <span id="cb39-41"><a href="#cb39-41" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div id="fig-b06-central-general" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-b06-central-general" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A standard normal density curve. The central area between two boundaries at equal distance from 0 is green and labelled 1 minus alpha. The two tails outside the boundaries are orange and each labelled alpha over 2.">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-b06-central-general-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="b06-continuous-normal_files/figure-html/fig-b06-central-general-1.png" class="img-fluid figure-img" width="672">
+<img src="b06-continuous-normal_files/figure-html/fig-b06-central-general-1.png" class="img-fluid figure-img" alt="A standard normal density curve. The central area between two boundaries at equal distance from 0 is green and labelled 1 minus alpha. The two tails outside the boundaries are orange and each labelled alpha over 2." width="672">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-b06-central-general-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;6.10: The central part of the standard normal. The green central area holds the probability 1 - α. The rest, α, is split equally over the two orange tails, α/2 in each. The two boundaries lie at the same distance from 0.
@@ -1538,10 +1539,10 @@ Figure&nbsp;6.10: The central part of the standard normal. The green central are
 <span id="cb44-36"><a href="#cb44-36" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div id="fig-b06-central-95" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-b06-central-95" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A standard normal density curve. The central area between minus 1.96 and 1.96 is green and holds 95 percent of the probability. The two tails beyond these values are orange and each holds 2.5 percent.">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-b06-central-95-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="b06-continuous-normal_files/figure-html/fig-b06-central-95-1.png" class="img-fluid figure-img" width="672">
+<img src="b06-continuous-normal_files/figure-html/fig-b06-central-95-1.png" class="img-fluid figure-img" alt="A standard normal density curve. The central area between minus 1.96 and 1.96 is green and holds 95 percent of the probability. The two tails beyond these values are orange and each holds 2.5 percent." width="672">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-b06-central-95-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;6.11: The standard normal density. The green area between -1.96 and 1.96 holds 95% of the probability. Each orange tail holds 2.5%.
@@ -1571,42 +1572,52 @@ Figure&nbsp;6.11: The standard normal density. The green area between -1.96 and 
 <span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a><span class="co"># by N is in the third decimal.</span></span>
 <span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>sd_equity <span class="ot">&lt;-</span> <span class="fu">sd</span>(sharks<span class="sc">$</span>equity_offered_pct)</span>
 <span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(sharks, <span class="fu">aes</span>(equity_offered_pct)) <span class="sc">+</span></span>
-<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">y =</span> <span class="fu">after_stat</span>(density)),</span>
-<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a>                 <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">100</span>, <span class="at">by =</span> <span class="dv">5</span>),</span>
-<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a>                 <span class="at">fill =</span> <span class="st">"#009E73"</span>, <span class="at">alpha =</span> <span class="fl">0.85</span>, <span class="at">colour =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
-<span id="cb45-13"><a href="#cb45-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_function</span>(<span class="at">fun =</span> dnorm,</span>
-<span id="cb45-14"><a href="#cb45-14" aria-hidden="true" tabindex="-1"></a>                <span class="at">args =</span> <span class="fu">list</span>(<span class="at">mean =</span> mean_equity, <span class="at">sd =</span> sd_equity),</span>
-<span id="cb45-15"><a href="#cb45-15" aria-hidden="true" tabindex="-1"></a>                <span class="at">colour =</span> <span class="st">"#D55E00"</span>, <span class="at">linewidth =</span> <span class="fl">0.9</span>) <span class="sc">+</span></span>
-<span id="cb45-16"><a href="#cb45-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="dv">42</span>, <span class="at">y =</span> <span class="fl">0.062</span>, <span class="at">label =</span> <span class="st">"observed pitches"</span>,</span>
-<span id="cb45-17"><a href="#cb45-17" aria-hidden="true" tabindex="-1"></a>           <span class="at">colour =</span> <span class="st">"#17324D"</span>, <span class="at">size =</span> <span class="fl">3.4</span>, <span class="at">hjust =</span> <span class="dv">0</span>) <span class="sc">+</span></span>
-<span id="cb45-18"><a href="#cb45-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="dv">42</span>, <span class="at">y =</span> <span class="fl">0.054</span>,</span>
-<span id="cb45-19"><a href="#cb45-19" aria-hidden="true" tabindex="-1"></a>           <span class="at">label =</span> <span class="st">"normal curve with the same mean and SD"</span>,</span>
-<span id="cb45-20"><a href="#cb45-20" aria-hidden="true" tabindex="-1"></a>           <span class="at">colour =</span> <span class="st">"#D55E00"</span>, <span class="at">size =</span> <span class="fl">3.4</span>, <span class="at">hjust =</span> <span class="dv">0</span>) <span class="sc">+</span></span>
-<span id="cb45-21"><a href="#cb45-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">expand =</span> <span class="fu">expansion</span>(<span class="at">mult =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.05</span>))) <span class="sc">+</span></span>
-<span id="cb45-22"><a href="#cb45-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Equity initially offered (%)"</span>, <span class="at">y =</span> <span class="st">"Density"</span>) <span class="sc">+</span></span>
-<span id="cb45-23"><a href="#cb45-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
-<span id="cb45-24"><a href="#cb45-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb45-25"><a href="#cb45-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb45-26"><a href="#cb45-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.x =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb45-27"><a href="#cb45-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#5B6976"</span>),</span>
-<span id="cb45-28"><a href="#cb45-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>)</span>
-<span id="cb45-29"><a href="#cb45-29" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Bars 1 point wide, each including its upper limit. With density on the</span></span>
+<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a><span class="co"># vertical axis, the normal curve keeps the same scale for any bar width.</span></span>
+<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a>bars <span class="ot">&lt;-</span> <span class="fu">hist</span>(sharks<span class="sc">$</span>equity_offered_pct, <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">100</span>, <span class="at">by =</span> <span class="dv">1</span>),</span>
+<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a>             <span class="at">plot =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb45-13"><a href="#cb45-13" aria-hidden="true" tabindex="-1"></a>spikes <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">15</span>, <span class="dv">20</span>) <span class="sc">-</span> <span class="fl">0.5</span>)</span>
+<span id="cb45-14"><a href="#cb45-14" aria-hidden="true" tabindex="-1"></a>spikes<span class="sc">$</span>count <span class="ot">&lt;-</span> bars<span class="sc">$</span>counts[<span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">15</span>, <span class="dv">20</span>)]</span>
+<span id="cb45-15"><a href="#cb45-15" aria-hidden="true" tabindex="-1"></a>spikes<span class="sc">$</span>density <span class="ot">&lt;-</span> bars<span class="sc">$</span>density[<span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">15</span>, <span class="dv">20</span>)]</span>
+<span id="cb45-16"><a href="#cb45-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-17"><a href="#cb45-17" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(sharks, <span class="fu">aes</span>(equity_offered_pct)) <span class="sc">+</span></span>
+<span id="cb45-18"><a href="#cb45-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">y =</span> <span class="fu">after_stat</span>(density)),</span>
+<span id="cb45-19"><a href="#cb45-19" aria-hidden="true" tabindex="-1"></a>                 <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">100</span>, <span class="at">by =</span> <span class="dv">1</span>),</span>
+<span id="cb45-20"><a href="#cb45-20" aria-hidden="true" tabindex="-1"></a>                 <span class="at">fill =</span> <span class="st">"#009E73"</span>, <span class="at">alpha =</span> <span class="fl">0.85</span>, <span class="at">colour =</span> <span class="cn">NA</span>) <span class="sc">+</span></span>
+<span id="cb45-21"><a href="#cb45-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_function</span>(<span class="at">fun =</span> dnorm, <span class="at">n =</span> <span class="dv">501</span>, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">15</span>, <span class="dv">100</span>),</span>
+<span id="cb45-22"><a href="#cb45-22" aria-hidden="true" tabindex="-1"></a>                <span class="at">args =</span> <span class="fu">list</span>(<span class="at">mean =</span> mean_equity, <span class="at">sd =</span> sd_equity),</span>
+<span id="cb45-23"><a href="#cb45-23" aria-hidden="true" tabindex="-1"></a>                <span class="at">colour =</span> <span class="st">"#D55E00"</span>, <span class="at">linewidth =</span> <span class="fl">0.9</span>) <span class="sc">+</span></span>
+<span id="cb45-24"><a href="#cb45-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="at">data =</span> spikes, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> density, <span class="at">label =</span> count),</span>
+<span id="cb45-25"><a href="#cb45-25" aria-hidden="true" tabindex="-1"></a>            <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.4</span>, <span class="at">colour =</span> <span class="st">"#17324D"</span>, <span class="at">size =</span> <span class="fl">3.2</span>) <span class="sc">+</span></span>
+<span id="cb45-26"><a href="#cb45-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="dv">42</span>, <span class="at">y =</span> <span class="fl">0.30</span>, <span class="at">label =</span> <span class="st">"observed pitches"</span>,</span>
+<span id="cb45-27"><a href="#cb45-27" aria-hidden="true" tabindex="-1"></a>           <span class="at">colour =</span> <span class="st">"#17324D"</span>, <span class="at">size =</span> <span class="fl">3.4</span>, <span class="at">hjust =</span> <span class="dv">0</span>) <span class="sc">+</span></span>
+<span id="cb45-28"><a href="#cb45-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="dv">42</span>, <span class="at">y =</span> <span class="fl">0.27</span>,</span>
+<span id="cb45-29"><a href="#cb45-29" aria-hidden="true" tabindex="-1"></a>           <span class="at">label =</span> <span class="st">"normal curve with the same mean and SD"</span>,</span>
+<span id="cb45-30"><a href="#cb45-30" aria-hidden="true" tabindex="-1"></a>           <span class="at">colour =</span> <span class="st">"#D55E00"</span>, <span class="at">size =</span> <span class="fl">3.4</span>, <span class="at">hjust =</span> <span class="dv">0</span>) <span class="sc">+</span></span>
+<span id="cb45-31"><a href="#cb45-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">expand =</span> <span class="fu">expansion</span>(<span class="at">mult =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.05</span>))) <span class="sc">+</span></span>
+<span id="cb45-32"><a href="#cb45-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Equity initially offered (%)"</span>, <span class="at">y =</span> <span class="st">"Density"</span>) <span class="sc">+</span></span>
+<span id="cb45-33"><a href="#cb45-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
+<span id="cb45-34"><a href="#cb45-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb45-35"><a href="#cb45-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb45-36"><a href="#cb45-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb45-37"><a href="#cb45-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#5B6976"</span>),</span>
+<span id="cb45-38"><a href="#cb45-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">colour =</span> <span class="st">"#17324D"</span>)</span>
+<span id="cb45-39"><a href="#cb45-39" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div id="fig-b06-equity-normal-check" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-b06-equity-normal-check" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Histogram of the equity initially offered across 1,441 pitches, in green bars 1 point wide from 0 to 100 percent. Most bars are low, but four stand far above their neighbours: 229 pitches at 5 percent, 474 at 10 percent, 166 at 15 percent, and 229 at 20 percent. A thin tail stretches to the right. An orange normal curve with the same mean and standard deviation is low and symmetric around about 13 percent, extends below 0 percent, and follows neither the spikes nor the skewed shape of the bars.">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-b06-equity-normal-check-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="b06-continuous-normal_files/figure-html/fig-b06-equity-normal-check-1.png" class="img-fluid figure-img" width="672">
+<img src="b06-continuous-normal_files/figure-html/fig-b06-equity-normal-check-1.png" class="img-fluid figure-img" alt="Histogram of the equity initially offered across 1,441 pitches, in green bars 1 point wide from 0 to 100 percent. Most bars are low, but four stand far above their neighbours: 229 pitches at 5 percent, 474 at 10 percent, 166 at 15 percent, and 229 at 20 percent. A thin tail stretches to the right. An orange normal curve with the same mean and standard deviation is low and symmetric around about 13 percent, extends below 0 percent, and follows neither the spikes nor the skewed shape of the bars." width="672">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-b06-equity-normal-check-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;6.12: Initial equity offered across all 1,441 recorded pitches (green bars), with the normal density that has the same mean and standard deviation (orange curve). The curve misses the skew, the bounds, and the spikes at round percentages.
+Figure&nbsp;6.12: Initial equity offered across all 1,441 recorded pitches in bars 1 percentage point wide (green), with the normal density that has the same mean and standard deviation (orange curve). Each bar includes its upper limit, and the number above a tall bar is its count. The curve misses the right skew, the bounds at 0% and 100%, and the spikes at round percentages.
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
-<p>Read <a href="#fig-b06-equity-normal-check" class="quarto-xref">Figure&nbsp;<span>6.12</span></a> with the reading sequence from Lecture 1. <em>Unit and variables:</em> one observation is one pitch. The horizontal axis is the equity offered, in percent. <em>Scales:</em> the vertical axis is density, so the areas of the bars, not their heights alone, represent proportions of pitches. <em>One element:</em> the green bars are the 1,441 observed offers. The orange curve is <span class="math inline">\(N(13.2,\,8.4^2)\)</span>, the normal model with the same mean and SD. <em>Pattern:</em> most bars are between 0% and 20%, and a long tail stretches to the right. The data are bounded between 0% and 100%, strongly right-skewed, and have spikes at round values such as 10% and 20%. The symmetric curve misses all three features. <em>Limits:</em> the figure rejects the normal model for single equity offers. It says nothing yet about averages of offers. A model is a choice, and this check shows that the normal model is the wrong choice here.</p>
+<p>Read <a href="#fig-b06-equity-normal-check" class="quarto-xref">Figure&nbsp;<span>6.12</span></a> with the reading sequence from Lecture 1. <em>Unit and variables:</em> one observation is one pitch. The horizontal axis is the equity offered, in percent. <em>Scales:</em> the vertical axis is density, so the areas of the bars represent proportions of pitches. Each bar is 1 percentage point wide, so here its height equals the share of pitches in it. <em>One element:</em> the green bars are the 1,441 observed offers. The orange curve is <span class="math inline">\(N(13.2,\,8.4^2)\)</span>, the normal model with the same mean and SD. <em>Pattern:</em> most offers lie between 0% and 20%, and a long tail stretches to the right. Four bars stand far above their neighbours, at 5%, 10%, 15%, and 20%. The tallest one holds the 474 pitches that offered exactly 10%, a third of all pitches, and its height of 0.33 is about seven times the highest point of the curve, 0.047. Founders tend to name round percentages: 1,230 of the 1,441 offers, 85%, are multiples of 5. The data are bounded between 0% and 100%, strongly right-skewed, and have spikes at round values. The symmetric curve misses all three features. <em>Limits:</em> the figure rejects the normal model for single equity offers. It says nothing yet about averages of offers. A model is a choice, and this check shows that the normal model is the wrong choice here.</p>
 <p>The opening question shows what happens without the check. The normal model gave <span class="math inline">\(P(X\ge 30)=0.0228\)</span>, about 2%. The data give 76 of 1,441, about 5%. The model misses the long right tail, and the offers of 30% or more lie in that tail.</p>
 <p>Still, the normal model remains useful. From Lecture 8 onwards it describes the sampling distribution of an average, that is, how an average varies from sample to sample. Lectures 7 and 8 explain this idea. The normal model fits those distributions well, even when the variable itself is as skewed as this one. That result is the central limit theorem. It is the main reason why the normal model is used so much in statistics.</p>
 </section>
@@ -1623,7 +1634,7 @@ Figure&nbsp;6.12: Initial equity offered across all 1,441 recorded pitches (gree
 <pre><code>[1] 43.2551 56.7449</code></pre>
 </div>
 </div>
-<p>The middle half of this model distribution runs from about 43.3 to 56.7 minutes. The width of this range is the interquartile range of the model.</p>
+<p>The middle half of this model distribution runs from about 43.3 to 56.7 minutes. The width of this range is the interquartile range of the model, 13.5 minutes, about 1.35 standard deviations, which holds for every normal model.</p>
 <div class="caveat-box">
 <p><span class="label">What a normal label can and cannot say</span></p>
 <ul>
@@ -1854,7 +1865,7 @@ Check your answer
 </section>
 <section id="worked-exam-interpretation-uniform-and-normal-probabilities" class="level3">
 <h3 class="anchored" data-anchor-id="worked-exam-interpretation-uniform-and-normal-probabilities">Worked exam interpretation: uniform and normal probabilities</h3>
-<p><strong>Exam-style question.</strong> An invented example. A web shop models the weight of a parcel as <span class="math inline">\(X\sim U(2,10)\)</span>, in kilograms. Separately, it models the value of one order as <span class="math inline">\(Y\sim N(80,400)\)</span>, in euros. Supplied:</p>
+<p><strong>Exam-style question.</strong> A web shop models the weight of a parcel as <span class="math inline">\(X\sim U(2,10)\)</span>, in kilograms. Separately, it models the value of one order as <span class="math inline">\(Y\sim N(80,400)\)</span>, in euros. Supplied:</p>
 <pre><code>P(Z &lt;=  1.5) = 0.9332
 P(Z &lt;=  1.0) = 0.8413
 0.975 quantile of Z: z(0.975) = 1.960</code></pre>
@@ -1903,7 +1914,7 @@ Check a model answer
 <blockquote class="blockquote">
 <p>“With the normal distribution, 30% is 2.0 standard deviations above the mean, so about 2.3% of pitches offer 30% or more.”</p>
 </blockquote>
-<p>Find what is wrong and write the corrected answer. This is the <strong>Verify</strong> step of Attempt → Ask → Verify → Explain.</p>
+<p>Find what is wrong and write the corrected answer. This is the Verify step of Attempt, Ask, Verify, Explain.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">

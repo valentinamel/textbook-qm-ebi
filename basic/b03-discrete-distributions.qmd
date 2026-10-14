@@ -10,10 +10,10 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 ::: {.outcomes}
 <span class="label">By the end of Lecture 3, you can</span>
 
-- describe a discrete variable with its probability and cumulative distributions
-- calculate and interpret the expected value of a discrete variable
-- measure spread with variance and standard deviation, also after rescaling
-- keep model expectations and variances apart from sample means and variances
+- describe a discrete variable with its probability and cumulative distributions,
+- calculate and interpret the expected value of a discrete variable,
+- measure spread with variance and standard deviation, also after rescaling,
+- keep model expectations and variances apart from sample means and variances.
 :::
 
 ::: {.driving-question}
@@ -70,7 +70,7 @@ selected deal (`number_sharks_in_deal`).
 :::
 
 If functions, support, or summation notation are unfamiliar, review
-[Mathematics Refresher: summation notation](../resources/math-refresher.html#summation-notation).
+[Mathematics Refresher: summation notation](../resources/math-refresher.qmd#summation-notation).
 
 **Predict.** Answer this question before you come to class. Option A pays
 €100 for sure. Option B pays €0 or €200, each with probability one half.
@@ -581,6 +581,7 @@ last value is 1 because every deal has at most five sharks.
 #| code-fold: true
 #| code-summary: "See the R code for this figure"
 #| fig-cap: "The CDF of the number of sharks in a deal: a step graph that never falls. It is 0 below one shark, jumps at each possible value by that value's probability mass, and stays at 1 from five sharks on."
+#| fig-alt: "Step graph of the cumulative distribution function of the number of sharks in a deal, with the number of sharks from 0 to 6 on the horizontal axis and the cumulative probability on the vertical axis. The line is 0 below one shark, jumps to 0.735 at one shark, to 0.965 at two, to 0.990 at three, to 0.993 at four, and to 1 at five sharks."
 library(ggplot2)
 sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
 deals <- subset(sharks, deal_on_show == 1)
@@ -819,9 +820,7 @@ quantity of interest.
 
 Finance gives a second reason. An investor who compares a risky payoff
 with a safe one wants to know how far the payoff can lie from its expected
-value. A risky investment must offer a higher expected payoff than a safe
-one, otherwise nobody would take the risk. This extra expected payoff is
-called the risk premium. To measure the risk, we need the expectation of a
+value. The measure of that risk, the variance, is the expectation of a
 squared distance from the mean. That is again a value computed from the
 random variable, and the section on variance builds on it.
 
@@ -883,8 +882,16 @@ c(
 )
 ```
 
-The first number repeats $E[K]\approx1.32$ from the previous section. By hand, $E[K^2]=(1\times648+4\times203+9\times22+16\times3+25\times6)/882
-=1856/882\approx2.10$. This number has no direct meaning in sharks, but the
+The first number repeats $E[K]\approx1.32$ from the previous section. By hand,
+
+$$
+\begin{aligned}
+E[K^2]&=(1\times648+4\times203+9\times22+16\times3+25\times6)/882\\
+&=1856/882\approx2.10.
+\end{aligned}
+$$
+
+This number has no direct meaning in sharks, but the
 next section uses it. The expected number of pairs is about 0.39 per deal.
 If you plug the expected number of sharks into the pair formula instead,
 as in the last number of the output, you get $1.32\times0.32/2\approx0.21$,
@@ -913,6 +920,7 @@ why?
 #| fig-width: 7
 #| fig-height: 3.15
 #| fig-cap: "Two distributions with the same expectation and very different spreads. The dashed line marks the common mean, 1."
+#| fig-alt: "Two panels side by side, each with possible values 0, 1, and 2 on the horizontal axis and probability on the vertical axis, and a dashed line at the mean 1. Distribution A, variance 0.20, puts probability 0.10 on 0, 0.80 on 1, and 0.10 on 2. Distribution B, variance 0.90, puts 0.45 on 0, 0.10 on 1, and 0.45 on 2."
 library(ggplot2)
 spread_df <- data.frame(
   x = rep(0:2, times = 2),
@@ -1075,9 +1083,17 @@ c(
 )
 ```
 
-By hand with the shortcut formula and the numbers of the previous section:
-$\operatorname{Var}(K)=E[K^2]-\left(E[K]\right)^2\approx2.104-1.317^2
-=2.104-1.736\approx0.37$ sharks squared. Both ways give the same variance.
+By hand with the shortcut formula and the numbers of the previous section,
+with $E[K]=1162/882\approx1.3175$:
+
+$$
+\begin{aligned}
+\operatorname{Var}(K)&=E[K^2]-\left(E[K]\right)^2\approx2.104-1.3175^2\\
+&=2.104-1.736\approx0.37 \text{ sharks squared.}
+\end{aligned}
+$$
+
+Both ways give the same variance.
 Its square root is the standard deviation, about 0.61 sharks. The number of
 sharks in a deal typically lies about 0.6 sharks away from the expected
 1.32, less than one shark and less than half of the expected value. This
@@ -1095,13 +1111,18 @@ case.
 
 Now return to the prediction question from before class. Option A pays €100
 for sure, and Option B pays €0 or €200 with probability one half each. These
-are the choices "keep it" and "go all-in" from the money question of the
+are the options "Keep" and "All-in" from the money question of the
 Lecture 1 survey. The expected payoffs are equal:
 $E[A]=100$ euros and $E[B]=0\times0.5+200\times0.5=100$ euros. Option A has
 no spread at all, so $\operatorname{Var}(A)=0$. For Option B, both possible
 payoffs lie 100 euros from the mean, so
-$\operatorname{Var}(B)=(0-100)^2\times0.5+(200-100)^2\times0.5=10{,}000$
-euros squared, and $\operatorname{SD}(B)=100$ euros. A typical result of B
+
+$$
+\operatorname{Var}(B)=(0-100)^2\times0.5+(200-100)^2\times0.5=10{,}000
+\text{ euros squared,}
+$$
+
+and $\operatorname{SD}(B)=100$ euros. A typical result of B
 lies 100 euros away from its expected payoff, which is as large as the
 expected payoff itself. So the answer is: equal expected payoffs, and B is
 the riskier option. The expectation alone cannot tell the two options apart.
@@ -1196,9 +1217,17 @@ units to the right. The distances between the values do not change, so the
 spread stays the same. Doubling doubles every value and every distance from
 the mean. The standard deviation doubles from 0.7 to 1.4, and the variance,
 which uses squared distances, grows four times, from 0.49 to 1.96. You can
-check this with the definition: $E[2Y]=0\times0.2+2\times0.5+4\times0.3=2.2$,
-and $\operatorname{Var}(2Y)=(0-2.2)^2(0.2)+(2-2.2)^2(0.5)+(4-2.2)^2(0.3)
-=0.968+0.02+0.972=1.96$. Changing the sign mirrors the distribution: the
+check this with the definition:
+
+$$
+\begin{aligned}
+E[2Y]&=0\times0.2+2\times0.5+4\times0.3=2.2,\\
+\operatorname{Var}(2Y)&=(0-2.2)^2(0.2)+(2-2.2)^2(0.5)+(4-2.2)^2(0.3)\\
+&=0.968+0.02+0.972=1.96.
+\end{aligned}
+$$
+
+Changing the sign mirrors the distribution: the
 centre moves to $-1.1$, but the spread stays the same. This is why the rule
 uses $|a|$ and $a^2$, which are never negative.
 
@@ -1227,8 +1256,9 @@ For observed values $x_1,\ldots,x_n$, the sample mean is
 
 $$\bar{x}=\frac{1}{n}\sum_{i=1}^n x_i.$$
 
-Now give every observed row the same probability, $1/n$. This distribution
-is called the **empirical distribution** of the data. Its expectation is
+Now give every observed row the same probability, $1/n$. This is the
+empirical distribution of Lecture 1, now read as a probability model: every
+observed row gets probability $1/n$. Its expectation is
 
 $$\sum_{i=1}^n x_i\,\frac{1}{n}=\bar{x}.$$
 
@@ -1372,8 +1402,8 @@ which costs $10\times5=50$ euros.
 **Step 3.** The expected cost of a plan is the probability-weighted average
 of its row, in euros per day:
 
-- prepare 20: $0.2\times0+0.5\times50+0.3\times100=55$
-- prepare 30: $0.2\times30+0.5\times0+0.3\times50=21$
+- prepare 20: $0.2\times0+0.5\times50+0.3\times100=55$,
+- prepare 30: $0.2\times30+0.5\times0+0.3\times50=21$,
 - prepare 40: $0.2\times60+0.5\times30+0.3\times0=27$.
 
 The decision: prepare 30 meal boxes, the plan with the lowest expected
@@ -1404,7 +1434,7 @@ After the lecture, work through all the practice below.
 ### Read the lecture material
 
 Read the Lecture material section above from start to end. The lecture
-covered the most important parts. The text has every step, every example, and all the
+covered the main points. The text has every step, every example, and all the
 code, including parts that were not shown in class. Note what is still
 unclear and bring it to the next tutorial, or ask Tilly.
 
@@ -1545,7 +1575,7 @@ randomly selected deal.
 
 [Shark Tank data]{.shark-tag} Select one of the 1,441 recorded pitches at random. $D$ is
 the event of an on-air deal, and $L$ is the event of a late season (Seasons
-9--16). Using the Lecture 2 counts table ($|D^c|=559$, $|L|=734$,
+9 to 16). Using the Lecture 2 counts table ($|D^c|=559$, $|L|=734$,
 $|D^c\cap L|=229$, $n=1441$), calculate $P(D^c\cup L)$ and interpret it in
 one sentence.
 
@@ -1553,7 +1583,7 @@ one sentence.
 ## Check your answer
 
 $P(D^c\cup L)=(559+734-229)/1441=1064/1441\approx0.738$: about 74% of the
-recorded pitches failed to reach an on-air deal, came from Seasons 9--16,
+recorded pitches failed to reach an on-air deal, came from Seasons 9 to 16,
 or both. We subtract the overlap (229 late-season no-deal records) once, so
 that no record counts twice.
 :::
@@ -1581,7 +1611,7 @@ pitch.
 
 ### Worked exam interpretation: from a PMF to the standard deviation
 
-**Exam-style question.** An invented example. A venture sells one product per customer,
+**Exam-style question.** A venture sells one product per customer,
 at one of three prices. Let $V$ be the price paid by a randomly selected customer, in
 euros, with PMF $p_V(10)=0.5$, $p_V(20)=0.3$, $p_V(40)=0.2$. (a) Verify
 that this is a valid PMF. (b) Calculate $F_V(20)$. (c) Calculate $E[V]$
@@ -1607,8 +1637,8 @@ more than half of the expected value.
 
 > "The expected number of sharks is 1.32. The expected value is the most likely value, so in most deals you negotiate with 1.32 sharks."
 
-Find what is wrong and write the corrected answer. This is the **Verify**
-step of Attempt → Ask → Verify → Explain.
+Find what is wrong and write the corrected answer. This is the Verify
+step of Attempt, Ask, Verify, Explain.
 
 ::: {.callout-note collapse="true"}
 ## Check your answer

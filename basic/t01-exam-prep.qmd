@@ -10,15 +10,14 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 ::: {.outcomes}
 <span class="label">By the end of Tutorial 1, you can</span>
 
-- classify variables and apply probability rules to a real dataset
-- calculate expectations, variances, and quartiles from small distributions and tables
-- interpret R output and correct the errors in an AI answer
+- classify variables and apply probability rules to a real dataset,
+- calculate expectations, variances, and quartiles from small distributions and tables,
+- interpret R output and correct the errors in an AI answer.
 :::
 
 Tutorials are exam preparation sessions. The tasks below are exam-style
-questions. You first try each task in pairs. You may use AI
-for this, following Attempt, Ask, Verify, Explain. Then the class discusses
-the solution together.
+questions. Attempt each task before you open its answer. You may use AI,
+following Attempt, Ask, Verify, Explain.
 
 ::: {.course-phase .phase-before}
 
@@ -37,8 +36,8 @@ chapters again, complete these definitions:
 Use the [formula sheet](formula-sheet.qmd) up to and including Lecture 3.
 
 Review [Mathematics Refresher: sets and event
-notation](../resources/math-refresher.html#sets-and-event-notation) and
-[summation notation](../resources/math-refresher.html#summation-notation) if the notation is difficult for you.
+notation](../resources/math-refresher.qmd#sets-and-event-notation) and
+[summation notation](../resources/math-refresher.qmd#summation-notation) if the notation is difficult for you.
 
 ::: {.callout-note collapse="true"}
 ## Check your preparation
@@ -63,7 +62,7 @@ notation](../resources/math-refresher.html#sets-and-event-notation) and
 
 ## In the tutorial
 
-Attempt each task before opening its answer. A complete written answer names
+A complete written answer names
 the quantity and shows the calculation. It reports the value and units and
 interprets the value in context. It also states one important limit of the
 model or of the measurement.
@@ -72,7 +71,7 @@ More tasks to practise at home are in the final section of this page,
 [Extra practice for home](#b-ep01-home).
 
 Tasks 1, 3, and 4 and the individual practice after class use the Shark Tank
-teaching file. Tasks 2 and 5 to 8 use invented examples. Load the file
+teaching file. Tasks 2 and 5 to 7 use invented examples. Load the file
 once:
 
 ```{r}
@@ -90,36 +89,34 @@ sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
 data.frame(
   rows = nrow(sharks),
   columns = ncol(sharks),
-  deals = sum(sharks$deal_on_show),
-  deal_proportion = round(mean(sharks$deal_on_show), 3),
-  median_description_words = median(sharks$description_words)
+  min_description_words = min(sharks$description_words),
+  median_description_words = median(sharks$description_words),
+  max_description_words = max(sharks$description_words)
 )
 ```
 
 1. What is the observational unit of the Shark Tank file?
-2. Verify the deal proportion from 882 deals and 559 non-deals.
-3. Explain in one sentence why the mean of `deal_on_show` is a proportion.
-4. Say in one sentence what is wrong with this claim: "The data contain
+2. Say in one sentence what is wrong with this claim: "The data contain
    1,441 successful companies."
-5. What exactly does the variable `description_words` measure?
+3. The variable `description_words` counts the words in the short written
+   description of each pitch. Explain in one sentence what the median of 5 words tells you, and why the few
+   descriptions of 12 or 13 words do not change it.
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
 1. One row is one recorded televised pitch.
-2. There are $882+559=1441$ records and $882/1441\approx0.612$, so 61.2%
-   reached an on-air deal.
-3. The mean of a 0/1 indicator equals the share coded 1 because its sum
-   counts the 1s.
-4. "Successful companies" is incorrect: the outcome is a deal made on the
+2. "Successful companies" is incorrect: the outcome is a deal made on the
    show, not completed funding or later venture performance.
-5. Word count describes the written text in the source dataset, not the
-   spoken pitch.
+3. At least half of the written descriptions have 5 words or fewer, and at
+   least half have 5 words or more. The median depends only on the middle of
+   the ordered values, so it stays at 5 however long the few longest
+   descriptions are.
 :::
 
 ### Task 2: Variables and samples
 
-An invented example. A coffee-bar start-up records, for each of 150 orders:
+A coffee-bar start-up records, for each of 150 orders:
 `order_id`, `drink` (espresso, latte, or tea), `cup_size` (small, medium, or
 large), `items` (the number of items), and `amount_eur` (the amount paid, in
 euros).
@@ -144,48 +141,62 @@ euros).
 
 ### Task 3: Events and probability rules
 
-[Shark Tank data]{.shark-tag} The experiment selects one of the 1,441 records at random, each with the
-same probability. The two events are defined exactly as in Lecture 2:
+[Shark Tank data]{.shark-tag} The event $D$ is an on-air deal. The event
+$M$ is that more than one entrepreneur presented the pitch
+(`multiple_entrepreneurs` equal to 1). This variable has no value for 427
+pitches, so the experiment selects one of the 1,014 records with a value at
+random, each with the same probability.
 
 ```{r}
 #| label: bep01-events
-D <- sharks$deal_on_show == 1   # on-air deal
-L <- sharks$season >= 9         # late season: Seasons 9-16
+team <- sharks[!is.na(sharks$multiple_entrepreneurs), ]
+D <- team$deal_on_show == 1             # on-air deal
+M <- team$multiple_entrepreneurs == 1   # more than one entrepreneur
 ```
 
-R reports:
+R reports the counts of the 1,014 records:
 
 ```{r}
 #| label: bep01-task3
 #| echo: false
-c(P_D = mean(D), P_L = mean(L), P_D_and_L = mean(D & L))
+table(on_air_deal = factor(D, c(FALSE, TRUE), c("no", "yes")),
+      more_than_one = factor(M, c(FALSE, TRUE), c("no", "yes")))
 ```
 
 1. Define the sample space $\Omega$. Then explain the difference between
    an outcome and the event $D$.
-2. Translate $D^c$, $D\cap L$, and $D\cup L$ into words.
+2. Translate $D^c$, $D\cap M$, and $D\cup M$ into words.
 3. Calculate $P(D^c)$.
-4. Calculate $P(D\cup L)$ using the addition rule.
+4. Calculate $P(D\cup M)$ using the addition rule.
 5. Explain in one or two sentences why these probabilities do not
    automatically apply to a future US entrepreneur.
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-1. The sample space is the set of 1,441 complete pitch records. One
-   selected record is an outcome, while $D$ is the subset of 882 deal
-   records.
-2. The complement is no on-air deal, the intersection is a late-season deal,
-   and the union is late-season, deal, or both.
-3. $P(D^c)=1-882/1441=559/1441\approx0.388$.
-4. The union is $P(D)+P(L)-P(D\cap L)\approx0.771$.
+1. The sample space is the set of 1,014 pitch records with a value for
+   `multiple_entrepreneurs`. One selected record is an outcome, while $D$
+   is the subset of $309+316=625$ deal records.
+2. The complement $D^c$ is no on-air deal. The intersection $D\cap M$ is a
+   deal for a pitch by more than one entrepreneur. The union $D\cup M$ is a
+   deal, a pitch by more than one entrepreneur, or both.
+3. $P(D^c)=(242+147)/1014=389/1014\approx0.384$.
+4. With $P(D)=625/1014\approx0.616$, $P(M)=(147+316)/1014=463/1014\approx0.457$
+   and $P(D\cap M)=316/1014\approx0.312$, the addition rule gives
+   $$
+   P(D\cup M)=\frac{625+463-316}{1014}=\frac{772}{1014}\approx0.761.
+   $$
+   About three in four of these records end in a deal, come from a team, or
+   both.
 5. To use these probabilities for a future entrepreneur, you need a defined
    target population and a comparable selection, time period, and outcome.
+   The 427 pitches without a value may also differ from the others.
 :::
 
 ### Task 4: PMF, CDF, and expectation
 
-[Shark Tank data]{.shark-tag} Select one of the 1,441 records at random, as in Task 3. Let
+[Shark Tank data]{.shark-tag} Select one of the 1,441 records at random, each with the
+same probability. Let
 $X=1$ if the founders offered at least 20% of their company to the sharks
 (`equity_offered_pct` of 20 or more) and $X=0$ otherwise. R counts these
 pitches:
@@ -202,7 +213,8 @@ Use $p=382/1441$.
 
 1. Write the PMF and verify that its masses sum to 1.
 2. Write the full piecewise CDF $F_X(a)$.
-3. Calculate $E[X]$ from the PMF and interpret it in one sentence.
+3. Calculate $E[X]$ from the PMF and interpret it in one sentence that
+   compares it with the median offer in the file (10% of the company).
 4. Explain why $E[X]$ equals the observed proportion of 1s.
 5. Explain the difference between the random variable $X$ and a realised
    value $x=1$.
@@ -237,7 +249,7 @@ Use $p=382/1441$.
 
 ### Task 5: Variance from a small PMF
 
-An invented example. A venture studio models $N$, the number of investors who
+A venture studio models $N$, the number of investors who
 make an offer to one of its start-ups, with the PMF
 
 | $n$ | 0 | 1 | 2 |
@@ -302,62 +314,11 @@ average a start-up gets 0.7 offers, half of the start-ups get no offer, and
 the number of offers typically differs from 0.7 by about 0.78 offers.
 :::
 
-### Task 7: Read a histogram
+### Task 7: Two options, compared by expected value and spread
 
-An invented example. A venture records the delivery times of 120 orders.
-@fig-bep01-delivery groups them into intervals of 10 minutes, and each bar
-includes its upper limit. The number above each bar is its count.
-
-```{r}
-#| label: fig-bep01-delivery
-#| code-fold: true
-#| code-summary: "See the R code for this figure"
-#| fig-cap: "Delivery times of 120 orders (invented example), in intervals of 10 minutes. Each bar includes its upper limit. The number above a bar is its count."
-#| fig-alt: "Histogram with five bars over delivery times from 0 to 50 minutes. The counts are 18 for 0 to 10 minutes, 46 for above 10 up to 20, 32 for above 20 up to 30, 16 for above 30 up to 40, and 8 for above 40 up to 50."
-library(ggplot2)
-delivery <- data.frame(
-  midpoint = c(5, 15, 25, 35, 45),   # middle of each 10-minute interval
-  orders = c(18, 46, 32, 16, 8)
-)
-ggplot(delivery, aes(x = midpoint, y = orders)) +
-  geom_col(width = 10, fill = "#009E73", alpha = 0.85, colour = "white") +
-  geom_text(aes(label = orders), vjust = -0.5, colour = "#17324D", size = 3.6) +
-  scale_x_continuous(breaks = seq(0, 50, by = 10)) +
-  scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
-  labs(x = "Delivery time (minutes)", y = "Number of orders") +
-  theme_minimal(base_size = 13) +
-  theme(
-    panel.grid.minor = element_blank(),
-    panel.grid.major.x = element_blank(),
-    axis.title = element_text(colour = "#17324D")
-  )
-```
-
-1. What does one observation represent, and what is on each axis?
-2. Describe the tallest bar in one full sentence.
-3. Which interval contains the median? Show the cumulative counts.
-4. Describe the shape, and state one thing the histogram cannot tell you.
-
-::: {.callout-note collapse="true"}
-## Check your answer
-
-1. One observation is one order. The horizontal axis is the delivery time
-   in minutes and the vertical axis is the number of orders.
-2. The tallest bar: 46 orders took more than 10 and at most 20 minutes.
-3. With 120 orders the median lies between the 60th and the 61st ordered
-   value. The cumulative counts are 18 and then 18 + 46 = 64, so both values
-   lie in the second interval: the median delivery time is above 10 and at
-   most 20 minutes.
-4. The distribution is right-skewed: most orders arrive within 30 minutes
-   and a few take much longer. The histogram cannot say which orders were
-   late or why, and it hides the exact times inside each interval.
-:::
-
-### Task 8: Two options, compared by expected value and spread
-
-An invented example. Two founders sell second-hand designer clothes online.
-For December they want to rent a pop-up store, and they can choose between
-two locations. Option A is a shop in a side street of the city centre. Option B
+Two founders sell second-hand designer clothes online. For December they
+want to rent a pop-up store, and they can choose between two locations.
+Option A is a shop in a side street of the city centre. Option B
 is a booth at the Christmas market, where the rent is high and the number of
 visitors depends on the weather. $X$ is the profit of the month with option
 A and $Y$ is the profit of the month with option B, both in thousands of
@@ -380,18 +341,26 @@ euros. A negative value is a loss. The founders use these two PMFs:
 5. Calculate both standard deviations and state them in euros. Compare each
    standard deviation with the expected profit of its option.
 6. Calculate the probability of a loss for each option.
-7. Decide which option you would choose. Give the numbers that support your
-   choice.
+7. Decide which option you would choose. Give three numbers that support
+   your choice (the expected profits, the standard deviations, and the
+   probabilities of a loss) and one sentence on the founders' attitude to
+   risk.
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
 1. No mass is negative. The masses sum to 1 in both tables:
    $0.05+0.25+0.45+0.15+0.10=1$ and $0.10+0.10+0.20+0.50+0.10=1$.
-2. $E[X]=0(0.05)+1(0.25)+2(0.45)+3(0.15)+4(0.10)=0+0.25+0.90+0.45+0.40=2.0$,
-   an expected profit of 2,000 euros.
-   $E[Y]=(-2)(0.10)+0(0.10)+2(0.20)+4(0.50)+8(0.10)=-0.20+0+0.40+2.00+0.80=3.0$,
-   an expected profit of 3,000 euros.
+2. The expected profits are
+   $$
+   \begin{aligned}
+   E[X]&=0(0.05)+1(0.25)+2(0.45)+3(0.15)+4(0.10)\\
+   &=0+0.25+0.90+0.45+0.40=2.0,\\
+   E[Y]&=(-2)(0.10)+0(0.10)+2(0.20)+4(0.50)+8(0.10)\\
+   &=-0.20+0+0.40+2.00+0.80=3.0,
+   \end{aligned}
+   $$
+   that is 2,000 euros for option A and 3,000 euros for option B.
 3. Definition form:
    $$
    \operatorname{Var}(X)=(0-2)^2(0.05)+(1-2)^2(0.25)+(2-2)^2(0.45)+
@@ -408,29 +377,29 @@ euros. A negative value is a loss. The founders use these two PMFs:
    =2.50+0.90+0.20+0.50+2.50=6.60.
    $$
 4. Computational form:
-   $E[X^2]=0(0.05)+1(0.25)+4(0.45)+9(0.15)+16(0.10)=0+0.25+1.80+1.35+1.60=5.00$,
-   so $\operatorname{Var}(X)=5.00-2^2=1.00$.
-   $E[Y^2]=4(0.10)+0(0.10)+4(0.20)+16(0.50)+64(0.10)=0.40+0+0.80+8.00+6.40=15.60$,
-   so $\operatorname{Var}(Y)=15.60-3^2=6.60$. Both forms agree.
+   $$
+   \begin{aligned}
+   E[X^2]&=0(0.05)+1(0.25)+4(0.45)+9(0.15)+16(0.10)\\
+   &=0+0.25+1.80+1.35+1.60=5.00,\\
+   E[Y^2]&=4(0.10)+0(0.10)+4(0.20)+16(0.50)+64(0.10)\\
+   &=0.40+0+0.80+8.00+6.40=15.60,
+   \end{aligned}
+   $$
+   so $\operatorname{Var}(X)=5.00-2^2=1.00$ and
+   $\operatorname{Var}(Y)=15.60-3^2=6.60$. Both forms agree.
 5. $\operatorname{SD}(X)=\sqrt{1.00}=1.00$ thousand euros, that is 1,000
    euros. This is half of the expected profit of option A.
    $\operatorname{SD}(Y)=\sqrt{6.60}\approx2.57$ thousand euros, that is
    about 2,570 euros. This is about 86% of the expected profit of option B.
 6. Option A has no negative value, so $P(X<0)=0$. For option B,
    $P(Y<0)=p_Y(-2)=0.10$.
-7. Both choices can be correct if the numbers support the reason. Option B has
-   the higher expected profit: 3,000 euros against 2,000 euros, which is
-   50% more. Option A has the smaller spread: its standard deviation of
-   1,000 euros is less than half of the 2,570 euros of option B. Option A
-   never makes a loss, and option B loses 2,000 euros with probability
-   0.10. The founders rent the store for one December only, so they cannot
-   count on an average over many repetitions. If a loss of 2,000 euros
-   would put the venture in danger, they choose option A. If they can afford
-   such a loss, option B is the better choice because of its higher
-   expected profit. In general, such a decision also depends on the
-   founders' attitude towards risk. A founder who dislikes risk may accept
-   a lower expected profit for a smaller spread, while a founder who is
-   willing to take risks may prefer option B even if a loss would hurt.
+7. Both choices can be correct if the numbers support the reason. Option B
+   has the higher expected profit, 3,000 against 2,000 euros (50% more).
+   Option A has the smaller standard deviation, 1,000 against about 2,570
+   euros. Option A never makes a loss, while option B loses 2,000 euros with
+   probability 0.10. Founders who dislike risk choose option A because a
+   loss would put the venture in danger, while founders who can afford such
+   a loss choose option B for its higher expected profit.
 
 Verification in R:
 
@@ -462,13 +431,14 @@ c(E_X = mean_x, E_Y = mean_y,
 
 ### Individual practice
 
-[Shark Tank data]{.shark-tag} The R output below describes the number of words in the written description
-(`description_words`) in the Shark Tank file:
+[Shark Tank data]{.shark-tag} The R output below describes the amount of money
+the founders asked for (`ask_amount_usd`, in US dollars) in the Shark Tank
+file:
 
 ```{r}
 #| label: bep01-timed
 #| echo: false
-w <- sharks$description_words
+w <- sharks$ask_amount_usd
 c(
   mean = mean(w),
   median = median(w),
@@ -484,12 +454,14 @@ equals the expectation if every record gets probability $1/1441$.
 ::: {.callout-note collapse="true"}
 ## Check a model answer
 
-The written descriptions have a mean length of about 5.0 words and a median
-of 5 words, so the two agree. Their range is $13-1=12$ words. The histogram
-in Lecture 1 shows a thin tail to the right (mildly right-skewed), although
-mean and median almost agree. If each record gets probability $1/1441$, the expectation of this
-distribution is the mean, about 5.0 words. These values describe the written
-text in the dataset, not the length or quality of the spoken pitch.
+The founders asked for 283,511 dollars on average, while the median ask is
+200,000 dollars. The mean is about 42% above the median, because a few very
+large asks pull it up: the distribution is right-skewed. The range is
+$5{,}000{,}000-10{,}000=4{,}990{,}000$ dollars, so the largest ask is 500
+times the smallest. If each record gets probability $1/1441$, the
+expectation of this distribution is the mean, about 283,511 dollars. The
+variable measures the amount asked on the show, not the amount the sharks
+agreed to invest or the money the venture finally received.
 :::
 
 ### Check your understanding
@@ -543,15 +515,72 @@ For extra exercises on the lectures of this tutorial, with worked solutions, ask
 QM Basic, the course AI assistant. For example: "Give me an extra exercise for
 Tutorial 1. Show the solution only after I send my answer."
 
+### Extra practice for home {#b-ep01-home}
 
-## Extra practice for home {#b-ep01-home}
-
-These tasks practise the calculations of Lectures 1 to 3 at home. All three
+These tasks practise the calculations of Lectures 1 to 3 at home. All four
 use invented examples. You need a simple calculator and the formula sheet.
 
-### Task 9: Mean, spread, and quartiles from a frequency table
+#### Task 8: Read a histogram
 
-An invented example. A founder runs an escape room. Groups of 2 to 6 persons
+A venture records the delivery times of 120 orders.
+@fig-bep01-delivery groups them into intervals of 10 minutes, and each bar
+includes its upper limit. The number above each bar is its count.
+
+```{r}
+#| label: fig-bep01-delivery
+#| code-fold: true
+#| code-summary: "See the R code for this figure"
+#| fig-cap: "Delivery times of 120 orders (invented example), in intervals of 10 minutes. Each bar includes its upper limit. The number above a bar is its count."
+#| fig-alt: "Histogram with five bars over delivery times from 0 to 50 minutes. The counts are 18 for 0 to 10 minutes, 46 for above 10 up to 20, 32 for above 20 up to 30, 16 for above 30 up to 40, and 8 for above 40 up to 50."
+library(ggplot2)
+delivery <- data.frame(
+  midpoint = c(5, 15, 25, 35, 45),   # middle of each 10-minute interval
+  orders = c(18, 46, 32, 16, 8)
+)
+ggplot(delivery, aes(x = midpoint, y = orders)) +
+  geom_col(width = 10, fill = "#009E73", alpha = 0.85, colour = "white") +
+  geom_text(aes(label = orders), vjust = -0.5, colour = "#17324D", size = 3.6) +
+  scale_x_continuous(breaks = seq(0, 50, by = 10)) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
+  labs(x = "Delivery time (minutes)", y = "Number of orders") +
+  theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    axis.title = element_text(colour = "#17324D")
+  )
+```
+
+1. What does one observation represent, and what is on each axis?
+2. Describe the tallest bar in one full sentence.
+3. Which interval contains the median? Show the cumulative counts.
+4. Which interval contains the upper quartile $Q_3$? Use the cumulative
+   counts again.
+5. Describe the shape, and state one thing the histogram cannot tell you.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+1. One observation is one order. The horizontal axis is the delivery time
+   in minutes and the vertical axis is the number of orders.
+2. The tallest bar: 46 orders took more than 10 and at most 20 minutes.
+3. With 120 orders the median lies between the 60th and the 61st ordered
+   value. The cumulative counts are 18 and then 18 + 46 = 64, so both values
+   lie in the second interval: the median delivery time is above 10 and at
+   most 20 minutes.
+4. Three quarters of 120 orders is 90, so $Q_3$ lies at the 90th and the
+   91st ordered value. The cumulative counts are 18, 64, and then
+   64 + 32 = 96. Both values lie in the third interval: $Q_3$ is above 20
+   and at most 30 minutes, so at least three quarters of the orders arrive
+   within 30 minutes.
+5. The distribution is right-skewed: most orders arrive within 30 minutes
+   and a few take much longer. The histogram cannot say which orders were
+   late or why, and it hides the exact times inside each interval.
+:::
+
+#### Task 9: Mean, spread, and quartiles from a frequency table
+
+A founder runs an escape room. Groups of 2 to 6 persons
 book the room for one hour. The table shows the group size of the 40
 bookings of last week.
 
@@ -590,9 +619,13 @@ quartiles as the rules in parts 4 and 5.
    $4/40=0.10$, $12/40=0.30$, $10/40=0.25$, $8/40=0.20$, and $6/40=0.15$.
    Their sum is 1.
 2. The mean is
-   $2(0.10)+3(0.30)+4(0.25)+5(0.20)+6(0.15)=0.20+0.90+1.00+1.00+0.90=4.0$
+   $$
+   2(0.10)+3(0.30)+4(0.25)+5(0.20)+6(0.15)=0.20+0.90+1.00+1.00+0.90=4.0
+   $$
    persons. The counts give the same result:
-   $(2\times4+3\times12+4\times10+5\times8+6\times6)/40=160/40=4.0$.
+   $$
+   \frac{2\times4+3\times12+4\times10+5\times8+6\times6}{40}=\frac{160}{40}=4.0.
+   $$
 3. The variance is
    $$
    (2-4)^2(0.10)+(3-4)^2(0.30)+(4-4)^2(0.25)+(5-4)^2(0.20)+(6-4)^2(0.15)
@@ -635,9 +668,9 @@ quantile(group_size, c(0.25, 0.50, 0.75))
 ```
 :::
 
-### Task 10: A random experiment, its sample space, and events
+#### Task 10: A random experiment, its sample space, and events
 
-An invented example. A streetwear start-up sells one hoodie in five sizes:
+A streetwear start-up sells one hoodie in five sizes:
 XS, S, M, L, and XL. The random experiment is this: the next order arrives
 and its size is recorded. The founders use the shares of last year's orders
 as probabilities:
@@ -711,9 +744,9 @@ c(total = sum(size_prob), P_A = p_A, P_B = p_B,
 ```
 :::
 
-### Task 11: From a CDF to probabilities and to the PMF
+#### Task 11: From a CDF to probabilities and to the PMF
 
-An invented example. A founder rents out four cargo bikes to students who
+A founder rents out four cargo bikes to students who
 move house. Let $X$ be the number of bikes that are rented out on a
 Saturday. Her model for $X$ is given as a CDF:
 

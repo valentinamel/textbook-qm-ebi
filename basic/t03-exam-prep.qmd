@@ -12,13 +12,13 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 ::: {.outcomes}
 <span class="label">By the end of Tutorial 3, you can</span>
 
-- calculate standard errors and probabilities for sample means and proportions
-- construct confidence intervals and qualify conclusions when the sampling design is limited
+- calculate standard errors and probabilities for sample means and proportions,
+- construct confidence intervals and qualify conclusions when the sampling design is limited.
 :::
 
 Tutorials are exam preparation sessions. The tasks below are exam-style
-questions. You first try each task in pairs. You may use AI for this, following
-Attempt, Ask, Verify, Explain. Then the class discusses the solution together.
+questions. Attempt each task before you open its answer. You may use AI,
+following Attempt, Ask, Verify, Explain.
 
 ::: {.course-phase .phase-before}
 
@@ -26,7 +26,7 @@ Attempt, Ask, Verify, Explain. Then the class discusses the solution together.
 
 Bring your after-class work from Lectures 7 to 9. If you find the algebra
 difficult, review [Mathematics Refresher: sums, fractions, and
-roots](../resources/math-refresher.html).
+roots](../resources/math-refresher.qmd).
 
 Use the formula sheet with all formulas up to and including Lecture 9.
 
@@ -73,8 +73,7 @@ Complete from memory:
 
 ## In the tutorial
 
-Attempt each task before you open its answer. A complete written answer
-names the quantity and shows the calculation. It reports the value with its
+A complete written answer names the quantity and shows the calculation. It reports the value with its
 unit and interprets this value in context. It also states one important
 limit of the model or the data.
 
@@ -92,28 +91,31 @@ the mean equity offered (`equity_offered_pct`).
 
 1. State the population about which this sample allows direct
    conclusions.
-2. Explain why this sample does not represent all *Shark Tank* applicants.
+2. Explain why this sample does not represent all Shark Tank applicants.
 3. Explain why this sample does not represent all US entrepreneurs.
 4. State one change needed to target all US entrepreneurs.
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-1. The direct finite population is the 1,441 recorded pitches in completed
-   Seasons 1--16.
+1. The population about which the sample allows direct conclusions is the
+   1,441 recorded pitches in completed Seasons 1 to 16.
 2. Applicants who did not appear on television are not in the file, so the
    frame does not represent all applicants.
-3. The show also selects a specialised group of entrepreneurs, not a
-   probability sample of US entrepreneurs.
+3. The show selects a special group of entrepreneurs. Its pitches are not a
+   random sample of US entrepreneurs, so the frame does not cover that
+   target population.
 4. To target all US entrepreneurs, you would need a suitable national
    sampling frame and a random selection from that frame.
 :::
 
 ### Task 2: Standard errors and a larger sample
 
-[Shark Tank data]{.shark-tag} Use the seed-123 sample of 100 pitches from
-Lecture 7: the sample SD of the equity offered is $s=7.71$ percentage
-points, and the sample deal proportion is $\hat p=0.64$.
+[Shark Tank data]{.shark-tag} A student draws a new random sample of 100
+pitches from the Shark Tank file, with the seed 2025. In this sample the
+mean equity offered is $\bar x=12.32$%, and the sample SD is $s=7.99$
+percentage points. Of the 100 pitches, 65 reached an on-air deal, so the
+sample deal proportion is $\hat p=0.65$.
 
 1. Calculate the standard error of the sample mean of the equity offered,
    $\operatorname{SE}(\bar X)$.
@@ -122,9 +124,8 @@ points, and the sample deal proportion is $\hat p=0.64$.
 3. Check the success-failure condition for $\widehat P$.
 4. Predict how each standard error changes if $n$ increases from 100 to 400
    and the spread in the sample stays similar.
-5. In part 1, R calculates the sample SD with `sd()`. This function divides
-   by $n-1$. State the value of $n-1$ here, and explain in one sentence why
-   `sd()` divides by it.
+5. The sample SD in part 1 divides by $n-1$. State the value of $n-1$ here,
+   and explain in one sentence why the divisor is $n-1$ and not $n$.
 6. Explain why the results of parts 1 and 2 are standard errors and not the
    standard deviations of $\bar X$ and $\widehat P$.
 
@@ -135,23 +136,23 @@ points, and the sample deal proportion is $\hat p=0.64$.
    Its value in this sample is
 
    $$
-   \frac{s}{\sqrt n}=\frac{7.7079}{\sqrt{100}}=0.7708.
+   \frac{s}{\sqrt n}=\frac{7.9912}{\sqrt{100}}=0.7991.
    $$
 
-   The standard error of the mean is about 0.77 percentage points of
-   equity.
+   The standard error of the mean is about 0.80 percentage points of
+   equity, about 6.5% of the sample mean of 12.32%.
 2. The standard error of the proportion is
    $\operatorname{SE}(\widehat P)=\sqrt{\widehat P(1-\widehat P)/n}$. Its
    value in this sample is
 
    $$
    \sqrt{\frac{\hat p(1-\hat p)}{n}}
-   =\sqrt{\frac{0.64(0.36)}{100}}=0.0480.
+   =\sqrt{\frac{0.65(0.35)}{100}}=0.0477.
    $$
 
    The standard error of the proportion is about 4.8 percentage points of
-   the deal rate.
-3. The sample contains 64 successes (deals) and 36 failures (no deal). Both
+   the deal rate, about 7.3% of the sample proportion of 0.65.
+3. The sample contains 65 successes (deals) and 35 failures (no deal). Both
    counts are at least 10, so the success-failure condition holds.
 4. If $n$ becomes four times as large, both standard errors are divided by
    $\sqrt 4=2$.
@@ -170,12 +171,14 @@ Verification in R:
 ```{r}
 #| label: bep03-standard-errors
 sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
-set.seed(123)
+set.seed(2025)
 sample_rows <- sample(seq_len(nrow(sharks)), size = 100, replace = FALSE)
 pitch_sample <- sharks[sample_rows, ]
 s_equity <- sd(pitch_sample$equity_offered_pct)
 p_hat <- mean(pitch_sample$deal_on_show)
-c(se_mean = s_equity / sqrt(100),
+c(mean_equity = mean(pitch_sample$equity_offered_pct),
+  sd_equity = s_equity,
+  se_mean = s_equity / sqrt(100),
   se_proportion = sqrt(p_hat * (1 - p_hat) / 100),
   deals = sum(pitch_sample$deal_on_show),
   no_deals = 100 - sum(pitch_sample$deal_on_show),
@@ -184,66 +187,9 @@ c(se_mean = s_equity / sqrt(100),
 ```
 :::
 
-### Task 3: One pitch versus one mean
+### Task 3: The exact normal case
 
-[Shark Tank data]{.shark-tag} Suppose the population mean of the equity offered is $\mu=13.21$%, the
-population SD is $\sigma=8.44$ percentage points. You draw independent
-random samples of $n=100$ pitches. Supplied values: $P(Z\le 2.12)=0.983$ and
-$P(Z\le 0.21)=0.583$.
-
-1. State the approximate sampling distribution of $\bar X$, with the
-   standard deviation of the sample mean.
-2. Calculate $P(\bar X>15)$.
-3. A classmate models a single pitch as $X\sim N(13.21, 8.44^2)$ and
-   calculates $P(X>15)$. Compute that value too. Then explain why the two
-   answers are so different.
-4. The equity offered is strongly right-skewed (Lecture 1). So which of the
-   two calculations uses a bad model? And why does the CLT still justify
-   the calculation in part 2?
-
-::: {.callout-note collapse="true"}
-## Check your answer
-
-1. The CLT gives approximately
-   $\bar X\mathrel{\dot\sim}N(13.21,\,8.44^2/100)$. The standard deviation
-   of the sample mean is $\operatorname{SD}(\bar X)=8.44/\sqrt{100}=0.844$
-   percentage points.
-2. With this distribution,
-
-   $$
-   P(\bar X>15)
-   =1-P\!\left(Z\le\frac{15-13.21}{0.844}\right)
-   =1-P(Z\le2.12)
-   \approx0.017.
-   $$
-
-3. For a single pitch, $z=(15-13.21)/8.44\approx0.21$, so
-   $P(X>15)\approx1-0.583\approx0.42$. The mean of 100 pitches varies ten
-   times less than one pitch ($\sigma/\sqrt{100}$), so 15 is an ordinary
-   value for one pitch but an extreme value for a mean of 100.
-4. A normal curve is symmetric and the equity offered is strongly
-   right-skewed. So the normal model for a single pitch in part 3 is a bad
-   model. The CLT concerns the sample mean. The mean of 100 independent
-   draws has a nearly normal sampling distribution, even when the
-   population is skewed. This is why the calculation in part 2 is
-   justified.
-
-Verification in R:
-
-```{r}
-#| label: bep03-pitch-mean-check
-sd_mean <- 8.44 / sqrt(100)
-c(sd_of_mean = sd_mean,
-  z_mean = (15 - 13.21) / sd_mean,
-  p_mean_above_15 = 1 - pnorm(15, mean = 13.21, sd = sd_mean),
-  z_single = (15 - 13.21) / 8.44,
-  p_single_above_15 = 1 - pnorm(15, mean = 13.21, sd = 8.44))
-```
-:::
-
-### Task 4: The exact normal case and the CLT
-
-An invented example. A founder makes scented candles. The burn time of one
+A founder makes scented candles. The burn time of one
 candle, $X$, is modelled as $X\sim N(40,6^2)$, in hours. A tester burns a
 random sample of $n=9$ candles and records the sample mean $\bar X$.
 Supplied values for the whole task:
@@ -251,7 +197,6 @@ Supplied values for the whole task:
 ```text
 P(Z <= 0.6) = 0.7257
 P(Z <= 1.8) = 0.9641
-P(Z <= 2.5) = 0.9938
 ```
 
 1. State the distribution of $\bar X$ for $n=9$, with its mean and its
@@ -261,17 +206,6 @@ P(Z <= 2.5) = 0.9938
 3. Calculate the probability that the mean burn time of the 9 candles is
    below 36.4 hours.
 4. Explain in one sentence why the answers to parts 2 and 3 differ.
-
-The founder also looks at the orders in her web shop. The value of one
-order is strongly right-skewed: most orders are small and a few are very
-large. The mean is $\mu=45$ euros and the standard deviation is
-$\sigma=30$ euros.
-
-5. For a random sample of $n=100$ orders, calculate the probability that
-   the sample mean is above 52.50 euros. Name the result (the theorem)
-   that allows this calculation.
-6. Explain why you cannot do the same calculation for a random sample of 9
-   orders.
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
@@ -287,13 +221,6 @@ $\sigma=30$ euros.
 4. The mean of 9 candles varies three times less than one candle, so 36.4
    hours is an ordinary value for one candle (about 27%) and an unusual
    value for the mean of 9 candles (about 4%).
-5. The population is not normal, but $n=100$ is large. The CLT gives
-   approximately $\bar X\mathrel{\dot\sim}N(45,\,30^2/100)$, with
-   $\operatorname{SD}(\bar X)=30/\sqrt{100}=3$ euros. Then
-   $z=(52.50-45)/3=2.5$ and $P(\bar X>52.50)\approx1-0.9938=0.0062$.
-6. The order values are not normal, so the exact normal case does not hold.
-   A sample of 9 is too small for the CLT. No result of Lecture 8 gives the
-   distribution of $\bar X$ in this case.
 
 Verification in R:
 
@@ -301,24 +228,24 @@ Verification in R:
 #| label: bep03-candles-check
 c(sd_mean_9 = 6 / sqrt(9),
   p_one_below_36.4 = pnorm(36.4, mean = 40, sd = 6),
-  p_mean_below_36.4 = pnorm(36.4, mean = 40, sd = 6 / sqrt(9)),
-  sd_mean_100 = 30 / sqrt(100),
-  p_mean_above_52.50 = 1 - pnorm(52.50, mean = 45, sd = 30 / sqrt(100)))
+  p_mean_below_36.4 = pnorm(36.4, mean = 40, sd = 6 / sqrt(9)))
 ```
 :::
 
-### Task 5: A proportion through the CLT
+### Task 4: A proportion through the CLT
 
-[Shark Tank data]{.shark-tag} The deal proportion (`deal_on_show`) in the Shark Tank file is $p=0.612$. A
-random sample of $n=100$ pitches is planned, with sample deal proportion
-$\widehat P$. Supplied value: $P(Z\le -2.30)=0.011$.
+A meal-kit start-up knows from its customer database that 45% of its
+subscribers paused their subscription at least once last year, so $p=0.45$.
+A survey of a random sample of $n=200$ subscribers is planned, with
+$\widehat P$ the sample proportion of subscribers who paused. Supplied
+value: $P(Z\le -1.99)=0.023$.
 
 1. Calculate the standard deviation of the sample proportion,
    $\operatorname{SD}(\widehat P)$. Then check the success-failure
    condition.
 2. State the approximate sampling distribution of $\widehat P$.
-3. Approximate the probability that the sample shows a deal rate of at
-   most 50%, that is, $P(\widehat P\le0.50)$.
+3. Approximate the probability that the survey shows a pause rate of at
+   most 38%, that is, $P(\widehat P\le0.38)$.
 4. Interpret the result in one sentence.
 
 ::: {.callout-note collapse="true"}
@@ -326,53 +253,50 @@ $\widehat P$. Supplied value: $P(Z\le -2.30)=0.011$.
 
 1. Here $p$ is given, so the result is a standard deviation and not a
    standard error:
-   $\operatorname{SD}(\widehat P)=\sqrt{0.612(0.388)/100}\approx0.0487$.
-   The expected counts are $np=61.2$ and $n(1-p)=38.8$, both at least 10.
-2. So $\widehat P\mathrel{\dot\sim}N(0.612,\,0.0487^2)$.
+   $\operatorname{SD}(\widehat P)=\sqrt{0.45(0.55)/200}\approx0.0352$,
+   about 3.5 percentage points. The expected counts are $np=90$ and
+   $n(1-p)=110$, both at least 10.
+2. So $\widehat P\mathrel{\dot\sim}N(0.45,\,0.0352^2)$.
 3. Standardise:
 
    $$
-   z=\frac{0.50-0.612}{0.0487}\approx-2.30,
+   z=\frac{0.38-0.45}{0.0352}\approx-1.99,
    \qquad
-   P(\widehat P\le0.50)\approx P(Z\le-2.30)\approx0.011.
+   P(\widehat P\le0.38)\approx P(Z\le-1.99)\approx0.023.
    $$
 
-4. If the deal proportion in the file is 61.2%, only about 1% of random
-   samples of 100 pitches would show a deal rate at or below 50%. Such a
-   sample would be surprising. Lecture 10 builds the hypothesis test on
-   this idea.
+4. If 45% of all subscribers paused, only about 2% of random samples of 200
+   subscribers would show a pause rate at or below 38%. Such a sample would
+   be surprising. Lecture 10 builds the hypothesis test on this idea.
 
 Verification in R:
 
 ```{r}
 #| label: bep03-proportion-clt-check
-sd_phat <- sqrt(0.612 * 0.388 / 100)
+sd_phat <- sqrt(0.45 * 0.55 / 200)
 c(sd_of_phat = sd_phat,
-  expected_deals = 100 * 0.612,
-  expected_no_deals = 100 * 0.388,
-  z = (0.50 - 0.612) / sd_phat,
-  p_at_most_050 = pnorm(0.50, mean = 0.612, sd = sd_phat))
+  expected_paused = 200 * 0.45,
+  expected_not_paused = 200 * 0.55,
+  z = (0.38 - 0.45) / sd_phat,
+  p_at_most_038 = pnorm(0.38, mean = 0.45, sd = sd_phat))
 ```
 :::
 
-### Task 6: A confidence interval for a mean
+### Task 5: A confidence interval for a mean
 
-An invented example. A founder runs a bouldering gym. Her business plan
+A founder runs a bouldering gym. Her business plan
 assumes that a visit lasts 120 minutes on average. She draws a random sample
 of 16 visits from the 5,000 visits of last year in the check-in system. The
 sample has a mean of 136 minutes and a standard deviation of $s=28$
 minutes. The visit times are roughly normally distributed. Supplied values:
-$t_{0.95,\,15}=1.753$, $t_{0.975,\,15}=2.131$, and $t_{0.995,\,15}=2.947$.
-The formula sheet does not list $df=15$, so the task gives these values
-here.
+$t_{0.975,\,15}=2.131$ and $t_{0.995,\,15}=2.947$.
 
 1. Construct a 95% confidence interval for the mean visit time of last
    year. Write the five parts of a complete answer for an interval for a mean (Lecture 9).
    In part 5, say what the interval tells you about the 120 minutes in the
    business plan.
 2. Construct the 99% confidence interval. Only parts 2 to 5 change.
-3. Construct the 90% confidence interval. Again only parts 2 to 5 change.
-4. Compare the three conclusions about the 120 minutes. Then explain how
+3. Compare the two conclusions about the 120 minutes. Then explain how
    the width of the interval changes with the confidence level.
 
 ::: {.callout-note collapse="true"}
@@ -406,23 +330,11 @@ here.
       the 1% level we cannot conclude that the mean visit time differs from
       120 minutes.
 
-3. The 90% interval, parts 2 to 5:
-
-   2. **Given values.** As before, but the confidence level is 90%, so
-      $\alpha=0.10$ and the critical value is $t_{0.95,\,15}=1.753$.
-   3. **Calculations.** The standard error stays 7 minutes. The margin of
-      error is $1.753\times7=12.27$ minutes.
-   4. **Interval.** $(136-12.27,\ 136+12.27)=(123.73,\ 148.27)$ minutes.
-   5. **Conclusion.** The value 120 minutes lies outside the interval. At
-      the 10% level we can conclude that the mean visit time differs from
-      120 minutes, and the whole interval lies above 120.
-
-4. A higher confidence level needs a larger critical value, so the margin
-   of error grows from 12.27 minutes at 90% to 14.92 minutes at 95% and
-   20.63 minutes at 99%. The 99% interval is about 1.7 times as wide as the
-   90% interval. With the same sample, we can conclude that the mean
-   differs from 120 minutes at the 10% and the 5% level, but not at the
-   stricter 1% level. For this reason every conclusion names its level.
+3. A higher confidence level needs a larger critical value, so the margin
+   of error grows from 14.92 minutes at 95% to 20.63 minutes at 99%. The
+   99% interval is about 1.4 times as wide as the 95% interval. With the
+   same sample, we can conclude that the mean differs from 120 minutes at
+   the 5% level, but not at the stricter 1% level. For this reason every conclusion names its level.
    One limit: the interval describes the visits of last year, not the
    visits of next year.
 
@@ -436,18 +348,16 @@ c(se = se_visit,
   lower_95 = 136 - 2.131 * se_visit, upper_95 = 136 + 2.131 * se_visit,
   margin_99 = 2.947 * se_visit,
   lower_99 = 136 - 2.947 * se_visit, upper_99 = 136 + 2.947 * se_visit,
-  margin_90 = 1.753 * se_visit,
-  lower_90 = 136 - 1.753 * se_visit, upper_90 = 136 + 1.753 * se_visit,
-  width_99_over_90 = 2.947 / 1.753)
-c(t_95 = qt(0.95, df = 15), t_975 = qt(0.975, df = 15),
+  width_99_over_95 = 2.947 / 2.131)
+c(t_975 = qt(0.975, df = 15),
   t_995 = qt(0.995, df = 15),
   low_end_above_120_in_percent = 100 * (121.08 - 120) / 120)
 ```
 :::
 
-### Task 7: A confidence interval for a proportion
+### Task 6: A confidence interval for a proportion
 
-An invented example. A founder sells sneakers online. Her parcel service
+A founder sells sneakers online. Her parcel service
 reports that customers return 15% of all sneaker orders. Last year her shop
 had 6,000 orders. She draws a random sample of 400 of these orders.
 Customers returned 40 of these 400 orders. Let
@@ -510,11 +420,11 @@ c(p_hat = p_hat_returns,
 ```
 :::
 
-### Task 8: A sample size for a target margin of error
+### Task 7: A sample size for a target margin of error
 
-The founder of the bouldering gym in Task 6 plans a new and larger sample.
+The founder of the bouldering gym in Task 5 plans a new and larger sample.
 She wants to estimate the mean visit time with a margin of error of at most
-5 minutes. She uses the sample SD of Task 6 as a planning value:
+5 minutes. She uses the sample SD of Task 5 as a planning value:
 $\sigma=28$ minutes.
 
 1. Calculate the sample size that she needs at the 95% level
@@ -574,27 +484,28 @@ ceiling(n_needed)
 
 ### Individual practice
 
-Do this task alone: no notes, no AI, only the formula sheet. An invented example. A random sample of 64 customers
-has a mean monthly spending of €82 and a sample SD of €24. Of the 64
-customers, 40 renewed their subscription.
+Do this task alone: no notes, no AI, only the formula sheet. A random
+sample of 49 customers of a subscription service has a mean monthly spending
+of €78 and a sample SD of €21. Of the 49 customers, 31 renewed their
+subscription.
 
 1. Calculate the standard error of the mean spending.
 2. Calculate the standard error of the renewal proportion. Then check the
    success-failure condition.
 3. State what would happen to both standard errors if the sample size were
-   $n=256$.
+   $n=196$.
 4. Construct a 95% confidence interval for the mean monthly spending of all
    customers, in the five parts of a complete answer. The degrees of
-   freedom are 63. Use the closest value on the formula sheet:
+   freedom are 48. Use the closest value on the formula sheet:
    $t_{0.975,\,60}=2.000$. The business plan of the founder assumes a mean
-   spending of €90. Say in part 5 what the interval tells you about this
+   spending of €85. Say in part 5 what the interval tells you about this
    value.
 5. Write one sentence that explains the difference between sampling
    uncertainty and selection bias.
-6. Treat $\mu=82$ and $\sigma=24$ as the population values. Use the CLT to
-   approximate the probability that a new sample of 64 customers shows a
-   mean above €85. Supplied value: $P(Z\le 1)=0.841$.
-7. Use $\sigma=24$ as a planning value. How many customers must a new
+6. Treat $\mu=78$ and $\sigma=21$ as the population values. Use the CLT to
+   approximate the probability that a new sample of 49 customers shows a
+   mean above €81. Supplied value: $P(Z\le 1)=0.841$.
+7. Use $\sigma=21$ as a planning value. How many customers must a new
    survey include to estimate the mean spending with a margin of error of
    at most €3, at the 95% level
    ($z_{0.975}=1.96$)?
@@ -602,49 +513,51 @@ customers, 40 renewed their subscription.
 ::: {.callout-note collapse="true"}
 ## Check a model answer
 
-1. The standard error of the mean is $24/\sqrt{64}=3$ euros.
-2. The renewal estimate is $\hat p=40/64=0.625$, with standard error
-   $\sqrt{0.625(0.375)/64}\approx0.0605$. The sample has 40 successes and
-   24 failures, so the success-failure condition holds.
-3. Increasing the sample size from 64 to 256 would halve both standard
+1. The standard error of the mean is $21/\sqrt{49}=3$ euros, about 4% of
+   the sample mean of 78 euros.
+2. The renewal estimate is $\hat p=31/49\approx0.633$, with standard error
+   $\sqrt{0.633(0.367)/49}\approx0.0689$, about 6.9 percentage points. The
+   sample has 31 successes and 18 failures, so the success-failure
+   condition holds.
+3. Increasing the sample size from 49 to 196 would halve both standard
    errors if the spread stayed similar.
 4. The interval for the mean spending in five parts:
 
    1. **Formula.** $\bar X\pm t_{1-\alpha/2,\,n-1}\,S/\sqrt n$. It may be
-      used because $n=64$ is large.
-   2. **Given values.** $\bar x=82$ euros, $s=24$ euros, $n=64$, $df=63$.
+      used because $n=49$ is large.
+   2. **Given values.** $\bar x=78$ euros, $s=21$ euros, $n=49$, $df=48$.
       The confidence level is 95%, and the closest value on the formula
       sheet is $t_{0.975,\,60}=2.000$.
-   3. **Calculations.** The standard error is $24/\sqrt{64}=3$ euros. The
+   3. **Calculations.** The standard error is $21/\sqrt{49}=3$ euros. The
       margin of error is $2.000\times3=6$ euros.
-   4. **Interval.** $(82-6,\ 82+6)=(76,\ 88)$ euros.
-   5. **Conclusion.** The value 90 euros lies outside the interval. At the
+   4. **Interval.** $(78-6,\ 78+6)=(72,\ 84)$ euros.
+   5. **Conclusion.** The value 85 euros lies outside the interval. At the
       5% level we can conclude that the mean monthly spending differs from
-      90 euros. The whole interval lies below 90, so customers spend less
-      than the plan assumes: at least 2 euros less, about 2% of 90 euros.
+      85 euros. The whole interval lies below 85, so customers spend less
+      than the plan assumes: at least 1 euro less, about 1% of 85 euros.
 
 5. The standard errors and the interval describe random variation from
    sample to sample, not bias created by an unrepresentative sampling
    frame.
 6. For the new sample, the standard deviation of the sample mean is
-   $\operatorname{SD}(\bar X)=24/\sqrt{64}=3$ euros and
-   $\bar X\mathrel{\dot\sim}N(82,3^2)$, so $z=(85-82)/3=1$ and
-   $P(\bar X>85)\approx1-P(Z\le1)\approx0.16$.
-7. For a margin of €3, $n\ge(1.96\times24/3)^2=15.68^2\approx245.9$, so
-   the survey needs 246 customers (Lecture 9).
+   $\operatorname{SD}(\bar X)=21/\sqrt{49}=3$ euros and
+   $\bar X\mathrel{\dot\sim}N(78,3^2)$, so $z=(81-78)/3=1$ and
+   $P(\bar X>81)\approx1-P(Z\le1)\approx0.16$.
+7. For a margin of €3, $n\ge(1.96\times21/3)^2=13.72^2\approx188.2$, so
+   the survey needs 189 customers.
 
 Verification in R:
 
 ```{r}
 #| label: bep03-timed-check
-p_hat_renew <- 40 / 64
-c(se_mean = 24 / sqrt(64),
-  se_proportion = sqrt(p_hat_renew * (1 - p_hat_renew) / 64),
-  t_exact_df63 = qt(0.975, df = 63),
-  lower = 82 - 2.000 * 3, upper = 82 + 2.000 * 3,
-  below_90_in_percent = 100 * (90 - 88) / 90,
-  p_mean_above_85 = 1 - pnorm(85, mean = 82, sd = 3),
-  n_for_margin_3 = (1.96 * 24 / 3)^2)
+p_hat_renew <- 31 / 49
+c(se_mean = 21 / sqrt(49),
+  se_proportion = sqrt(p_hat_renew * (1 - p_hat_renew) / 49),
+  t_exact_df48 = qt(0.975, df = 48),
+  lower = 78 - 2.000 * 3, upper = 78 + 2.000 * 3,
+  below_85_in_percent = 100 * (85 - 84) / 85,
+  p_mean_above_81 = 1 - pnorm(81, mean = 78, sd = 3),
+  n_for_margin_3 = (1.96 * 21 / 3)^2)
 ```
 :::
 
@@ -708,45 +621,136 @@ For extra exercises on the lectures that this tutorial covers, with worked solut
 the course AI assistant. For example: "Give me an extra exercise for
 Tutorial 3. Show the solution only after I send my answer."
 
+### Extra practice for home {#b-ep03-home}
 
-## Extra practice for home {#b-ep03-home}
+These tasks practise Lectures 7 to 9 at home. Tasks 8 and 10 use the Shark
+Tank file, and Tasks 9 and 11 use invented examples.
 
-These tasks practise Lectures 7 to 9 at home. Task 9 uses the Shark Tank
-file, and Task 10 uses an invented example.
+#### Task 8: One pitch versus one mean
 
-### Task 9: Reproduce the realised sample
+[Shark Tank data]{.shark-tag} Suppose the population mean of the equity offered is $\mu=13.21$%, the
+population SD is $\sigma=8.44$ percentage points. You draw independent
+random samples of $n=100$ pitches. Supplied values: $P(Z\le 2.12)=0.983$ and
+$P(Z\le 0.21)=0.583$.
 
-[Shark Tank data]{.shark-tag} The code below draws the sample with seed 123, exactly as in Lecture 7.
-So you get the same 100 rows when you run it:
+1. State the approximate sampling distribution of $\bar X$, with the
+   standard deviation of the sample mean.
+2. Calculate $P(\bar X>15)$.
+3. A classmate models a single pitch as $X\sim N(13.21, 8.44^2)$ and
+   calculates $P(X>15)$. Compute that value too. Then explain why the two
+   answers are so different.
+4. The equity offered is strongly right-skewed (Lecture 1). So which of the
+   two calculations uses a bad model? And why does the CLT still justify
+   the calculation in part 2?
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+1. The CLT gives approximately
+   $\bar X\mathrel{\dot\sim}N(13.21,\,8.44^2/100)$. The standard deviation
+   of the sample mean is $\operatorname{SD}(\bar X)=8.44/\sqrt{100}=0.844$
+   percentage points.
+2. With this distribution,
+
+   $$
+   P(\bar X>15)
+   =1-P\!\left(Z\le\frac{15-13.21}{0.844}\right)
+   =1-P(Z\le2.12)
+   \approx0.017.
+   $$
+
+3. For a single pitch, $z=(15-13.21)/8.44\approx0.21$, so
+   $P(X>15)\approx1-0.583\approx0.42$. The mean of 100 pitches varies ten
+   times less than one pitch ($\sigma/\sqrt{100}$), so 15 is an ordinary
+   value for one pitch but an extreme value for a mean of 100.
+4. A normal curve is symmetric and the equity offered is strongly
+   right-skewed. So the normal model for a single pitch in part 3 is a bad
+   model. The CLT concerns the sample mean. The mean of 100 independent
+   draws has a nearly normal sampling distribution, even when the
+   population is skewed. This is why the calculation in part 2 is
+   justified.
+
+Verification in R:
+
+```{r}
+#| label: bep03-pitch-mean-check
+sd_mean <- 8.44 / sqrt(100)
+c(sd_of_mean = sd_mean,
+  z_mean = (15 - 13.21) / sd_mean,
+  p_mean_above_15 = 1 - pnorm(15, mean = 13.21, sd = sd_mean),
+  z_single = (15 - 13.21) / 8.44,
+  p_single_above_15 = 1 - pnorm(15, mean = 13.21, sd = 8.44))
+```
+:::
+
+#### Task 9: The CLT for skewed order values
+
+The candle founder of Task 3 also looks at the orders in her web shop. The
+value of one order is strongly right-skewed: most orders are small and a few
+are very large. The mean is $\mu=45$ euros and the standard deviation is
+$\sigma=30$ euros. Supplied value: $P(Z\le 2.5)=0.9938$.
+
+1. For a random sample of $n=100$ orders, calculate the probability that
+   the sample mean is above 52.50 euros. Name the result (the theorem)
+   that allows this calculation.
+2. Explain why you cannot do the same calculation for a random sample of 9
+   orders.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+1. The population is not normal, but $n=100$ is large. The CLT gives
+   approximately $\bar X\mathrel{\dot\sim}N(45,\,30^2/100)$, with
+   $\operatorname{SD}(\bar X)=30/\sqrt{100}=3$ euros. Then
+   $z=(52.50-45)/3=2.5$ and $P(\bar X>52.50)\approx1-0.9938=0.0062$.
+   A sample mean that is 7.50 euros (about 17%) above the population mean
+   occurs in fewer than 1 of 100 samples.
+2. The order values are not normal, so the exact normal case does not hold.
+   A sample of 9 is too small for the CLT. No result of Lecture 8 gives the
+   distribution of $\bar X$ in this case.
+
+Verification in R:
+
+```{r}
+#| label: bep03-orders-clt-check
+c(sd_mean_100 = 30 / sqrt(100),
+  p_mean_above_52.50 = 1 - pnorm(52.50, mean = 45, sd = 30 / sqrt(100)))
+```
+:::
+
+#### Task 10: Reproduce the realised sample
+
+[Shark Tank data]{.shark-tag} The code below draws the sample of Task 2 with
+the seed 2025. So you get the same 100 rows when you run it:
 
 ```{r}
 #| label: bep03-sample-output
 sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
-set.seed(123)
+set.seed(2025)
 sample_rows <- sample(seq_len(nrow(sharks)), size = 100, replace = FALSE)
 pitch_sample <- sharks[sample_rows, ]
 
 c(
   n = nrow(pitch_sample),
-  mean_equity = mean(pitch_sample$equity_offered_pct),
-  sd_equity = sd(pitch_sample$equity_offered_pct),
+  mean_description_words = mean(pitch_sample$description_words),
+  share_modest_offers = mean(pitch_sample$equity_offered_pct <= 10),
   q1_equity = unname(quantile(pitch_sample$equity_offered_pct, 0.25)),
   median_equity = median(pitch_sample$equity_offered_pct),
-  q3_equity = unname(quantile(pitch_sample$equity_offered_pct, 0.75)),
-  deal_proportion = mean(pitch_sample$deal_on_show)
+  q3_equity = unname(quantile(pitch_sample$equity_offered_pct, 0.75))
 )
 ```
 
 A note on the quartiles in this output. When a quartile falls between two
-ordered values, R's `quantile()` reports a point between them. Here the
-75th ordered value is 17 and the 76th is 20, and R reports 17.75. The
-definition of Lecture 1 holds for every value from 17 to 20. If you take
-the 75th ordered value, you get 17.
+ordered values, R reports a point between them. Here the 25th ordered value
+of the equity offered is 6.3 and the 26th is 7.5, and R reports 7.2. The
+definition of Lecture 1 holds for every value from 6.3 to 7.5. If you take
+the 25th ordered value, you get 6.3.
 
-1. Identify the parameter, estimator, and estimate for the mean equity
-   offered (`equity_offered_pct`).
-2. Identify the parameter, estimator, and estimate for the deal proportion
-   (`deal_on_show`).
+1. Identify the parameter, estimator, and estimate for the mean number of
+   words in the written description (`description_words`).
+2. Identify the parameter, estimator, and estimate for the proportion of
+   modest offers, the pitches that offered at most 10% of the company
+   (`equity_offered_pct` of 10 or less).
 3. Calculate the interquartile range (IQR) of the equity offered in the
    sample from the R output and interpret it. The IQR is defined in
    [Lecture 1](b01-introduction-data-analysis.qmd#b01-quartiles).
@@ -756,16 +760,18 @@ the 75th ordered value, you get 17.
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-1. For the equity offered, the parameter is the population mean $\mu$, the
-   estimator is $\bar X$, and the estimate is $\bar x=12.76$%.
-2. For the deal outcome, the parameter is the population proportion $p$,
-   the estimator is $\widehat P$, and the estimate is $\hat p=0.64$.
-3. The sample quartiles in the R output are $Q_1=8$ and $Q_3=17.75$, so
-   $\operatorname{IQR}=17.75-8=9.75$ percentage points: the middle half of
-   the initial equity offers in the sample lies between 8% and 17.75%. If
-   you take the 75th ordered value, $Q_3=17$ and the IQR is $17-8=9$
+1. For the description length, the parameter is the population mean
+   $\mu$, the mean number of words over all 1,441 pitches. The estimator is
+   $\bar X$, and the estimate is $\bar x=4.72$ words.
+2. For the modest offers, the parameter is the population proportion $p$
+   of the 1,441 pitches that offered at most 10%. The estimator is
+   $\widehat P$, and the estimate is $\hat p=0.67$.
+3. The sample quartiles in the R output are $Q_1=7.2$ and $Q_3=15$, so
+   $\operatorname{IQR}=15-7.2=7.8$ percentage points: the middle half of
+   the initial equity offers in the sample lies between 7.2% and 15%. If you
+   take the 25th ordered value, $Q_1=6.3$ and the IQR is $15-6.3=8.7$
    percentage points. Both answers are correct when you say how you found
-   $Q_3$.
+   $Q_1$.
 4. A different seed selects a different random set of rows. So all sample
    statistics, including the IQR, can change.
 
@@ -777,9 +783,9 @@ sort(pitch_sample$equity_offered_pct)[c(25, 26, 75, 76)]
 ```
 :::
 
-### Task 10: A value for a sample mean
+#### Task 11: A value for a sample mean
 
-An invented example. A founder sells granola in bags of 250 grams. The
+A founder sells granola in bags of 250 grams. The
 filling machine puts $X\sim N(250,4^2)$ grams into one bag. Every hour she
 weighs a random sample of $n=16$ bags and calculates the sample mean
 $\bar X$. She wants an alarm value $a$: she checks the machine when

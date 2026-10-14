@@ -57,8 +57,7 @@ Complete from memory:
 
 ## In the tutorial
 
-Try each task in R before you open the answer. More practice for home is in
-the final section of this page,
+More practice for home is in the final section of this page,
 [Extra practice for home](#i-ep02-home).
 
 Tasks 1 to 4 use the Shark Tank file, and money is measured in thousands of
@@ -67,8 +66,10 @@ This tutorial asks what changes when several predictors are held fixed at
 the same time, when categories enter the model, and when a slope depends on
 a group or on the season. First build the data for the analysis. The code
 converts the requested amount to thousands of dollars (`ask_1k`). Task 2
-uses all 1,441 pitches (`sharks`). Task 1 uses the 874 deals for a share of
-the company (`deals`). Tasks 3 and 4 use the 869 of these deals with a known
+uses all 1,441 pitches (`sharks`). Task 1 uses the deals for a share of the
+company (`deals`): the 882 deals agreed on air without the 8 deals that gave
+the sharks no equity, for which `deal_equity_pct` is 0. This leaves 874
+deals. Tasks 3 and 4 use the 869 of these deals with a known
 team classification (`known_deals`). The 5 deals with an unknown team are
 left out, because the team dummy cannot be defined for them, and Tasks 3
 and 4 then use the same observations. For these deals the code builds the
@@ -95,7 +96,7 @@ c(pitches = nrow(sharks), deals = nrow(deals), known_deals = nrow(known_deals))
 
 [Shark Tank data]{.shark-tag} How much of the company do founders give up
 in a deal, once the season and the size of the request are taken into
-account? With the 874 deals for a share of the company (`deals`), fit a
+account? Use the 874 deals for a share of the company (`deals`). Fit a
 regression of the equity agreed in the deal, in percent
 (`deal_equity_pct`), on the equity that the founder first offered, in
 percent (`equity_offered_pct`), the season (`season`), and the requested
@@ -145,9 +146,9 @@ Filled-in structure:
 
 - R code: see the code above.
 - Interpretation of the equity-offered slope: among the 874 deals, at the
-  same season and requested amount, a founder who offers one percentage
-  point more gives up on average about 1.04 percentage points more in the
-  deal.
+  same season and requested amount, an offer that is one percentage point
+  higher is associated with on average about 1.04 percentage points more
+  equity given up in the deal.
 - Interpretation of the season slope: at the same offer and requested
   amount, one later season is associated with about 0.63 percentage points
   less agreed equity, on average. Over ten seasons this adds up to about
@@ -170,11 +171,10 @@ Filled-in structure:
   compares the model with the intercept-only model. It gives
   $F\approx221.1$ on 3 and 870 degrees of freedom, with a p-value below
   0.001, so it rejects the null hypothesis that all three slopes are zero.
-- Two reasons why the coefficients are not causal effects: any two of
-  these. Only pitches that ended in a deal on air are in the data. The
-  quality of the venture is not measured, and it can affect both the share
-  that a founder offers and the share that the sharks take. The amounts
-  and shares may be measured with error.
+- Two reasons why the coefficients are not causal effects: only pitches
+  that ended in a deal on air are in the data. The quality of the venture
+  is not measured, and it can affect both the share that a founder offers
+  and the share that the sharks take.
 :::
 
 ### Task 2: Dummy variables and a partial F-test (Lecture 5)
@@ -264,8 +264,8 @@ Filled-in structure:
 
 [Shark Tank data]{.shark-tag} Over the seasons, the sharks took smaller
 shares of the companies in their deals. Did this trend differ between teams
-with women and all-men teams? With the 869 deals with a known team
-classification (`known_deals`), fit a regression of the equity agreed in
+with women and all-men teams? Use the 869 deals with a known team
+classification (`known_deals`). Fit a regression of the equity agreed in
 the deal (`deal_equity_pct`) on the centred season `season_c`, the dummy
 `women` (1 for all-women and mixed teams), their interaction, and the
 equity that the founder first offered (`equity_offered_pct`).
@@ -333,7 +333,8 @@ Filled-in structure:
   percentage points per season, with p $\approx$ 0.77, so the model gives
   no evidence that the trends differ between the two groups. The 95%
   interval, from about $-0.31$ to $0.42$, rules out differences in the
-  yearly trend larger than about 0.4 percentage points, compared with a
+  season trend larger than about 0.4 percentage points per season,
+  compared with a
   decline of about 0.66 points per season for all-men teams.
 - What centring changes and what it does not change: centring makes the
   `women` coefficient compare the groups at the average season (about 9.4)
@@ -343,8 +344,8 @@ Filled-in structure:
 
 ### Task 4: Polynomial term (Lecture 6)
 
-[Shark Tank data]{.shark-tag} With the 869 deals with a known team
-classification (`known_deals`), fit a linear model of the equity agreed in
+[Shark Tank data]{.shark-tag} Use the 869 deals with a known team
+classification (`known_deals`). Fit a linear model of the equity agreed in
 the deal (`deal_equity_pct`) on the season and the equity offered
 (`equity_offered_pct`), and a quadratic model that adds the square of the
 season.
@@ -490,87 +491,7 @@ adjusted $R^2$ from 0.420 to 0.446, about 2.6 percentage points of the
 variation in the agreed equity. Use this layout for regression results in
 your thesis.
 
-### Task 5: Read a regression table from a paper
-
-The table below has the layout of a regression table in a research paper,
-the same layout as the table above. The outcome is entrepreneurial
-intention on a scale from 1 to 7, measured in a survey of 265 students.
-Self-efficacy is a score from 1 to 7 for how confident a student is that he
-or she can start a business. The table does not show the intercept. Some
-journals do this.
-
-::: {.reg-table}
-| | (1) | (2) |
-|:---|---:|---:|
-| Age (years) | 0.02 | 0.01 |
-| | (0.02) | (0.02) |
-| Female (1 = yes) | −0.21\* | −0.15 |
-| | (0.10) | (0.10) |
-| Prior entrepreneurial experience (1 = yes) | | 0.42\*\* |
-| | | (0.13) |
-| Entrepreneurial self-efficacy (1--7) | | 0.38\*\*\* |
-| | | (0.07) |
-| Observations | 265 | 265 |
-| $R^2$ | 0.03 | 0.19 |
-| Adjusted $R^2$ | 0.02 | 0.18 |
-:::
-
-Outcome: entrepreneurial intention (scale from 1 to 7). Ordinary least
-squares. Standard errors in parentheses.
-\* p < 0.05, \*\* p < 0.01, \*\*\* p < 0.001.
-
-1. Say in one sentence each what the numbers in parentheses and the stars
-   mean. Then check the stars of the self-efficacy coefficient with its t
-   statistic. The critical value is $t_{0.975,\,260}=1.969$.
-2. The coefficient of Female changes from $-0.21$ with a star in column (1)
-   to $-0.15$ without a star in column (2). Explain in one or two sentences
-   why the coefficient changed. Then say in one or two sentences what the
-   missing star does and does not mean.
-3. $R^2$ rises from 0.03 to 0.19. Say in one sentence what that means, and
-   name the test that shows whether the two added predictors are jointly
-   significant.
-
-Use (copy and paste) this structure:
-
-```text
-Numbers in parentheses:
-Stars:
-t statistic of self-efficacy, and check of its stars:
-What happened to the Female coefficient:
-What the missing star does and does not mean:
-What the rise in R-squared says:
-Test of the two added predictors:
-```
-
-::: {.callout-note collapse="true"}
-## Check your answer
-
-Filled-in structure:
-
-- Numbers in parentheses: the standard errors of the coefficients.
-- Stars: the p-value of the two-sided t-test of each coefficient against
-  zero, with more stars for a smaller p-value.
-- t statistic of self-efficacy, and check of its stars:
-  $t_{obs}=0.38/0.07\approx5.4$. This is far beyond the critical value
-  $t_{0.975,\,260}$ = `qt(0.975, 260)` = 1.969, and p is below 0.001, so
-  three stars are correct.
-- What happened to the Female coefficient: model (2) holds experience and
-  self-efficacy fixed as well, so the coefficient now compares women and
-  men with the same age, experience, and self-efficacy. Part of the
-  difference of 0.21 points in column (1) went together with differences in
-  experience and self-efficacy.
-- What the missing star does and does not mean: the 95% confidence
-  interval around $-0.15$ includes zero. It does not show that the
-  difference is zero.
-- What the rise in R-squared says: the two added predictors explain a
-  further 16 percentage points of the variation in intentions in this
-  sample.
-- Test of the two added predictors: a partial F-test of the two nested
-  models, model (1) against model (2) on the same 265 students. If you have
-  the data, `anova()` of the two fitted models gives this test.
-:::
-
-### Task 6: A/B test, moderator and mediator (Lectures 5 and 6)
+### Task 5: A/B test, moderator and mediator (Lectures 5 and 6)
 
 &#40;a) An online shop for refurbished phones shows 120 new visitors either
 its current product page (`new_page = 0`) or a new page with customer
@@ -669,7 +590,7 @@ Filled-in structure:
   of the model.
 :::
 
-### Task 7: Check the AI (Lectures 4 to 6)
+### Task 6: Check the AI (Lectures 4 to 6)
 
 Lisa runs a café on campus. On 150 days she recorded the daily sales in
 euros, the number of flyers that she handed out that day, the temperature,
@@ -691,9 +612,9 @@ $t_{0.975,\,146}=1.976$.
 
 She asked: "Should I hand out more flyers?" The AI answered:
 
-> "Your model controls for the temperature and for exam weeks. So it shows
-> the causal effect of flyers: every 100 extra flyers will raise your daily
-> sales by €18. In exam weeks, your café sells on average €85 less per day
+> "Your model controls for the temperature and for exam weeks. So the flyer
+> coefficient is a causal effect of flyers: every 100 extra flyers raise
+> your daily sales by €18. In exam weeks, your café sells on average €85 less per day
 > than on an average day. The 95% confidence interval of the flyer
 > coefficient does not include zero, so the coefficient is significantly
 > different from zero at the 5% level."
@@ -710,8 +631,9 @@ of sales, 50 cents are left as margin after the direct costs.
    interpret the interval in one sentence, with units. Then calculate the
    extra daily margin that goes with 100 more flyers, at the lower and at
    the upper end of the interval.
-4. Decide whether Lisa should hand out 100 more flyers per day on the basis
-   of these numbers, and give your reason in one sentence.
+
+Finally, say in one sentence whether these numbers support handing out 100
+more flyers per day.
 
 Use (copy and paste) this structure:
 
@@ -724,7 +646,7 @@ Interval, calculation:
 Interval, lower and upper bound:
 Interval interpretation:
 Extra margin at both ends:
-Decision and reason:
+Decision:
 ```
 
 ::: {.callout-note collapse="true"}
@@ -733,7 +655,7 @@ Decision and reason:
 ```{r}
 #| label: iep02-ai-check
 #| include: false
-# Checks the numbers of Task 7.
+# Checks the numbers of Task 6.
 qt(0.975, 150 - 3 - 1)
 ci_flyers <- 18 + c(-1, 1) * qt(0.975, 146) * 5
 ci_flyers
@@ -765,11 +687,11 @@ Filled-in structure:
 - Extra margin at both ends: at 50 cents per euro,
   $0.5\times\text{€}8.12=\text{€}4.06$ and
   $0.5\times\text{€}27.88=\text{€}13.94$ per day.
-- Decision and reason: hand out the extra flyers on this evidence, because
+- Decision: hand out the extra flyers on this evidence, because
   even at the lower end of the interval the extra margin of €4.06 is above
   the €3 that 100 flyers cost.
 
-The third sentence of the AI answer is correct: the interval from €8.12 to
+The last sentence of the AI answer is correct: the interval from €8.12 to
 €27.88 does not include zero.
 :::
 :::
@@ -889,17 +811,18 @@ ask Tilly for QM Intermediate, the course AI assistant. For example: "Give me
 an extra exercise for Intermediate Tutorial 2. Show the solution only after
 I send my answer."
 
-## Extra practice for home {#i-ep02-home}
+### Extra practice for home {#i-ep02-home}
 
-These tasks practise the content of Lectures 4 and 5 at home. Task 8
-practises the one-way ANOVA table. Task 9 practises the question that every
+These tasks practise the content of Lectures 4 and 5 at home. Task 7
+practises the one-way ANOVA table. Task 8 practises the question that every
 interpretation of a coefficient must answer: is it large in business
-terms? Task 10 shows what happens to a standard error when two predictors
-move closely together.
+terms? Task 9 shows what happens to a standard error when two predictors
+move closely together. Task 10 practises reading a regression table from a
+research paper.
 
-### Task 8: A one-way ANOVA (Lecture 5)
+#### Task 7: A one-way ANOVA (Lecture 5)
 
-The online shop for refurbished phones of Task 6 records the delivery time
+The online shop for refurbished phones of Task 5 records the delivery time
 in hours of 20 orders for each of three couriers. The code below creates
 the data.
 
@@ -965,11 +888,11 @@ Filled-in structure:
   about 16% of the overall mean of 23.96 hours.
 :::
 
-### Task 9: How large is the coefficient? (Lecture 4)
+#### Task 8: How large is the coefficient? (Lecture 4)
 
 [Shark Tank data]{.shark-tag} When several sharks invest together, do they
-take a larger share of the company? With the 874 deals for a share of the
-company (`deals`), regress the equity agreed in the deal
+take a larger share of the company? Use the 874 deals for a share of the
+company (`deals`). Regress the equity agreed in the deal
 (`deal_equity_pct`) on the number of sharks in the deal
 (`number_sharks_in_deal`), the equity offered (`equity_offered_pct`), and
 the season.
@@ -1040,7 +963,7 @@ Filled-in structure:
   shark should be worth at least that much to you."
 :::
 
-### Task 10: Two predictors that move together (Lecture 4)
+#### Task 9: Two predictors that move together (Lecture 4)
 
 A chain of fitness clubs wants to know how the size of a club relates to
 the number of new members per month. For 40 clubs it recorded the floor
@@ -1138,6 +1061,87 @@ Filled-in structure:
   other held fixed, and because the two move so closely together, the data
   cannot tell which of the two matters, so the non-significant t-tests do
   not show that size is unimportant.
+:::
+
+#### Task 10: Read a regression table from a paper (Lectures 4 and 5)
+
+The table below has the layout of a regression table in a research paper,
+the same layout as the
+[table of the models of Tasks 3 and 4](#iep02-spec-table). The outcome is entrepreneurial
+intention on a scale from 1 to 7, measured in a survey of 265 students.
+Self-efficacy is a score from 1 to 7 for how confident a student is that he
+or she can start a business. The table does not show the intercept. Some
+journals do this.
+
+::: {.reg-table}
+| | (1) | (2) |
+|:---|---:|---:|
+| Age (years) | 0.02 | 0.01 |
+| | (0.02) | (0.02) |
+| Female (1 = yes) | −0.21\* | −0.15 |
+| | (0.10) | (0.10) |
+| Prior entrepreneurial experience (1 = yes) | | 0.42\*\* |
+| | | (0.13) |
+| Entrepreneurial self-efficacy (1 to 7) | | 0.38\*\*\* |
+| | | (0.07) |
+| Observations | 265 | 265 |
+| $R^2$ | 0.03 | 0.19 |
+| Adjusted $R^2$ | 0.02 | 0.18 |
+:::
+
+Outcome: entrepreneurial intention (scale from 1 to 7). Ordinary least
+squares. Standard errors in parentheses.
+\* p < 0.05, \*\* p < 0.01, \*\*\* p < 0.001.
+
+1. Say in one sentence each what the numbers in parentheses and the stars
+   mean. Then check the stars of the self-efficacy coefficient with its t
+   statistic. The critical value is $t_{0.975,\,260}=1.969$.
+2. The coefficient of Female changes from $-0.21$ with a star in column (1)
+   to $-0.15$ without a star in column (2). Explain in one or two sentences
+   why the coefficient changed. Then say in one or two sentences what the
+   missing star does and does not mean.
+3. $R^2$ rises from 0.03 to 0.19. Say in one sentence what that means, and
+   name the test that shows whether the two added predictors are jointly
+   significant.
+
+Use (copy and paste) this structure:
+
+```text
+Numbers in parentheses:
+Stars:
+t statistic of self-efficacy, and check of its stars:
+What happened to the Female coefficient:
+What the missing star does and does not mean:
+What the rise in R-squared says:
+Test of the two added predictors:
+```
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+Filled-in structure:
+
+- Numbers in parentheses: the standard errors of the coefficients.
+- Stars: the p-value of the two-sided t-test of each coefficient against
+  zero, with more stars for a smaller p-value.
+- t statistic of self-efficacy, and check of its stars:
+  $t_{obs}=0.38/0.07\approx5.4$. This is far beyond the critical value
+  $t_{0.975,\,260}$ = `qt(0.975, 260)` = 1.969, and p is below 0.001, so
+  three stars are correct.
+- What happened to the Female coefficient: model (2) holds experience and
+  self-efficacy fixed as well, so the coefficient now compares women and
+  men with the same age, experience, and self-efficacy. Part of the
+  difference of 0.21 points in column (1) went together with differences in
+  experience and self-efficacy.
+- What the missing star does and does not mean: the 95% confidence
+  interval around $-0.15$ includes zero. It does not show that the
+  difference is zero.
+- What the rise in R-squared says: the two added predictors explain a
+  further 16 percentage points of the variation in intentions in this
+  sample.
+- Test of the two added predictors: a partial F-test of the two nested
+  models, model (1) against model (2) on the same 265 students. If you have
+  the data, `anova()` of the two fitted models gives this test.
 :::
 
 This is the end of the QM Intermediate lectures and tutorials. Review the

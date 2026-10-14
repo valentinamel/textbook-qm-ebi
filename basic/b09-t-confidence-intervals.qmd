@@ -12,8 +12,8 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 ::: {.outcomes}
 <span class="label">By the end of Lecture 9, you can</span>
 
-- construct and interpret a confidence interval for a mean or a proportion
-- choose a sample size for a target margin of error
+- construct and interpret a confidence interval for a mean or a proportion,
+- choose a sample size for a target margin of error,
 - state the hypotheses of a two-sided test and calculate its test statistic
 :::
 
@@ -54,6 +54,7 @@ Extra, if you want more explanation:
 - The videos write $z_{\alpha/2}$ and $t_{\alpha/2}$ for the value with area $\alpha/2$ to its right. This book writes the same values as quantiles: $z_{0.975}=1.96$ and $t_{0.975,\,n-1}$, as R does with `qnorm(0.975)` and `qt(0.975, df)`.
 - The videos read critical values and p-values from tables. This course uses R.
 - If a video calls $\sigma/\sqrt n$ the standard error, read it as the standard deviation of the sample mean. This book keeps the name standard error for the estimated version $S/\sqrt n$.
+- The MIT videos linked in the lecture material write $M_n$ for the sample mean $\bar X$ and $\hat\Theta$ for an estimator.
 
 </details>
 
@@ -89,7 +90,7 @@ error, and a quantile of a known distribution.
 If you are not sure about intervals, standardisation, or degrees of freedom,
 review
 [Mathematics Refresher: intervals, standardisation, and degrees of
-freedom](../resources/math-refresher.html).
+freedom](../resources/math-refresher.qmd).
 
 **Predict.** Answer these two questions before you come to class.
 
@@ -165,8 +166,9 @@ answer three kinds of question about an unknown parameter.
 
 The sample mean $\bar x=12.76$ is a point estimate of $\mu$. Two statements are
 true of any such number. First, it is almost certainly not equal to $\mu$.
-We treat the equity offered as continuous, so the probability that a
-sample mean is exactly equal to $\mu$ is zero (Lecture 6). Second, the number
+A sample mean of 100 offers, each recorded with at most two decimals, is a
+multiple of 0.0001, and $\mu=13.20761\ldots$ is not. In general a sample
+mean almost never hits the parameter exactly. Second, the number
 alone does not say how far from $\mu$ it might be. Lecture 8 measured that
 distance with the standard error. A confidence interval combines the
 estimate and its standard error into one statement about $\mu$.
@@ -212,6 +214,7 @@ $\alpha=0.05$.
 #| code-fold: true
 #| code-summary: "See the R code for this figure"
 #| fig-cap: "The standard normal density. The green central area has probability 1 − α and lies between the two cut-offs. Each orange tail has probability α/2. The curve is drawn for α = 0.05, where the cut-offs are −1.96 and 1.96."
+#| fig-alt: "A standard normal density curve. The central area between the cut-offs minus 1.96 and 1.96 is green and has probability 1 minus alpha. The two tails beyond the cut-offs are orange and each has probability alpha over 2."
 library(ggplot2)
 
 z_cut <- qnorm(0.975)
@@ -360,7 +363,8 @@ c(lower = x_bar - margin_z, upper = x_bar + margin_z)
 
 The standard deviation of the sample mean is $8.44/\sqrt{100}=0.844$. With
 $z_{0.975}=1.96$, the bounds are $12.76\pm1.96\times0.844=12.76\pm1.65$. The
-95% confidence interval with $\sigma$ known is $(11.11,\ 14.41)$.
+95% confidence interval with $\sigma$ known is $(11.11,\ 14.41)$, a width of
+3.3 points, or plus or minus 13% of the sample mean.
 
 The difference between $(L,U)$ and $(l,u)$ explains what the word
 confidence means. The method captures $\mu$ in a fraction $1-\alpha$ of all
@@ -520,7 +524,7 @@ interval or test, go through this checklist:
    right-skewed, so the population is not normal. With $n=100$ the sample is
    large and the t interval for the mean is still reasonable. For a very
    small sample it would not be: that is the missing case of the table in
-   [Lecture 8](b08-sampling-distributions.qmd#b09-t-rule). Also check for data errors and for single observations that have
+   [Lecture 8](b08-sampling-distributions.qmd#b08-t-rule). Also check for data errors and for single observations that have
    a very large influence on the mean.
 
 These conditions support conclusions about the recorded pitches, the
@@ -610,7 +614,7 @@ The same calculation, written in the five parts:
    $df=100$, the closest one listed.
 3. **Calculations.** The standard error is $7.71/\sqrt{100}=0.771$
    percentage points. The margin of error is $1.984\times0.771=1.53$
-   percentage points.
+   percentage points, 12% of the sample mean.
 4. **Interval.** In percent,
 
    $$
@@ -652,6 +656,7 @@ It is known here because the file is the whole population.
 #| fig-width: 7
 #| fig-height: 5.2
 #| fig-cap: "One hundred repetitions of the same procedure: draw 100 random pitches, compute a 95% t interval for the mean equity offered. Green intervals contain the fixed target mean (gold dashed line). Orange intervals miss it. In this run, 96 of 100 intervals cover the target."
+#| fig-alt: "One hundred horizontal confidence intervals stacked from top to bottom, with a gold dashed vertical line at the target mean of the equity offered. Ninety-six intervals are green and cross the line. Four intervals are orange and lie completely to one side of it."
 library(ggplot2)
 
 sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
@@ -757,7 +762,7 @@ For a 95% confidence level, $z_{0.975}=1.96$ and the formula is
 $n\ge(1.96\times\sigma/m)^2$. For 90% use $z_{0.95}=1.645$, and for 99% use
 $z_{0.995}=2.576$. Always round the result up to the next whole number.
 
-::: {#exm-b08-sample-size}
+::: {#exm-b09-sample-size}
 ## Worked example: a sample size for a margin of 2 euros
 
 An invented example. You want to know the average order value of your
@@ -777,11 +782,21 @@ must you survey?
 - **Round up.** Survey $n=139$ customers. Always round up: with 138
   customers the margin would be slightly above 2 euros.
 
-Halving the margin to 1 euro needs $(1.96\times 12/1)^2=23.52^2\approx 553.2$,
+Halving the margin to 1 euro needs
+
+$$
+n\ge\left(\frac{1.96\times 12}{1}\right)^2=23.52^2\approx 553.2,
+$$
+
 so 554 customers. Half the margin costs about four times the sample, as the
 square-root rule of Lecture 8 says. A higher confidence level also needs
 more observations. A margin of 2 euros at the 99% level needs
-$(2.576\times 12/2)^2=15.456^2\approx 238.9$, so 239 customers.
+
+$$
+n\ge\left(\frac{2.576\times 12}{2}\right)^2=15.456^2\approx 238.9,
+$$
+
+so 239 customers.
 
 ```{r}
 #| label: b09-sample-size-calc
@@ -934,7 +949,8 @@ c(lower = p_hat - margin_p, upper = p_hat + margin_p)
    \sqrt{\frac{0.64\times0.36}{100}}=\sqrt{0.002304}=0.048.
    $$
 
-   The margin of error is $1.96\times0.048=0.094$.
+   The margin of error is $1.96\times0.048=0.094$, about 9 percentage
+   points, or 15% of the sample proportion.
 4. **Interval.** The interval is
 
    $$
@@ -1095,8 +1111,11 @@ statistic calculated from the data is called the observed value, $z_{obs}$.
 ::: {#exm-b09-test-statistic}
 ## Worked example: the hypotheses and the observed value
 
-[Shark Tank data]{.shark-tag} A complete test has five steps, which Lecture 10 lists. This example carries
-out steps 1, 2, and 4. The advisor claims $\mu_0=15$. The sample of Lecture
+[Shark Tank data]{.shark-tag} A complete test has five steps: the hypotheses, the test
+statistic, the critical value and rejection region, the observed value, and
+the conclusion. The critical value and the conclusion need the rule for the
+decision, which Lecture 10 introduces, so this example carries out steps 1,
+2, and 4. The advisor claims $\mu_0=15$. The sample of Lecture
 7 has $n=100$ and $\bar x=12.76$. The population SD, known from the file, is
 $\sigma=8.44$.
 
@@ -1146,6 +1165,7 @@ $z_{obs}=-2.65$.
 #| code-fold: true
 #| code-summary: "See the R code for this figure"
 #| fig-cap: "The distribution of the test statistic Z if the null hypothesis is true: the standard normal curve. The orange line marks the observed value −2.65, far out in the left tail. The open question is how far from zero the observed value must lie before the null hypothesis is rejected."
+#| fig-alt: "A standard normal density curve, the distribution of the test statistic if the null hypothesis is true. An orange vertical line marks the observed value minus 2.65, far out in the left tail where the curve is almost zero."
 library(ggplot2)
 
 z_observed <- -2.65
@@ -1373,7 +1393,7 @@ equals 40: values up to about 46 points are also compatible with the sample.
 
 ### Practice
 
-The numbers in tasks 1 to 4 are invented. Write every interval in the five
+The numbers in tasks 1 to 4 and 6 are invented. Write every interval in the five
 parts.
 
 1. An app founder measures the length of a session for a random sample of
@@ -1497,8 +1517,8 @@ as in @fig-b09-coverage.
 
 > "It means that 95% of all pitches offer between 11.23% and 14.29% of the company."
 
-Find what is wrong and write the corrected answer. This is the **Verify**
-step of Attempt → Ask → Verify → Explain.
+Find what is wrong and write the corrected answer. This is the Verify
+step of Attempt, Ask, Verify, Explain.
 
 ::: {.callout-note collapse="true"}
 ## Check your answer

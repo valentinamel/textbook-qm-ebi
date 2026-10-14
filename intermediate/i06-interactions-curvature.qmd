@@ -57,8 +57,8 @@ The videos explain key ideas in another way. The lecture material and its notati
 :::
 
 If you are not sure about products, powers, or centring, review
-[Mathematics Refresher: products, interactions, and combined effects](../resources/math-refresher.html#products-interactions-and-combined-effects)
-and [polynomial terms](../resources/math-refresher.html#polynomial-terms).
+[Mathematics Refresher: products, interactions, and combined effects](../resources/math-refresher.qmd#products-interactions-and-combined-effects)
+and [polynomial terms](../resources/math-refresher.qmd#polynomial-terms).
 
 **From one equation to two lines.** An invented example. A café models its
 daily sales in euros with the temperature in degrees Celsius and a dummy
@@ -87,6 +87,13 @@ $D\in\{0,1\}$. For $D=0$: $E[Y\mid X,D=0]=\beta_0+\beta_1X$. For $D=1$:
 $E[Y\mid X,D=1]=(\beta_0+\beta_2)+(\beta_1+\beta_3)X$. Setting $D=1$ shifts
 the intercept by $\beta_2$ and the slope by $\beta_3$.
 :::
+
+**Predict.** Answer this question before you run the R warm-up below. Over
+the 16 seasons, the equity offered by all-men teams fell by about 0.8
+percentage points per season. For teams with at least one woman, did it
+fall (a) clearly faster, (b) clearly slower, or (c) at about the same speed?
+Choose one answer. Your plot from the R warm-up and the lecture material
+show the answer.
 
 [Shark Tank data]{.shark-tag} **R warm-up.** Build the variables for the analysis. The code
 uses the same `known_gender` subset as Lecture 5: the 1,434 pitches with
@@ -121,13 +128,6 @@ abline(lm(equity_offered_pct ~ season,
 the course project open. All the code of the lecture is in this chapter,
 ready to copy. You can run each step yourself during the lecture and get the
 same numbers and figures.
-
-**Predict.** Answer this question before you run the R warm-up above. Over
-the 16 seasons, the equity offered by all-men teams fell by about 0.8
-percentage points per season. For teams with at least one woman, did it
-fall (a) clearly faster, (b) clearly slower, or (c) at about the same speed?
-Choose one answer. Your plot from the R warm-up and the lecture material
-show the answer.
 
 :::
 
@@ -174,13 +174,13 @@ draw_panel <- function(exam_slope, title) {
     y_ordinary <- 100 + 0.10 * a
     y_exam <- 115 + exam_slope * a
     arrows(a, y_ordinary, a, y_exam, length = 0.05, code = 3, col = "grey40")
-    text(a + 6, (y_ordinary + y_exam) / 2,
-         paste0("gap ", round(y_exam - y_ordinary)), pos = 4, cex = 0.8,
+    text(a, y_ordinary - 9,
+         paste0("gap ", round(y_exam - y_ordinary)), cex = 0.8,
          col = "grey30")
   }
-  text(300, 100 + 0.10 * 300 - 15, "ordinary weeks", col = "#009E73",
+  text(270, 100 + 0.10 * 270 - 22, "ordinary weeks", col = "#009E73",
        cex = 0.85)
-  text(110, 115 + exam_slope * 110 + 12, "exam weeks", col = "#D55E00",
+  text(110, 115 + exam_slope * 110 + 20, "exam weeks", col = "#D55E00",
        cex = 0.85)
 }
 draw_panel(0.10, "No interaction: parallel lines")
@@ -284,9 +284,9 @@ You will check this in R in the after-class practice.
 ## Try it: two lines from four coefficients
 
 In an invented example, a juice bar with two locations models its
-weekly sales in bottles with the price per bottle in euros, a dummy
-`campus` (1 for the location on campus, 0 for the location in town), and
-their interaction:
+weekly sales in bottles with the price per bottle in euros. The model also
+contains a dummy `campus` (1 for the location on campus, 0 for the location
+in town) and the interaction of price and campus:
 fitted sales = 300 − 40 × price + 100 × campus − 20 × price × campus.
 
 *Step 1 (given).* In town (campus = 0) the line is 300 − 40 × price.
@@ -372,8 +372,8 @@ average requested amount, with $\text{season\_c}$ as the predictor:
 $$
 \begin{aligned}
 \text{all-men teams: } & \widehat{\text{equity}} = 12.866 - 0.799\times\text{season\_c},\\
-\text{teams with women: } & \widehat{\text{equity}} = (12.866+0.807) + (-0.7994-0.0615)\times\text{season\_c}\\
-& \phantom{\widehat{\text{equity}}} = 13.673 - 0.861\times\text{season\_c}.
+\text{teams with women: } & \widehat{\text{equity}} = (12.866+0.807) + (-0.799-0.061)\times\text{season\_c}\\
+& \phantom{\widehat{\text{equity}}} \approx 13.673 - 0.860\times\text{season\_c}.
 \end{aligned}
 $$
 
@@ -457,17 +457,17 @@ newdat$season_c <- newdat$season - mean(known_gender$season)
 newdat$ask_1k <- ask_bar
 newdat$fit <- predict(interaction_model, newdata = newdat)
 newdat$group <- ifelse(newdat$women == 1, "Teams with women", "All-men")
-fit_men_13 <- newdat$fit[newdat$women == 0 & newdat$season == 13]
-fit_women_13 <- newdat$fit[newdat$women == 1 & newdat$season == 13]
+fit_men_14 <- newdat$fit[newdat$women == 0 & newdat$season == 14]
+fit_women_14 <- newdat$fit[newdat$women == 1 & newdat$season == 14]
 
 ggplot(newdat, aes(x = season, y = fit,
                    colour = group, linetype = group)) +
   geom_line(linewidth = 1.1) +
   geom_point(data = subset(newdat, season %in% c(1, 16)), size = 2.2) +
-  annotate("text", x = 13, y = fit_women_13 + 1.1,
+  annotate("text", x = 14, y = fit_women_14 + 1.6,
            label = "Teams with women",
            colour = "#D55E00", size = 3.4) +
-  annotate("text", x = 13, y = fit_men_13 - 1.1,
+  annotate("text", x = 14, y = fit_men_14 - 1.6,
            label = "All-men",
            colour = "#009E73", size = 3.4) +
   scale_colour_manual(values = c("All-men" = "#009E73",
@@ -840,13 +840,13 @@ The table compares the three roles of a third variable $Z$.
 | Role | What it is | How it appears in a regression | Example |
 |---|---|---|---|
 | Moderator | Changes the slope of $X$ | Interaction term $XZ$ | Number of stores changes the marketing slope |
-| Mediator | Lies on the path from $X$ to $Y$ | Adding it shrinks the coefficient of $X$ to the direct part | Website visits between marketing and sales |
+| Mediator | Lies on the path from $X$ to $Y$ | Adding it changes the coefficient of $X$ from the total to the direct part | Website visits between marketing and sales |
 | Confounder | Affects both $X$ and $Y$ | Control variable, to remove omitted variable bias | Firm size behind both advertising and sales |
 
 ### Curvature: polynomials are still linear regression
 
-An interaction term lets the slope of $x$ differ by group or change with a
-moderator. A quadratic term, defined below, lets the slope change as $x$
+An interaction term lets the slope of $X$ differ by group or change with a
+moderator. A quadratic term, defined below, lets the slope change as $X$
 itself changes. Both add one new column to the data, a product or a square.
 In both, you read two coefficients together.
 
@@ -1049,7 +1049,7 @@ $F \approx 20.1$, p $<$ 0.001). The fitted decline becomes flatter: from
 about $-1.56$ points per season between Seasons 1 and 2 to about $-0.64$
 between Seasons 10 and 11. A straight line gives the same drop of about
 0.81 points in every season. It understates the early decline and overstates
-the late one. Use the curve only inside Seasons 1--16.
+the late one. Use the curve only inside Seasons 1 to 16.
 
 As a founder who prepares a pitch, you might use recent seasons as a
 benchmark for how much equity to offer. You might expect teams with and
@@ -1101,7 +1101,7 @@ Try it yourself first.
 :::
 :::
 
-This lecture completes QM Intermediate. In this sample, you can now describe
+This lecture completes QM Intermediate. You can now describe
 how an outcome is related to several variables at the same time: with
 numbers and categories as predictors, with slopes that differ between
 groups, and with trends that bend. You can also judge how precise these
@@ -1115,7 +1115,7 @@ the basis for all of them.
 
 **Next:** With dummies, interactions and curves, the regression model can
 now answer most "does it depend?" questions that a founder asks. Tutorial 2
-practises Lectures 4--6 with exam-style questions. It ends with one full
+practises Lectures 4 to 6 with exam-style questions. It ends with one full
 analysis, from a research question to a conclusion of 150 words. Your thesis
 asks for this kind of analysis too.
 
@@ -1168,7 +1168,7 @@ assistant.
    such as the sample mean, and not to zero. Centring never changes the
    fitted values, the residuals, $R^2$, or the interaction coefficient.
 3. Keep $X$ and $D$ in the model whenever their interaction $XD$ is in it,
-   and keep $x$ whenever $x^2$ is in it.
+   and keep $X$ whenever $X^2$ is in it.
 4. It is linear in the unknown coefficients. The squared column is one more
    predictor built from the data.
 5. No single coefficient is the slope, so only fitted values or the curve
@@ -1229,8 +1229,8 @@ we compare the two groups. It did not move the lines.
 ### Finish a half-worked example: a quadratic change
 
 [Shark Tank data]{.shark-tag} Read the worked calculation for Season 5 to Season 6 again
-(@exm-i06-quadratic-change). Then calculate the fitted change from **Season
-10 to Season 11** in the same model: the equity offered regressed on the
+(@exm-i06-quadratic-change). Then calculate the fitted change from Season
+10 to Season 11 in the same model: the equity offered regressed on the
 season, the season squared, and the requested amount, for all 1,441
 pitches.
 
@@ -1247,8 +1247,8 @@ in one sentence what the comparison shows about the trend.
 
 $-1.713+0.051\times21\approx-1.713+1.071\approx-0.64$ percentage points
 (with the unrounded coefficients: $\hat\beta_1+21\hat\beta_2=-0.642$). The
-drop per season has become smaller, from about $-1.15$ (Seasons 5--6) to
-about $-0.64$ (Seasons 10--11). The decline becomes flatter in later
+drop per season has become smaller, from about $-1.15$ (Seasons 5 and 6) to
+about $-0.64$ (Seasons 10 and 11). The decline becomes flatter in later
 seasons. This is what a positive $\hat\beta_2$ means.
 :::
 
@@ -1294,7 +1294,7 @@ term because of this question about the shape, not because I am searching
 for a significant result. I would test it with a partial F-test against the
 nested linear model on the same observations (here $F\approx20.1$,
 p $<$ 0.001). I would also check that adjusted $R^2$ rises and graph the
-fitted curve inside Seasons 1--16. Finally, I would report fitted changes
+fitted curve inside Seasons 1 to 16. Finally, I would report fitted changes
 from season to season, not the `season` coefficient alone." An answer with an interaction is equally
 good if it names the question and the nested test. An example is the
 interaction of season with the `women` dummy, which asks whether the trend
@@ -1320,7 +1320,7 @@ significant. Joint tests and individual tests answer different questions.
 
 ### Worked exam interpretation
 
-**Exam-style question.** An invented example. A model of the weekly
+**Exam-style question.** A model of the weekly
 revenue of market stalls (in €100s) on opening hours per week, a dummy for
 indoor stalls, and their interaction reports `hours 1.20`,
 `indoor 2.00`, `hours:indoor -0.50`. A student writes: "One more opening
@@ -1346,7 +1346,7 @@ hours.
 
 > "The p-value proves that the season trend is identical for both groups. And the season coefficient of -0.80 is the season trend for all teams."
 
-Find what is wrong and write the corrected answer. This is the **Verify**
+Find what is wrong and write the corrected answer. This is the Verify
 step of Attempt → Ask → Verify → Explain.
 
 ::: {.callout-note collapse="true"}
@@ -1388,12 +1388,12 @@ QM Intermediate, the course AI assistant. For example: "Give me an extra
 exercise for Intermediate Lecture 6. Show the solution only after I send my
 answer."
 
-[Continue to Tutorial 2: Multiple regression and extensions](t02-exam-prep.qmd).
-
 [Code sheet: Lecture 6 commands and formulas](code-sheet.qmd#lecture-6-interactions-and-polynomial-terms).
 
 For a more formal treatment, see
 [Nieuwenhuis, *Statistical Methods for Business and Economics*](https://tilburguniversity.on.worldcat.org/oclc/317545871),
 Chapter 21.
+
+[Continue to Tutorial 2: Multiple regression and extensions](t02-exam-prep.qmd).
 
 :::

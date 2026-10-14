@@ -29,12 +29,11 @@ following Attempt, Ask, Verify, Explain.
 
 Complete the after-class practice from Lectures 1 and 2. Lecture 3 is on the
 day before this tutorial: read its lecture material, and do its practice
-after the tutorial. Keep the Lectures
-1--3 sections of the
+after the tutorial. Keep the sections for Lectures 1 to 3 of the
 [QM Intermediate Code Sheet](code-sheet.qmd) open while you work.
 If the notation slows you down, review
-[Mathematics Refresher: straight lines, slopes, and intercepts](../resources/math-refresher.html#straight-lines-slopes-and-intercepts)
-and [powers, roots, and squared deviations](../resources/math-refresher.html#powers-roots-and-squared-deviations).
+[Mathematics Refresher: straight lines, slopes, and intercepts](../resources/math-refresher.qmd#straight-lines-slopes-and-intercepts)
+and [powers, roots, and squared deviations](../resources/math-refresher.qmd#powers-roots-and-squared-deviations).
 
 Write from memory:
 
@@ -60,14 +59,13 @@ Write from memory:
 
 ## In the tutorial
 
-Try each task in R before you open the answer. A complete written answer
-does five things. It names the sample, shows the calculation, and reports
+A complete written answer does five things. It names the sample, shows the calculation, and reports
 values with units. It interprets the values in context. And it states one
 important limit of the model or of the data. More practice for home is in
 the final section of this page,
 [Extra practice for home](#i-ep01-home).
 
-All seven tasks follow one founder question through the steps of Lectures 1
+All six tasks follow one founder question through the steps of Lectures 1
 to 3: when founders offer more equity, how much equity do they end up giving
 in the deal? Before a pitch, every founder decides which share of the
 company to offer. On Shark Tank the sharks often accept the amount of money
@@ -159,61 +157,10 @@ Filled-in structure:
   no useful business meaning of its own.
 :::
 
-### Task 2: Prediction and residual (Lecture 1)
-
-[Shark Tank data]{.shark-tag} Use the Task 1 model of the equity given in
-the deal on the equity offered. A founder plans to offer 10% of the company.
-
-1. Calculate the fitted deal share for this offer. Say in one sentence
-   whether an offer of 10% lies inside the range of offers in the data, and
-   why this matters for the prediction.
-2. The founder ends up giving 30% of the company. Calculate the residual of
-   this deal, and give it as a percent of the fitted value.
-3. Interpret the sign of the residual in one sentence.
-
-Use (copy and paste) this structure:
-
-```text
-R code:
-Fitted deal share:
-Inside the range of the data, and why it matters:
-Residual:
-Meaning of the sign:
-```
-
-::: {.callout-note collapse="true"}
-## Check your answer
-
-The code prints the fitted deal share for an offer of 10% and the residual
-of a deal at 30%, both in percent of the company.
-
-```{r}
-#| label: iep01-task2
-equity_model <- lm(deal_equity_pct ~ equity_offered_pct, data = deals)
-fitted_10 <- unname(predict(equity_model,
-                            newdata = data.frame(equity_offered_pct = 10)))
-c(fitted = fitted_10, residual = 30 - fitted_10)
-```
-
-Filled-in structure:
-
-- R code: see the code above.
-- Fitted deal share: with $x=10$,
-  $\widehat y = 8.315 + 1.2073 \times 10 \approx 20.4$, so about 20% of the
-  company, twice the offer.
-- Inside the range of the data, and why it matters: the offers in the data
-  run from 1% to 51%, and 309 deals started with an offer of exactly 10%, so
-  the prediction rests on many similar deals and does not extrapolate.
-- Residual: $e = 30 - 20.4 = 9.6$ percentage points, about 47% of the
-  fitted value.
-- Meaning of the sign: the positive sign means that this founder gave more
-  equity than the fitted mean deal share of founders who offered 10%.
-:::
-
-### Task 3: Diagnostics and how the data were generated (Lecture 2)
+### Task 2: Diagnostics and how the data were generated (Lecture 2)
 
 [Shark Tank data]{.shark-tag} Produce the residual-versus-fitted plot and
-the normal Q--Q plot for the Task 1 model of the equity given in the deal on
+the normal Q-Q plot for the Task 1 model of the equity given in the deal on
 the equity offered.
 
 1. Name two problems with the assumptions that you can see in the plots.
@@ -246,14 +193,15 @@ Assumption the plots cannot assess, and what would assess it:
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-The code draws the two plots side by side. It then prints the standard
-deviation of the residuals in five groups of offers, the two counts of
-flagged deals, the number of flagged deals in which the sharks took the
-whole company, and the number of offers and deal shares at a multiple of 5%.
+The code draws the two plots side by side. It then prints
+
+- the standard deviation of the residuals in five groups of offers,
+- the two counts of flagged deals,
+- the number of flagged deals in which the sharks took the whole company,
+- the number of offers and deal shares at a multiple of 5%.
 
 ```{r}
-#| label: iep01-task3
-#| code-fold: true
+#| label: fig-iep01-task3
 #| fig-height: 3.6
 #| fig-cap: "Residuals against fitted deal shares (left) and normal Q-Q plot of the standardised residuals (right), for the 882 deals."
 #| fig-alt: "Two panels. Left: residuals against fitted deal shares between about 9 and 70 percent. The points form vertical stripes at round offers, narrow at the smallest fitted values and wider to the right, with a few residuals between 50 and 86 percentage points. Right: normal Q-Q plot whose points follow the line in the middle and bend sharply upwards at the right end, up to a standardised residual of about 7."
@@ -271,7 +219,9 @@ qqnorm(rstandard(equity_model), pch = 16,
        ylab = "Standardised residual")
 qqline(rstandard(equity_model), col = "#D55E00", lwd = 2)
 par(old_par)
-offer_group <- cut(deals$equity_offered_pct, c(0, 4.99, 5, 10, 20, 100))
+offer_group <- cut(deals$equity_offered_pct, c(0, 4.99, 5, 10, 20, 100),
+                   labels = c("below 5", "exactly 5", "5 to 10", "10 to 20",
+                              "above 20"))
 round(tapply(residuals(equity_model), offer_group, sd), 1)   # spread per group
 rs <- rstandard(equity_model)
 c(big_rstandard = sum(abs(rs) > 3),
@@ -291,7 +241,7 @@ Filled-in structure:
   points for offers below 5% to about 11 for offers of 5% to 20% and 18 for
   offers above 20%. This widening band shows heteroskedasticity, so it
   challenges homoskedasticity.
-- Second problem, and what in the plots shows it: the Q--Q plot leaves the
+- Second problem, and what in the plots shows it: the Q-Q plot leaves the
   line at the right end, with standardised residuals up to about 7.4. Some
   deals lie far above the line, so the right tail is much heavier than a
   normal tail, which challenges normality.
@@ -321,7 +271,7 @@ below the line. Their average residual is about $-5.6$ percentage points,
 so the straight line overstates the deal share for the smallest offers.
 :::
 
-### Task 4: Coefficient inference (Lecture 3)
+### Task 3: Coefficient inference (Lecture 3)
 
 [Shark Tank data]{.shark-tag} Use the coefficient table and the 95%
 confidence intervals of the Task 1 model of the equity given in the deal on
@@ -340,7 +290,7 @@ the equity offered.
    $t=(\hat\beta_1-1)/\operatorname{SE}(\hat\beta_1)$, and state the
    conclusion in business terms in one sentence.
 4. Would heteroskedasticity-robust standard errors fix both problems with
-   the assumptions that you named in Task 3? Answer yes or no, and explain
+   the assumptions that you named in Task 2? Answer yes or no, and explain
    in one or two sentences.
 
 Use (copy and paste) this structure:
@@ -421,11 +371,13 @@ Filled-in structure:
   $8.32+0.207\times10\approx10.4$ points at an offer of 10% to about 12.5
   points at an offer of 20%.
 - Robust standard errors, yes or no, and why: no. Robust standard errors
-  address the heteroskedasticity only. They do not change the estimated line,
-  so they do not help with the deals far above the line that may move it.
+  address the heteroskedasticity only. They do not change the estimated line
+  and do not address the heavy right tail of the residuals. With 882 deals
+  the non-normality matters little for the tests, but the deals far above
+  the line can still move the fit, which Task 5 checks.
 :::
 
-### Task 5: R² and F (Lecture 3)
+### Task 4: R² and F (Lecture 3)
 
 [Shark Tank data]{.shark-tag} Use the Task 1 model of the equity given in
 the deal on the equity offered.
@@ -491,9 +443,9 @@ Filled-in structure:
   line.
 :::
 
-### Task 6: Do a few deals drive the answer? (Lecture 2)
+### Task 5: Do a few deals drive the answer? (Lecture 2)
 
-[Shark Tank data]{.shark-tag} Task 3 flagged 34 deals with a Cook's
+[Shark Tank data]{.shark-tag} Task 2 flagged 34 deals with a Cook's
 distance above $4/n$. Before a founder relies on the Task 1 line, check how
 much these deals move it. Fit the Task 1 model again without the flagged
 deals. The rule, a Cook's distance above $4/n$, is fixed before you look at
@@ -523,10 +475,13 @@ Advice in two sentences:
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-The code marks the flagged deals, fits the model without them, and prints
-the coefficients of both fits, the change of the slope in percent, the
-fitted deal shares for an offer of 10%, and the residual standard error of
-the model with all deals.
+The code marks the flagged deals and fits the model without them. It then
+prints
+
+- the coefficients of both fits,
+- the change of the slope in percent,
+- the fitted deal shares for an offer of 10%,
+- the residual standard error of the model with all deals.
 
 ```{r}
 #| label: iep01-task6
@@ -565,7 +520,7 @@ Filled-in structure:
   so be prepared for a final share well above or below this number."
 :::
 
-### Task 7: Check the AI (Lectures 1 to 3)
+### Task 6: Check the AI (Lectures 1 to 3)
 
 [Shark Tank data]{.shark-tag} Tom prepares a pitch. He gave the output of
 the Task 1 model of the equity given in the deal on the equity offered to an
@@ -590,7 +545,7 @@ He asked: "How good is this model?" The AI answered:
    it in one sentence.
 2. Write one correct sentence about the $R^2$ of 0.388.
 3. State in one sentence what the small p-value of the slope does show.
-   Then name in one sentence one result from Task 3 that Tom should know
+   Then name in one sentence one result from Task 2 that Tom should know
    before he trusts this p-value.
 
 Use (copy and paste) this structure:
@@ -600,19 +555,19 @@ First error:
 Second error:
 Correct sentence about the R-squared:
 What the small p-value does show:
-A result from Task 3 to know before trusting the p-value:
+A result from Task 2 to know before trusting the p-value:
 ```
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
+The code prints the share of the 882 deals whose residual is at most one
+percentage point away from zero, that is, whose deal share lies within one
+percentage point of the fitted value.
+
 ```{r}
 #| label: iep01-ai-check
-#| include: false
-# Checks the numbers of Task 7.
 equity_model <- lm(deal_equity_pct ~ equity_offered_pct, data = deals)
-summary(equity_model)$coefficients
-summary(equity_model)$r.squared
 mean(abs(residuals(equity_model)) <= 1)   # share within 1 point of the fitted value
 ```
 
@@ -629,7 +584,7 @@ Filled-in structure:
   deal."
 - What the small p-value does show: it is strong evidence against a slope
   of zero, if the assumptions of the model hold.
-- A result from Task 3 to know before trusting the p-value: the spread of
+- A result from Task 2 to know before trusting the p-value: the spread of
   the residuals grows with the offer, so the homoskedasticity assumption
   fails and the usual standard error and p-value may be wrong.
 
@@ -666,15 +621,35 @@ deals$deal_1k <- deals$deal_amount_usd / 1000   # amount agreed, in $1,000s
    and its 95% confidence interval. Say in one sentence whether a slope of
    exactly 1 (one dollar agreed per dollar asked) lies inside the interval.
 4. Report $R^2$ and the result of the overall F-test.
-5. Inspect the residual plot and the normal Q--Q plot, and write a
+5. Inspect the residual plot and the normal Q-Q plot, and write a
    conclusion of about 120 words.
 
 ::: {.callout-note collapse="true"}
 ## Check a model answer
 
 ```{r}
-#| label: iep01-practice-amounts
+#| label: fig-iep01-practice-amounts
+#| fig-width: 9
+#| fig-height: 3.6
+#| fig-cap: "Amount agreed against amount asked with the fitted line (left), residuals against fitted values (middle), and normal Q-Q plot of the standardised residuals (right), for the 882 deals, in thousands of dollars."
+#| fig-alt: "Three panels. Left: amount agreed against amount asked, both from 10 to 5,000 thousand dollars. Most points lie on the fitted line, which runs close to the line where agreed equals asked, and a group of points lies above it, a few up to about 3,000 thousand dollars at asks below 500. Middle: residuals against fitted values. A dense row of points lies just below zero, with a few residuals up to about 2,800 above zero at small fitted values. Right: normal Q-Q plot that is flat in the middle and rises steeply at the right end, to a standardised residual of about 17."
 amount_model <- lm(deal_1k ~ ask_1k, data = deals)
+old_par <- par(no.readonly = TRUE)
+par(mfrow = c(1, 3), mar = c(4.5, 4.4, 1.3, 0.7), las = 1)
+plot(deals$ask_1k, deals$deal_1k, pch = 16,
+     col = grDevices::adjustcolor("#0072B2", alpha.f = 0.35), bty = "n",
+     xlab = "Amount asked ($1,000s)", ylab = "Amount agreed ($1,000s)")
+abline(amount_model, col = "#D55E00", lwd = 2)
+plot(fitted(amount_model), residuals(amount_model), pch = 16,
+     col = grDevices::adjustcolor("#0072B2", alpha.f = 0.35), bty = "n",
+     xlab = "Fitted amount agreed ($1,000s)", ylab = "Residual ($1,000s)")
+abline(h = 0, lty = 2, lwd = 2, col = "#D55E00")
+qqnorm(rstandard(amount_model), pch = 16,
+       col = grDevices::adjustcolor("#009E73", alpha.f = 0.40), bty = "n",
+       main = "", xlab = "Normal theoretical quantile",
+       ylab = "Standardised residual")
+qqline(rstandard(amount_model), col = "#D55E00", lwd = 2)
+par(old_par)
 summary(amount_model)$coefficients
 confint(amount_model)
 c(r_squared = summary(amount_model)$r.squared,
@@ -685,9 +660,10 @@ c(same = sum(deals$deal_1k == deals$ask_1k),
   less = sum(deals$deal_1k < deals$ask_1k))
 ```
 
-The code fits the model, prints the coefficient table, the 95% intervals,
-$R^2$ and the overall F statistic, and then counts how many deals paid
-exactly, more than, or less than the amount asked.
+The code fits the model and draws the scatterplot with the fitted line, the
+residual plot, and the normal Q-Q plot. It then prints the coefficient
+table, the 95% intervals, $R^2$ and the overall F statistic, and counts how
+many deals paid exactly, more than, or less than the amount asked.
 
 1. Most deals lie on one straight line on which the amount agreed equals
    the amount asked. A smaller group lies above that line, where the
@@ -695,7 +671,8 @@ exactly, more than, or less than the amount asked.
    dollars more.
 2. The fitted equation is
    $\widehat{\text{agreed}}=27.6+1.009\,\text{asked}$, both in \$1,000s.
-   A founder who asks \$1,000 more agrees on average about \$1,009 more.
+   Among the 882 deals, an amount asked that is \$1,000 higher is associated
+   with an amount agreed that is on average about \$1,009 higher.
 3. The standard error is about 0.018, $t\approx55.4$, and the p-value is
    below 0.001. The 95% interval runs from about 0.973 to 1.044, so a slope
    of exactly 1 lies inside it.
@@ -707,7 +684,7 @@ exactly, more than, or less than the amount asked.
    exactly the amount asked, in 138 deals more, and in 17 deals less. The
    residual plot shows a dense row of residuals just below zero, about
    $-\$29{,}000$, from the deals that paid exactly the ask, and a few very
-   large positive residuals, up to about \$2.8 million. The Q--Q plot rises
+   large positive residuals, up to about \$2.8 million. The Q-Q plot rises
    steeply at the right end, so the residuals are far from normal. The
    usual standard errors are therefore only a rough guide. The data contain
    only pitches that ended in a deal on air, so they do not show that
@@ -745,7 +722,7 @@ Think of your own venture, or any business you know well. Imagine the
 one simple regression you would show an investor (revenue on customers,
 orders on advertising spending). Write two sentences. First, name the number
 from this tutorial that you would put in the headline (slope, interval, or
-$R^2$), and say why. Second, name the limit from Task 3 or Task 5 that you
+$R^2$), and say why. Second, name the limit from Task 2 or Task 4 that you
 would state openly next to that number. There is no wrong answer.
 
 ::: {.callout-note collapse="true"}
@@ -766,14 +743,66 @@ ask Tilly for QM Intermediate, the course AI assistant. For example: "Give me
 an extra exercise for Intermediate Tutorial 1. Show the solution only after
 I send my answer."
 
-## Extra practice for home {#i-ep01-home}
+### Extra practice for home {#i-ep01-home}
 
-These tasks practise the content of Lectures 1 to 3 at home, with a focus
-on a question that every regression answer must address: is the estimated
-association large or small in business terms? Task 8 uses the Shark Tank
-file. Tasks 9 and 10 use invented examples.
+These tasks practise the content of Lectures 1 to 3 at home. Task 7 returns
+to the equity model of Task 1. Tasks 8 to 10 focus on a question that every
+regression answer must address: is the estimated association large or small
+in business terms? Tasks 7 and 8 use the Shark Tank file. Tasks 9 and 10 use
+invented examples.
 
-### Task 8: Significant, but is it large? (Lecture 3)
+#### Task 7: Prediction and residual (Lecture 1)
+
+[Shark Tank data]{.shark-tag} Use the Task 1 model of the equity given in
+the deal on the equity offered. A founder plans to offer 10% of the company.
+
+1. Calculate the fitted deal share for this offer. Say in one sentence
+   whether an offer of 10% lies inside the range of offers in the data, and
+   why this matters for the prediction.
+2. The founder ends up giving 30% of the company. Calculate the residual of
+   this deal, and give it as a percent of the fitted value.
+3. Interpret the sign of the residual in one sentence.
+
+Use (copy and paste) this structure:
+
+```text
+R code:
+Fitted deal share:
+Inside the range of the data, and why it matters:
+Residual:
+Meaning of the sign:
+```
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+The code prints the fitted deal share for an offer of 10% and the residual
+of a deal at 30%, both in percent of the company.
+
+```{r}
+#| label: iep01-task2
+equity_model <- lm(deal_equity_pct ~ equity_offered_pct, data = deals)
+fitted_10 <- unname(predict(equity_model,
+                            newdata = data.frame(equity_offered_pct = 10)))
+c(fitted = fitted_10, residual = 30 - fitted_10)
+```
+
+Filled-in structure:
+
+- R code: see the code above.
+- Fitted deal share: with $x=10$,
+  $\widehat y = 8.315 + 1.2073 \times 10 \approx 20.4$, so about 20% of the
+  company, twice the offer.
+- Inside the range of the data, and why it matters: the offers in the data
+  run from 1% to 51%, and 309 deals started with an offer of exactly 10%, so
+  the prediction rests on many similar deals and does not extrapolate.
+- Residual: $e = 30 - 20.4 = 9.6$ percentage points, about 47% of the
+  fitted value.
+- Meaning of the sign: the positive sign means that this founder gave more
+  equity than the fitted mean deal share of founders who offered 10%.
+:::
+
+#### Task 8: Significant, but is it large? (Lecture 3)
 
 [Shark Tank data]{.shark-tag} Some deals are made with one shark, others
 with two or more sharks who invest together. Does a deal with more sharks
@@ -854,7 +883,7 @@ Filled-in structure:
   things than on the number of sharks."
 :::
 
-### Task 9: A regression line from summary statistics (Lecture 1)
+#### Task 9: A regression line from summary statistics (Lecture 1)
 
 A start-up sells online courses. Over 30 weeks it recorded its weekly
 advertising spend $X$, in hundreds of euros, and the number of new
@@ -929,7 +958,7 @@ c(slope = b1, intercept = b0, fitted_at_15 = b0 + b1 * 15,
 ```
 :::
 
-### Task 10: A result without stars that is still informative (Lecture 3)
+#### Task 10: A result without stars that is still informative (Lecture 3)
 
 A webshop with 250 product pages wants to know whether more product photos
 go with a higher conversion rate, the percent of visitors of a page who buy

@@ -10,10 +10,10 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 ::: {.outcomes}
 <span class="label">By the end of Lecture 1, you can</span>
 
-- organise a reproducible R analysis and check work done with AI help
-- tell types of variables apart and spot selection bias in a sample
-- inspect a real dataset and describe one variable with tables and charts
-- read a histogram and locate the interval holding the median
+- organise a reproducible R analysis and check work done with AI help,
+- tell types of variables apart and spot selection bias in a sample,
+- inspect a real dataset and describe one variable with tables and charts,
+- read a histogram and locate the interval holding the median.
 :::
 
 ::: {.driving-question}
@@ -33,13 +33,13 @@ Do all the preparation below before class.
 
 **Read.** Read the [Welcome page](../index.qmd) of this book, in particular
 the part on how to use this book. Then locate the sections called
-**Before class**, **Lecture material**, and **After class** in this chapter.
+"Before class", "Lecture material", and "After class" in this chapter.
 
 [Shark Tank data]{.shark-tag} **Set up.** Create one folder on your laptop
 that you will use for this course, for example `qm-basic`. Inside it, create
 two subfolders: `data` for data files and `scripts` for your R scripts.
-Then open RStudio on your computer. Choose **File > New Project >
-Existing Directory** and select your course folder. RStudio now works inside
+Then open RStudio on your computer. Choose `File > New Project >
+Existing Directory` and select your course folder. RStudio now works inside
 this folder, so R finds files with short paths such as
 `data/shark_tank_teaching.csv`.
 [Download `shark_tank_teaching.csv`](../data/shark_tank_teaching.csv){download="shark_tank_teaching.csv"}
@@ -79,7 +79,7 @@ above feel unfamiliar, revisit its chapters on
 or use the [R Refresher](../resources/r-refresher.qmd) of this book.
 
 If percentages, units, or graph axes are unfamiliar, review
-[Mathematics Refresher: numbers, proportions, percentages, and units](../resources/math-refresher.html#numbers-proportions-percentages-and-units).
+[Mathematics Refresher: numbers, proportions, percentages, and units](../resources/math-refresher.qmd#numbers-proportions-percentages-and-units).
 
 ### Read before class: working reproducibly
 
@@ -90,14 +90,14 @@ need objects that you created earlier at the Console.
 
 Use these habits from the start:
 
-- open the project rather than changing the working directory with `setwd()`
-- keep downloaded data unchanged
-- use relative paths such as `data/shark_tank_teaching.csv`
+- open the project rather than changing the working directory with `setwd()`,
+- keep downloaded data unchanged,
+- use relative paths such as `data/shark_tank_teaching.csv`,
 - write every step (importing, checking, transforming, plotting, and
-  modelling) in scripts
-- give objects meaningful names
+  modelling) in scripts,
+- give objects meaningful names,
 - write what a result means as a comment (a line that starts with `#`)
-  directly below the code that produced it
+  directly below the code that produced it,
 - restart R and run the complete script before you share the analysis.
 
 #### The analysis cycle
@@ -114,8 +114,30 @@ step:
 6. Interpret the result in context and state its limits.
 
 Going back is normal. A check in step 4 can show that a variable does not
-measure what the question needs, and you return to step 2. This searching
-again is one reason why the work is called research: re-search.
+measure what the question needs, and you return to step 2.
+
+### Read before class: AI as a fallible assistant
+
+You will often use an AI assistant for the code and interpretations in this
+course, so one habit belongs to the set-up: check what it tells you. AI
+systems write answers that sound right. They do not guarantee that a
+calculation, source, or interpretation is correct. The reason lies in how
+they work. An AI assistant is a language model that works with
+probabilities. It writes, word by word, what is likely to come next, given
+the texts it learned from. A likely answer is not always a correct answer.
+So where there is probability, there is uncertainty and room for error. To
+check an answer, use four steps, Attempt, Ask, Verify, Explain:
+
+1. **Attempt** the question and identify where you are stuck.
+2. **Ask** for a hint, a question that helps you find the problem, a
+   counterexample, or a review of your code.
+3. **Verify** every claim against the data, R output, course notation, and
+   reliable sources.
+4. **Explain** the result in your own words and ask for feedback on that
+   explanation.
+
+Do not share confidential or personal material, or exam material that you
+may not share. You stay responsible for every claim that you hand in.
 
 ### Read before class: the variables in the Shark Tank file {#b01-variable-table}
 
@@ -131,8 +153,8 @@ into groups.
 |---|---|---|
 | `pitch_id` | number that labels the row | identifier |
 | `startup_name` | name of the venture or product | identifier (a name) |
-| `season` | television season, 1--16 | numerical, discrete, ordered in time |
-| `episode` | episode number within the season | numerical, discrete, labels the episode |
+| `season` | television season, 1 to 16 | numerical, discrete, ordered in time |
+| `episode` | episode number within the season | numerical, discrete, ordered within the season |
 | `industry` | industry category given by the source | categorical, nominal |
 | `business_description` | short written description of the venture, written by the source of the data | text, not analysed in this course |
 | `description_words` | number of words in `business_description` | numerical, discrete (a count) |
@@ -147,7 +169,31 @@ into groups.
 | `deal_amount_usd` | amount of money in the agreed deal | numerical, continuous, in USD, missing without a deal |
 | `deal_equity_pct` | ownership share in the agreed deal | numerical, continuous, in percent, missing without a deal |
 | `deal_valuation_usd` | company value implied by the agreed deal | numerical, continuous, in USD, missing without a deal |
-| `number_sharks_in_deal` | number of sharks who joined the deal, 1--5 | numerical, discrete (a count), missing without a deal |
+| `number_sharks_in_deal` | number of sharks who joined the deal, 1 to 5 | numerical, discrete (a count), missing without a deal |
+
+**Warm up.** Use the output of your preparation code and the reading above.
+
+1. How many rows and columns does the file have, and what does one row
+   stand for?
+2. Why does a reproducible script use a relative path such as
+   `data/shark_tank_teaching.csv`?
+3. A check in step 4 of the analysis cycle shows that a variable does not
+   measure what your question needs. To which step do you return?
+4. An AI assistant reports a share for the Shark Tank file. Which of the
+   four steps Attempt, Ask, Verify, Explain tells you to compare it with your
+   own R output?
+
+::: {.callout-note collapse="true"}
+## Check your preparation
+
+1. `dim(sharks)` prints 1441 and 19: the file has 1,441 rows and 19
+   columns. One row is one recorded pitch.
+2. A relative path starts from the project folder, so the script finds the
+   file on every computer that has the same course folder.
+3. To step 2: you decide again how to measure the idea, and then continue
+   with the later steps.
+4. Verify: you check every claim against the data and your R output.
+:::
 
 **Predict.** Answer this question before you come to class: suppose we
 analyse this file carefully. Can we conclude that what we learn applies to
@@ -182,16 +228,18 @@ the room onto a table or a graph. Seeing how our own answers turn into rows
 and columns shows what any dataset is, and also what it leaves out. The
 survey has three questions.
 
-The first question is: imagine that you receive EUR 100 and make one choice.
+The first question is:
 
-| Choice | Amount placed at risk | Possible final amounts |
+> You receive €100. Which option do you choose?
+
+| Option | Amount placed at risk | Possible final amounts |
 |---|---:|---|
-| Keep it | EUR 0 | EUR 100 for certain |
-| Split it | EUR 50 | EUR 50 or EUR 150, each with 50% chance |
-| Go all-in | EUR 100 | EUR 0 or EUR 200, each with 50% chance |
+| Keep | €0 | €100 certain |
+| Split | €50 | €50 or €150 (50% each) |
+| All-in | €100 | €0 or €200 (50% each) |
 
-All three choices have the same average payoff if the choice is repeated many
-times: EUR 100. The choices differ only in how uncertain the result of a
+All three options have the same average payoff if the choice is repeated many
+times: €100. The options differ only in how uncertain the result of a
 single choice is. In other words, they differ in the spread of the possible
 outcomes around that average. Lecture 3 measures this spread with the
 variance, which is a central tool for judging the risk of an investment or a
@@ -199,17 +247,16 @@ business plan.
 
 The second question is:
 
-> How do you see yourself in general? Use 0 for "not at all willing to take
-> risks" and 10 for "very willing to take risks."
+> How willing are you to take risks in general? (1 = not at all, 5 = very
+> willing)
 
-You answer it by choosing one of eleven separate points: 0, 1, 2, and so on
-up to 10. No answer can lie between two points, so the answer is a discrete
-variable.
+You answer it by choosing one of five separate values: 1, 2, 3, 4, or 5. No
+answer can lie between two values, so the answer is a discrete variable.
 
 The third question asks for your current belief:
 
-> What is the probability that you will start or co-found a business at
-> least once during the next five years?
+> What is the probability you will start or co-found a business in the next
+> five years?
 
 You answer it with a slider from 0% to 100%, so any value in this range is
 possible, such as 37.5%. The answer is a continuous variable. The second and
@@ -230,7 +277,7 @@ The survey turns three ideas into data. Five terms describe how this works.
 risk attitude.
 
 **Variable.** A well-defined rule for measuring a characteristic. Example:
-the amount of 0, 50, or 100 euros that a student puts at risk
+the amount of €0, €50, or €100 that a student puts at risk
 (`amount_at_risk`).
 
 **Unit (observational unit).** One member of the group we study. Example:
@@ -272,7 +319,7 @@ class survey.
 are two kinds.
 
 - **Discrete.** The values are separate numbers, often counts. Examples:
-  `number_sharks_in_deal`, and the answer from 0 to 10 to the second survey
+  `number_sharks_in_deal`, and the answer from 1 to 5 to the second survey
   question (`risk_willingness`).
 - **Continuous.** The values can lie anywhere in a range. Examples:
   `equity_offered_pct`, and the probability of founding a business from the
@@ -283,20 +330,20 @@ are two kinds.
 meaning. Example: `pitch_id`.
 :::
 
-Rating scales such as the answer from 0 to 10 are sometimes treated as
-ordinal, because the step from 3 to 4 need not mean the same as the step from
-8 to 9. In this course we treat such answers as discrete numerical variables.
+Rating scales such as the answer from 1 to 5 are sometimes treated as
+ordinal, because the step from 1 to 2 need not mean the same as the step from
+4 to 5. In this course we treat such answers as discrete numerical variables.
 The class survey has the following variables:
 
 | Variable | What is recorded | Type |
 |---|---|---|
 | `respondent_id` | anonymous row label | identifier |
-| `amount_at_risk` | 0, 50, or 100 euros | numerical, discrete |
-| `risk_willingness` | one selected point from 0 to 10 | numerical, discrete |
+| `amount_at_risk` | €0, €50, or €100 | numerical, discrete |
+| `risk_willingness` | one selected value from 1 to 5 | numerical, discrete |
 | `founder_probability` | belief from 0% to 100% | numerical, continuous, stored as a rounded value |
 
 **Risk attitude** is an idea that cannot be observed directly. The money
-choice and the 0--10 answer are two imperfect measurements of it. The two
+choice and the answer from 1 to 5 are two imperfect measurements of it. The two
 measurements may disagree for three reasons. Risk taking depends on the
 situation. An imagined choice differs from a choice with real money. Also,
 people do not judge themselves perfectly. One answer does not show a fixed personality type.
@@ -325,10 +372,10 @@ In the class survey, the sample consists of the students who are present and
 respond. The population we want to learn about is called the **target
 population**. It could be any of these five groups:
 
-- the responding students
-- everyone attending the lecture
-- all students enrolled in QM Basic
-- all first-year business students in the Netherlands
+- the responding students,
+- everyone attending the lecture,
+- all students enrolled in QM Basic,
+- all first-year business students in the Netherlands,
 - all young adults in the Netherlands.
 
 ::: {.callout-note collapse="true"}
@@ -358,7 +405,7 @@ up:
 
 *Scenario 1.* A researcher draws 40 students at random from the list of all
 students enrolled in the programme. By chance, the sample contains an unusually large
-number of students who chose "go all-in."
+number of students who chose "All-in".
 
 *Scenario 2.* A student shares a survey about founding a business in the
 group chat of the entrepreneurship club, and 400 members respond.
@@ -404,13 +451,13 @@ valuation implied by the agreed deal in `deal_valuation_usd`. The section
 [Claimed and agreed valuations](#b01-valuations) below compares the two.
 
 The teaching file contains 1,441 televised pitches from completed Seasons
-1--16 and 19 variables. The Before class section lists all 19. The table
+1 to 16 and 19 variables. The Before class section lists all 19. The table
 below repeats the five that this lecture uses most.
 
 | Variable | Meaning | Type |
 |---|---|---|
 | `deal_on_show` | 1 for an on-air deal, 0 otherwise | categorical, nominal with two groups (binary), stored as 0/1 |
-| `season` | television season, 1--16 | numerical, discrete, ordered in time |
+| `season` | television season, 1 to 16 | numerical, discrete, ordered in time |
 | `description_words` | number of words in the written description | numerical, discrete (a count) |
 | `ask_amount_usd` | amount of money requested | numerical, continuous, in USD |
 | `equity_offered_pct` | ownership share initially offered | numerical, continuous, in percent |
@@ -441,7 +488,7 @@ str(sharks)
 ```
 
 There are 1,441 rows and 19 columns. One row represents one recorded
-televised pitch from Seasons 1--16 of *Shark Tank US*. In the words of this
+televised pitch from Seasons 1 to 16 of *Shark Tank US*. In the words of this
 lecture, the unit is one pitch, and each of the 19 columns is one variable.
 
 The next code counts the missing values (`NA`) in every column and prints
@@ -550,7 +597,8 @@ comes from each season. Season 5 has 116 of the 1,441 pitches, so its
 proportion is 116/1441 = 0.080, or 8.0%. Season 2 holds only 36/1441 = 0.025,
 or 2.5%. If every season had the same number of pitches, each would hold
 1/16 = 0.0625, or 6.25%. So Seasons 1 to 3 hold clearly fewer pitches than
-an equal split would give, and Seasons 4 to 13 hold slightly more.
+an equal split would give, Seasons 4 to 13 hold slightly more, and Seasons 14
+to 16 again slightly fewer.
 
 ```{r}
 #| label: fig-b01-season-bar
@@ -700,7 +748,7 @@ middle half of the data.
 :::
 
 The median lies between the two quartiles: it splits the data in half, and
-the quartiles split each half again. `quantile()` computes the values below
+the quartiles split each half again. `quantile()` computes the values at or below
 which a given share of the data lies, here a quarter, a half, and three
 quarters. `IQR()` computes the interquartile range for the equity initially
 offered (`equity_offered_pct`):
@@ -737,7 +785,7 @@ R.
    of pitches.
 2. The horizontal axis runs from 0 to 100 in intervals of width 5. The
    vertical axis counts pitches.
-3. The tallest bar covers 5--10%: 560 pitches offered more than 5% and at
+3. The tallest bar covers 5 to 10%: 560 pitches offered more than 5% and at
    most 10% equity.
 4. The distribution is strongly right-skewed: most offers are at or below
    20%, and a few values spread out towards 100% (a thin tail).
@@ -757,9 +805,9 @@ total reaches 721:
 
 After the first bar only 293 observations are covered, not yet 721. After
 the second bar the running total is $293+560=853\ge721$, so the 721st
-observation lies in the 5--10% interval: the median interval. (R
+observation lies in the interval from 5 to 10%: the median interval. (R
 confirms this: the exact median is 10%. This histogram counts the value 10%
-in the 5--10 bar, because each bar includes its right endpoint.)
+in the bar from 5 to 10, because each bar includes its right endpoint.)
 :::
 
 ::: {.callout-caution collapse="true"}
@@ -780,9 +828,9 @@ the running total first reaches 1,081.
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-Up to and including the 10--15% bar, the cumulative count is
-$293+560+194=1{,}047$, still below 1,081. Adding the 15--20% bar gives $1{,}047+241=1{,}288\ge1{,}081$, so the
-upper quartile lies in the 15--20% interval. (R confirms this: the `quantile()`
+Up to and including the bar from 10 to 15%, the cumulative count is
+$293+560+194=1{,}047$, still below 1,081. Adding the bar from 15 to 20% gives $1{,}047+241=1{,}288\ge1{,}081$, so the
+upper quartile lies in the interval from 15 to 20%. (R confirms this: the `quantile()`
 output above gives 20 for the upper quartile, on the upper edge of that bar.)
 :::
 :::
@@ -886,7 +934,7 @@ Such numbers help a decision. As a founder preparing a pitch for the show,
 you might expect about three chances in five of a deal on air, and you
 should prepare for a valuation well below your own claim. These
 expectations hold under the assumption that your pitch resembles the pitches
-that producers selected for Seasons 1--16, and that the show still works in
+that producers selected for Seasons 1 to 16, and that the show still works in
 the same way.
 
 The file can never tell us three things. It cannot describe start-ups in
@@ -930,31 +978,6 @@ better sample and plan with that share.
 :::
 :::
 
-### AI as a fallible assistant
-
-In this course you will often ask an AI assistant for help with code or
-with an interpretation like the ones above. AI systems write answers that
-sound right. They do not guarantee that a calculation, source, or
-interpretation is correct. The reason lies in how they work. An AI assistant
-is a language model that works with probabilities. It writes, word by word,
-what is likely to come next, given the texts it learned from. A likely answer
-is not always a correct answer. So where there is probability, there is
-uncertainty and room for error. Always check what an AI assistant tells you.
-Use:
-
-**Attempt → Ask → Verify → Explain**
-
-1. **Attempt** the question and identify where you are stuck.
-2. **Ask** for a hint, a question that helps you find the problem, a
-   counterexample, or a review of your code.
-3. **Verify** every claim against the data, R output, course notation, and
-   reliable sources.
-4. **Explain** the result in your own words and ask for feedback on that
-   explanation.
-
-Do not share confidential or personal material, or exam material that you
-may not share. You stay responsible for every claim that you hand in.
-
 **Next:** We can now describe what happened in these 1,441 pitches: counts,
 shares, and shapes. Description alone cannot answer the questions about
 chance that an investor asks. How likely is a deal if I pick a pitch at
@@ -977,7 +1000,7 @@ After the lecture, work through all the practice below.
 ### Read the lecture material
 
 Read the Lecture material section above from start to end. The lecture
-covered the most important parts. The text has every step, every example, and all the
+covered the main points. The text has every step, every example, and all the
 code, including parts that were not shown in class. Note what is still
 unclear and bring it to the next tutorial, or ask Tilly.
 
@@ -999,7 +1022,7 @@ Answer without reopening the chapter, then check your answers.
 ## Check your answers
 
 1. One row is one recorded televised pitch. The file directly describes
-   these 1,441 records from completed Seasons 1--16.
+   these 1,441 records from completed Seasons 1 to 16.
 2. `pitch_id` labels a record. Differences between its values have no
    meaning.
 3. The first has sampling variability only: the draw was random, and a
@@ -1017,7 +1040,7 @@ Answer without reopening the chapter, then check your answers.
 
 [Shark Tank data]{.shark-tag} Save your R script for this lecture: the
 script you started before class, which imports the Shark Tank file as
-`sharks`. In RStudio, choose **Session > Restart R** to clear objects
+`sharks`. In RStudio, choose `Session > Restart R` to clear objects
 from memory. Run the complete script from top to bottom. It should import
 the data, perform the checks, calculate the deal rate, and recreate at least
 one graph. It should not need any commands that you ran earlier at the
@@ -1034,7 +1057,7 @@ table(sharks$pitcher_gender_group, useNA = "ifany")
 anyDuplicated(sharks$pitch_id)
 ```
 
-Deal status contains only 0 and 1. Episodes run from 1 to 29. Written
+Deal status contains only 0 and 1, episodes run from 1 to 29, and written
 descriptions contain 1 to 13 words. Seven records have an unknown gender
 classification in the source, and no pitch identifier appears twice.
 
@@ -1124,7 +1147,6 @@ sharks$deal_status <- factor(sharks$deal_on_show, levels = c(0, 1),
 season_means <- aggregate(equity_offered_pct ~ season + deal_status,
                           data = sharks, FUN = mean)
 
-set.seed(2026)
 ggplot(sharks, aes(x = season, y = equity_offered_pct)) +
   geom_point(alpha = 0.15, size = 1.6, colour = "#0072B2") +
   geom_line(data = season_means, colour = "#D55E00", linewidth = 1.1) +
@@ -1233,7 +1255,7 @@ ggplot(sharks, aes(x = description_words)) +
 
 In @fig-b01-word-hist the horizontal axis measures description length in
 words and the vertical axis counts pitches in each one-word interval. The
-distribution is slightly right-skewed: most descriptions contain 3--7 words,
+distribution is slightly right-skewed: most descriptions contain 3 to 7 words,
 and a small number of longer descriptions lie further to the right. The median is 5 words.
 Remember what this variable measures: the source text about the pitch, not
 the pitch itself.
@@ -1261,14 +1283,14 @@ the 721st observation.
 Cumulative counts: 4, 117, 334, 619, 911, ... The running total first
 reaches 721 at the 5-word bar ($619+292=911\ge721$), so the median is 5
 words, which matches `median(sharks$description_words)`. The distribution is
-slightly right-skewed, with most values at 3--7 words and a thin right tail. The
+slightly right-skewed, with most values at 3 to 7 words and a thin right tail. The
 graph cannot say anything about the pitch itself: it describes the source's
 written text.
 :::
 
 ### Worked exam interpretation
 
-**Exam-style question.** An invented example. A meal-delivery
+**Exam-style question.** A meal-delivery
 start-up records, for each of 200 orders: `order_value_eur` (the amount paid,
 in euros), `items` (the number of items in the order), `district` (one of four city
 districts), and `repeat_customer` (1 if the customer ordered before, 0
@@ -1299,7 +1321,7 @@ up to EUR 20, and the median lies there too.
 > "The dataset contains 1,441 successful companies and proves that offering
 > less equity makes investors fund startups."
 
-Use **Attempt → Ask → Verify → Explain** to correct it. Your final response
+Use the four steps Attempt, Ask, Verify, Explain to correct it. Your final response
 must use the observed count or percentage, name the measured outcome, and
 state why the causal claim is unsupported.
 
@@ -1348,6 +1370,6 @@ Lecture 1. Show the solution only after I send my answer."
 
 For a more formal explanation, consult
 [Nieuwenhuis, *Statistical Methods for Business and Economics*](https://tilburguniversity.on.worldcat.org/oclc/317545871),
-Chapters 1--5.
+Chapters 1 to 5.
 
 :::

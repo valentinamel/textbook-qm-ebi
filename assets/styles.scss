@@ -397,7 +397,7 @@ figcaption {
   margin: 1.5em 0;
 }
 .course-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.team-grid { grid-template-columns: 1fr; }
+.team-grid { grid-template-columns: minmax(0, 1fr); }
 
 .team-card, .course-card {
   background: #fff;
@@ -430,6 +430,7 @@ figcaption {
 .team-photo--serhan    { object-position: 50% 50%; }
 
 .team-name { color: $qm-navy; font-weight: 650; line-height: 1.3; margin-bottom: 0.25rem; }
+.team-email { display: block; overflow-wrap: anywhere; margin-bottom: 0.25rem; }
 .team-role { color: #5B6976; font-size: 0.92em; margin-bottom: 0.65rem; }
 
 .course-number {
@@ -445,7 +446,7 @@ figcaption {
 
 @media (max-width: 760px) {
   .course-grid { grid-template-columns: 1fr; }
-  .team-card { grid-template-columns: 1fr; }
+  .team-card { grid-template-columns: minmax(0, 1fr); }
   .team-card > :not(.team-photo) { grid-column: 1; }
 }
 
@@ -601,5 +602,41 @@ mjx-container[display="true"] {
     display: block;
     max-width: 100%;
     overflow-x: auto;
+  }
+}
+
+/* Inline formulas cannot wrap. A long inline formula scrolls inside its own
+   box instead of widening the whole page on a phone. */
+mjx-container:not([display="true"]) {
+  display: inline-block;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  vertical-align: middle;
+}
+
+/* Inline code in list items may wrap (long R expressions). */
+li code {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* Interactive widgets in an iframe (Lecture 7 sampling lab): the widget
+   stacks its two panels below 640px, so the frame needs more height. */
+iframe.widget-frame { height: 520px; }
+@media (max-width: 700px) {
+  iframe.widget-frame { height: 900px; }
+}
+
+@media (max-width: 767.98px) {
+  /* Pipe tables carry column widths from the source line lengths. On a
+     phone the browser chooses the widths. */
+  main table col { width: auto !important; }
+
+  /* Code inside callouts wraps on a phone instead of being clipped. */
+  div.callout pre > code.sourceCode,
+  div.callout pre code {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
   }
 }

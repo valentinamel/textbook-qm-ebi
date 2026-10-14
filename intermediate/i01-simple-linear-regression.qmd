@@ -132,8 +132,8 @@ copy, so you can run each step yourself during the lecture and get the same
 numbers and figures.
 
 If you are not sure about lines, slopes, intercepts, or subscripts, review
-[Mathematics Refresher: straight lines, slopes, and intercepts](../resources/math-refresher.html#straight-lines-slopes-and-intercepts)
-and [subscripts and indices](../resources/math-refresher.html#subscripts-and-indices).
+[Mathematics Refresher: straight lines, slopes, and intercepts](../resources/math-refresher.qmd#straight-lines-slopes-and-intercepts)
+and [subscripts and indices](../resources/math-refresher.qmd#subscripts-and-indices).
 
 **Predict.** Answer this question before you come to class. Think of a line
 that summarises your warm-up plot. When the claimed valuation is \$1 million
@@ -174,7 +174,7 @@ through the middle of the data points.
 
 Once you have the line, you can also use it to predict. A founder who plans
 to claim \$2 million can read from the line at what valuation such deals
-closed on average. Such predictions are useful with care: inside the range
+were agreed on air, on average. Such predictions are useful with care: inside the range
 of the data, and under the assumptions that Lecture 2 explains. This section
 explains what the line describes, how it is calculated, and how to read its
 slope and its intercept.
@@ -277,7 +277,7 @@ Each point in @fig-i01-scatter is one deal. The claimed valuation is on
 the horizontal axis and the agreed valuation is on the vertical axis. Both
 axes use units of \$1 million. The grey dashed line is a reference line, not
 an estimate. It joins all points where the agreed valuation equals the
-claimed one, such as (1, 1) and (5, 5). A deal below this line closed at a
+claimed one, such as (1, 1) and (5, 5). A deal below this line was agreed at a
 lower valuation than the founder claimed.
 
 The orange line is the regression line. Among all straight lines, it is the
@@ -354,11 +354,10 @@ number chosen in a pitch, not a measured value of the company.
 :::
 :::
 
-Every number in this lecture has the units of the two valuation columns, so
-we fix the units before we fit any model. We divide the raw dollar
-valuations by 1,000,000: a claimed valuation of \$2,000,000 becomes
-`claimed_m = 2`. This change in the units of measurement does not change the
-relationship between the two valuations. @exm-i01-units, after the model is
+Every number in this lecture has the units of the two valuation columns.
+The code above divided the raw dollar valuations by 1,000,000, so a claimed
+valuation of \$2,000,000 is `claimed_m = 2`. This change of units does not
+change the relationship between the two valuations. @exm-i01-units, after the model is
 fitted, shows what happens to the coefficients when the units change.
 
 ### The population model and the conditional mean
@@ -430,11 +429,8 @@ the data.
 
 Here the slope is the difference in the average agreed valuation between
 deals whose claimed valuations differ by \$1 million. We say "is associated
-with", because the line compares groups of observed deals. The slope is the
-effect of the claim only if the claimed valuation is as good as randomly
-assigned, that is, unrelated to everything else that drives the agreed
-valuation, such as the sales of the company. Lecture 2 returns to this
-condition.
+with", because the line compares groups of observed deals. Lecture 2
+explains when a slope may be read as an effect.
 
 ### Error terms versus residuals
 
@@ -808,7 +804,8 @@ them.
   [Basic Lecture 5](../basic/b05-joint-covariance-correlation.qmd) explains
   the covariance and the correlation.
 
-The variance is an average of squared deviations from the mean. The
+Lower-case $x_i$ and $y_i$ are the observed values in the sample, as in
+QM Basic. The variance is an average of squared deviations from the mean. The
 covariance is an average of products of deviations. Both divide by $n-1$ in
 place of $n$:
 
@@ -954,7 +951,7 @@ reports: intercept 1 and slope 1.5, the same line as by hand.
 
 #### Why the covariance is divided by the variance of $X$
 
-The slope is the number you will interpret most often in this course, so it
+The slope is the number you will interpret most often in this course. It
 pays to understand what it measures and why the formula divides the
 covariance by the variance of $X$. @fig-i01-slope-intuition shows the three
 toy points with the fitted line $\widehat y=1+1.5x$.
@@ -1097,7 +1094,7 @@ formulas give the slope 0.649 that `lm()` reports, and the third line that
 the intercept formula gives $-0.068$, as `lm()` does.
 
 The form $\hat\beta_1=r_{XY}\,s_Y/s_X$ shows where the slope below 1 comes
-from. If every deal had closed exactly at the claimed valuation, all points
+from. If every deal had been agreed exactly at the claimed valuation, all points
 would lie on the grey dashed line. The correlation would then be 1, both
 standard deviations would be equal, and the slope would be 1. In the data,
 both parts are below 1. The correlation is 0.893, because the deals do not
@@ -1107,23 +1104,26 @@ than the claimed ones: in dollars, the gap between the claim and the agreed
 valuation tends to be larger for high claims. Together,
 $\hat\beta_1 = 0.893 \times 3.70/5.09 \approx 0.649$.
 
-The weights of the previous section also matter here. Deals with a claim
-far from the average claim have a long run, so they count heavily in the
-slope. The code below computes the share of all weight, the squared run
-$(x_i-\bar x)^2$, that falls on the deals with a claim above \$10 million.
+Not every deal counts equally in the slope. The slope formula adds up the
+products $(x_i-\bar x)(y_i-\bar y)$ over all deals. A deal with a claim far
+from the average claim of \$3.52 million usually also has an agreed
+valuation far from the average agreed valuation. Its product is then large,
+and it pulls the slope strongly. The code below computes the share of the
+sum of all products that comes from the deals with a claim above
+\$10 million.
 
 ```{r}
 #| label: i01-slope-weights
-weight <- (x - mean(x))^2                      # squared run of every deal
+dev_prod <- (x - mean(x)) * (y - mean(y))     # product of deviations of every deal
 c(deals_above_10m = sum(x > 10),
   pct_of_deals = round(100 * mean(x > 10), 1),
-  pct_of_weight = round(100 * sum(weight[x > 10]) / sum(weight), 1))
+  pct_of_sum_of_products = round(100 * sum(dev_prod[x > 10]) / sum(dev_prod), 1))
 ```
 
 The 52 deals with a claim above \$10 million are only 5.9% of the deals,
-but they carry 73.8% of the weight in the slope. So a few large deals have
-a strong say in the slope of 0.649. This is not an error: least squares
-trusts points with a long run. But it is worth knowing before you rely on
+but they contribute 76.1% of the sum of the products. So a few large deals
+have a strong say in the slope of 0.649. This is not an error: least
+squares gives deals far from the average claim a strong pull. But it is worth knowing before you rely on
 the slope. Lecture 2 shows how to check how much the slope changes without
 such deals.
 
@@ -1298,7 +1298,7 @@ detail.
 ### Prediction inside the range of the data
 
 [Shark Tank data]{.shark-tag} A founder who plans to claim \$2 million wants
-to know at what valuation such deals closed on average. The fitted line
+to know at what valuation such deals were agreed on air, on average. The fitted line
 answers this. The function `predict()` calculates the fitted value for a new
 value of the predictor, and `range()` gives the smallest and the largest
 claimed valuation in the data:
@@ -1330,7 +1330,7 @@ depends only on the assumption that the line continues.
 ## Try it: a fitted value and a residual
 
 [Shark Tank data]{.shark-tag} A founder claims a valuation of
-\$8 million, and the deal closes at a valuation of \$6 million.
+\$8 million, and the deal is agreed on air at a valuation of \$6 million.
 
 *Step 1 (given).* The fitted equation is
 $\widehat{\text{agreed}}=-0.068+0.649\times\text{claimed}$, in \$ millions.
@@ -1439,9 +1439,8 @@ it, and the deals may scatter more around it at high claims than at low
 ones. Before you use the line to prepare a negotiation or to predict a deal,
 Lecture 2 shows how to check the assumptions behind it with residual plots.
 
-**Next:** R fits a least-squares line to any data, even to data that a
-straight line describes badly. R gives no warning. Lecture 2 states the assumptions behind the
-fitted line and shows how to check them with residual plots.
+**Next:** R fits a least-squares line to any data without a warning, so
+Lecture 2 states the assumptions behind the fitted line.
 
 :::
 
@@ -1553,7 +1552,7 @@ Then do five more tasks. These tasks have no given steps:
    about 0.58 and 6.42 in \$ millions.
 2. The fitted valuation is $-0.068+0.649\times3\approx1.88$ in \$ millions,
    so the residual is $1.5-1.88\approx-0.38$, or about $-\$380{,}000$. The
-   deal closed below the fitted value.
+   deal was agreed below the fitted value.
 3. R formulas use `outcome ~ predictors`: the left-hand side is what the
    model predicts. The right-hand side is what the model uses to predict it.
 4. Only the predictor is rescaled, by the factor 1,000. The slope is divided
@@ -1637,7 +1636,8 @@ SSE that the lab shows each time.
    line can have a smaller SSE, so your best attempt is at least as large.
 5. The SSE rises in both directions. The least-squares line has the
    smallest possible SSE, so every other line has a larger SSE.
-6. The fitted value is $0.41 + 0.93\times5\approx5.04$, the mean of $y$.
+6. The fitted value is $0.41 + 0.93\times5\approx5.06$, which is the mean
+   of $y$ (5.04) up to rounding of the coefficients.
    The least-squares line always passes through the point
    $(\bar x, \bar y)$.
 :::
@@ -1662,7 +1662,7 @@ the 400 customers are a random sample.
 
 ### Worked exam interpretation
 
-**Exam-style question.** An invented example. A model of the
+**Exam-style question.** A model of the
 monthly revenue of cafés (€1,000s) on their opening hours per week reports
 $\widehat{\text{revenue}} = 4.20 + 0.85\,\text{hours}$. Interpret the slope
 with units. Then calculate the fitted value and the residual for a café that
@@ -1683,7 +1683,7 @@ about $-$€3,200: the observed revenue is below the fitted value.
 
 > "If you raise your claimed valuation by 1 million dollars, the sharks will pay you 649,000 dollars more. And a company with a claimed valuation of zero gets -68,000 dollars."
 
-Find what is wrong and write the corrected answer. This task is the **Verify**
+Find what is wrong and write the corrected answer. This task is the Verify
 step of Attempt → Ask → Verify → Explain.
 
 ::: {.callout-note collapse="true"}
@@ -1721,12 +1721,12 @@ QM Intermediate, the course AI assistant. For example: "Give me an extra
 exercise for Intermediate Lecture 1. Show the solution only after I send my
 answer."
 
-[Continue to Lecture 2: What the model assumes and how residuals reveal it](i02-assumptions-diagnostics.qmd).
-
 [Code sheet: Lecture 1 commands and formulas](code-sheet.qmd#lecture-1-simple-linear-regression).
 
 For a more formal treatment, see
 [Nieuwenhuis, *Statistical Methods for Business and Economics*](https://tilburguniversity.on.worldcat.org/oclc/317545871),
 Chapter 19.
+
+[Continue to Lecture 2: What the model assumes and how residuals reveal it](i02-assumptions-diagnostics.qmd).
 
 :::

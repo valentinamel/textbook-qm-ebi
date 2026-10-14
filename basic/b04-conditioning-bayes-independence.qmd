@@ -10,10 +10,10 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 ::: {.outcomes}
 <span class="label">By the end of Lecture 4, you can</span>
 
-- calculate conditional probabilities and say which group each one refers to
-- rebuild an overall probability from the rates of separate groups
-- update a probability after new evidence with Bayes' rule
-- check whether two events are independent and tell this apart from disjoint
+- calculate conditional probabilities and say which group each one refers to,
+- rebuild an overall probability from the rates of separate groups,
+- update a probability after new evidence with Bayes' rule,
+- check whether two events are independent and tell this apart from disjoint.
 :::
 
 ::: {.driving-question}
@@ -68,21 +68,36 @@ table(deal = D, late = L)
 
 Then compare, in words only:
 
-- "Among pitches in Seasons 9--16, what proportion reached an on-air deal?"
+- "Among pitches in Seasons 9 to 16, what proportion reached an on-air deal?"
 - "Among pitches that reached an on-air deal, what proportion came from
-  Seasons 9--16?"
+  Seasons 9 to 16?"
 
 For both questions, the number on top of the fraction is the same: the
 late-season pitches that reached a deal. The questions differ in the group
 that you divide by. Before class, decide for each question which total of
 your table goes underneath: the total of the late-season column, or the
-total of the deal row.
+total of the deal row. Finally, answer one question on the videos: in
+words, what does it mean that two events $A$ and $B$ are independent?
+
+::: {.callout-note collapse="true"}
+## Check your preparation
+
+- The first question divides by the total of the late-season column, 734
+  pitches: $505/734\approx 0.688$, or 68.8%.
+- The second question divides by the total of the deal row, 882 pitches:
+  $505/882\approx 0.573$, or 57.3%.
+
+The same 505 pitches give two different shares because the group you divide
+by differs. Two events are independent when knowing that one occurred does
+not change the probability of the other, for example
+$P(A\mid B)=P(A)$.
+:::
 
 If fractions or event notation are unfamiliar, review
 [Mathematics Refresher: sets and event
-notation](../resources/math-refresher.html#sets-and-event-notation) and
+notation](../resources/math-refresher.qmd#sets-and-event-notation) and
 [fractions and rearranging
-equations](../resources/math-refresher.html#fractions-and-rearranging-equations).
+equations](../resources/math-refresher.qmd#fractions-and-rearranging-equations).
 
 **Predict.** Answer this question before you come to class. A venture fund
 receives many pitches by email, and only 10% of them end in a deal with the
@@ -131,7 +146,7 @@ numbers. This lecture shows what each sentence claims. Later, the lecture
 uses the same idea in another situation: a venture fund that screens the
 pitches it receives with an AI tool.
 
-### One table, five probabilities
+### One table, five probabilities {#b04-one-table}
 
 [Shark Tank data]{.shark-tag} The starting point is the counts table from Lecture 2. The code builds the
 events $D$ (on-air deal, `deal_on_show`) and $L$ (late season, `season` 9 or
@@ -150,7 +165,7 @@ FALSE or TRUE). Each number counts the pitches with that combination. For
 example, 505 pitches are from a late season and reached a deal. The same
 table with labels and with row and column totals:
 
-|                    | Early ($L^c$, S1--8) | Late ($L$, S9--16) | Total |
+|                    | Early ($L^c$, Seasons 1 to 8) | Late ($L$, Seasons 9 to 16) | Total |
 |--------------------|---------------------:|-------------------:|------:|
 | **No deal** ($D^c$) | 330 | 229 | **559** |
 | **Deal** ($D$)      | 377 | 505 | **882** |
@@ -396,8 +411,8 @@ c(
 R confirms both reference classes (734 late-season pitches and 882 deals)
 and both shares: 0.688 for Sentence A and 0.573 for Sentence B. For
 comparison, the deal rate among all pitches is $882/1441\approx 0.612$. So
-knowing that a pitch is from a late season raises the deal probability by
-about 7.6 percentage points.
+late-season pitches have a deal rate about 7.6 percentage points higher than
+all pitches together.
 
 ### The multiplication rule
 
@@ -515,10 +530,14 @@ $$P(A)=P(A\mid B)\,P(B)+P(A\mid B^c)\,P(B^c).$$
 
 [Shark Tank data]{.shark-tag} The early and late events $L^c$ and $L$ form a partition, so
 
-$$P(D)=P(D\mid L^c)\,P(L^c)+P(D\mid L)\,P(L)
-=\frac{377}{707}\cdot\frac{707}{1441}
-+\frac{505}{734}\cdot\frac{734}{1441}
-=\frac{377+505}{1441}=\frac{882}{1441}\approx 0.612.$$
+$$
+\begin{aligned}
+P(D)&=P(D\mid L^c)\,P(L^c)+P(D\mid L)\,P(L)\\
+&=\frac{377}{707}\cdot\frac{707}{1441}
++\frac{505}{734}\cdot\frac{734}{1441}\\
+&=\frac{377+505}{1441}=\frac{882}{1441}\approx 0.612.
+\end{aligned}
+$$
 
 Two kinds of number appear here. $377/707\approx 0.533$ and
 $505/734\approx 0.688$ are the deal rates within each period.
@@ -579,9 +598,9 @@ uses an AI tool that reads each pitch and flags (marks) the pitches that it
 considers likely to reach a deal. A tool that sorts cases into two groups in
 this way is called a classifier. Three numbers describe it:
 
-- the **base rate**: 10% of the pitches that the fund receives reach a deal.
+- the **base rate**: 10% of the pitches that the fund receives reach a deal,
 - the **sensitivity**: among actual deals, 80% get flagged,
-  $P(\text{flag}\mid\text{deal})=0.80$.
+  $P(\text{flag}\mid\text{deal})=0.80$,
 - the **false-positive rate**: among non-deals, 20% still get flagged,
   $P(\text{flag}\mid\text{no deal})=0.20$.
 
@@ -695,9 +714,13 @@ $$P(B_i\mid A)=\frac{P(A\mid B_i)\,P(B_i)}
 
 For the classifier, the partition is deal and no deal:
 
-$$P(\text{deal}\mid\text{flag})
-=\frac{0.80\times 0.10}{0.80\times 0.10+0.20\times 0.90}
-=\frac{0.08}{0.08+0.18}=\frac{0.08}{0.26}\approx 0.308.$$
+$$
+\begin{aligned}
+P(\text{deal}\mid\text{flag})
+&=\frac{0.80\times 0.10}{0.80\times 0.10+0.20\times 0.90}\\
+&=\frac{0.08}{0.08+0.18}=\frac{0.08}{0.26}\approx 0.308.
+\end{aligned}
+$$
 
 Every term is a branch of the tree, divided by 1,000:
 
@@ -715,8 +738,12 @@ The tree and the formula always give the same answer.
 Bayes' rule also works on the Shark Tank events. Starting from
 $P(D\mid L)$, it gives $P(L\mid D)$:
 
-$$P(L\mid D)=\frac{P(D\mid L)\,P(L)}{P(D)}
-=\frac{(505/734)(734/1441)}{882/1441}=\frac{505}{882}\approx 0.573.$$
+$$
+\begin{aligned}
+P(L\mid D)&=\frac{P(D\mid L)\,P(L)}{P(D)}\\
+&=\frac{(505/734)(734/1441)}{882/1441}=\frac{505}{882}\approx 0.573.
+\end{aligned}
+$$
 
 The R check computes the same formula and compares it with the direct count
 from the table. The first line plugs $P(D\mid L)$, $P(L)$ and $P(D)$ into
@@ -776,8 +803,8 @@ dependent.
 Check both forms with the numbers from the counts table.
 
 With conditioning: $P(D\mid L)=505/734\approx 0.688$, while
-$P(D)=882/1441\approx 0.612$. Learning that a pitch is late-season raises
-the deal probability, so $D$ and $L$ are not independent.
+$P(D)=882/1441\approx 0.612$. Late-season pitches have a higher deal rate
+than all pitches together, so $D$ and $L$ are not independent.
 
 With the product form: $P(D\cap L)=505/1441\approx 0.350$, while
 $$P(D)\,P(L)=\frac{882}{1441}\cdot\frac{734}{1441}\approx 0.612\times0.509\approx 0.312.$$
@@ -799,8 +826,8 @@ c(
 ```
 
 The R output repeats both checks. The first pair compares $P(D\mid L)=0.688$
-with $P(D)=0.612$: a late season raises the deal probability by 7.6
-percentage points, or by about an eighth of the overall rate. The second
+with $P(D)=0.612$: late-season pitches have a deal rate 7.6 percentage
+points higher, about an eighth of the overall rate. The second
 pair compares $P(D\cap L)=0.350$ with $P(D)\,P(L)=0.312$. Both pairs differ,
 so both checks agree that $D$ and $L$ are dependent.
 
@@ -828,8 +855,11 @@ probability. Knowing that one happened makes the other impossible, so they
 can never be independent. For two coin tosses it is the other way round.
 Both can land heads, and the first toss tells you nothing about the second.
 
-Independence closes the toolbox of this lecture. The next section uses
-conditional probabilities to compare groups of pitches.
+Independence closes the toolbox of this lecture. One more use of conditional
+probability is so common in business reports that it deserves its own
+section: comparing the success rates of groups. The next section shows that
+such a comparison is a set of conditional probabilities, and why shares and
+not counts must be compared.
 
 ### Second application: deal rates by team composition
 
@@ -869,6 +899,7 @@ and 66.3% for mixed teams.
 #| code-fold: true
 #| code-summary: "See the R code for this figure"
 #| fig-cap: "Share of pitches with an on-air deal by team category (`pitcher_gender_group`), among the 1,434 Shark Tank pitches with a known category. Each bar is a percentage within its own category: P(deal | category). The three rates lie between 58% and 67%."
+#| fig-alt: "Bar chart of the share of pitches with an on-air deal for three team categories. All-men teams have 58.1 percent, all-women teams 63.6 percent, and mixed teams 66.3 percent."
 library(ggplot2)
 sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
 known_gender <- sharks$pitcher_gender_group != "unknown"
@@ -961,13 +992,13 @@ about 69% to leave with an on-air deal. That is 7.6 percentage points above
 the 61.2% for all seasons together. This expectation rests on two
 assumptions: that your pitch is like a typical late-season pitch in the
 file, and that the show keeps selecting and judging pitches as it did in
-Seasons 9--16. It does not say that pitching later causes a deal.
+Seasons 9 to 16. It does not say that pitching later causes a deal.
 
 The venture fund example shows the same trap with a signal. A flag from the
 fund's AI tool tells less than its 80% sensitivity suggests. With a 10%
 base rate and a 20% false-positive rate, only $80/260\approx 31\%$ of
-flagged pitches reach a deal. The flag raises the probability of a deal from
-10% to 31%, and not more.
+flagged pitches reach a deal. Among flagged pitches the probability of a
+deal is 31% instead of 10%, and not more.
 
 ::: {.founder-box}
 <span class="label">A founder's decision (invented example)</span>
@@ -1049,7 +1080,7 @@ After the lecture, work through all the practice below.
 ### Read the lecture material
 
 Read the Lecture material section above from start to end. The lecture
-covered the most important parts. The text has every step, every example, and all the
+covered the main points. The text has every step, every example, and all the
 code, including parts that were not shown in class. Note what is still
 unclear and bring it to the next tutorial, or ask Tilly.
 
@@ -1143,11 +1174,9 @@ keeps the share of true flags below one third.
 ### Practice
 
 [Shark Tank data]{.shark-tag} Select one of the 1,441 recorded pitches at random. $D$ is the event
-of an on-air deal, and $L$ is the event of a late season (Seasons 9--16).
-Use the counts table of this lecture. Without a deal: 330 early-season and
-229 late-season pitches (559 in total). With a deal: 377 early-season and
-505 late-season pitches (882 in total). The early seasons have 707
-pitches, the late seasons 734, and all seasons 1,441.
+of an on-air deal, and $L$ is the event of a late season (Seasons 9 to 16).
+Use the counts table of the section
+[One table, five probabilities](#b04-one-table).
 
 1. Use the early/late partition to verify
    $$P(D)=P(D\mid L^c)\,P(L^c)+P(D\mid L)\,P(L).$$
@@ -1165,10 +1194,15 @@ pitches, the late seasons 734, and all seasons 1,441.
 ::: {.callout-note collapse="true"}
 ## Check your answers
 
-1. $(377/707)(707/1441)+(505/734)(734/1441)=(377+505)/1441=882/1441
-   \approx 0.612$.
+1. The two products add up to the overall deal probability:
+   $$
+   \begin{aligned}
+   &(377/707)(707/1441)+(505/734)(734/1441)\\
+   &=(377+505)/1441=882/1441\approx 0.612.
+   \end{aligned}
+   $$
 2. $P(L\mid D)=505/882\approx 0.573$: among deal records, 57.3% came from
-   Seasons 9--16. It differs from $P(D\mid L)=505/734\approx 0.688$ because
+   Seasons 9 to 16. It differs from $P(D\mid L)=505/734\approx 0.688$ because
    the conditioning event, and so the denominator, is different.
 3. $P(D\cap L)=505/1441\approx 0.350$, while
    $P(D)\,P(L)=(882/1441)(734/1441)\approx 0.312$. The two are not equal, so
@@ -1200,7 +1234,7 @@ not have to be a value that the variable can take: here $Y$ is never 1.1.
 
 [Shark Tank data]{.shark-tag} **Question.** Select one recorded Shark Tank pitch at random. $D$
 is the event of an on-air deal, and $L$ is the event of a late season
-(Seasons 9--16). A student sees $P(D\mid L)=0.688$ and writes, "68.8% of deal
+(Seasons 9 to 16). A student sees $P(D\mid L)=0.688$ and writes, "68.8% of deal
 pitches came from late seasons." Explain what is wrong and give the correct
 interpretation.
 
@@ -1208,7 +1242,7 @@ interpretation.
 ## Check a model answer
 
 The calculation conditions on $L$, so the denominator is the 734 pitches in
-Seasons 9--16. The correct interpretation is that 68.8% of late-season
+Seasons 9 to 16. The correct interpretation is that 68.8% of late-season
 records reached an on-air deal. The sentence the student wrote describes the
 reversed conditional probability, $P(L\mid D)=505/882\approx 57.3\%$. Neither quantity
 measures completed investment or a causal season effect.
@@ -1220,8 +1254,8 @@ measures completed investment or a causal season effect.
 
 > "68.8% of late-season pitches got a deal. So if a pitch got a deal, there is a 68.8% chance that it came from a late season."
 
-Find what is wrong and write the corrected answer. This is the **Verify**
-step of Attempt → Ask → Verify → Explain.
+Find what is wrong and write the corrected answer. This is the Verify
+step of Attempt, Ask, Verify, Explain.
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
@@ -1286,6 +1320,6 @@ Lecture 4. Show the solution only after I send my answer."
 
 For a more formal explanation, consult
 [Nieuwenhuis, *Statistical Methods for Business and Economics*](https://tilburguniversity.on.worldcat.org/oclc/317545871),
-Chapters 7--8.
+Chapters 7 and 8.
 
 :::

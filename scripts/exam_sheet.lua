@@ -153,9 +153,30 @@ local function convert(blocks, wide)
   }).content
 end
 
+-- On the web page every formula stands in a $$ paragraph of its own, so
+-- that nothing is cut off on a phone. In the PDF, consecutive formula
+-- paragraphs (with no label or text between them) are joined with \qquad,
+-- so that they share lines where the column is wide enough.
+local function merge_formulas(blocks)
+  local out = {}
+  for _, b in ipairs(blocks) do
+    local prev = out[#out]
+    local m = b.t == 'Para' and only_display_math(b.content)
+    local pm = prev and prev.t == 'Para' and only_display_math(prev.content)
+    if m and pm then
+      out[#out] = pandoc.Para({pandoc.Math('DisplayMath',
+        pm.text:gsub('%s+$', '') .. '\n\\qquad\n' .. m.text)})
+    else
+      out[#out + 1] = b
+    end
+  end
+  return out
+end
+
 -- The body is set in columns. A top-level `::: {.sheet-wide}` block leaves
 -- the columns, spans the page, and the columns start again after it.
 function Pandoc(doc)
+  doc.blocks = merge_formulas(doc.blocks)
   local out, in_columns = {}, false
   local function columns(on)
     if on and not in_columns then
@@ -168,7 +189,7 @@ function Pandoc(doc)
   for _, block in ipairs(doc.blocks) do
     local wide = block.t == 'Div' and block.classes:includes('sheet-wide')
     columns(not wide)
-    local source = wide and block.content or {block}
+    local source = wide and merge_formulas(block.content) or {block}
     for _, b in ipairs(convert(source, wide)) do out[#out + 1] = b end
   end
   columns(false)
