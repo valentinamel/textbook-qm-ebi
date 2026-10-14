@@ -231,7 +231,7 @@ and one sentence of interpretation.
    printer's parts that fail is $P(F\mid N)=10\%$. A correct sentence is:
    the new printer makes 40% of all parts and 57% of the failed parts.
 
-Verification in R:
+The code below checks these results in R.
 
 ```{r}
 #| label: bep02-printers-check
@@ -248,6 +248,8 @@ c(P_F_and_N = fail_new * p_new, P_F_and_not_N = fail_old * (1 - p_new),
   P_F = p_fail, P_N_given_F = fail_new * p_new / p_fail,
   P_F_times_P_N = p_fail * p_new)
 ```
+
+The first line of the output gives the four counts of the tree for 1,000 parts. The second line repeats $P(F\cap N)=0.04$, $P(F\cap N^c)=0.03$, $P(F)=0.07$, $P(N\mid F)\approx0.571$, and the product $P(F)\,P(N)=0.028$.
 :::
 
 ### Task 3: Covariance and correlation from the same table
@@ -316,7 +318,7 @@ and one sentence of interpretation.
    three plants does not always have a pot. A correlation of 0.37 describes
    a tendency across all orders. It cannot say what one order contains.
 
-Verification in R:
+The code below checks these results in R.
 
 ```{r}
 #| label: bep02-plants-cov-check
@@ -340,6 +342,8 @@ c(E_X = mean_plants, E_Y = mean_pots,
   correlation = cov_plants_pots / sqrt(var_plants * var_pots),
   no_pot_given_3_plants = plant_pot["3", "0"] / p_plants[["3"]])
 ```
+
+The output repeats the means 1.9 and 0.8, $E[XY]=1.75$, the covariance 0.23, the variances 0.69 and 0.56, the standard deviations 0.831 and 0.748, the correlation 0.37, and the share 0.17 of three-plant orders without a pot.
 :::
 
 ### Task 4: A normal model in both directions
@@ -386,7 +390,7 @@ Parts 1 and 2 go from a value to a probability. Part 3 goes from a
 probability to a value. One limit: the normal curve is a model. The answers
 are only as good as the fit of this model to the recorded times.
 
-Verification in R:
+The code below checks these results in R.
 
 ```{r}
 #| label: bep02-normal-check
@@ -396,6 +400,8 @@ c(p_at_most_49 = pnorm(49, mean = 45, sd = 5),
   limit = qnorm(0.95, mean = 45, sd = 5),
   limit_by_hand = 45 + 1.645 * 5)
 ```
+
+R gives 0.7881 for part 1, 0.6731 for part 2, and a limit of 53.22 minutes. The results by hand, 0.6730 and 53.23, differ only in the last decimal, because the supplied values are rounded.
 :::
 :::
 
@@ -687,7 +693,7 @@ Take the houseplant table of Task 3 again.
    $Y$ are not independent. Independence needs the product form in every
    cell, so one cell that does not match is enough to show dependence.
 
-Verification in R:
+The code below checks these results in R.
 
 ```{r}
 #| label: bep02-plants-check
@@ -708,6 +714,8 @@ c(total = sum(plant_pot),
   cell_1_0 = plant_pot["1", "0"],
   product_1_0 = sum(plant_pot["1", ]) * sum(plant_pot[, "0"]))
 ```
+
+The output shows the row sums 0.40, 0.30, and 0.30, the column sums 0.40, 0.40, and 0.20, the conditional PMF 0.625, 0.25, and 0.125, and the values of parts 1 to 5: the total 1, the probabilities 0.10 and 0.80, the means 1.5 and 1.9, and the entry 0.25 against the product 0.16.
 :::
 
 #### Task 9: Two independent variables
@@ -770,7 +778,7 @@ marginal PMFs are:
    not match is enough, so $X$ and $Y$ are dependent in the friend's table.
    The two marginal PMFs alone do not determine the joint PMF.
 
-Verification in R:
+The code below checks these results in R.
 
 ```{r}
 #| label: bep02-soap-check
@@ -790,6 +798,8 @@ round(c(total = sum(soap_joint), E_X = mean_tilburg, E_Y = mean_groningen,
         E_sum = mean_tilburg + mean_groningen,
         Var_sum = var_tilburg + var_groningen), 4)
 ```
+
+The first table of the output is the joint PMF of part 1. The second line repeats the total 1, the means 0.7 and 0.6, $E[XY]=0.42$, the covariance 0, the variances 0.41 and 0.44, and the mean 1.3 and the variance 0.85 of the sum.
 :::
 
 #### Task 10: The sum of two variables, with positive and negative covariance
@@ -838,7 +848,7 @@ has a mean of 180 euros and a standard deviation of 30 euros.
    other out. With a positive covariance, good days and bad days come together,
    and the total varies more.
 
-Verification in R:
+The code below checks these results in R.
 
 ```{r}
 #| label: bep02-icecream-check
@@ -853,6 +863,8 @@ c(var_icecream = var_icecream, var_second = var_second,
   corr_lemonade = 600 / (50 * 30), corr_chocolate = -600 / (50 * 30),
   sd_reduction = 1 - sqrt(var_chocolate) / sqrt(var_lemonade))
 ```
+
+The output repeats the variances 2,500 and 900, the expected total of 500 euros, the variances and standard deviations of the two totals, the correlations 0.4 and $-0.4$, and the reduction of about 31% in the standard deviation.
 :::
 
 #### Task 11: A uniform model
@@ -888,7 +900,7 @@ to be anywhere between 20 and 60 minutes: $X\sim U(20,60)$.
    zero. The height 0.025 is a probability per minute. It becomes a
    probability only when you multiply it by a width in minutes.
 
-Verification in R:
+The code below checks these results in R.
 
 ```{r}
 #| label: bep02-uniform-check
@@ -898,8 +910,9 @@ c(area_of_sketch = (60 - 20) * 0.02,
   p_above_50 = 1 - punif(50, min = 20, max = 60),
   p_10_to_30 = punif(30, min = 20, max = 60) - punif(10, min = 20, max = 60))
 ```
-:::
 
+The output repeats the area 0.8 of the sketch, the correct height 0.025, and the probabilities 0.375, 0.25, and 0.25 of parts 2 to 4.
+:::
 
 [Continue to Lecture 7: Samples, parameters, and estimators](b07-samples-estimators.qmd).
 
