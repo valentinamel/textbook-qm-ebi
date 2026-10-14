@@ -19,7 +19,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 ::: {.driving-question}
 <span class="label">Driving question</span>
 
-<p class="dq-context">A deal is only the start. Will you work with one investor who gives you full attention, or share your company with several? Before you plan, you want two numbers: what to expect, and how much reality can differ from it.</p>
+<p class="dq-context">A deal is only the start. Will you work with one investor who gives you full attention, or share your company with several? Before you plan, you want two numbers: what to expect, and how much reality can differ from it. In other words: what is the expected outcome, and what is the variance of the outcome, the measure of risk that this lecture introduces?</p>
 
 If your pitch ends in a deal, how many sharks will you work with, and how
 much does that number differ from deal to deal?
@@ -31,15 +31,24 @@ much does that number differ from deal to deal?
 
 Do all the preparation below before class.
 
-<div class="video-prep">
-<span class="label">Video preparation</span><br>
-Watch
-<a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/probability-mass-functions/">Probability Mass Functions</a> and
-<a href="https://www.youtube.com/watch?v=_yJsO5955ZE">Expectation</a>.
-Be ready to explain what $p_X(x)$ measures and why an expected
-value does not have to be a possible realised value.
+::: {.video-prep}
+[Video preparation]{.label}
+
+Watch these short videos from MIT OpenCourseWare, Introduction to Probability, before class. Be ready to explain what $p_X(x)$ measures, what an expected value is, and what the variance measures.
+
+1. [Probability Mass Functions](https://www.youtube.com/watch?v=zW1_iugJvF0) (10:20)
+2. [Expectation](https://www.youtube.com/watch?v=_yJsO5955ZE) (10:38)
+3. [Variance](https://www.youtube.com/watch?v=ZWo1XgAQE5k) (10:43)
+
+Extra, if you want more explanation:
+
+- [Bernoulli and Indicator Random Variables](https://www.youtube.com/watch?v=J8L9kRGSvSY) (3:06)
+- [Elementary Properties of Expectation](https://www.youtube.com/watch?v=GARQ31BrKQA) (4:12)
+- [The Expected Value Rule](https://www.youtube.com/watch?v=gB5TCCfF6e4) (9:59)
+- [The Variance of the Bernoulli and the Uniform](https://www.youtube.com/watch?v=7_livg-uaVs) (8:40)
+
 The videos explain key ideas in another way and can use a different notation. The lecture material and its notation always come first.
-</div>
+:::
 
 [Shark Tank data]{.shark-tag} **Warm up.** Lecture 2 ended with random variables for the
 experiment that selects one record uniformly at random. Define $X=1$ if the
@@ -60,13 +69,14 @@ selected deal (`number_sharks_in_deal`).
    step.
 :::
 
-[Shark Tank data]{.shark-tag} **Predict.** Answer this question before you come to class: can the expected number of
-sharks in a deal be a number that is not a whole number, yes or no? Choose
-one answer. You find the answer in the section on expectation in the lecture
-material.
-
 If functions, support, or summation notation are unfamiliar, review
 [Mathematics Refresher: summation notation](../resources/math-refresher.html#summation-notation).
+
+**Predict.** Answer this question before you come to class. Option A pays
+€100 for sure. Option B pays €0 or €200, each with probability one half.
+Which option has the higher expected payoff, and which one is riskier?
+Choose one answer for each part: A, B, or equal. You find the answer in the
+section on variance and standard deviation in the lecture material.
 
 :::
 
@@ -76,10 +86,14 @@ If functions, support, or summation notation are unfamiliar, review
 
 ### Start with a founder's question
 
-[Shark Tank data]{.shark-tag} Suppose your pitch ends in a deal. Will you work with one investor who gives
-you full attention, or with a group of sharks who share the deal? The Shark
-Tank file records the number of sharks in each deal in the variable
-`number_sharks_in_deal`. The code below counts the deals by this number:
+[Shark Tank data]{.shark-tag} Lecture 2 gave a probability to a single event, such as deal or no deal.
+Many business questions are about a number with several possible values
+instead. Suppose your pitch ends in a deal. Will you work with one investor
+who gives you full attention, or with a group of sharks who share the deal?
+The Shark Tank file records the number of sharks in each deal in the
+variable `number_sharks_in_deal`. The code below keeps the 882 records with
+an on-air deal, counts the deals by the number of sharks, and then turns
+the counts into shares of all deals:
 
 ```{r}
 #| label: b03-sharks-table
@@ -90,8 +104,11 @@ shark_counts
 round(prop.table(shark_counts), 3)
 ```
 
-Of the 882 deals, 648 have one shark, 203 have two, 22 have three, 3 have
-four, and 6 have five. As shares: 0.735, 0.230, 0.025, 0.003, and 0.007.
+The first output gives the counts. Of the 882 deals, 648 have one shark,
+203 have two, 22 have three, 3 have four, and 6 have five. The second
+output divides each count by 882. As shares: 0.735, 0.230, 0.025, 0.003,
+and 0.007. So almost three in four deals are made with a single shark, and
+deals with three or more sharks are rare.
 
 #### Four questions, answered from the shares
 
@@ -104,18 +121,25 @@ four, and 6 have five. As shares: 0.735, 0.230, 0.025, 0.003, and 0.007.
    No deal has 1.32 sharks. The section on expectation
    explains how to read such a number.
 4. **How much do deals differ from that number?** Not much: most deals have
-   one shark and nearly all others have two. The section on variance gives
-   one number for this spread.
+   one shark and nearly all others have two. The section on variance
+   teaches how to summarise this spread in one number.
+
+Question 4 is about risk. The money choice in the Lecture 1 survey had the
+same average payoff for all three options, and the options differed only
+in how far a single result could lie from that average. The variance turns
+this idea into a number.
 
 Each of the four answers uses a tool that has a name. The list of shares is a probability mass
 function. The running total in question 2 is a cumulative distribution
 function. The weighted average in question 3 is an expected value. The spread
-in question 4 is measured by the variance and the standard deviation.
+in question 4 is measured by the variance and the standard deviation. These
+four tools are introduced below, one section each, starting with the list
+of shares.
 
 ### A PMF assigns probability to each possible value
 
 <p class="concept-video"><strong>MIT explanation (review):</strong>
-<a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/probability-mass-functions/">05.3 Probability Mass Functions</a>.</p>
+<a href="https://www.youtube.com/watch?v=zW1_iugJvF0">05.3 Probability Mass Functions</a>.</p>
 
 [Shark Tank data]{.shark-tag} A random variable tells us which numerical values we may observe. Its
 distribution adds the missing information: how the probability is divided
@@ -169,8 +193,11 @@ $$
 This is a valid PMF.
 :::
 
-The code below builds the same objects in R: the data, the deal proportion
-`p_hat`, and the PMF.
+R can do the same calculation in three steps. First, `mean()` of the 0/1
+column `deal_on_show` gives the share of records with a deal, which we
+store as `p_hat` for later use. Second, `table()` counts the records with
+the values 0 and 1, and `prop.table()` divides each count by the 1,441
+records. Third, `sum()` adds the two masses to check the second rule.
 
 ```{r}
 #| label: b03-deal-pmf
@@ -185,9 +212,51 @@ deal_pmf
 sum(deal_pmf)
 ```
 
-For the number of sharks $K$ in a randomly selected deal, the PMF gives each
-number its share of the 882 deals. These are the shares from the opening
-section:
+The first output is the PMF: 0.388 for no deal and 0.612 for a deal, the
+same two fractions as in the worked example. The second output, 1, confirms
+that the masses add up to 1. In words: a pitch drawn at random from the file
+reached a deal with probability 0.612, so about three in five recorded
+pitches ended in a deal. @fig-b03-deal-pmf draws this PMF.
+
+```{r}
+#| label: fig-b03-deal-pmf
+#| code-fold: true
+#| code-summary: "See the R code for this figure"
+#| fig-height: 3.4
+#| fig-cap: "The PMF of the deal indicator X: two probability masses, at 0 (no on-air deal) and at 1 (on-air deal). The labels show how each height is calculated."
+#| fig-alt: "Two vertical bars. At 0 the bar has height 559/1441, about 0.388. At 1 the bar has height 882/1441, about 0.612."
+library(ggplot2)
+deal_df <- data.frame(
+  x = c(0, 1),
+  probability = c(559, 882) / 1441,
+  label = c("559/1441\n= 0.388", "882/1441\n= 0.612")
+)
+
+ggplot(deal_df, aes(x = x, y = probability)) +
+  geom_segment(aes(xend = x, yend = 0),
+               linewidth = 1.3, colour = "#0072B2") +
+  geom_point(size = 3, colour = "#0072B2") +
+  geom_text(aes(label = label), vjust = -0.4, size = 3.6,
+            colour = "#17324D", lineheight = 0.9) +
+  scale_x_continuous(breaks = c(0, 1), limits = c(-0.5, 1.5),
+                     labels = c("0: no deal", "1: deal")) +
+  scale_y_continuous(limits = c(0, 0.85),
+                     expand = expansion(mult = c(0, 0.02))) +
+  labs(x = "Value x of the deal indicator", y = expression(p[X](x))) +
+  theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    axis.title = element_text(colour = "#17324D")
+  )
+```
+
+The deal indicator has only two possible values, so its PMF has only two
+masses. Most business quantities have more possible values. For the number
+of sharks $K$ in a randomly selected deal, the PMF gives each number its
+share of the 882 deals. The code below takes the counts of the opening
+section, divides them by 882 with `prop.table()`, rounds them to three
+decimals, and checks that they add up to 1:
 
 ```{r}
 #| label: b03-sharks-pmf
@@ -196,28 +265,38 @@ round(sharks_pmf, 3)
 sum(sharks_pmf)
 ```
 
+These are the shares from the opening section, now read as probabilities.
+If you draw one deal at random, the probability that it has exactly one
+shark is 0.735, and the probability that it has five sharks is 0.007, less
+than one in a hundred. Both rules hold: every mass is non-negative and the
+sum is 1. @fig-b03-sharks-pmf draws this PMF.
+
 ```{r}
 #| label: fig-b03-sharks-pmf
 #| code-fold: true
 #| code-summary: "See the R code for this figure"
-#| fig-cap: "The PMF of the number of sharks in a randomly selected deal: five separated probability masses, one per possible value."
+#| fig-cap: "The PMF of the number of sharks in a randomly selected deal: five separated probability masses, one per possible value. The label above each mass shows its calculation: the number of deals with k sharks divided by all 882 deals."
+#| fig-alt: "Five vertical bars at 1 to 5 sharks with heights 648/882 = 0.735, 203/882 = 0.230, 22/882 = 0.025, 3/882 = 0.003 and 6/882 = 0.007."
 library(ggplot2)
 sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
 deals <- subset(sharks, deal_on_show == 1)
-sharks_pmf <- prop.table(table(deals$number_sharks_in_deal))
+shark_counts <- table(deals$number_sharks_in_deal)
+sharks_pmf <- prop.table(shark_counts)
 pmf_df <- data.frame(
   k = as.numeric(names(sharks_pmf)),
-  probability = as.numeric(sharks_pmf)
+  probability = as.numeric(sharks_pmf),
+  label = sprintf("%d/%d\n= %.3f", as.numeric(shark_counts),
+                  sum(shark_counts), as.numeric(sharks_pmf))
 )
 
 ggplot(pmf_df, aes(x = k, y = probability)) +
   geom_segment(aes(xend = k, yend = 0),
                linewidth = 1.3, colour = "#009E73") +
   geom_point(size = 3, colour = "#009E73") +
-  geom_text(aes(label = sprintf("%.3f", probability)), vjust = -1,
-            size = 3.6, colour = "#17324D") +
+  geom_text(aes(label = label), vjust = -0.4, lineheight = 0.9,
+            size = 3.4, colour = "#17324D") +
   scale_x_continuous(breaks = 1:5) +
-  scale_y_continuous(limits = c(0, 0.85),
+  scale_y_continuous(limits = c(0, 0.92),
                      expand = expansion(mult = c(0, 0.02))) +
   labs(x = "Number of sharks k", y = expression(p[K](k))) +
   theme_minimal(base_size = 13) +
@@ -233,16 +312,32 @@ The probability mass above 1 in @fig-b03-sharks-pmf has height
 $$p_K(1)=P(K=1)=\frac{648}{882}\approx0.735.$$
 Almost three quarters of the probability sits on one value. The masses for
 three, four, and five sharks are so small that their bars are hard to see.
-The numbers above the bars show their sizes. The
+The label above each bar shows how its height is calculated: the number of
+deals with that many sharks, divided by all 882 deals. The
 graph shows the PMF as separate probability masses, because $K$ can take
 only the listed discrete values. The term probability density function
 (PDF) is used only for continuous random variables. Lecture 6 introduces it.
+
+The PMF shows the whole shape of a distribution at a glance: which values
+are possible and which of them are likely. Many practical questions,
+however, ask about a range of values, such as "at most two sharks". The
+next tool answers such questions directly.
 
 ### A CDF accumulates probability up to a threshold
 
 [Shark Tank data]{.shark-tag} The PMF asks about one exact value. The **cumulative distribution function
 (CDF)** asks how much probability lies at or below a chosen threshold (a
-cut-off value). Imagine moving from left to right across the PMF and keeping a
+cut-off value). Why do we need a second tool? Many decisions depend on a
+threshold. A founder who can handle at most two investors asks for
+$P(K\le 2)$. A bank asks how likely sales stay below the level needed to
+repay a loan. With the PMF alone, you must add up several masses for every
+such question. The CDF stores these sums once, so one reading answers the
+question. The two tools carry the same information and are used together.
+The PMF shows which single values are likely. The CDF answers questions about
+"at most", "at least", and "between". From Lecture 6 on, for continuous
+variables, almost every probability is read from a CDF.
+
+Imagine moving from left to right across the PMF and keeping a
 running total.
 
 For any random variable $X$,
@@ -262,6 +357,184 @@ $$F_X(a)=\sum_{x\le a}p_X(x).$$
 exactly the value $x$. The CDF, $F_X(a)=P(X\le a)$, gives the probability
 that $X$ is at or below the threshold $a$.
 :::
+
+#### Try it yourself: build the running total
+
+The lab below shows the PMF of the number of sharks on top and the CDF
+below it. Move the slider to change the threshold $a$. Every probability
+mass at or below $a$ turns green and is added to the running total. The
+lower panel draws the CDF up to the current threshold, and the text below
+the panels shows the sum.
+
+<style>
+.b03-lab {
+  background: #fff;
+  border: 1px solid #d5dbe0;
+  border-radius: 8px;
+  margin: 1.2em 0 1.5em;
+  padding: 1em;
+}
+.b03-lab-heading {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em 1.2em;
+  justify-content: space-between;
+}
+.b03-lab svg {
+  display: block;
+  height: auto;
+  margin: 0.5em auto;
+  max-width: 560px;
+  width: 100%;
+}
+.b03-lab label {
+  color: #17324d;
+  display: block;
+  font-size: 0.9em;
+  font-weight: 600;
+  margin: 0.6em 0;
+}
+.b03-lab input[type="range"] {
+  display: block;
+  margin-top: 0.3em;
+  width: 100%;
+}
+.b03-lab select {
+  font: inherit;
+  margin-left: 0.4em;
+  max-width: 100%;
+}
+.b03-lab button {
+  background: #17324d;
+  border: 1px solid #17324d;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  padding: 0.45em 0.8em;
+}
+.b03-readout {
+  color: #17324d;
+  font-size: 0.95em;
+  margin: 0.4em 0;
+  overflow-wrap: anywhere;
+}
+.b03-caption {
+  color: #53606b;
+  font-size: 0.9em;
+  margin-bottom: 0;
+}
+.b03-axis { stroke: #65727e; stroke-width: 1.2; }
+.b03-tick { fill: #53606b; font-size: 13px; }
+.b03-label { fill: #263b4b; font-size: 14px; }
+.b03-mass-in { fill: #009e73; }
+.b03-mass-out { fill: #c9d4dc; }
+.b03-step { fill: none; stroke: #0072b2; stroke-width: 3; }
+.b03-threshold { stroke: #d55e00; stroke-width: 2; stroke-dasharray: 5 4; }
+.b03-dot { fill: #d55e00; }
+.b03-beam { fill: #17324d; }
+.b03-weight { fill: #009e73; stroke: #17324d; stroke-width: 1; }
+.b03-pivot { fill: #e69f00; stroke: #17324d; stroke-width: 1.5; }
+</style>
+
+<div id="cdf-lab" class="b03-lab" role="group" aria-labelledby="cdf-lab-title">
+<div class="b03-lab-heading">
+<strong id="cdf-lab-title">Running-total lab: from PMF to CDF</strong>
+<span id="cdf-value" aria-live="polite"></span>
+</div>
+<svg id="cdf-svg" viewBox="0 0 460 420" role="img" aria-label="PMF of the number of sharks on top, with the masses at or below the threshold highlighted, and the CDF built up to the threshold below"></svg>
+<label>Threshold a: <span id="cdf-a-text"></span>
+<input id="cdf-a" type="range" min="0" max="6" step="0.1" value="0">
+</label>
+<p id="cdf-sum" class="b03-readout" aria-live="polite"></p>
+<p class="b03-caption">The CDF rises only where the threshold passes a possible value. Between two possible values the running total stays the same.</p>
+</div>
+
+<script>
+(function () {
+  const root = document.getElementById("cdf-lab");
+  if (!root || root.dataset.ready) return;
+  root.dataset.ready = "true";
+  const svg = root.querySelector("#cdf-svg");
+  const slider = root.querySelector("#cdf-a");
+  const aText = root.querySelector("#cdf-a-text");
+  const valueText = root.querySelector("#cdf-value");
+  const sumText = root.querySelector("#cdf-sum");
+  const counts = [648, 203, 22, 3, 6];
+  const total = 882;
+  const ks = [1, 2, 3, 4, 5];
+  const ns = "http://www.w3.org/2000/svg";
+  const left = 52, right = 440;
+  const top1 = 30, bottom1 = 170, top2 = 240, bottom2 = 370;
+  const sx = x => left + x / 6 * (right - left);
+  const sy1 = p => bottom1 - p / 0.8 * (bottom1 - top1);
+  const sy2 = F => bottom2 - F * (bottom2 - top2);
+  const add = (name, attrs, parent = svg) => {
+    const el = document.createElementNS(ns, name);
+    Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
+    parent.appendChild(el); return el;
+  };
+  const text = (x, y, s, cls, anchor) => {
+    const t = add("text", {x: x, y: y, class: cls, "text-anchor": anchor || "middle"});
+    t.textContent = s; return t;
+  };
+  [[top1, bottom1], [top2, bottom2]].forEach(([t, b]) => {
+    add("line", {x1: left, y1: b, x2: right, y2: b, class: "b03-axis"});
+    add("line", {x1: left, y1: t, x2: left, y2: b, class: "b03-axis"});
+    for (let v = 0; v <= 6; v++) {
+      add("line", {x1: sx(v), y1: b, x2: sx(v), y2: b + 5, class: "b03-axis"});
+      text(sx(v), b + 20, String(v), "b03-tick");
+    }
+  });
+  [0, 0.4, 0.8].forEach(p => text(left - 8, sy1(p) + 4, p.toFixed(1), "b03-tick", "end"));
+  [0, 0.5, 1].forEach(F => text(left - 8, sy2(F) + 4, F.toFixed(1), "b03-tick", "end"));
+  text(left + 4, top1 - 12, "PMF: P(K = k)", "b03-label", "start");
+  text(left + 4, top2 - 12, "CDF: F(a) = P(K ≤ a)", "b03-label", "start");
+  text((left + right) / 2, 410, "Number of sharks", "b03-label");
+  const bars = ks.map((k, i) => {
+    const p = counts[i] / total;
+    const h = Math.max(bottom1 - sy1(p), 1.5);
+    const r = add("rect", {x: sx(k) - 13, y: bottom1 - h, width: 26, height: h, class: "b03-mass-out"});
+    text(sx(k), bottom1 - h - 6, p.toFixed(3), "b03-tick");
+    return r;
+  });
+  const step = add("path", {class: "b03-step"});
+  const line = add("line", {y1: top1 - 4, y2: bottom2, class: "b03-threshold"});
+  const dot = add("circle", {r: 5, class: "b03-dot"});
+  function draw() {
+    const a = Number(slider.value);
+    let cum = 0, cumCount = 0;
+    const parts = [];
+    let d = "M " + sx(0) + " " + sy2(0);
+    ks.forEach((k, i) => {
+      const inside = k <= a + 1e-9;
+      bars[i].setAttribute("class", inside ? "b03-mass-in" : "b03-mass-out");
+      if (inside) {
+        d += " L " + sx(k) + " " + sy2(cum);
+        cum += counts[i] / total; cumCount += counts[i];
+        d += " L " + sx(k) + " " + sy2(cum);
+        parts.push(counts[i] + "/" + total);
+      }
+    });
+    d += " L " + sx(a) + " " + sy2(cum);
+    step.setAttribute("d", d);
+    line.setAttribute("x1", sx(a)); line.setAttribute("x2", sx(a));
+    dot.setAttribute("cx", sx(a)); dot.setAttribute("cy", sy2(cum));
+    aText.textContent = a.toFixed(1);
+    valueText.textContent = "F(" + a.toFixed(1) + ") = " + cum.toFixed(3);
+    if (parts.length === 0) {
+      sumText.textContent = "No possible number of sharks lies at or below " + a.toFixed(1) + ", so F(" + a.toFixed(1) + ") = 0.";
+    } else {
+      const sumPart = parts.length > 1 ? parts.join(" + ") + " = " + cumCount + "/" + total + " ≈ " : parts[0] + " ≈ ";
+      sumText.textContent = "P(K ≤ " + a.toFixed(1) + ") = " + sumPart + cum.toFixed(3) +
+        ". About " + (100 * cum).toFixed(1) + "% of the deals have at most " + Math.floor(a + 1e-9) + (Math.floor(a + 1e-9) === 1 ? " shark." : " sharks.");
+    }
+  }
+  slider.addEventListener("input", draw);
+  draw();
+})();
+</script>
 
 ::: {#exm-b03-cdf-hand}
 ## Worked example: F(2) for the number of sharks, by hand
@@ -295,6 +568,13 @@ sharks_distribution <- data.frame(
 )
 sharks_distribution
 ```
+
+The table has one row per possible number of sharks. The column `count`
+gives the number of deals, `pmf` divides it by 882, and `cdf` adds up the
+`pmf` column from the top down to the current row. The `cdf` column grows
+from 0.735 to 0.965, 0.990, 0.993, and finally 1. Read the row for three
+sharks as an example: 99.0% of the deals have at most three sharks. The
+last value is 1 because every deal has at most five sharks.
 
 ```{r}
 #| label: fig-b03-sharks-cdf
@@ -359,15 +639,42 @@ $F_K(3)=873/882\approx0.990$. Only 1% of the deals have four or five
 sharks.
 :::
 
-The probability of an interval is a difference of two CDF values:
+The CDF also answers questions about intervals, such as "between two and
+three sharks". $F_X(b)$ contains all probability up to $b$, and $F_X(a)$
+contains all probability up to $a$. If $a<b$ and you take the second away
+from the first, only the probability between $a$ and $b$ is left. So the
+probability of an interval is a difference of two CDF values:
 
 $$P(a<X\le b)=F_X(b)-F_X(a).$$
 
-For example, the probability that a deal has two or three sharks is
+Note the two signs. The lower end $a$ is excluded, because its mass is part
+of $F_X(a)$ and is taken away. The upper end $b$ is included. For example,
+the probability that a deal has two or three sharks is
 $$P(1<K\le 3)=F_K(3)-F_K(1)=\frac{873-648}{882}=\frac{225}{882}\approx0.255.$$
-So 25.5% of the deals have two or three sharks.
+So 25.5% of the deals have two or three sharks. We use $a=1$, not $a=2$,
+because the deals with exactly two sharks must stay in the result.
 
-For the deal indicator:
+The same idea answers other common questions. Each line below uses the
+`cdf` column of `sharks_distribution`, or the counts behind it.
+
+| Question | As a probability | From the CDF | Result |
+|---|---|---|---:|
+| exactly two sharks | $P(K=2)$ | $F_K(2)-F_K(1)=\frac{851-648}{882}$ | 0.230 |
+| at least two sharks | $P(K\ge 2)=P(K>1)$ | $1-F_K(1)=\frac{882-648}{882}$ | 0.265 |
+| more than three sharks | $P(K>3)$ | $1-F_K(3)=\frac{882-873}{882}$ | 0.010 |
+| three, four, or five sharks | $P(2<K\le 5)$ | $F_K(5)-F_K(2)=\frac{882-851}{882}$ | 0.035 |
+
+The first line shows that the mass at one value is the jump of the CDF at
+that value: 0.230 is the PMF value for two sharks. The second and third
+lines use the complement rule of Lecture 2, $P(A^c)=1-P(A)$: "at least
+two" is everything except "at most one". So about one deal in four involves
+two or more sharks, only 3.5% involve three or more, and only about one deal
+in a hundred involves more than three.
+For a founder this means that a large investor group is rare, but a second
+shark is a real possibility.
+
+The deal indicator of @fig-b03-deal-pmf has a CDF with only two jumps:
+one at 0, of size $1-p$, and one at 1, of size $p$. Written out:
 
 $$
 F_X(a)=
@@ -382,10 +689,14 @@ where $p=P(X=1)$. So $p_X(1)=P(X=1)=p$, while $F_X(1)=P(X\le1)=1$. The
 PMF measures the mass at exactly 1. The CDF includes all mass up to and
 including 1.
 
+The PMF and the CDF describe a whole distribution, value by value. For
+planning, you often want a shorter summary: one number for the centre and
+one for the spread. The next two sections give these two numbers.
+
 ### Expectation is the distribution's weighted centre
 
 <p class="concept-video"><strong>MIT explanation (review):</strong>
-<a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/expectation/">05.8 Expectation</a>.</p>
+<a href="https://www.youtube.com/watch?v=_yJsO5955ZE">05.8 Expectation</a>.</p>
 
 [Shark Tank data]{.shark-tag} A distribution can contain many possible values and probabilities. The
 **expected value**, or expectation, summarises its centre in one number.
@@ -439,16 +750,142 @@ Each possible value contributes its value times its probability. The sum,
 never equals 1.1.
 :::
 
+#### Try it yourself: find the balance point
+
+The lab below puts the probability masses as weights on a ruler. The
+orange triangle is the pivot that holds the ruler. Move the pivot with the
+slider. If more weight pulls on one side, the ruler tips to that side. The
+text below the ruler reports the turning force $\sum_x (x-\text{pivot})\,p_X(x)$.
+It is negative when the left side goes down, positive when the right side
+goes down, and zero at the balance point. Choose a distribution, find the
+balance point yourself, and then press "Show the balance point" to compare
+it with the expected value.
+
+<div id="balance-lab" class="b03-lab" role="group" aria-labelledby="balance-lab-title">
+<div class="b03-lab-heading">
+<strong id="balance-lab-title">Balance-point lab</strong>
+<label style="margin:0">Distribution
+<select id="bal-dist">
+<option value="Y">Tiny example Y</option>
+<option value="K">Number of sharks K</option>
+<option value="X">Deal indicator X</option>
+</select>
+</label>
+</div>
+<svg id="bal-svg" viewBox="0 0 460 250" role="img" aria-label="Probability masses as weights on a ruler that tilts around a movable pivot"></svg>
+<label>Pivot position: <span id="bal-f-text"></span>
+<input id="bal-f" type="range" min="0" max="2" step="0.01" value="1">
+</label>
+<p id="bal-readout" class="b03-readout" aria-live="polite"></p>
+<button id="bal-show" type="button">Show the balance point</button>
+<p class="b03-caption">A large mass far from the pivot turns the ruler more than a small mass close to it. Each mass counts with its probability times its distance from the pivot.</p>
+</div>
+
+<script>
+(function () {
+  const root = document.getElementById("balance-lab");
+  if (!root || root.dataset.ready) return;
+  root.dataset.ready = "true";
+  const svg = root.querySelector("#bal-svg");
+  const select = root.querySelector("#bal-dist");
+  const slider = root.querySelector("#bal-f");
+  const fText = root.querySelector("#bal-f-text");
+  const readout = root.querySelector("#bal-readout");
+  const ns = "http://www.w3.org/2000/svg";
+  const dists = {
+    Y: {name: "Y", x: [0, 1, 2], p: [0.2, 0.5, 0.3], lo: -0.5, hi: 2.5, start: 1.6},
+    K: {name: "K", x: [1, 2, 3, 4, 5], p: [648 / 882, 203 / 882, 22 / 882, 3 / 882, 6 / 882], lo: 0, hi: 6, start: 3},
+    X: {name: "X", x: [0, 1], p: [559 / 1441, 882 / 1441], lo: -0.5, hi: 1.5, start: 0.5}
+  };
+  const left = 30, right = 430, beamY = 170, maxH = 110;
+  const add = (name, attrs, parent = svg) => {
+    const el = document.createElementNS(ns, name);
+    Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
+    parent.appendChild(el); return el;
+  };
+  let d = dists.Y, beam = null, pivot = null;
+  const sx = x => left + (x - d.lo) / (d.hi - d.lo) * (right - left);
+  const mean = () => d.x.reduce((s, x, i) => s + x * d.p[i], 0);
+  function build() {
+    svg.replaceChildren();
+    add("line", {x1: 10, y1: 222, x2: 450, y2: 222, class: "b03-axis"});
+    beam = add("g", {});
+    add("rect", {x: left, y: beamY, width: right - left, height: 7, rx: 2, class: "b03-beam"}, beam);
+    for (let v = Math.ceil(d.lo); v <= d.hi; v++) {
+      const t = add("text", {x: sx(v), y: beamY + 22, class: "b03-tick", "text-anchor": "middle"}, beam);
+      t.textContent = String(v);
+    }
+    d.x.forEach((x, i) => {
+      const h = Math.max(d.p[i] * maxH / Math.max(...d.p) * 0.9, 2);
+      add("rect", {x: sx(x) - 12, y: beamY - h, width: 24, height: h, class: "b03-weight"}, beam);
+      const t = add("text", {x: sx(x), y: beamY - h - 6, class: "b03-tick", "text-anchor": "middle"}, beam);
+      t.textContent = d.p[i].toFixed(3);
+    });
+    pivot = add("polygon", {class: "b03-pivot"});
+    slider.min = d.x[0]; slider.max = d.x[d.x.length - 1];
+    slider.value = d.start;
+  }
+  function draw() {
+    const f = Number(slider.value);
+    const torque = d.x.reduce((s, x, i) => s + (x - f) * d.p[i], 0);
+    const span = d.hi - d.lo;
+    const angle = 14 * Math.tanh(torque / (0.1 * span));
+    const px = sx(f);
+    beam.setAttribute("transform", "rotate(" + angle.toFixed(2) + " " + px + " " + (beamY + 7) + ")");
+    pivot.setAttribute("points", px + "," + (beamY + 8) + " " + (px - 16) + ",222 " + (px + 16) + ",222");
+    fText.textContent = f.toFixed(2);
+    let side;
+    if (Math.abs(torque) < 0.005) side = "The ruler balances. The pivot sits at the expected value.";
+    else if (torque < 0) side = "The left side goes down: move the pivot to the left.";
+    else side = "The right side goes down: move the pivot to the right.";
+    readout.textContent = "Turning force: " + (torque >= 0 ? "+" : "−") + Math.abs(torque).toFixed(3) + ". " + side;
+  }
+  select.addEventListener("change", () => { d = dists[select.value]; build(); draw(); });
+  slider.addEventListener("input", draw);
+  root.querySelector("#bal-show").addEventListener("click", () => {
+    slider.value = mean().toFixed(2); draw();
+    readout.textContent += " E[" + d.name + "] = " + mean().toFixed(3) + ".";
+  });
+  build(); draw();
+})();
+</script>
+
+The lab shows why the expected value is a centre. At the balance point,
+the pull of the masses on the left equals the pull of the masses on the
+right. For the tiny example $Y$, the ruler balances at 1.1, a point where
+no mass sits.
+
 Now apply the same steps to the Shark Tank distributions. For the deal
 indicator,
 
 $$E[X]=0\times(1-p)+1\times p=p.$$
 
-This result explains why the mean of a 0/1 variable equals its proportion
-of 1s. Here $E[X]=882/1441\approx0.612$.
+The value 0 contributes nothing to the sum, so only the mass at 1 is left.
+The expected value of a 0/1 variable is therefore the probability of a 1.
+The same holds for data. If you add up the 0/1 values of `deal_on_show`
+over all 1,441 records, every deal counts 1 and every other record counts
+0, so the sum is the number of deals, 882. Dividing by 1,441 gives the
+share of deals. This is why the mean of a 0/1 variable equals its
+proportion of 1s, and why the code above computed the deal rate as
+`mean(sharks$deal_on_show)`. Here $E[X]=882/1441\approx0.612$: on average,
+0.612 deals per recorded pitch, or 61.2% of the pitches.
 
-For the number of sharks, the sum has five products instead of two. This is
-the calculation of question 3 in the opening section:
+For the number of sharks, the sum has five products, one for each possible
+number of sharks. This is the weighted average of question 3 in the opening
+section. By hand, with the exact fractions:
+
+$$
+E[K]=1\times\frac{648}{882}+2\times\frac{203}{882}+3\times\frac{22}{882}
++4\times\frac{3}{882}+5\times\frac{6}{882}
+=\frac{648+406+66+12+30}{882}=\frac{1162}{882}\approx1.32.
+$$
+
+The numerator has a simple meaning: the 882 deals together involve 1,162
+sharks. Dividing by the number of deals gives the average number of sharks
+per deal. The code below does the same in R. It stores the possible values
+in `k` and their masses in `p_k`. Then `sum(k * p_k)` multiplies each value
+by its mass and adds the products. For comparison, it also computes $E[X]$
+and the plain average of the column `number_sharks_in_deal`:
 
 ```{r}
 #| label: b03-expectation
@@ -462,19 +899,41 @@ c(
 )
 ```
 
+The output confirms the hand calculation: $E[X]\approx0.612$ and
+$E[K]\approx1.32$. The expected value from the PMF equals the plain average
+of the 882 deals, because the PMF gives every deal the same weight, $1/882$.
+The section on the sample mean at the end of this lecture comes back to
+this point.
+
 The expected number of sharks is about 1.32, and no deal has 1.32 sharks.
-This answers the prediction question from before class: an expectation is a
-probability-weighted average, so it need not be a possible value of the
-random variable. The value 1.32 lies close to 1, because most of the
-probability sits at one shark.
+An expectation is a probability-weighted average, so it need not be a
+possible value of the random variable. The value 1.32 lies close to 1, because most of the
+probability sits at one shark. It lies about a third of a shark above 1,
+because the deals with two or more sharks pull the balance point to the
+right.
 
 ### Expectation after transforming a variable
 
-[Shark Tank data]{.shark-tag} Many quantities come from a random variable through a fixed rule. Examples
-for the variable $Y$ of the worked example are the profit $10Y-3$ (10 euros
-per unit of $Y$ minus a fixed cost of 3 euros) and the square $Y^2$. Such a
-function $g(X)$ of a random variable $X$ is itself a random variable, with
-its own possible values and its own distribution.
+[Shark Tank data]{.shark-tag} In business, the quantity you care about is often not the random variable
+itself but something computed from it. An investor does not care about the
+number of units a start-up sells, but about the payoff that follows from
+it. A shop owner cares about the profit, not the number of customers. A
+founder with several sharks cares about the time spent keeping all of them
+informed. In each case a fixed rule turns the random variable into the
+quantity of interest.
+
+Finance gives a second reason. An investor who compares a risky payoff
+with a safe one wants to know how far the payoff can lie from its expected
+value. A risky investment must offer a higher expected payoff than a safe
+one, otherwise nobody would take the risk. This extra expected payoff is
+called the risk premium. To measure the risk, we need the expectation of a
+squared distance from the mean. That is again a value computed from the
+random variable, and the section on variance builds on it.
+
+Examples for the variable $Y$ of the worked example are the profit $10Y-3$
+(10 euros per unit of $Y$ minus a fixed cost of 3 euros) and the square
+$Y^2$. Such a function $g(X)$ of a random variable $X$ is itself a random
+variable, with its own possible values and its own distribution.
 
 If $g$ changes each possible value of $X$, the expected value of the
 transformed variable is
@@ -487,8 +946,7 @@ the transformed values by the original PMF, and add.
 ::: {.callout-caution collapse="true"}
 ## Try it: E[Y²] for the tiny PMF
 
-Try this first with the student next to you. Use the same distribution as
-in the worked example: $Y\in\{0,1,2\}$ with masses $0.2,0.5,0.3$, and $g(y)=y^2$.
+Use the same distribution as in the worked example: $Y\in\{0,1,2\}$ with masses $0.2,0.5,0.3$, and $g(y)=y^2$.
 
 *Step 1 (given).* Square each possible value: $0^2=0$, $1^2=1$, $2^2=4$.
 
@@ -511,20 +969,41 @@ $1.7-1.21=0.49$. The section on variance gives this gap a name.
 :::
 :::
 
-The same rule for the number of sharks in R:
+Now apply the same rule to the number of sharks. Take two functions of $K$.
+The square $K^2$ is needed for the variance in the next section. The
+number of pairs of sharks, $K(K-1)/2$, measures how much coordination a
+deal needs. With one shark there is no pair, with two sharks there is one
+pair who must agree, and with three sharks there are already three pairs.
+The code below applies each function to the possible values in `k`,
+weights the results by the original masses `p_k`, and adds them:
 
 ```{r}
 #| label: b03-transformed-expectation
+E_K <- sum(k * p_k)
 c(
-  E_K = sum(k * p_k),
-  E_K_squared = sum(k^2 * p_k)
+  E_K = E_K,
+  E_K_squared = sum(k^2 * p_k),
+  E_pairs = sum(k * (k - 1) / 2 * p_k),
+  pairs_at_E_K = E_K * (E_K - 1) / 2
 )
 ```
+
+The first number repeats $E[K]\approx1.32$ from the previous section. By hand, $E[K^2]=(1\times648+4\times203+9\times22+16\times3+25\times6)/882
+=1856/882\approx2.10$. This number has no direct meaning in sharks, but the
+next section uses it. The expected number of pairs is about 0.39 per deal.
+If you plug the expected number of sharks into the pair formula instead,
+as in the last number of the output, you get $1.32\times0.32/2\approx0.21$,
+only about half of the correct value.
+The reason is the same as in the Try it task: the expectation of a function
+is not the function of the expectation, except for straight-line rules. The
+rare deals with four or five sharks have 6 or 10 pairs, and they count with
+their full weight only in $E[g(K)]$. For straight-line rules such as profit
+$10Y-3$, the next sections show that you may plug in the expected value.
 
 ### Variance and standard deviation
 
 <p class="concept-video"><strong>MIT explanation (review):</strong>
-<a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/variance/">06.2 Variance</a>.</p>
+<a href="https://www.youtube.com/watch?v=ZWo1XgAQE5k">06.2 Variance</a>.</p>
 
 [Shark Tank data]{.shark-tag} Expectation gives the centre of a distribution, but it does not describe
 how close the values lie to that centre. Two distributions can have
@@ -596,15 +1075,45 @@ the Greek letter sigma). Read the calculation as four steps:
 3. Square the deviation, $(x-\mu)^2$.
 4. Weight it by $p_X(x)$ and add across the support.
 
-So large deviations contribute more than small deviations. Variance is zero
-only when all probability lies at one single value.
+So large deviations contribute more than small deviations. Every term in
+the sum is a square times a probability, so it can never be negative. The
+variance is therefore always zero or positive.
 
-The equivalent **computational form** is
+::: {.callout-caution collapse="true"}
+## Think about it: when is the variance zero?
+
+The variance is a sum of terms $(x-\mu)^2\,p_X(x)$ that are all zero or
+positive. When can the sum be exactly zero? Think of a business example of
+such a variable before you open the answer.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+The sum is zero only if every term is zero. A term with positive
+probability is zero only if $x=\mu$. So the variance is zero only when all
+probability lies at one single value: the variable is not random at all.
+An example is a fixed monthly rent of 800 euros. It equals 800 every month,
+so its expected value is 800 and its variance is 0. Any chance of a
+different value, however small, makes the variance positive.
+:::
+:::
+
+There is a second way to compute the variance, called the **shortcut
+formula** (also known as the computational form):
 
 $$\operatorname{Var}(X)=E[X^2]-\left(E[X]\right)^2.$$
 
-It gives the same result, but the definition $E[(X-\mu)^2]$ is usually
-easier to interpret.
+In words: the variance is the average of the squares minus the square of
+the average. You compute two expectations from the PMF, $E[X^2]$ and $E[X]$,
+square the second one, and subtract. This saves work, because you do not
+need the deviation of every value from $\mu$. You met the gap between the
+two numbers in the Try it task: $E[Y^2]=1.7$ and $\left(E[Y]\right)^2=1.21$
+differ by 0.49. The shortcut formula says that this gap is exactly the
+variance. It follows from the definition by multiplying out the square
+$(X-\mu)^2=X^2-2\mu X+\mu^2$ and taking the expectation of each part. The
+two formulas always give the same result. Use the shortcut formula to
+calculate, and the definition $E[(X-\mu)^2]$ to interpret: the definition
+shows that the variance is an average squared distance from the mean.
 
 The **standard deviation** is the square root of the variance. It is also
 written $\sigma$:
@@ -643,7 +1152,7 @@ $$
 =0.49.
 $$
 
-**By the computational form**, using $E[Y^2]=1.7$ from the Try it task:
+**By the shortcut formula**, using $E[Y^2]=1.7$ from the Try it task:
 
 $$
 \operatorname{Var}(Y)=E[Y^2]-\left(E[Y]\right)^2=1.7-1.21=0.49.
@@ -653,8 +1162,66 @@ Both ways give 0.49, so $\operatorname{SD}(Y)=\sqrt{0.49}=0.7$, in the
 same units as $Y$.
 :::
 
-A variable with only the values 0 and 1, such as the deal indicator, is so
-common that its distribution has a name.
+Now return to the number of sharks. The code below computes its variance
+by the definition. It stores the expected value in `mu_k`, squares the
+deviation of each possible value from it, weights the squares by `p_k`, and
+adds them. It then checks the result with the shortcut formula and takes
+the square root for the standard deviation:
+
+```{r}
+#| label: b03-variance
+mu_k <- sum(k * p_k)
+var_k <- sum((k - mu_k)^2 * p_k)
+
+c(
+  Var_K = var_k,
+  Var_K_shortcut = sum(k^2 * p_k) - mu_k^2,
+  SD_K = sqrt(var_k)
+)
+```
+
+By hand with the shortcut formula and the numbers of the previous section:
+$\operatorname{Var}(K)=E[K^2]-\left(E[K]\right)^2\approx2.104-1.317^2
+=2.104-1.736\approx0.37$ sharks squared. Both ways give the same variance.
+Its square root is the standard deviation, about 0.61 sharks. The number of
+sharks in a deal typically lies about 0.6 sharks away from the expected
+1.32, less than one shark and less than half of the expected value. This
+answers the opening question: the number of sharks differs little from
+deal to deal.
+
+What does this mean for your own plans? If your pitch ends in a deal, you
+might expect to work with one shark, and you should be prepared for a
+second one: one deal in four has two or more sharks. A group of three or
+more sharks is rare, with a probability of 3.5%. This forecast assumes
+that your deal behaves like a deal drawn at random from the recorded deals.
+If your company is unusually large or needs several kinds of expertise,
+more sharks may want to join, and the recorded shares may not fit your
+case.
+
+Now return to the prediction question from before class. Option A pays €100
+for sure, and Option B pays €0 or €200 with probability one half each. These
+are the choices "keep it" and "go all-in" from the money question of the
+Lecture 1 survey. The expected payoffs are equal:
+$E[A]=100$ euros and $E[B]=0\times0.5+200\times0.5=100$ euros. Option A has
+no spread at all, so $\operatorname{Var}(A)=0$. For Option B, both possible
+payoffs lie 100 euros from the mean, so
+$\operatorname{Var}(B)=(0-100)^2\times0.5+(200-100)^2\times0.5=10{,}000$
+euros squared, and $\operatorname{SD}(B)=100$ euros. A typical result of B
+lies 100 euros away from its expected payoff, which is as large as the
+expected payoff itself. So the answer is: equal expected payoffs, and B is
+the riskier option. The expectation alone cannot tell the two options apart.
+Risk is the spread of the possible outcomes around the expectation, and the
+variance and the standard deviation measure it. This is why investors and
+founders look at both numbers when they compare an investment or a business
+plan.
+
+Expectation and variance are powerful summaries. For some distributions,
+these two numbers even describe the whole distribution, so you do not need
+the full PMF. Such distributions are so common in practice that they have a
+name. The simplest example has only the values 0 and 1. You have already
+seen one: the deal indicator $X$ of @fig-b03-deal-pmf. Many business
+variables have this form: a customer buys or not, a loan is repaid or not,
+a pitch reaches a deal or not.
 
 ::: {.definition-box}
 <span class="label">Definition</span>
@@ -665,44 +1232,41 @@ written $X\sim\text{Bernoulli}(p)$. Its expected value is $p$ and its
 variance is $p(1-p)$.
 :::
 
-The symbol $\sim$ is read "is distributed as". We found the expected value $p$
-in the section on expectation. The variance follows from the
-computational form. Since $X^2=X$ when $X$ is 0 or 1, $E[X^2]=E[X]=p$, so
+The symbol $\sim$ is read "is distributed as". A single number, $p$, fixes
+the whole PMF. We found the expected value $p$ in the section on
+expectation. The variance follows from the shortcut formula. Since $X^2=X$
+when $X$ is 0 or 1 ($0^2=0$ and $1^2=1$), $E[X^2]=E[X]=p$, so
 
 $$
 \operatorname{Var}(X)=p-p^2=p(1-p).
 $$
 
 The deal indicator is a Bernoulli variable with $p=882/1441\approx0.612$.
-Its variance is $0.612\times0.388\approx0.237$ and its standard deviation is
-about 0.49.
+The code below applies the two formulas to `p_hat`:
 
 ```{r}
-#| label: b03-variance
-mu_k <- sum(k * p_k)
-var_k <- sum((k - mu_k)^2 * p_k)
-
+#| label: b03-bernoulli-variance
 c(
+  E_X = p_hat,
   Var_X = p_hat * (1 - p_hat),
-  SD_X = sqrt(p_hat * (1 - p_hat)),
-  Var_K = var_k,
-  SD_K = sqrt(var_k),
-  average_distance_K = sum(abs(k - mu_k) * p_k)
+  SD_X = sqrt(p_hat * (1 - p_hat))
 )
 ```
 
-The number of sharks has a variance of about 0.37 sharks squared and a
-standard deviation of about 0.61 sharks. The number of sharks in a deal
-typically lies about 0.6 sharks away from the expected 1.32, less than one
-shark. This answers the opening question: the number of sharks differs
-little from deal to deal. The standard deviation is somewhat larger than the
-plain average distance (about 0.47 sharks here), because squaring gives the
-few deals with four or five sharks more weight.
+The variance is $0.612\times0.388\approx0.237$ and the standard deviation
+is about 0.49. A 0/1 variable lies either 0.612 below its mean (no deal) or
+0.388 above it (deal), so a standard deviation of about one half is
+natural. The variance $p(1-p)$ is largest when $p=0.5$, where it equals
+0.25. With $p=0.612$ the deal indicator is close to this maximum: whether a
+single pitch ends in a deal is nearly as uncertain as a coin toss.
 
 ### Shifting and rescaling a variable {#b03-shift-rescale}
 
-Business quantities are often built from other quantities: revenue is price
-times units, profit is revenue minus a fixed cost. For constants $a$ and $b$,
+The previous section measured the spread of one variable. Business
+quantities are often built from other quantities: revenue is price times
+units, profit is revenue minus a fixed cost. You do not need a new PMF to
+find their centre and spread. For a straight-line rule $aX+b$ with
+constants $a$ and $b$,
 
 $$
 E[aX+b]=aE[X]+b,
@@ -718,12 +1282,38 @@ Multiplying by $a$ multiplies the centre by $a$ and the standard deviation
 by $|a|$, the size of $a$ without its sign. So the variance is multiplied
 by $a^2$.
 
-An example with the tiny PMF: $Y$ has $E[Y]=1.1$,
-$\operatorname{Var}(Y)=0.49$, and $\operatorname{SD}(Y)=0.7$. If each unit of
-$Y$ earns 10 euros and there is a fixed cost of 3 euros, the profit is
-$10Y-3$. Its expectation is $10\times1.1-3=8$ euros. Its variance is
-$10^2\times0.49=49$ euros squared, and its standard deviation is
-$10\times0.7=7$ euros.
+The tiny PMF shows how each rule works. Let $Y$ be the number of units
+sold on one day, with $E[Y]=1.1$, $\operatorname{Var}(Y)=0.49$, and
+$\operatorname{SD}(Y)=0.7$. The table applies four rules to $Y$. The
+probabilities 0.2, 0.5, and 0.3 stay the same in every row. Only the
+possible values change.
+
+| Rule | Business meaning | Possible values | Expected value | Variance | SD |
+|---|---|---|---:|---:|---:|
+| $Y$ | units sold | 0, 1, 2 | 1.1 | 0.49 | 0.7 |
+| $Y+2$ | two pre-ordered units are added every day | 2, 3, 4 | 3.1 | 0.49 | 0.7 |
+| $2Y$ | every sale is a pack of two units | 0, 2, 4 | 2.2 | 1.96 | 1.4 |
+| $-Y$ | units taken out of stock | $-2$, $-1$, 0 | $-1.1$ | 0.49 | 0.7 |
+| $10Y-3$ | profit in euros: 10 euros per unit, 3 euros fixed cost | $-3$, 7, 17 | 8 | 49 | 7 |
+
+Read the rows one by one. Adding 2 moves every value, and the centre, two
+units to the right. The distances between the values do not change, so the
+spread stays the same. Doubling doubles every value and every distance from
+the mean. The standard deviation doubles from 0.7 to 1.4, and the variance,
+which uses squared distances, grows four times, from 0.49 to 1.96. You can
+check this with the definition: $E[2Y]=0\times0.2+2\times0.5+4\times0.3=2.2$,
+and $\operatorname{Var}(2Y)=(0-2.2)^2(0.2)+(2-2.2)^2(0.5)+(4-2.2)^2(0.3)
+=0.968+0.02+0.972=1.96$. Changing the sign mirrors the distribution: the
+centre moves to $-1.1$, but the spread stays the same. This is why the rule
+uses $|a|$ and $a^2$, which are never negative.
+
+The last row combines both steps. If each unit of $Y$ earns 10 euros and
+there is a fixed cost of 3 euros, the profit is $10Y-3$. Its expectation is
+$10\times1.1-3=8$ euros. Its variance is $10^2\times0.49=49$ euros
+squared, and its standard deviation is $10\times0.7=7$ euros, close to the
+expected profit itself. So a typical day can lie far from the expected 8
+euros. The fixed cost lowers the expected profit, but it does not make
+profit more or less risky.
 
 Standardising in [Lecture 6](b06-continuous-normal.qmd) uses this rule. Subtract the mean $\mu$ from $X$ and divide by the standard deviation
 $\sigma$. The result $(X-\mu)/\sigma$ then has mean 0 and standard
@@ -732,7 +1322,13 @@ mean.
 
 ### Model expectation and the sample mean
 
-[Shark Tank data]{.shark-tag} For observed values $x_1,\ldots,x_n$, the sample mean is
+[Shark Tank data]{.shark-tag} The expected number of sharks turned out to equal the plain average of the
+882 deals. This is no coincidence, and it raises a question that matters
+for every analysis of data: when is a number a property of a probability
+model, and when is it a summary of observed data? This section keeps the
+two apart, because later lectures use the data to learn about the model.
+
+For observed values $x_1,\ldots,x_n$, the sample mean is
 
 $$\bar{x}=\frac{1}{n}\sum_{i=1}^n x_i.$$
 
@@ -814,14 +1410,27 @@ serious damage.
 
 ### Answering the driving question
 
-If your pitch ends in a deal, expect to work with one shark. 73.5% of deals
-have exactly one shark and 96.5% have at most two. The expected number is
-1.32, with a standard deviation of about 0.61. The same two numbers, centre
-and spread, describe the other variables of this lecture. The deal indicator
-is a Bernoulli variable: a recorded pitch reaches an on-air deal with
-probability 0.612, and the variance is about 0.24. Centre and spread
-together describe a distribution. One of them alone can give a wrong
-picture.
+The driving question asked how many sharks you will work with if your pitch
+ends in a deal, and how much that number differs from deal to deal.
+
+How many sharks? Most likely one: 73.5% of the recorded deals have exactly
+one shark. The expected number is 1.32 sharks per deal. No single deal has
+1.32 sharks, but over many deals the average comes close to it.
+
+How much does the number differ? Little. The standard deviation is about
+0.61 sharks, less than half of the expected value, and 96.5% of the deals
+have at most two sharks.
+
+What does this mean for you as a pitcher? Plan for one shark as your
+partner, but prepare for a second one: about one deal in four (26.5%) has
+two or more sharks. A group of three or more is rare (3.5%). This
+prediction assumes that your deal is like a deal drawn at random from the
+recorded deals. If your company differs from the typical company on the
+show, for example because it needs the expertise of several investors,
+these shares may not fit your case. Lecture 4 shows how such information
+changes the probabilities. In any case, the expected value alone would not
+tell you all of this. Centre and spread together describe a distribution,
+and one of them alone can give a wrong picture.
 
 ::: {.founder-box}
 <span class="label">A founder's decision (invented example)</span>
@@ -947,7 +1556,7 @@ $0.3+0.4+0.3=1$.
 *Step 3 (you).* Calculate $E[W]$, writing each product.
 
 *Step 4 (you).* Calculate $E[W^2]$, then $\operatorname{Var}(W)$ with the
-computational form, then $\operatorname{SD}(W)$.
+shortcut formula, then $\operatorname{SD}(W)$.
 
 ::: {.callout-note collapse="true"}
 ## Check your answer
@@ -1006,6 +1615,64 @@ that deal (`number_sharks_in_deal`).
    deviation of the profit is $15\times4=60$ euros, half of the expected
    profit. The stall cost of 60 euros lowers the expected profit and leaves
    the spread unchanged.
+:::
+
+### Widget homework
+
+[Shark Tank data]{.shark-tag} Open the [running-total lab](#cdf-lab) of
+this lecture again. It uses the PMF of the number of sharks $K$ in a
+randomly selected deal.
+
+1. Set the threshold to $a=2.0$. Write down $F_K(2)$ and the masses that
+   the lab adds up.
+2. Move the slider slowly from 2.0 to 2.9. Does $F_K(a)$ change? Explain
+   why.
+3. Set $a=0.5$. What is $F_K(0.5)$, and why?
+4. Use two readings of the lab to find $P(1<K\le3)$, the probability that
+   a deal has two or three sharks.
+
+::: {.callout-note collapse="true"}
+## Check a model answer
+
+1. $F_K(2)=648/882+203/882=851/882\approx0.965$. The masses at one and two
+   sharks are added.
+2. No. It stays at 0.965, because no possible number of sharks lies
+   between 2 and 3. The CDF is flat between possible values and only jumps
+   at them.
+3. $F_K(0.5)=0$. No deal has fewer than one shark, so no probability lies
+   at or below 0.5.
+4. Read $F_K(3)\approx0.990$ and $F_K(1)\approx0.735$. The difference is
+   $0.990-0.735=0.255$: about a quarter of the deals have two or three
+   sharks.
+:::
+
+Now open the [balance-point lab](#balance-lab) of this lecture again.
+
+5. Choose "Number of sharks K". The pivot starts at 3, the middle of the
+   ruler. Which side goes down, and why?
+6. Move the pivot until the ruler balances. Write down the pivot position.
+   Then press "Show the balance point" and compare.
+7. Put the pivot at 1.00 and read the turning force. Compare it with
+   $E[K]-1$. What does this suggest about the turning force in general?
+8. Choose "Deal indicator X". Where does the ruler balance, and which
+   number from the lecture is this?
+
+::: {.callout-note collapse="true"}
+## Check a model answer
+
+5. The left side goes down, with a turning force of about $-1.68$. Almost
+   all probability lies at one and two sharks, left of the pivot. The
+   middle of the ruler is not the balance point when the masses are
+   unequal.
+6. The ruler balances at about 1.32, the expected number of sharks
+   $E[K]=1162/882\approx1.317$.
+7. The turning force at 1.00 is about $+0.317$, which equals
+   $E[K]-1=1.317-1$. In general the turning force is
+   $\sum_x (x-\text{pivot})\,p_X(x)=E[X]-\text{pivot}$, so it is zero
+   exactly when the pivot sits at the expected value.
+8. The ruler balances at about 0.61, the deal probability
+   $p=882/1441\approx0.612$. For a 0/1 variable the expected value equals
+   the probability of a 1.
 :::
 
 ### Review questions from past lectures

@@ -78,8 +78,8 @@ names the quantity and shows the calculation. It reports the value with its
 unit and interprets this value in context. It also states one important
 limit of the model or the data.
 
-Tasks 1 and 3 to 9 belong to the tutorial. Tasks 2 and 10 are extra
-practice for home.
+More tasks to practise at home are in the final section of this page,
+[Extra practice for home](#b-ep03-home).
 
 In practice $\sigma$ is unknown, so an interval for a mean uses $s$ and a t
 value. In this book, the values you need are given in the task or on the
@@ -109,73 +109,10 @@ the mean equity offered (`equity_offered_pct`).
    sampling frame and a random selection from that frame.
 :::
 
-### Task 2: Reproduce the realised sample (extra practice for home)
+### Task 2: Standard errors and a larger sample
 
-[Shark Tank data]{.shark-tag} The code below draws the sample with seed 123, exactly as in Lecture 7.
-So you get the same 100 rows when you run it:
-
-```{r}
-#| label: bep03-sample-output
-sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
-set.seed(123)
-sample_rows <- sample(seq_len(nrow(sharks)), size = 100, replace = FALSE)
-pitch_sample <- sharks[sample_rows, ]
-
-c(
-  n = nrow(pitch_sample),
-  mean_equity = mean(pitch_sample$equity_offered_pct),
-  sd_equity = sd(pitch_sample$equity_offered_pct),
-  q1_equity = unname(quantile(pitch_sample$equity_offered_pct, 0.25)),
-  median_equity = median(pitch_sample$equity_offered_pct),
-  q3_equity = unname(quantile(pitch_sample$equity_offered_pct, 0.75)),
-  deal_proportion = mean(pitch_sample$deal_on_show)
-)
-```
-
-A note on the quartiles in this output. When a quartile falls between two
-ordered values, R's `quantile()` reports a point between them. Here the
-75th ordered value is 17 and the 76th is 20, and R reports 17.75. The
-definition of Lecture 1 holds for every value from 17 to 20. If you take
-the 75th ordered value, you get 17.
-
-1. Identify the parameter, estimator, and estimate for the mean equity
-   offered (`equity_offered_pct`).
-2. Identify the parameter, estimator, and estimate for the deal proportion
-   (`deal_on_show`).
-3. Calculate the interquartile range (IQR) of the equity offered in the
-   sample from the R output and interpret it. The IQR is defined in
-   [Lecture 1](b01-introduction-data-analysis.qmd#b01-quartiles).
-4. Explain why a different seed can produce different estimates and a
-   different IQR.
-
-::: {.callout-note collapse="true"}
-## Check your answer
-
-1. For the equity offered, the parameter is the population mean $\mu$, the
-   estimator is $\bar X$, and the estimate is $\bar x=12.76$%.
-2. For the deal outcome, the parameter is the population proportion $p$,
-   the estimator is $\widehat P$, and the estimate is $\hat p=0.64$.
-3. The sample quartiles in the R output are $Q_1=8$ and $Q_3=17.75$, so
-   $\operatorname{IQR}=17.75-8=9.75$ percentage points: the middle half of
-   the initial equity offers in the sample lies between 8% and 17.75%. If
-   you take the 75th ordered value, $Q_3=17$ and the IQR is $17-8=9$
-   percentage points. Both answers are correct when you say how you found
-   $Q_3$.
-4. A different seed selects a different random set of rows. So all sample
-   statistics, including the IQR, can change.
-
-The 25th, 26th, 75th, and 76th ordered values:
-
-```{r}
-#| label: bep03-quartile-rules
-sort(pitch_sample$equity_offered_pct)[c(25, 26, 75, 76)]
-```
-:::
-
-### Task 3: Standard errors and a larger sample
-
-[Shark Tank data]{.shark-tag} Use the seed-123 sample of 100 pitches from Lecture 7 (its R
-output is in Task 2): the sample SD of the equity offered is $s=7.71$ percentage
+[Shark Tank data]{.shark-tag} Use the seed-123 sample of 100 pitches from
+Lecture 7: the sample SD of the equity offered is $s=7.71$ percentage
 points, and the sample deal proportion is $\hat p=0.64$.
 
 1. Calculate the standard error of the sample mean of the equity offered,
@@ -247,7 +184,7 @@ c(se_mean = s_equity / sqrt(100),
 ```
 :::
 
-### Task 4: One pitch versus one mean
+### Task 3: One pitch versus one mean
 
 [Shark Tank data]{.shark-tag} Suppose the population mean of the equity offered is $\mu=13.21$%, the
 population SD is $\sigma=8.44$ percentage points. You draw independent
@@ -304,7 +241,7 @@ c(sd_of_mean = sd_mean,
 ```
 :::
 
-### Task 5: The exact normal case and the CLT
+### Task 4: The exact normal case and the CLT
 
 An invented example. A founder makes scented candles. The burn time of one
 candle, $X$, is modelled as $X\sim N(40,6^2)$, in hours. A tester burns a
@@ -370,7 +307,7 @@ c(sd_mean_9 = 6 / sqrt(9),
 ```
 :::
 
-### Task 6: A proportion through the CLT
+### Task 5: A proportion through the CLT
 
 [Shark Tank data]{.shark-tag} The deal proportion (`deal_on_show`) in the Shark Tank file is $p=0.612$. A
 random sample of $n=100$ pitches is planned, with sample deal proportion
@@ -418,7 +355,7 @@ c(sd_of_phat = sd_phat,
 ```
 :::
 
-### Task 7: A confidence interval for a mean
+### Task 6: A confidence interval for a mean
 
 An invented example. A founder runs a bouldering gym. Her business plan
 assumes that a visit lasts 120 minutes on average. She draws a random sample
@@ -430,7 +367,7 @@ The formula sheet does not list $df=15$, so the task gives these values
 here.
 
 1. Construct a 95% confidence interval for the mean visit time of last
-   year. Write the five parts of the exam procedure for a mean (Lecture 9).
+   year. Write the five parts of a complete answer for an interval for a mean (Lecture 9).
    In part 5, say what the interval tells you about the 120 minutes in the
    business plan.
 2. Construct the 99% confidence interval. Only parts 2 to 5 change.
@@ -508,7 +445,7 @@ c(t_95 = qt(0.95, df = 15), t_975 = qt(0.975, df = 15),
 ```
 :::
 
-### Task 8: A confidence interval for a proportion
+### Task 7: A confidence interval for a proportion
 
 An invented example. A founder sells sneakers online. Her parcel service
 reports that customers return 15% of all sneaker orders. Last year her shop
@@ -516,9 +453,9 @@ had 6,000 orders. She draws a random sample of 400 of these orders.
 Customers returned 40 of these 400 orders. Let
 $p$ be the proportion of returned orders among all 6,000 orders.
 
-1. Construct a 95% confidence interval for $p$. Write the five parts of the
-   exam procedure for a proportion (Lecture 9), with the check of the
-   condition. Check the 10% condition first. In part 5, say what the
+1. Construct a 95% confidence interval for $p$. Write the five parts of a
+   complete answer for an interval for a proportion (Lecture 9), with the
+   check of the condition. Check the 10% condition first. In part 5, say what the
    interval tells you about the 15% reported by the parcel service.
 2. The founder says: "My return rate is 10%, so I am 5 percentage points
    below the 15%." Say in at most four sentences what is wrong with this
@@ -573,11 +510,11 @@ c(p_hat = p_hat_returns,
 ```
 :::
 
-### Task 9: A sample size for a target margin of error
+### Task 8: A sample size for a target margin of error
 
-The founder of the bouldering gym in Task 7 plans a new and larger sample.
+The founder of the bouldering gym in Task 6 plans a new and larger sample.
 She wants to estimate the mean visit time with a margin of error of at most
-5 minutes. She uses the sample SD of Task 7 as a planning value:
+5 minutes. She uses the sample SD of Task 6 as a planning value:
 $\sigma=28$ minutes.
 
 1. Calculate the sample size that she needs at the 95% level
@@ -629,48 +566,6 @@ n_needed
 ceiling(n_needed)
 ```
 :::
-
-### Task 10: A value for a sample mean (extra practice for home)
-
-An invented example. A founder sells granola in bags of 250 grams. The
-filling machine puts $X\sim N(250,4^2)$ grams into one bag. Every hour she
-weighs a random sample of $n=16$ bags and calculates the sample mean
-$\bar X$. She wants an alarm value $a$: she checks the machine when
-$\bar X>a$. When the machine works as described, only 5% of the hourly
-samples may give an alarm. Supplied value: the 0.95 quantile of $Z$ is
-$z_{0.95}=1.645$.
-
-1. State the distribution of $\bar X$, with its standard deviation.
-2. Calculate the value $a$ with $P(\bar X>a)=0.05$.
-3. Would the same rule make sense with single bags instead of the mean of
-   16 bags? Calculate the value for a single bag and compare.
-
-::: {.callout-note collapse="true"}
-## Check your answer
-
-1. The population is normal, so the sample mean is exactly normal:
-   $\bar X\sim N(250,\,4^2/16)$, with
-   $\operatorname{SD}(\bar X)=4/\sqrt{16}=1$ gram.
-2. If 5% of the sample means lie above $a$, then 95% lie at or below it.
-   So $a$ is the 0.95 quantile of $\bar X$:
-   $a=250+1.645\times1=251.65$ grams.
-3. For a single bag the value is $250+1.645\times4=256.58$ grams. Single
-   bags vary four times more than the mean of 16 bags. So the mean of 16
-   bags detects a change in the filling of the machine much earlier. Its
-   alarm value is only 1.65 grams above 250, about 0.7% of the bag weight.
-
-Verification in R:
-
-```{r}
-#| label: bep03-alarm-check
-c(sd_mean = 4 / sqrt(16),
-  alarm_mean = qnorm(0.95, mean = 250, sd = 4 / sqrt(16)),
-  alarm_by_hand = 250 + 1.645 * 1,
-  alarm_single = 250 + 1.645 * 4,
-  shift_in_percent = 100 * 1.645 / 250)
-```
-:::
-
 :::
 
 ::: {.course-phase .phase-after}
@@ -689,7 +584,7 @@ customers, 40 renewed their subscription.
 3. State what would happen to both standard errors if the sample size were
    $n=256$.
 4. Construct a 95% confidence interval for the mean monthly spending of all
-   customers, in the five parts of the exam procedure. The degrees of
+   customers, in the five parts of a complete answer. The degrees of
    freedom are 63. Use the closest value on the formula sheet:
    $t_{0.975,\,60}=2.000$. The business plan of the founder assumes a mean
    spending of €90. Say in part 5 what the interval tells you about this
@@ -788,7 +683,7 @@ Complete from memory:
 :::: {.utility-prompt}
 <span class="label">Two sentences about your own venture</span>
 
-Think of your EiA venture, or any business you know well. Pick one rate
+Think of your own venture, or any business you know well. Pick one rate
 or average that you could estimate from about 100 observations, for
 example a conversion rate, the average value of a purchase, or a renewal
 share. Then write two sentences. First state the standard error that you
@@ -813,6 +708,116 @@ For extra exercises on the lectures that this tutorial covers, with worked solut
 the course AI assistant. For example: "Give me an extra exercise for
 Tutorial 3. Show the solution only after I send my answer."
 
-[Continue to Lecture 10: Testing decisions, errors, and power](b10-testing-errors-power.qmd).
-
 :::
+
+## Extra practice for home {#b-ep03-home}
+
+These tasks practise Lectures 7 to 9 at home. Task 9 uses the Shark Tank
+file, and Task 10 uses an invented example.
+
+### Task 9: Reproduce the realised sample
+
+[Shark Tank data]{.shark-tag} The code below draws the sample with seed 123, exactly as in Lecture 7.
+So you get the same 100 rows when you run it:
+
+```{r}
+#| label: bep03-sample-output
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+set.seed(123)
+sample_rows <- sample(seq_len(nrow(sharks)), size = 100, replace = FALSE)
+pitch_sample <- sharks[sample_rows, ]
+
+c(
+  n = nrow(pitch_sample),
+  mean_equity = mean(pitch_sample$equity_offered_pct),
+  sd_equity = sd(pitch_sample$equity_offered_pct),
+  q1_equity = unname(quantile(pitch_sample$equity_offered_pct, 0.25)),
+  median_equity = median(pitch_sample$equity_offered_pct),
+  q3_equity = unname(quantile(pitch_sample$equity_offered_pct, 0.75)),
+  deal_proportion = mean(pitch_sample$deal_on_show)
+)
+```
+
+A note on the quartiles in this output. When a quartile falls between two
+ordered values, R's `quantile()` reports a point between them. Here the
+75th ordered value is 17 and the 76th is 20, and R reports 17.75. The
+definition of Lecture 1 holds for every value from 17 to 20. If you take
+the 75th ordered value, you get 17.
+
+1. Identify the parameter, estimator, and estimate for the mean equity
+   offered (`equity_offered_pct`).
+2. Identify the parameter, estimator, and estimate for the deal proportion
+   (`deal_on_show`).
+3. Calculate the interquartile range (IQR) of the equity offered in the
+   sample from the R output and interpret it. The IQR is defined in
+   [Lecture 1](b01-introduction-data-analysis.qmd#b01-quartiles).
+4. Explain why a different seed can produce different estimates and a
+   different IQR.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+1. For the equity offered, the parameter is the population mean $\mu$, the
+   estimator is $\bar X$, and the estimate is $\bar x=12.76$%.
+2. For the deal outcome, the parameter is the population proportion $p$,
+   the estimator is $\widehat P$, and the estimate is $\hat p=0.64$.
+3. The sample quartiles in the R output are $Q_1=8$ and $Q_3=17.75$, so
+   $\operatorname{IQR}=17.75-8=9.75$ percentage points: the middle half of
+   the initial equity offers in the sample lies between 8% and 17.75%. If
+   you take the 75th ordered value, $Q_3=17$ and the IQR is $17-8=9$
+   percentage points. Both answers are correct when you say how you found
+   $Q_3$.
+4. A different seed selects a different random set of rows. So all sample
+   statistics, including the IQR, can change.
+
+The 25th, 26th, 75th, and 76th ordered values:
+
+```{r}
+#| label: bep03-quartile-rules
+sort(pitch_sample$equity_offered_pct)[c(25, 26, 75, 76)]
+```
+:::
+
+### Task 10: A value for a sample mean
+
+An invented example. A founder sells granola in bags of 250 grams. The
+filling machine puts $X\sim N(250,4^2)$ grams into one bag. Every hour she
+weighs a random sample of $n=16$ bags and calculates the sample mean
+$\bar X$. She wants an alarm value $a$: she checks the machine when
+$\bar X>a$. When the machine works as described, only 5% of the hourly
+samples may give an alarm. Supplied value: the 0.95 quantile of $Z$ is
+$z_{0.95}=1.645$.
+
+1. State the distribution of $\bar X$, with its standard deviation.
+2. Calculate the value $a$ with $P(\bar X>a)=0.05$.
+3. Would the same rule make sense with single bags instead of the mean of
+   16 bags? Calculate the value for a single bag and compare.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+1. The population is normal, so the sample mean is exactly normal:
+   $\bar X\sim N(250,\,4^2/16)$, with
+   $\operatorname{SD}(\bar X)=4/\sqrt{16}=1$ gram.
+2. If 5% of the sample means lie above $a$, then 95% lie at or below it.
+   So $a$ is the 0.95 quantile of $\bar X$:
+   $a=250+1.645\times1=251.65$ grams.
+3. For a single bag the value is $250+1.645\times4=256.58$ grams. Single
+   bags vary four times more than the mean of 16 bags. So the mean of 16
+   bags detects a change in the filling of the machine much earlier. Its
+   alarm value is only 1.65 grams above 250, about 0.7% of the bag weight.
+
+Verification in R:
+
+```{r}
+#| label: bep03-alarm-check
+c(sd_mean = 4 / sqrt(16),
+  alarm_mean = qnorm(0.95, mean = 250, sd = 4 / sqrt(16)),
+  alarm_by_hand = 250 + 1.645 * 1,
+  alarm_single = 250 + 1.645 * 4,
+  shift_in_percent = 100 * 1.645 / 250)
+```
+:::
+
+
+[Continue to Lecture 10: Testing decisions, errors, and power](b10-testing-errors-power.qmd).

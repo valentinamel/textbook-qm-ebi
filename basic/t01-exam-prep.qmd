@@ -68,11 +68,11 @@ the quantity and shows the calculation. It reports the value and units and
 interprets the value in context. It also states one important limit of the
 model or of the measurement.
 
-Tasks 1 to 7 and Task 11 belong to the tutorial. Tasks 8 to 10 are extra
-practice for home.
+More tasks to practise at home are in the final section of this page,
+[Extra practice for home](#b-ep01-home).
 
 Tasks 1, 3, and 4 and the individual practice after class use the Shark Tank
-teaching file. Tasks 2 and 5 to 7 use invented examples. Load the file
+teaching file. Tasks 2 and 5 to 8 use invented examples. Load the file
 once:
 
 ```{r}
@@ -124,8 +124,8 @@ An invented example. A coffee-bar start-up records, for each of 150 orders:
 large), `items` (the number of items), and `amount_eur` (the amount paid, in
 euros).
 
-1. Classify each variable as categorical, ordinal, discrete, continuous, or
-   an identifier.
+1. State the type of each variable: categorical (nominal or ordinal),
+   numerical (discrete or continuous), or identifier.
 2. The founder asks 150 loyalty-card holders whether they would pay more for
    oat milk. Is the main problem sampling variability or selection bias?
    Explain in two sentences.
@@ -133,8 +133,9 @@ euros).
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-1. `order_id` is an identifier, `drink` is categorical, `cup_size` is
-   ordinal, `items` is discrete, and `amount_eur` is continuous.
+1. `order_id` is an identifier, `drink` is categorical and nominal,
+   `cup_size` is categorical and ordinal, `items` is numerical and discrete,
+   and `amount_eur` is numerical and continuous.
 2. The main problem is selection bias. Loyalty-card holders are regular
    customers who like the bar, so they may be more willing to pay extra than
    other customers. Asking more card holders would not fix this, because
@@ -185,12 +186,23 @@ c(P_D = mean(D), P_L = mean(L), P_D_and_L = mean(D & L))
 ### Task 4: PMF, CDF, and expectation
 
 [Shark Tank data]{.shark-tag} Select one of the 1,441 records at random, as in Task 3. Let
-$X=1$ if the selected pitch reached an on-air deal and $X=0$ otherwise. Use
-$p=882/1441$.
+$X=1$ if the founders offered at least 20% of their company to the sharks
+(`equity_offered_pct` of 20 or more) and $X=0$ otherwise. R counts these
+pitches:
+
+```{r}
+#| label: bep01-task4
+#| echo: false
+X <- as.integer(sharks$equity_offered_pct >= 20)
+data.frame(pitches = length(X), offered_20_or_more = sum(X),
+           proportion = round(mean(X), 3))
+```
+
+Use $p=382/1441$.
 
 1. Write the PMF and verify that its masses sum to 1.
 2. Write the full piecewise CDF $F_X(a)$.
-3. Calculate $E[X]$ from the PMF.
+3. Calculate $E[X]$ from the PMF and interpret it in one sentence.
 4. Explain why $E[X]$ equals the observed proportion of 1s.
 5. Explain the difference between the random variable $X$ and a realised
    value $x=1$.
@@ -198,9 +210,9 @@ $p=882/1441$.
 ::: {.callout-note collapse="true"}
 ## Check your answer
 
-1. The PMF is
+1. With $p=382/1441\approx0.265$ the PMF is
    $$
-   p_X(0)=1-p,\qquad p_X(1)=p,
+   p_X(0)=1-p\approx0.735,\qquad p_X(1)=p\approx0.265,
    $$
    and the masses sum to $1-p+p=1$.
 2. The CDF is
@@ -208,17 +220,19 @@ $p=882/1441$.
    F_X(a)=
    \begin{cases}
    0,&a<0,\\
-   1-p,&0\le a<1,\\
+   1-p\approx0.735,&0\le a<1,\\
    1,&a\ge1.
    \end{cases}
    $$
-3. The expectation is $E[X]=0(1-p)+1p=p\approx0.612$.
-4. Because the indicator contains 882 ones among 1,441 observations, its
-   mean is also $882/1441$.
+3. The expectation is $E[X]=0(1-p)+1p=p\approx0.265$. About one pitch in
+   four offers at least 20% of the company. The median offer in the file is
+   10%, so these founders give away at least twice the typical share.
+4. The indicator contains 382 ones among 1,441 observations, so its sum is
+   382 and its mean is $382/1441$, the proportion of 1s.
 5. $X$ is the random variable: a numerical measurement of the outcome, a
-   fixed rule that turns each outcome into a number (1 for a deal, 0 for no
-   deal). $x=1$ is one realised value, the number obtained when the selected
-   pitch has a deal.
+   fixed rule that turns each selected pitch into a number (1 for an offer
+   of at least 20%, 0 otherwise). $x=1$ is one realised value, the number
+   obtained when the selected pitch offers 20% or more.
 :::
 
 ### Task 5: Variance from a small PMF
@@ -288,12 +302,36 @@ average a start-up gets 0.7 offers, half of the start-ups get no offer, and
 the number of offers typically differs from 0.7 by about 0.78 offers.
 :::
 
-### Task 7: Read a histogram by hand
+### Task 7: Read a histogram
 
-An invented example. A venture records the delivery times of 120 orders. A histogram groups them
-into intervals of 10 minutes, and each bar includes its upper limit. The bar
-counts, from the first interval (0 to 10 minutes) to the fifth (above 40, up
-to 50 minutes), are 18, 46, 32, 16, and 8.
+An invented example. A venture records the delivery times of 120 orders.
+@fig-bep01-delivery groups them into intervals of 10 minutes, and each bar
+includes its upper limit. The number above each bar is its count.
+
+```{r}
+#| label: fig-bep01-delivery
+#| code-fold: true
+#| code-summary: "See the R code for this figure"
+#| fig-cap: "Delivery times of 120 orders (invented example), in intervals of 10 minutes. Each bar includes its upper limit. The number above a bar is its count."
+#| fig-alt: "Histogram with five bars over delivery times from 0 to 50 minutes. The counts are 18 for 0 to 10 minutes, 46 for above 10 up to 20, 32 for above 20 up to 30, 16 for above 30 up to 40, and 8 for above 40 up to 50."
+library(ggplot2)
+delivery <- data.frame(
+  midpoint = c(5, 15, 25, 35, 45),   # middle of each 10-minute interval
+  orders = c(18, 46, 32, 16, 8)
+)
+ggplot(delivery, aes(x = midpoint, y = orders)) +
+  geom_col(width = 10, fill = "#009E73", alpha = 0.85, colour = "white") +
+  geom_text(aes(label = orders), vjust = -0.5, colour = "#17324D", size = 3.6) +
+  scale_x_continuous(breaks = seq(0, 50, by = 10)) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
+  labs(x = "Delivery time (minutes)", y = "Number of orders") +
+  theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    axis.title = element_text(colour = "#17324D")
+  )
+```
 
 1. What does one observation represent, and what is on each axis?
 2. Describe the tallest bar in one full sentence.
@@ -315,247 +353,7 @@ to 50 minutes), are 18, 46, 32, 16, and 8.
    late or why, and it hides the exact times inside each interval.
 :::
 
-### More calculation practice {#b-ep01-calculation}
-
-Tasks 8 to 11 practise the calculations of Lectures 1 to 3 by hand. Task 11
-belongs to the tutorial. Tasks 8 to 10 are extra practice for home.
-All four tasks use invented examples. You need
-a simple calculator and the formula sheet.
-
-### Task 8: Mean, spread, and quartiles from a frequency table (extra practice for home)
-
-An invented example. A founder runs an escape room. Groups of 2 to 6 persons
-book the room for one hour. The table shows the group size of the 40
-bookings of last week.
-
-| Group size (persons) | 2 | 3 | 4 | 5 | 6 |
-|---|---:|---:|---:|---:|---:|
-| Number of bookings | 4 | 12 | 10 | 8 | 6 |
-
-Give every booking the same weight, $1/40$. This is the empirical
-distribution of Lecture 3, so the relative frequencies work like a PMF.
-
-1. State what one observation is. Calculate the relative frequency of each
-   group size and check that the five values sum to 1.
-2. Calculate the mean group size.
-3. Calculate the variance and the standard deviation of this empirical
-   distribution. Use the variance formula of Lecture 3 with the relative
-   frequencies as weights. This version divides by $n$. State the unit. Then
-   calculate the sample standard deviation $s$ of Lecture 3, which divides
-   by $n-1$.
-4. Write down the cumulative counts and find the median.
-5. Find the lower quartile $Q_1$ and the upper quartile $Q_3$ with
-   cumulative counts, as for the median in Lecture 1. Add the counts from the
-   left until the running total first reaches one quarter of the
-   observations. The group size at which this
-   happens is $Q_1$. Do the same with three quarters for $Q_3$. Then
-   calculate the interquartile range and interpret it in one sentence.
-6. Compare the mean with the median. What does the comparison say about the
-   shape of the distribution?
-
-For these 40 values, R's `quantile()` reports the same median and the same
-quartiles as the rules in parts 4 and 5.
-
-::: {.callout-note collapse="true"}
-## Check your answer
-
-1. One observation is one booking. The relative frequencies are
-   $4/40=0.10$, $12/40=0.30$, $10/40=0.25$, $8/40=0.20$, and $6/40=0.15$.
-   Their sum is 1.
-2. The mean is
-   $2(0.10)+3(0.30)+4(0.25)+5(0.20)+6(0.15)=0.20+0.90+1.00+1.00+0.90=4.0$
-   persons. The counts give the same result:
-   $(2\times4+3\times12+4\times10+5\times8+6\times6)/40=160/40=4.0$.
-3. The variance is
-   $$
-   (2-4)^2(0.10)+(3-4)^2(0.30)+(4-4)^2(0.25)+(5-4)^2(0.20)+(6-4)^2(0.15)
-   $$
-   $$
-   =0.40+0.30+0+0.20+0.60=1.50.
-   $$
-   The standard deviation is $\sqrt{1.50}\approx1.22$ persons. A booking
-   typically differs from the mean of 4 persons by about 1.2 persons, which
-   is about 31% of the mean. This variance divides by $n=40$. The sum of
-   the squared deviations is $40\times1.50=60$. The sample variance divides
-   it by $n-1=39$: $s^2=60/39\approx1.54$ and $s\approx1.24$ persons, the
-   value of R's `sd()`.
-4. The cumulative counts are 4, 16, 26, 34, and 40. With 40 observations the
-   median is the average of the 20th and the 21st ordered value. The ordered
-   values 17 to 26 all have group size 4, so the median is 4 persons.
-5. One quarter of 40 is 10. The running total first reaches 10 at group size
-   3, because $16\ge10$, so $Q_1=3$. Three quarters of 40 is 30. The running
-   total first reaches 30 at group size 5, because $34\ge30$, so $Q_3=5$.
-   The interquartile range is $5-3=2$ persons: the middle half of the
-   bookings lies between 3 and 5 persons. Of the 40 bookings, 16 are at or
-   below 3 persons. That is 40%, more than one quarter, which is why the
-   definition of $Q_1$ says "at least one quarter".
-6. The mean and the median are both 4 persons, so the two agree. The
-   distribution has no long tail on one side that pulls the mean away from
-   the median.
-
-Verification in R:
-
-```{r}
-#| label: bep01-frequency-check
-group_size <- rep(2:6, times = c(4, 12, 10, 8, 6))
-c(mean = mean(group_size),
-  var_divide_n = mean((group_size - mean(group_size))^2),
-  sum_of_squares = sum((group_size - mean(group_size))^2),
-  var_divide_n_minus_1 = var(group_size),
-  sd_divide_n_minus_1 = sd(group_size))
-cumsum(table(group_size))
-quantile(group_size, c(0.25, 0.50, 0.75))
-```
-:::
-
-### Task 9: A random experiment, its sample space, and events (extra practice for home)
-
-An invented example. A streetwear start-up sells one hoodie in five sizes:
-XS, S, M, L, and XL. The random experiment is this: the next order arrives
-and its size is recorded. The founders use the shares of last year's orders
-as probabilities:
-
-| Size | XS | S | M | L | XL |
-|---|---:|---:|---:|---:|---:|
-| Probability | 0.05 | 0.20 | 0.35 | 0.30 | 0.10 |
-
-Two events matter for the founders. $A$ is the event that the order is for a
-size up to M, that is XS, S, or M. $B$ is the event that the order is for a
-standard size, that is S, M, or L. The start-up keeps the standard sizes
-in stock and makes XS and XL only after a customer orders them.
-
-1. Write down the sample space $\Omega$. Is L an outcome or an event? What
-   is $\{\text{L}\}$?
-2. Check that the table is a valid probability model.
-3. Write $A$ and $B$ in set notation, and calculate $P(A)$ and $P(B)$.
-4. Describe $A^c$ and $B^c$ in words and write them in set notation.
-   Calculate their probabilities with the complement rule.
-5. Write $A\cap B$ and $A\cup B$ in set notation and in words. Calculate
-   $P(A\cup B)$ with the addition rule. Explain why $P(A)+P(B)$ cannot be
-   the answer.
-6. Which size is neither in $A$ nor in $B$? Calculate its probability from
-   part 5 with the complement rule, and check the result in the table.
-7. State one assumption that the founders make when they use these
-   probabilities for the next order.
-
-::: {.callout-note collapse="true"}
-## Check your answer
-
-1. $\Omega=\{\text{XS},\text{S},\text{M},\text{L},\text{XL}\}$. L is an
-   outcome: one complete possible result of the experiment. $\{\text{L}\}$
-   is an event: the set that contains only this outcome.
-2. Every probability is at least 0, and
-   $0.05+0.20+0.35+0.30+0.10=1$, so $P(\Omega)=1$. The five sizes are
-   disjoint, so their probabilities may be added.
-3. $A=\{\text{XS},\text{S},\text{M}\}$ and $P(A)=0.05+0.20+0.35=0.60$.
-   $B=\{\text{S},\text{M},\text{L}\}$ and $P(B)=0.20+0.35+0.30=0.85$.
-4. $A^c=\{\text{L},\text{XL}\}$: the order is for a size above M.
-   $P(A^c)=1-0.60=0.40$. $B^c=\{\text{XS},\text{XL}\}$: the order is for a
-   size that is made only after an order. $P(B^c)=1-0.85=0.15$. The table gives the
-   same values: $0.30+0.10=0.40$ and $0.05+0.10=0.15$.
-5. $A\cap B=\{\text{S},\text{M}\}$: the size is up to M and it is a standard
-   size. Its probability is $0.20+0.35=0.55$.
-   $A\cup B=\{\text{XS},\text{S},\text{M},\text{L}\}$: the size is up to M,
-   or it is a standard size, or both. The addition rule gives
-   $P(A\cup B)=0.60+0.85-0.55=0.90$. The sum $P(A)+P(B)=1.45$ is above 1,
-   so it cannot be a probability. It counts the sizes S and M twice.
-6. Only XL. In symbols, $(A\cup B)^c=\{\text{XL}\}$, and the complement rule
-   gives $1-0.90=0.10$. The table shows the same value for XL.
-7. The probabilities are shares of last year's orders. They describe the
-   next order only if customers choose sizes in the same way as last year.
-   A new group of customers or a new design of the hoodie could change the
-   shares.
-
-Verification in R:
-
-```{r}
-#| label: bep01-sizes-check
-size_prob <- c(XS = 0.05, S = 0.20, M = 0.35, L = 0.30, XL = 0.10)
-size_A <- c("XS", "S", "M")
-size_B <- c("S", "M", "L")
-p_A <- sum(size_prob[size_A])
-p_B <- sum(size_prob[size_B])
-p_A_and_B <- sum(size_prob[intersect(size_A, size_B)])
-c(total = sum(size_prob), P_A = p_A, P_B = p_B,
-  P_not_A = 1 - p_A, P_not_B = 1 - p_B,
-  P_A_and_B = p_A_and_B,
-  P_A_or_B = p_A + p_B - p_A_and_B,
-  P_neither = 1 - (p_A + p_B - p_A_and_B))
-```
-:::
-
-### Task 10: From a CDF to probabilities and to the PMF (extra practice for home)
-
-An invented example. A founder rents out four cargo bikes to students who
-move house. Let $X$ be the number of bikes that are rented out on a
-Saturday. Her model for $X$ is given as a CDF:
-
-| Threshold $a$ | $F_X(a)=P(X\le a)$ |
-|---|---:|
-| $a<0$ | 0 |
-| $0\le a<1$ | 0.05 |
-| $1\le a<2$ | 0.20 |
-| $2\le a<3$ | 0.50 |
-| $3\le a<4$ | 0.80 |
-| $a\ge4$ | 1 |
-
-1. State the possible values of $X$. How does the table show them?
-2. Read $F_X(2)$, $F_X(2.5)$, and $F_X(6)$ from the table. Say in words what $F_X(2)$
-   means.
-3. Calculate $P(X>2)$, $P(1<X\le3)$, and $P(1\le X\le3)$.
-4. Recover the PMF of $X$ from the CDF, and check that it is a valid PMF.
-5. Check your PMF in two ways. Calculate $F_X(3)$ again as a running total, and
-   calculate $P(1\le X\le3)$ again by adding probability masses.
-6. Interpret $p_X(4)$ in one sentence. State one thing that this number
-   cannot tell the founder.
-
-::: {.callout-note collapse="true"}
-## Check your answer
-
-1. $X$ can take the values 0, 1, 2, 3, and 4. These are the thresholds at
-   which the CDF jumps. Between two of these values the CDF stays flat,
-   because no probability lies there.
-2. $F_X(2)=0.50$: with probability 0.50, at most two bikes are rented out on
-   a Saturday. $F_X(2.5)=0.50$ as well, because $X$ takes no value between 2
-   and 2.5. $F_X(6)=1$, because $X$ is never above 4.
-3. $P(X>2)=1-F_X(2)=1-0.50=0.50$.
-   $P(1<X\le3)=F_X(3)-F_X(1)=0.80-0.20=0.60$. The event $1\le X\le3$
-   includes the value 1. $X$ takes whole numbers only, so this event is the
-   same as $0<X\le3$, and
-   $P(1\le X\le3)=F_X(3)-F_X(0)=0.80-0.05=0.75$.
-4. Each probability mass is the size of the jump of the CDF at that value:
-   $p_X(0)=0.05$, $p_X(1)=0.20-0.05=0.15$, $p_X(2)=0.50-0.20=0.30$,
-   $p_X(3)=0.80-0.50=0.30$, and $p_X(4)=1-0.80=0.20$.
-
-   | $x$ | 0 | 1 | 2 | 3 | 4 |
-   |---|---:|---:|---:|---:|---:|
-   | $p_X(x)$ | 0.05 | 0.15 | 0.30 | 0.30 | 0.20 |
-
-   No mass is negative, and $0.05+0.15+0.30+0.30+0.20=1$.
-5. $F_X(3)=0.05+0.15+0.30+0.30=0.80$, as in the table.
-   $P(1\le X\le3)=0.15+0.30+0.30=0.75$, as in part 3.
-6. $p_X(4)=0.20$: with probability 0.20, on about one Saturday in five, all
-   four bikes are rented out. The number counts rented bikes. It cannot tell
-   how many students asked for a bike on such a day, so it does not show how
-   often a fifth bike would be rented.
-
-Verification in R:
-
-```{r}
-#| label: bep01-cdf-check
-bike_cdf <- c(0.05, 0.20, 0.50, 0.80, 1)
-bike_pmf <- diff(c(0, bike_cdf))
-names(bike_pmf) <- 0:4
-bike_pmf
-c(total = sum(bike_pmf),
-  P_more_than_2 = 1 - bike_cdf[3],
-  P_above_1_to_3 = bike_cdf[4] - bike_cdf[2],
-  P_1_to_3 = sum(bike_pmf[c("1", "2", "3")]),
-  F_3 = sum(bike_pmf[c("0", "1", "2", "3")]))
-```
-:::
-
-### Task 11: Two options, compared by expected value and spread
+### Task 8: Two options, compared by expected value and spread
 
 An invented example. Two founders sell second-hand designer clothes online.
 For December they want to rent a pop-up store, and they can choose between
@@ -629,7 +427,10 @@ euros. A negative value is a loss. The founders use these two PMFs:
    count on an average over many repetitions. If a loss of 2,000 euros
    would put the venture in danger, they choose option A. If they can afford
    such a loss, option B is the better choice because of its higher
-   expected profit.
+   expected profit. In general, such a decision also depends on the
+   founders' attitude towards risk. A founder who dislikes risk may accept
+   a lower expected profit for a smaller spread, while a founder who is
+   willing to take risks may prefer option B even if a loss would hurt.
 
 Verification in R:
 
@@ -719,7 +520,7 @@ Complete from memory:
 :::: {.utility-prompt}
 <span class="label">Two sentences about your own venture</span>
 
-Think of your EiA venture, or any business you know well. Pick one
+Think of your own venture, or any business you know well. Pick one
 uncertain count that matters for it, for example customers who sign up in a
 week, offers received, or orders returned. Write two sentences. First,
 sketch a small PMF for the count: three or four values with rough
@@ -742,6 +543,245 @@ For extra exercises on the lectures of this tutorial, with worked solutions, ask
 QM Basic, the course AI assistant. For example: "Give me an extra exercise for
 Tutorial 1. Show the solution only after I send my answer."
 
-[Continue to Lecture 4: Conditioning, Bayes' rule, and independence](b04-conditioning-bayes-independence.qmd).
-
 :::
+
+## Extra practice for home {#b-ep01-home}
+
+These tasks practise the calculations of Lectures 1 to 3 at home. All three
+use invented examples. You need a simple calculator and the formula sheet.
+
+### Task 9: Mean, spread, and quartiles from a frequency table
+
+An invented example. A founder runs an escape room. Groups of 2 to 6 persons
+book the room for one hour. The table shows the group size of the 40
+bookings of last week.
+
+| Group size (persons) | 2 | 3 | 4 | 5 | 6 |
+|---|---:|---:|---:|---:|---:|
+| Number of bookings | 4 | 12 | 10 | 8 | 6 |
+
+Give every booking the same weight, $1/40$. This is the empirical
+distribution of Lecture 3, so the relative frequencies work like a PMF.
+
+1. State what one observation is. Calculate the relative frequency of each
+   group size and check that the five values sum to 1.
+2. Calculate the mean group size.
+3. Calculate the variance and the standard deviation of this empirical
+   distribution. Use the variance formula of Lecture 3 with the relative
+   frequencies as weights. This version divides by $n$. State the unit. Then
+   calculate the sample standard deviation $s$ of Lecture 3, which divides
+   by $n-1$.
+4. Write down the cumulative counts and find the median.
+5. Find the lower quartile $Q_1$ and the upper quartile $Q_3$ with
+   cumulative counts, as for the median in Lecture 1. Add the counts from the
+   left until the running total first reaches one quarter of the
+   observations. The group size at which this
+   happens is $Q_1$. Do the same with three quarters for $Q_3$. Then
+   calculate the interquartile range and interpret it in one sentence.
+6. Compare the mean with the median. What does the comparison say about the
+   shape of the distribution?
+
+For these 40 values, R's `quantile()` reports the same median and the same
+quartiles as the rules in parts 4 and 5.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+1. One observation is one booking. The relative frequencies are
+   $4/40=0.10$, $12/40=0.30$, $10/40=0.25$, $8/40=0.20$, and $6/40=0.15$.
+   Their sum is 1.
+2. The mean is
+   $2(0.10)+3(0.30)+4(0.25)+5(0.20)+6(0.15)=0.20+0.90+1.00+1.00+0.90=4.0$
+   persons. The counts give the same result:
+   $(2\times4+3\times12+4\times10+5\times8+6\times6)/40=160/40=4.0$.
+3. The variance is
+   $$
+   (2-4)^2(0.10)+(3-4)^2(0.30)+(4-4)^2(0.25)+(5-4)^2(0.20)+(6-4)^2(0.15)
+   $$
+   $$
+   =0.40+0.30+0+0.20+0.60=1.50.
+   $$
+   The standard deviation is $\sqrt{1.50}\approx1.22$ persons. A booking
+   typically differs from the mean of 4 persons by about 1.2 persons, which
+   is about 31% of the mean. This variance divides by $n=40$. The sum of
+   the squared deviations is $40\times1.50=60$. The sample variance divides
+   it by $n-1=39$: $s^2=60/39\approx1.54$ and $s\approx1.24$ persons, the
+   value of R's `sd()`.
+4. The cumulative counts are 4, 16, 26, 34, and 40. With 40 observations the
+   median is the average of the 20th and the 21st ordered value. The ordered
+   values 17 to 26 all have group size 4, so the median is 4 persons.
+5. One quarter of 40 is 10. The running total first reaches 10 at group size
+   3, because $16\ge10$, so $Q_1=3$. Three quarters of 40 is 30. The running
+   total first reaches 30 at group size 5, because $34\ge30$, so $Q_3=5$.
+   The interquartile range is $5-3=2$ persons: the middle half of the
+   bookings lies between 3 and 5 persons. Of the 40 bookings, 16 are at or
+   below 3 persons. That is 40%, more than one quarter, which is why the
+   definition of $Q_1$ says "at least one quarter".
+6. The mean and the median are both 4 persons, so the two agree. The
+   distribution has no long tail on one side that pulls the mean away from
+   the median.
+
+Verification in R:
+
+```{r}
+#| label: bep01-frequency-check
+group_size <- rep(2:6, times = c(4, 12, 10, 8, 6))
+c(mean = mean(group_size),
+  var_divide_n = mean((group_size - mean(group_size))^2),
+  sum_of_squares = sum((group_size - mean(group_size))^2),
+  var_divide_n_minus_1 = var(group_size),
+  sd_divide_n_minus_1 = sd(group_size))
+cumsum(table(group_size))
+quantile(group_size, c(0.25, 0.50, 0.75))
+```
+:::
+
+### Task 10: A random experiment, its sample space, and events
+
+An invented example. A streetwear start-up sells one hoodie in five sizes:
+XS, S, M, L, and XL. The random experiment is this: the next order arrives
+and its size is recorded. The founders use the shares of last year's orders
+as probabilities:
+
+| Size | XS | S | M | L | XL |
+|---|---:|---:|---:|---:|---:|
+| Probability | 0.05 | 0.20 | 0.35 | 0.30 | 0.10 |
+
+Two events matter for the founders. $A$ is the event that the order is for a
+size up to M, that is XS, S, or M. $B$ is the event that the order is for a
+standard size, that is S, M, or L. The start-up keeps the standard sizes
+in stock and makes XS and XL only after a customer orders them.
+
+1. Write down the sample space $\Omega$. Is L an outcome or an event? What
+   is $\{\text{L}\}$?
+2. Check that the table is a valid probability model.
+3. Write $A$ and $B$ in set notation, and calculate $P(A)$ and $P(B)$.
+4. Describe $A^c$ and $B^c$ in words and write them in set notation.
+   Calculate their probabilities with the complement rule.
+5. Write $A\cap B$ and $A\cup B$ in set notation and in words. Calculate
+   $P(A\cup B)$ with the addition rule. Explain why $P(A)+P(B)$ cannot be
+   the answer.
+6. Which size is neither in $A$ nor in $B$? Calculate its probability from
+   part 5 with the complement rule, and check the result in the table.
+7. State one assumption that the founders make when they use these
+   probabilities for the next order.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+1. $\Omega=\{\text{XS},\text{S},\text{M},\text{L},\text{XL}\}$. L is an
+   outcome: one complete possible result of the experiment. $\{\text{L}\}$
+   is an event: the set that contains only this outcome.
+2. Every probability is at least 0, and
+   $0.05+0.20+0.35+0.30+0.10=1$, so $P(\Omega)=1$. The five sizes are
+   disjoint, so their probabilities may be added.
+3. $A=\{\text{XS},\text{S},\text{M}\}$ and $P(A)=0.05+0.20+0.35=0.60$.
+   $B=\{\text{S},\text{M},\text{L}\}$ and $P(B)=0.20+0.35+0.30=0.85$.
+4. $A^c=\{\text{L},\text{XL}\}$: the order is for a size above M.
+   $P(A^c)=1-0.60=0.40$. $B^c=\{\text{XS},\text{XL}\}$: the order is for a
+   size that is made only after an order. $P(B^c)=1-0.85=0.15$. The table gives the
+   same values: $0.30+0.10=0.40$ and $0.05+0.10=0.15$.
+5. $A\cap B=\{\text{S},\text{M}\}$: the size is up to M and it is a standard
+   size. Its probability is $0.20+0.35=0.55$.
+   $A\cup B=\{\text{XS},\text{S},\text{M},\text{L}\}$: the size is up to M,
+   or it is a standard size, or both. The addition rule gives
+   $P(A\cup B)=0.60+0.85-0.55=0.90$. The sum $P(A)+P(B)=1.45$ is above 1,
+   so it cannot be a probability. It counts the sizes S and M twice.
+6. Only XL. In symbols, $(A\cup B)^c=\{\text{XL}\}$, and the complement rule
+   gives $1-0.90=0.10$. The table shows the same value for XL.
+7. The probabilities are shares of last year's orders. They describe the
+   next order only if customers choose sizes in the same way as last year.
+   A new group of customers or a new design of the hoodie could change the
+   shares.
+
+Verification in R:
+
+```{r}
+#| label: bep01-sizes-check
+size_prob <- c(XS = 0.05, S = 0.20, M = 0.35, L = 0.30, XL = 0.10)
+size_A <- c("XS", "S", "M")
+size_B <- c("S", "M", "L")
+p_A <- sum(size_prob[size_A])
+p_B <- sum(size_prob[size_B])
+p_A_and_B <- sum(size_prob[intersect(size_A, size_B)])
+c(total = sum(size_prob), P_A = p_A, P_B = p_B,
+  P_not_A = 1 - p_A, P_not_B = 1 - p_B,
+  P_A_and_B = p_A_and_B,
+  P_A_or_B = p_A + p_B - p_A_and_B,
+  P_neither = 1 - (p_A + p_B - p_A_and_B))
+```
+:::
+
+### Task 11: From a CDF to probabilities and to the PMF
+
+An invented example. A founder rents out four cargo bikes to students who
+move house. Let $X$ be the number of bikes that are rented out on a
+Saturday. Her model for $X$ is given as a CDF:
+
+| Threshold $a$ | $F_X(a)=P(X\le a)$ |
+|---|---:|
+| $a<0$ | 0 |
+| $0\le a<1$ | 0.05 |
+| $1\le a<2$ | 0.20 |
+| $2\le a<3$ | 0.50 |
+| $3\le a<4$ | 0.80 |
+| $a\ge4$ | 1 |
+
+1. State the possible values of $X$. How does the table show them?
+2. Read $F_X(2)$, $F_X(2.5)$, and $F_X(6)$ from the table. Say in words what $F_X(2)$
+   means.
+3. Calculate $P(X>2)$, $P(1<X\le3)$, and $P(1\le X\le3)$.
+4. Recover the PMF of $X$ from the CDF, and check that it is a valid PMF.
+5. Check your PMF in two ways. Calculate $F_X(3)$ again as a running total, and
+   calculate $P(1\le X\le3)$ again by adding probability masses.
+6. Interpret $p_X(4)$ in one sentence. State one thing that this number
+   cannot tell the founder.
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+1. $X$ can take the values 0, 1, 2, 3, and 4. These are the thresholds at
+   which the CDF jumps. Between two of these values the CDF stays flat,
+   because no probability lies there.
+2. $F_X(2)=0.50$: with probability 0.50, at most two bikes are rented out on
+   a Saturday. $F_X(2.5)=0.50$ as well, because $X$ takes no value between 2
+   and 2.5. $F_X(6)=1$, because $X$ is never above 4.
+3. $P(X>2)=1-F_X(2)=1-0.50=0.50$.
+   $P(1<X\le3)=F_X(3)-F_X(1)=0.80-0.20=0.60$. The event $1\le X\le3$
+   includes the value 1. $X$ takes whole numbers only, so this event is the
+   same as $0<X\le3$, and
+   $P(1\le X\le3)=F_X(3)-F_X(0)=0.80-0.05=0.75$.
+4. Each probability mass is the size of the jump of the CDF at that value:
+   $p_X(0)=0.05$, $p_X(1)=0.20-0.05=0.15$, $p_X(2)=0.50-0.20=0.30$,
+   $p_X(3)=0.80-0.50=0.30$, and $p_X(4)=1-0.80=0.20$.
+
+   | $x$ | 0 | 1 | 2 | 3 | 4 |
+   |---|---:|---:|---:|---:|---:|
+   | $p_X(x)$ | 0.05 | 0.15 | 0.30 | 0.30 | 0.20 |
+
+   No mass is negative, and $0.05+0.15+0.30+0.30+0.20=1$.
+5. $F_X(3)=0.05+0.15+0.30+0.30=0.80$, as in the table.
+   $P(1\le X\le3)=0.15+0.30+0.30=0.75$, as in part 3.
+6. $p_X(4)=0.20$: with probability 0.20, on about one Saturday in five, all
+   four bikes are rented out. The number counts rented bikes. It cannot tell
+   how many students asked for a bike on such a day, so it does not show how
+   often a fifth bike would be rented.
+
+Verification in R:
+
+```{r}
+#| label: bep01-cdf-check
+bike_cdf <- c(0.05, 0.20, 0.50, 0.80, 1)
+bike_pmf <- diff(c(0, bike_cdf))
+names(bike_pmf) <- 0:4
+bike_pmf
+c(total = sum(bike_pmf),
+  P_more_than_2 = 1 - bike_cdf[3],
+  P_above_1_to_3 = bike_cdf[4] - bike_cdf[2],
+  P_1_to_3 = sum(bike_pmf[c("1", "2", "3")]),
+  F_3 = sum(bike_pmf[c("0", "1", "2", "3")]))
+```
+:::
+
+
+[Continue to Lecture 4: Conditioning, Bayes' rule, and independence](b04-conditioning-bayes-independence.qmd).

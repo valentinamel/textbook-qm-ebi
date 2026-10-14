@@ -61,7 +61,8 @@ Try each task in R before you open the answer. Tasks 1 to 4 use the Shark
 Tank file, and money is measured in thousands of dollars (`ask_1k`). First
 build the data for the analysis. The code is the same as in Lectures 4--6.
 
-Tasks 1 to 7 belong to the tutorial. Task 8 is extra practice for home.
+More practice for home is in the final section of this page,
+[Extra practice for home](#i-ep02-home).
 
 ```{r}
 #| label: iep02-load
@@ -657,73 +658,6 @@ ci_flyers
 The third sentence of the AI answer is correct: the interval from €8.12 to
 €27.88 does not include zero.
 :::
-
-### Task 8: A one-way ANOVA (extra practice for home)
-
-An invented one-way ANOVA. The online shop for refurbished phones of Task 6
-records the delivery time in hours of 20 orders for each of three couriers.
-
-```{r}
-#| label: iep02-anova
-set.seed(7)
-courier <- factor(rep(c("cycle", "post", "van"), each = 20))
-delivery_hours <- round(c(rnorm(20, 20, 6), rnorm(20, 26, 6),
-                          rnorm(20, 22, 6)), 1)
-deliveries <- data.frame(courier, delivery_hours)
-```
-
-Fit the regression of `delivery_hours` on `courier` and make its ANOVA
-table. Which dummies does this regression use? What do its two dummy
-coefficients say? Test in five steps, with the critical value approach at
-the 5% level, whether the mean delivery time is the same for the three
-couriers. The critical value of this F-test is 3.16. Use (copy and paste)
-this structure:
-
-```text
-R code:
-Dummies in the regression:
-Meaning of the two dummy coefficients:
-Hypotheses:
-Test statistic, with both degrees of freedom:
-Critical value and rejection region:
-Observed value:
-Conclusion:
-```
-
-::: {.callout-note collapse="true"}
-## Check your answer
-
-```{r}
-#| label: iep02-courier-fit
-courier_fit <- lm(delivery_hours ~ courier, data = deliveries)
-coef(courier_fit)
-anova(courier_fit)
-mean(deliveries$delivery_hours)   # overall mean
-qf(0.95, 2, 57)
-```
-
-The ANOVA table comes from the regression of `delivery_hours` on two
-dummies, `post` and `van`, with `cycle` as the reference category. The
-intercept 22.65 hours is the mean of the cycle courier. The post courier
-takes on average 3.94 hours longer, and the van courier 0.02 hours less.
-
-1. **Hypotheses.**
-   $H_0:\mu_{\text{cycle}}=\mu_{\text{post}}=\mu_{\text{van}}$.
-   $H_1$: at least one mean differs. The significance level is 5%.
-2. **Test statistic.** $F$ = mean square of `courier` divided by the mean
-   square of the residuals, with $G-1=2$ and $n-G=57$ degrees of freedom.
-3. **Critical value and rejection region.** The critical value is 3.16,
-   from `qf(0.95, 2, 57)`. Reject $H_0$ if $F_{obs}\ge3.16$.
-4. **Observed value.** $F_{obs}=103.62/35.11\approx2.95$.
-5. **Conclusion.** $2.95<3.16$ (p $\approx$ 0.060), so do not reject
-   $H_0$. At the 5% level, the data do not show that the mean delivery time
-   differs between the couriers. This does not prove that the means are
-   equal.
-
-The largest difference, 3.95 hours between the post and the van courier,
-is about 16% of the overall mean of 23.96 hours.
-:::
-
 :::
 
 ::: {.course-phase .phase-after}
@@ -811,7 +745,7 @@ Complete from memory:
 :::: {.utility-prompt}
 <span class="label">Two sentences about your own venture</span>
 
-Think of your EiA3 venture, or any business you know well. Describe in two
+Think of your own venture, or any business you know well. Describe in two
 sentences the full analysis that you would run on its data. First, name the
 outcome, two predictors, and one extension (a set of dummies, an
 interaction, or a quadratic term) that answers a real question. Second,
@@ -836,6 +770,79 @@ ask Tilly for QM Intermediate, the course AI assistant. For example: "Give me
 an extra exercise for Intermediate Tutorial 2. Show the solution only after
 I send my answer."
 
+:::
+
+## Extra practice for home {#i-ep02-home}
+
+This task practises the ANOVA table of Lecture 5 at home with an invented
+example.
+
+### Task 8: A one-way ANOVA (Lecture 5)
+
+An invented one-way ANOVA. The online shop for refurbished phones of Task 6
+records the delivery time in hours of 20 orders for each of three couriers.
+
+```{r}
+#| label: iep02-anova
+set.seed(7)
+courier <- factor(rep(c("cycle", "post", "van"), each = 20))
+delivery_hours <- round(c(rnorm(20, 20, 6), rnorm(20, 26, 6),
+                          rnorm(20, 22, 6)), 1)
+deliveries <- data.frame(courier, delivery_hours)
+```
+
+Fit the regression of `delivery_hours` on `courier` and make its ANOVA
+table. Which dummies does this regression use? What do its two dummy
+coefficients say? Test in five steps, with the critical value approach at
+the 5% level, whether the mean delivery time is the same for the three
+couriers. The critical value of this F-test is 3.16. Use (copy and paste)
+this structure:
+
+```text
+R code:
+Dummies in the regression:
+Meaning of the two dummy coefficients:
+Hypotheses:
+Test statistic, with both degrees of freedom:
+Critical value and rejection region:
+Observed value:
+Conclusion:
+```
+
+::: {.callout-note collapse="true"}
+## Check your answer
+
+```{r}
+#| label: iep02-courier-fit
+courier_fit <- lm(delivery_hours ~ courier, data = deliveries)
+coef(courier_fit)
+anova(courier_fit)
+mean(deliveries$delivery_hours)   # overall mean
+qf(0.95, 2, 57)
+```
+
+The ANOVA table comes from the regression of `delivery_hours` on two
+dummies, `post` and `van`, with `cycle` as the reference category. The
+intercept 22.65 hours is the mean of the cycle courier. The post courier
+takes on average 3.94 hours longer, and the van courier 0.02 hours less.
+
+1. **Hypotheses.**
+   $H_0:\mu_{\text{cycle}}=\mu_{\text{post}}=\mu_{\text{van}}$.
+   $H_1$: at least one mean differs. The significance level is 5%.
+2. **Test statistic.** $F$ = mean square of `courier` divided by the mean
+   square of the residuals, with $G-1=2$ and $n-G=57$ degrees of freedom.
+3. **Critical value and rejection region.** The critical value is 3.16,
+   from `qf(0.95, 2, 57)`. Reject $H_0$ if $F_{obs}\ge3.16$.
+4. **Observed value.** $F_{obs}=103.62/35.11\approx2.95$.
+5. **Conclusion.** $2.95<3.16$ (p $\approx$ 0.060), so do not reject
+   $H_0$. At the 5% level, the data do not show that the mean delivery time
+   differs between the couriers. This does not prove that the means are
+   equal.
+
+The largest difference, 3.95 hours between the post and the van courier,
+is about 16% of the overall mean of 23.96 hours.
+:::
+
 This is the end of the QM Intermediate lectures and tutorials. Review the
 [QM Intermediate Code Sheet](code-sheet.qmd), attempt the
 [QM Intermediate Mock Exam](mock-exam.qmd), then return to the
@@ -844,5 +851,3 @@ This is the end of the QM Intermediate lectures and tutorials. Review the
 review a specific topic.
 
 [Continue to QM Intermediate Code Sheet](code-sheet.qmd).
-
-:::

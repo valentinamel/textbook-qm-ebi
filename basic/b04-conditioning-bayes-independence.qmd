@@ -19,7 +19,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 ::: {.driving-question}
 <span class="label">Driving question</span>
 
-<p class="dq-context">New information changes chances. If you know that a pitch comes from a late season, the chance of a deal changes. The difficulty is to read such a chance the right way round. "Deals among late-season pitches" and "late-season pitches among deals" are different numbers.</p>
+<p class="dq-context">New information changes our assessment of chances. If you know that a pitch comes from a late season, the chance of a deal changes. The difficulty is to read such a chance the right way round. "Deals among late-season pitches" and "late-season pitches among deals" are different numbers.</p>
 
 You will pitch in a late season. Which of these two sentences tells you how
 likely a deal is?
@@ -34,15 +34,24 @@ likely a deal is?
 
 Do all the preparation below before class.
 
-<div class="video-prep">
-<span class="label">Video preparation</span><br>
-Watch <a href="https://www.youtube.com/watch?v=MPRKc4UPoJk">Conditional
-Probabilities</a> and
-<a href="https://www.youtube.com/watch?v=kz2tvO_ZAKI">Bayes' Rule</a>. Be
-ready to identify the reference class in a conditional probability and to
-explain why turning a condition around changes the denominator.
+::: {.video-prep}
+[Video preparation]{.label}
+
+Watch these short videos from MIT OpenCourseWare, Introduction to Probability, before class. Be ready to identify the reference class in a conditional probability, to explain why turning a condition around changes the denominator, and to say what independence of two events means.
+
+1. [Conditional Probabilities](https://www.youtube.com/watch?v=MPRKc4UPoJk) (8:59)
+2. [A Radar Example and Three Basic Tools](https://www.youtube.com/watch?v=uL31gpFdarc) (10:59)
+3. [Bayes' Rule](https://www.youtube.com/watch?v=kz2tvO_ZAKI) (4:27)
+4. [Independence of Two Events](https://www.youtube.com/watch?v=w423ypsUHf0) (6:10)
+
+Extra, if you want more explanation:
+
+- [A Die Roll Example](https://www.youtube.com/watch?v=YenDB3yOfDc) (5:02)
+- [The Multiplication Rule](https://www.youtube.com/watch?v=ugzs7dgQ-JE) (6:16)
+- [Total Probability Theorem](https://www.youtube.com/watch?v=8odFouBR2wE) (5:24)
+
 The videos explain key ideas in another way and can use a different notation. The lecture material and its notation always come first.
-</div>
+:::
 
 [Shark Tank data]{.shark-tag} **Warm up.** Lecture 2 built the counts table for deals and
 seasons from the Shark Tank file. Build it again. The events $D$ (on-air
@@ -63,16 +72,11 @@ Then compare, in words only:
 - "Among pitches that reached an on-air deal, what proportion came from
   Seasons 9--16?"
 
-Both questions use the same cell of your table. Decide before class which
-part of the table each question looks at.
-
-**Predict.** Answer this question before you come to class. A venture fund receives many
-pitches by email, and only 10% of them end in a deal with the fund. An AI
-tool flags (marks) the pitches that it considers likely to reach a deal. It
-flags 80% of the pitches that do reach a deal, and also 20% of the pitches
-that do not. Of the flagged pitches, what share reach a deal: near 80%, near
-50%, or near 30%? Choose one answer. You find the answer in the section
-"Bayes' rule: count first, formula second".
+For both questions, the number on top of the fraction is the same: the
+late-season pitches that reached a deal. The questions differ in the group
+that you divide by. Before class, decide for each question which total of
+your table goes underneath: the total of the late-season column, or the
+total of the deal row.
 
 If fractions or event notation are unfamiliar, review
 [Mathematics Refresher: sets and event
@@ -80,15 +84,35 @@ notation](../resources/math-refresher.html#sets-and-event-notation) and
 [fractions and rearranging
 equations](../resources/math-refresher.html#fractions-and-rearranging-equations).
 
+**Predict.** Answer this question before you come to class. A venture fund
+receives many pitches by email, and only 10% of them end in a deal with the
+fund. To save time, the fund tests an AI tool that marks some pitches as
+promising. We call such a mark a flag. Among the pitches that later reach a
+deal, the tool flags 80%. Among the pitches that do not reach a deal, it
+also flags 20%. Now the tool flags one new pitch. How likely is it that this
+pitch reaches a deal: near 80%, near 50%, or near 30%? Do not calculate.
+Choose one answer and write down your reason in one sentence. You find the
+answer in the section "Bayes' rule: count first, formula second".
+
 :::
 
 ::: {.course-phase .phase-in-class}
 
 ## Lecture material
 
-This section starts from one counts table. On that table it builds four
-tools: conditional probability, the law of total probability, Bayes' rule,
-and independence of events.
+Lecture 2 gave each event one probability, computed from all pitches in the
+file. In practice you usually know something extra about a case: the season
+of a pitch, the sector of a startup, or a signal from a screening tool. Such
+information should change your assessment of the chances. This lecture shows
+how to update a probability when new information arrives, and how to avoid
+reading the update the wrong way round, which is the trap in the driving
+question.
+
+The lecture builds four tools on one counts table. Conditional probability
+gives the chance of an event within a group. The law of total probability
+rebuilds an overall chance from the chances within groups. Bayes' rule turns
+a conditional probability around. Independence describes the case in which
+new information does not change the chance at all.
 
 ### Start with a founder's question
 
@@ -121,7 +145,10 @@ L <- sharks$season >= 9         # late season: Seasons 9-16
 table(deal = D, late = L)
 ```
 
-Written with row and column totals:
+The output has two rows (`deal` FALSE or TRUE) and two columns (`late`
+FALSE or TRUE). Each number counts the pitches with that combination. For
+example, 505 pitches are from a late season and reached a deal. The same
+table with labels and with row and column totals:
 
 |                    | Early ($L^c$, S1--8) | Late ($L$, S9--16) | Total |
 |--------------------|---------------------:|-------------------:|------:|
@@ -160,15 +187,103 @@ a conditional probability. The next section defines it.
 ### Conditional probability
 
 <p class="concept-video"><strong>MIT explanation (review):</strong>
-<a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/conditional-probabilities/">02.2 Conditional Probabilities</a>.</p>
+<a href="https://www.youtube.com/watch?v=MPRKc4UPoJk">02.2 Conditional Probabilities</a>.</p>
 
-[Shark Tank data]{.shark-tag} Items 4 and 5 above ask the same kind of question: what is the probability
-of one event if you already know that another event happens? You answer
-both in two steps. First, keep only the pitches in one group. This group
-is called the **reference class**. Second, take the share of them in which
-the event happens. For item 4 the reference class is the 734 late-season
-pitches, and 505 of them reached a deal. Looking only at a
-reference class is called **conditioning** on it.
+[Shark Tank data]{.shark-tag} A probability describes how uncertain you
+are, given what you know. When you learn something new, some outcomes are
+no longer possible. If you know that a pitch comes from a late season, the
+early-season pitches can no longer be the one you are looking at. A good
+probability model drops these outcomes and spreads the full probability of
+1 over the outcomes that are left. This updating is what items 4 and 5 above
+ask for: what is the probability of one event if you already know that
+another event happens?
+
+You answer such a question in two steps. First, keep only the pitches that
+match what you know, for item 4 the 734 late-season pitches. This group is
+called the **reference class**. Second, take the share of the reference
+class in which the event happens. For item 4, 505 of the 734 late-season
+pitches reached a deal. Restricting attention to a reference class is
+called **conditioning** on it. @fig-b04-conditioning shows both steps as
+areas.
+
+```{r}
+#| label: fig-b04-conditioning
+#| code-fold: true
+#| code-summary: "See the R code for this figure"
+#| fig-width: 9
+#| fig-height: 3.8
+#| fig-cap: "Conditioning shrinks the sample space and rescales it. Panel 1: all 1,441 pitches as a square of area 1. The early column (green) and the late column (orange) have widths P(L^c) and P(L). The solid parts are the deals, so the deals D are split across the two columns. Panel 2: given L, only the late column is left. It is stretched to the full width, so its area is 1 again, and the solid part now has area P(D | L). Panel 3: given D, only the two solid deal parts are left, rescaled to fill the square, and the late part has area P(L | D)."
+#| fig-alt: "Three square panels. Panel 1 shows all pitches split into a green early column and an orange late column, each with a solid lower part for deals: 377 early deals, 505 late deals, 330 early pitches without a deal and 229 late pitches without a deal. Panel 2 shows only the late column stretched to the full square: the solid deal part covers 68.8 percent. Panel 3 shows only the deals stretched to the full square: the early part covers 42.7 percent and the late part 57.3 percent."
+library(ggplot2)
+sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
+D <- sharks$deal_on_show == 1
+L <- sharks$season >= 9
+p_early <- mean(!L)                 # width of the early column
+rate_early <- mean(D[!L])           # deal rate among early pitches
+rate_late <- mean(D[L])             # deal rate among late pitches
+late_among_deals <- mean(L[D])      # share of late pitches among deals
+pct <- function(x) paste0(format(round(100 * x, 1), nsmall = 1), "%")
+
+panels <- c("1. All 1,441 pitches",
+            "2. Given L: keep the 734 late pitches",
+            "3. Given D: keep the 882 deal pitches")
+rects <- data.frame(
+  panel = factor(panels[c(1, 1, 1, 1, 2, 2, 3, 3)], levels = panels),
+  xmin = c(0, p_early, 0, p_early, 0, 0, 0, 1 - late_among_deals),
+  xmax = c(p_early, 1, p_early, 1, 1, 1, 1 - late_among_deals, 1),
+  ymin = 0,
+  ymax = c(1, 1, rate_early, rate_late, 1, rate_late, 1, 1),
+  period = c("early", "late", "early", "late", "late", "late", "early", "late"),
+  solid = c(FALSE, FALSE, TRUE, TRUE, FALSE, TRUE, TRUE, TRUE)
+)
+labels <- data.frame(
+  panel = factor(panels[c(1, 1, 1, 1, 2, 2, 3, 3)], levels = panels),
+  x = c(p_early / 2, (1 + p_early) / 2, p_early / 2, (1 + p_early) / 2,
+        0.5, 0.5, (1 - late_among_deals) / 2, 1 - late_among_deals / 2),
+  y = c(rate_early / 2, rate_late / 2, (1 + rate_early) / 2,
+        (1 + rate_late) / 2, rate_late / 2, (1 + rate_late) / 2, 0.5, 0.5),
+  text = c("deal,\nearly\n377", "deal,\nlate\n505",
+           "no deal,\nearly\n330", "no deal,\nlate\n229",
+           paste0("deal\n505 of 734\n= ", pct(rate_late)),
+           paste0("no deal\n229 of 734\n= ", pct(1 - rate_late)),
+           paste0("early\n377 of 882\n= ", pct(1 - late_among_deals)),
+           paste0("late\n505 of 882\n= ", pct(late_among_deals))),
+  colour = c("white", "white", "#17324D", "#17324D",
+             "white", "#17324D", "white", "white")
+)
+
+ggplot() +
+  geom_rect(data = rects,
+            aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax,
+                fill = period, alpha = solid),
+            colour = "white", linewidth = 0.6) +
+  geom_text(data = labels, aes(x = x, y = y, label = text),
+            colour = labels$colour, size = 3.1, lineheight = 0.9) +
+  facet_wrap(~ panel, nrow = 1) +
+  scale_fill_manual(values = c(early = "#009E73", late = "#D55E00")) +
+  scale_alpha_manual(values = c(`FALSE` = 0.25, `TRUE` = 0.9)) +
+  coord_fixed(expand = FALSE) +
+  theme_void(base_size = 11) +
+  theme(legend.position = "none",
+        strip.text = element_text(colour = "#17324D", face = "bold",
+                                  margin = margin(b = 6)),
+        panel.border = element_rect(colour = "#17324D", fill = NA,
+                                    linewidth = 0.8),
+        panel.spacing = unit(1.2, "lines"))
+```
+
+Read @fig-b04-conditioning from left to right. Panel 1 shows what you know
+before any extra information. The square stands for all 1,441 pitches, so
+its area is 1. The deals are split across both periods: 377 early deals and
+505 late deals. Panel 2 shows what happens when you learn that the pitch is
+from a late season. The early column drops out, because it is no longer
+possible. What is left, the late column, is stretched to fill the whole
+square, so the probabilities add up to 1 again. The solid part now covers
+68.8% of the square. That is the deal probability given a late season.
+Panel 3 conditions on the other event. It keeps only the 882 deals and
+stretches them to fill the square. The late part now covers 57.3%. Panels 2
+and 3 start from the same 505 late-season deals but divide them by different
+groups, so they give different numbers.
 
 The symbol for this is a vertical bar, read as "given". Item 4 is written
 $P(D\mid L)$, "the probability of $D$ given $L$". Item 5 is written
@@ -192,7 +307,8 @@ $$P(D\mid L)=\frac{P(D\cap L)}{P(L)}
 =\frac{505/1441}{734/1441}=\frac{505}{734}.$$
 
 The reference class gives the denominator. Dividing by $P(B)$ rescales
-the probabilities inside $B$ so that they add up to 1 again.
+the probabilities inside $B$ so that they add up to 1 again. This is the
+stretching step from panel 1 to panel 2 of @fig-b04-conditioning.
 
 For a fixed event $B$, conditional probabilities follow all three rules from
 Lecture 2. So every rule that Lecture 2 derived from them also holds inside
@@ -245,37 +361,57 @@ denominators differ, and so do the questions. Sentence A looks only at the
 734 late-season pitches. Sentence B looks only at the 882 deal pitches.
 :::
 
-::: {.callout-note collapse="true"}
-## Check: which sentence matches which number?
+To match a sentence with its number, look at the words after "of" or
+"among". Sentence A, "68.8% of late-season pitches reached an on-air deal",
+names the late-season pitches as the group, so it is
+$P(D\mid L)=505/734\approx 68.8\%$. Sentence B, "57.3% of the pitches that
+reached a deal came from the late seasons", names the deals as the group,
+so it is $P(L\mid D)=505/882\approx 57.3\%$. A report that says "68.8% of
+deal pitches came from late seasons" has put the right number into the
+wrong sentence.
 
-Sentence A ("of late-season pitches, ... reached a deal") conditions on the
-season, so it is $P(D\mid L)=505/734\approx 68.8\%$. Sentence B ("of deal
-pitches, ... came from late seasons") conditions on the deal, so it is
-$P(L\mid D)=505/882\approx 57.3\%$. A report that quotes "68.8% of deal
-pitches came from late seasons" has put the right number into the wrong
-sentence.
-:::
-
-The same two numbers in R. `D[L]` keeps only the late-season pitches, and
-`L[D]` keeps only the deal pitches. This is the step that keeps only the
-reference class:
+The same two numbers in R. In the code, `D` and `L` are lists of 1,441
+TRUE/FALSE values, one for each pitch. Square brackets select entries: `D[L]`
+keeps the deal values of only those pitches where `L` is TRUE, so it is the
+list of 734 late-season pitches. This is the step that keeps only the
+reference class. `mean()` of TRUE/FALSE values is the share of TRUE values,
+just as the mean of a 0/1 variable is its share of 1s. So `mean(D[L])` is
+the share of deals among late-season pitches. In the same way, `L[D]` keeps
+the 882 deal pitches and `mean(L[D])` is the share of them from a late
+season. The first output counts the size of each reference class, with
+`sum()`, which counts the TRUE values. The second output gives the two
+shares:
 
 ```{r}
 #| label: b04-conditionals
 D <- sharks$deal_on_show == 1
 L <- sharks$season >= 9
+c(n_late = sum(L), n_deal = sum(D))
 c(
   P_deal_given_late = mean(D[L]),
   P_late_given_deal = mean(L[D])
 )
 ```
 
+R confirms both reference classes (734 late-season pitches and 882 deals)
+and both shares: 0.688 for Sentence A and 0.573 for Sentence B. For
+comparison, the deal rate among all pitches is $882/1441\approx 0.612$. So
+knowing that a pitch is from a late season raises the deal probability by
+about 7.6 percentage points.
+
 ### The multiplication rule
 
 <p class="concept-video"><strong>MIT explanation (review):</strong>
-<a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/the-multiplication-rule/">02.6 The Multiplication Rule</a>.</p>
+<a href="https://www.youtube.com/watch?v=ugzs7dgQ-JE">02.6 The Multiplication Rule</a>.</p>
 
-[Shark Tank data]{.shark-tag} The probability of an intersection, $P(A\cap B)$, is also called a **joint
+[Shark Tank data]{.shark-tag} Often you know a rate within a group and the
+size of the group, but not how often both things happen together. A bank,
+for example, may know that 30% of its loans go to small businesses and that
+5% of those loans are not repaid. The share of all loans that are
+small-business loans and not repaid is then $0.05\times 0.30=0.015$, or 1.5%
+of all loans. The multiplication rule makes this step general.
+
+The probability of an intersection, $P(A\cap B)$, is also called a **joint
 probability**: both events happen together. Multiply both sides of the
 definition of conditional probability by $P(B)$. The result is the
 **multiplication rule**. It builds a joint probability from a conditional
@@ -295,9 +431,9 @@ different reference class.
 ::: {.callout-caution collapse="true"}
 ## Try it: verify the joint probability two ways
 
-[Shark Tank data]{.shark-tag} Try this first with the student next to you. Use the counts table of the
-section "One table, five probabilities" to check the equation above for $D$
-(on-air deal) and $L$ (late season).
+[Shark Tank data]{.shark-tag} Use the counts table of the section "One
+table, five probabilities" to check the equation above for $D$ (on-air deal)
+and $L$ (late season).
 
 *Step 1 (given).* The direct way: $P(D\cap L)=505/1441\approx 0.350$.
 
@@ -316,6 +452,12 @@ fractions from the table. Show that it also equals $505/1441$.
 $P(L\mid D)\,P(D)=\dfrac{505}{882}\cdot\dfrac{882}{1441}=\dfrac{505}{1441}
 \approx 0.350$. The 882 cancels, just as the 734 did.
 
+The R code computes the joint probability in the three ways. `mean(D & L)`
+is the share of pitches that are both deals and late-season. The other two
+lines multiply a conditional share by the share of its reference class. All
+three outputs are 0.350: 35% of all pitches are late-season deals, whichever
+way you compute it.
+
 ```{r}
 #| label: b04-multiplication
 D <- sharks$deal_on_show == 1
@@ -329,12 +471,22 @@ c(
 :::
 :::
 
+The multiplication rule is the building block of the next two tools. The
+law of total probability adds up several joint probabilities, and Bayes'
+rule divides one joint probability by a total.
+
 ### The law of total probability
 
 <p class="concept-video"><strong>MIT explanation (review):</strong>
-<a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/total-probability-theorem/">02.7 Total Probability Theorem</a>.</p>
+<a href="https://www.youtube.com/watch?v=8odFouBR2wE">02.7 Total Probability Theorem</a>.</p>
 
-[Shark Tank data]{.shark-tag} Lecture 2 introduced a partition: events that do not overlap and together
+[Shark Tank data]{.shark-tag} Data often come as rates for separate
+groups: the deal rate in each period of the show, the repayment rate in each
+segment of a loan portfolio, or the conversion rate in each sales channel.
+A decision may still need the overall rate. The law of total probability
+combines the group rates into one overall rate.
+
+Lecture 2 introduced a partition: events that do not overlap and together
 cover every outcome. The early seasons and the late seasons are a partition
 of the pitches. You can rebuild an overall probability from the parts of a
 partition in three steps. Take the conditional probability of $A$ within
@@ -376,6 +528,10 @@ is a weighted average of the two rates. So it must lie between 0.533 and
 0.688, and it is a little closer to the rate of the larger group.
 :::
 
+In R, `mean(D[!L])` is the deal rate among early pitches (`!L` means "not
+late"), and `mean(!L)` is the share of early pitches. The second line
+multiplies each rate by its weight and adds the two products:
+
 ```{r}
 #| label: b04-total-probability
 D <- sharks$deal_on_show == 1
@@ -386,58 +542,34 @@ c(
 )
 ```
 
-@fig-b04-partition-areas shows the same calculation as areas.
+Both outputs are 0.612. Rebuilding the overall deal probability from the
+two periods gives exactly the share of deals among all pitches, as the law
+promises.
 
-```{r}
-#| label: fig-b04-partition-areas
-#| code-fold: true
-#| code-summary: "See the R code for this figure"
-#| fig-width: 7
-#| fig-height: 3.6
-#| fig-cap: "Total probability as areas. The two columns are the early and late seasons, a partition of all pitches. The width of a column is the probability of that period (the weight). The height of the solid region is the deal rate within that period. The two solid areas do not overlap, and their sum is P(D)."
-library(ggplot2)
-sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
-D <- sharks$deal_on_show == 1
-L <- sharks$season >= 9
-p_early <- mean(!L)
-p_deal_early <- mean(D[!L])
-p_deal_late <- mean(D[L])
-
-ggplot() +
-  # light backgrounds: the two parts of the partition
-  annotate("rect", xmin = 0, xmax = p_early, ymin = 0, ymax = 1,
-           fill = "#009E73", alpha = 0.25) +
-  annotate("rect", xmin = p_early, xmax = 1, ymin = 0, ymax = 1,
-           fill = "#D55E00", alpha = 0.25) +
-  # solid areas: deal rate within each part, times the part's width
-  annotate("rect", xmin = 0, xmax = p_early, ymin = 0,
-           ymax = p_deal_early, fill = "#009E73", alpha = 0.85) +
-  annotate("rect", xmin = p_early, xmax = 1, ymin = 0,
-           ymax = p_deal_late, fill = "#D55E00", alpha = 0.85) +
-  annotate("segment", x = p_early, xend = p_early, y = 0, yend = 1,
-           colour = "#17324D", linewidth = 0.8) +
-  annotate("rect", xmin = 0, xmax = 1, ymin = 0, ymax = 1,
-           fill = NA, colour = "#17324D", linewidth = 0.8) +
-  annotate("text", x = p_early / 2, y = 0.28,
-           label = "D ~ symbol('\\307') ~ L^c", parse = TRUE,
-           colour = "white", size = 4.2) +
-  annotate("text", x = p_early + (1 - p_early) / 2, y = 0.36,
-           label = "D ~ symbol('\\307') ~ L", parse = TRUE,
-           colour = "white", size = 4.2) +
-  annotate("text", x = p_early / 2, y = 0.88, label = "L^c",
-           parse = TRUE, colour = "#17324D", size = 4.4) +
-  annotate("text", x = p_early + (1 - p_early) / 2, y = 0.88,
-           label = "L", colour = "#17324D", size = 4.4) +
-  annotate("text", x = 0.985, y = 0.955, label = "Omega",
-           parse = TRUE, colour = "#17324D", size = 3.8) +
-  coord_cartesian(expand = FALSE) +
-  theme_void()
-```
+Panel 1 of @fig-b04-conditioning shows the same calculation as areas. The
+width of each column is the probability of that period, the weight: 0.491
+for the early and 0.509 for the late seasons. The height of the solid part
+is the deal rate within that period: 0.533 and 0.688. So the area of each
+solid part is width times height, which is a joint probability. For the
+late seasons this is $0.509\times 0.688\approx 0.350$, and for the early
+seasons $0.491\times 0.533\approx 0.262$. The two solid parts do not
+overlap, so $P(D)$ is their total area, $0.262+0.350=0.612$. In the figure
+you can also see why the overall rate lies between the two group rates.
+Flattening the two solid parts to one common height that keeps their total
+area gives a height of 0.612, below the late part and above the early part.
+The law of total probability returns in the next section, where it gives
+the denominator of Bayes' rule.
 
 ### Bayes' rule: count first, formula second
 
 <p class="concept-video"><strong>MIT explanation (review):</strong>
-<a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/bayes-rule/">02.8 Bayes' Rule</a>.</p>
+<a href="https://www.youtube.com/watch?v=kz2tvO_ZAKI">02.8 Bayes' Rule</a>.</p>
+
+Many business decisions start from a signal: a flag from a screening tool,
+a positive review, or a click on an ad. The quality of a signal is usually
+described the other way round, as the share of good cases that show the
+signal. The decision needs the share of good cases among those that show
+the signal. Bayes' rule turns the one into the other.
 
 Return to the prediction question from before class. It is about another
 situation than the Shark Tank show, with invented numbers. A venture fund
@@ -486,45 +618,58 @@ This is real evidence, but it is far from certainty.
 #| fig-width: 8
 #| fig-height: 4.6
 #| fig-cap: "Tree of counts for 1,000 imaginary pitches. Orange boxes are the flagged pitches: 80 + 180 = 260 flags in total, of which only 80 are deals, so P(deal | flag) = 80/260, about 31%."
-old_par <- par(no.readonly = TRUE)
-par(mar = c(0.2, 0.2, 0.2, 0.2))
-plot(NA, xlim = c(0, 10), ylim = c(0.3, 9.7), axes = FALSE,
-     xlab = "", ylab = "", xaxs = "i", yaxs = "i")
-
-draw_node <- function(x, y, top, bottom, fill = "white",
-                      border = "#17324D", lwd = 1.4, w = 1.05, h = 0.78) {
-  rect(x - w, y - h, x + w, y + h, col = fill, border = border, lwd = lwd)
-  text(x, y + 0.26, top, font = 2, cex = 1.0, col = "#17324D")
-  text(x, y - 0.30, bottom, cex = 0.8, col = "#5B6976")
+#| fig-alt: "A tree that starts with 1,000 pitches, splits into 100 deals and 900 non-deals, and then into flagged and not flagged: 80 flagged and 20 not flagged deals, 180 flagged and 720 not flagged non-deals. The 80 and 180 flagged boxes are highlighted in orange, with 260 flagged in total."
+# draw_count_tree() draws a tree of counts. The later trees in this
+# lecture reuse it.
+draw_count_tree <- function(root, root_label, mid, mid_labels, ends,
+                            end_labels, branch_labels, side_text = "") {
+  old_par <- par(no.readonly = TRUE)
+  on.exit(par(old_par))
+  par(mar = c(0.2, 0.2, 0.2, 0.2))
+  plot(NA, xlim = c(0, 10), ylim = c(0.3, 9.7), axes = FALSE,
+       xlab = "", ylab = "", xaxs = "i", yaxs = "i")
+  draw_node <- function(x, y, top, bottom, fill = "white",
+                        border = "#17324D", lwd = 1.4, w = 1.05, h = 0.78) {
+    rect(x - w, y - h, x + w, y + h, col = fill, border = border, lwd = lwd)
+    text(x, y + 0.26, top, font = 2, cex = 1.0, col = "#17324D")
+    text(x, y - 0.30, bottom, cex = 0.8, col = "#5B6976")
+  }
+  draw_branch <- function(x1, y1, x2, y2, label, above = TRUE) {
+    segments(x1, y1, x2, y2, col = "#9AA7B2", lwd = 1.6)
+    text((x1 + x2) / 2, (y1 + y2) / 2 + if (above) 0.32 else -0.32,
+         label, cex = 0.76, col = "#5B6976")
+  }
+  # branches first, then boxes on top
+  draw_branch(2.45, 5.35, 3.55, 7.15, branch_labels[1])
+  draw_branch(2.45, 4.65, 3.55, 2.85, branch_labels[2], above = FALSE)
+  draw_branch(5.65, 7.75, 6.95, 8.45, branch_labels[3])
+  draw_branch(5.65, 7.05, 6.95, 6.35, branch_labels[4], above = FALSE)
+  draw_branch(5.65, 2.95, 6.95, 3.65, branch_labels[5])
+  draw_branch(5.65, 2.25, 6.95, 1.55, branch_labels[6], above = FALSE)
+  draw_node(1.35, 5.0, root, root_label, w = 1.15)
+  draw_node(4.6, 7.4, mid[1], mid_labels[1])
+  draw_node(4.6, 2.6, mid[2], mid_labels[2])
+  # orange boxes: the cases with the signal
+  draw_node(8.0, 8.6, ends[1], end_labels[1], fill = "#FDE5C1",
+            border = "#D55E00", lwd = 2.2)
+  draw_node(8.0, 6.2, ends[2], end_labels[2], fill = "#F4F7F9",
+            border = "#9AA7B2")
+  draw_node(8.0, 3.8, ends[3], end_labels[3], fill = "#FDE5C1",
+            border = "#D55E00", lwd = 2.2)
+  draw_node(8.0, 1.4, ends[4], end_labels[4], fill = "#F4F7F9",
+            border = "#9AA7B2")
+  text(9.55, 6.2, side_text, cex = 0.82, col = "#D55E00")
 }
-draw_branch <- function(x1, y1, x2, y2, label, above = TRUE) {
-  segments(x1, y1, x2, y2, col = "#9AA7B2", lwd = 1.6)
-  text((x1 + x2) / 2, (y1 + y2) / 2 + if (above) 0.32 else -0.32,
-       label, cex = 0.76, col = "#5B6976")
-}
 
-# branches first, then boxes on top
-draw_branch(2.45, 5.35, 3.55, 7.15, "10% deal")
-draw_branch(2.45, 4.65, 3.55, 2.85, "90% no deal", above = FALSE)
-draw_branch(5.65, 7.75, 6.95, 8.45, "80% flagged")
-draw_branch(5.65, 7.05, 6.95, 6.35, "20% not", above = FALSE)
-draw_branch(5.65, 2.95, 6.95, 3.65, "20% flagged")
-draw_branch(5.65, 2.25, 6.95, 1.55, "80% not", above = FALSE)
-
-draw_node(1.35, 5.0, "1,000", "pitches", w = 1.15)
-draw_node(4.6, 7.4, "100", "deal")
-draw_node(4.6, 2.6, "900", "no deal")
-draw_node(8.0, 8.6, "80", "flagged", fill = "#FDE5C1",
-          border = "#D55E00", lwd = 2.2)
-draw_node(8.0, 6.2, "20", "not flagged", fill = "#F4F7F9",
-          border = "#9AA7B2")
-draw_node(8.0, 3.8, "180", "flagged", fill = "#FDE5C1",
-          border = "#D55E00", lwd = 2.2)
-draw_node(8.0, 1.4, "720", "not flagged", fill = "#F4F7F9",
-          border = "#9AA7B2")
-
-text(9.55, 6.2, "260\nflagged\nin total", cex = 0.82, col = "#D55E00")
-par(old_par)
+draw_count_tree(
+  root = "1,000", root_label = "pitches",
+  mid = c("100", "900"), mid_labels = c("deal", "no deal"),
+  ends = c("80", "20", "180", "720"),
+  end_labels = c("flagged", "not flagged", "flagged", "not flagged"),
+  branch_labels = c("10% deal", "90% no deal", "80% flagged", "20% not",
+                    "20% flagged", "80% not"),
+  side_text = "260\nflagged\nin total"
+)
 ```
 
 Now the formula. The question turns a condition around. We describe the
@@ -574,7 +719,9 @@ $$P(L\mid D)=\frac{P(D\mid L)\,P(L)}{P(D)}
 =\frac{(505/734)(734/1441)}{882/1441}=\frac{505}{882}\approx 0.573.$$
 
 The R check computes the same formula and compares it with the direct count
-from the table:
+from the table. The first line plugs $P(D\mid L)$, $P(L)$ and $P(D)$ into
+Bayes' rule. The second line takes the share of late-season pitches among
+the deals directly:
 
 ```{r}
 #| label: b04-bayes
@@ -587,14 +734,23 @@ c(
 )
 ```
 
+Both numbers are 0.573: Bayes' rule turns the 68.8% of Sentence A into the
+57.3% of Sentence B. With a counts table at hand you can always count
+directly. Bayes' rule is needed when, as for the venture fund, you only know
+the rates in one direction and the base rate.
+
 ### Independence of events
 
 <p class="concept-video"><strong>MIT explanation (review):</strong>
-<a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/resources/independence-of-two-events/">03.3 Independence of Two Events</a>.</p>
+<a href="https://www.youtube.com/watch?v=w423ypsUHf0">03.3 Independence of Two Events</a>.</p>
 
-[Shark Tank data]{.shark-tag} Sometimes knowing that one event happened tells you nothing about another
-event. Lecture 2 mentioned this idea. Conditional probability makes it
-precise.
+[Shark Tank data]{.shark-tag} Sometimes knowing that one event happened
+tells you nothing about another event. This case matters in practice. A
+signal that is unrelated to the outcome in this way is useless for
+screening, however often it appears. In finance, an investor who holds
+several startups hopes that their failures are unrelated, so that one
+failure does not make the others more likely. Conditional probability makes
+the idea precise.
 
 ::: {.definition-box}
 <span class="label">Definition</span>
@@ -642,21 +798,53 @@ c(
 )
 ```
 
-**Disjoint is not independent.** Take the early and late events $L^c$ and
-$L$. They are disjoint: no pitch is in both periods, so $P(L^c\cap L)=0$.
-But the product $P(L^c)\,P(L)\approx 0.491\times 0.509\approx 0.25$ is not
-zero, so the product check fails. Disjoint events with positive probability
-are always dependent. If you observe one of them, you know that the other
-did not happen. So one event tells you a lot about the other.
+The R output repeats both checks. The first pair compares $P(D\mid L)=0.688$
+with $P(D)=0.612$: a late season raises the deal probability by 7.6
+percentage points, or by about an eighth of the overall rate. The second
+pair compares $P(D\cap L)=0.350$ with $P(D)\,P(L)=0.312$. Both pairs differ,
+so both checks agree that $D$ and $L$ are dependent.
+
+#### Disjoint is not the same as independent
+
+The two words sound alike, but they describe very different situations.
+
+|  | Disjoint events | Independent events |
+|---|---|---|
+| Meaning | $A$ and $B$ never happen together | Learning that $B$ happened does not change the chance of $A$ |
+| Condition | $P(A\cap B)=0$ | $P(A\cap B)=P(A)\,P(B)$ |
+| Example | $A$: the pitch is from an early season. $B$: the same pitch is from a late season. | $A$: the first toss of a fair coin lands heads. $B$: the second toss lands heads. |
+
+Take the early and late events $L^c$ and $L$. They are disjoint: no pitch is
+in both periods. Before you know anything, the probability of a late season
+is $P(L)\approx 0.509$. Now you learn that the pitch is from an early
+season. Then it cannot be from a late season, so $P(L\mid L^c)=0$. The new
+information has moved the probability from about 51% to 0%. That is the
+largest change possible, so the two events are as far from independent as
+events can be. The product form shows the same: $P(L^c\cap L)=0$, while
+$P(L^c)\,P(L)\approx 0.491\times 0.509\approx 0.25$.
+
+The same reasoning holds for any two disjoint events with positive
+probability. Knowing that one happened makes the other impossible, so they
+can never be independent. For two coin tosses it is the other way round.
+Both can land heads, and the first toss tells you nothing about the second.
+
+Independence closes the toolbox of this lecture. The next section uses
+conditional probabilities to compare groups of pitches.
 
 ### Second application: deal rates by team composition
 
-[Shark Tank data]{.shark-tag} The variable `pitcher_gender_group` in the Shark Tank file puts each team
-that pitches into one of four groups: `all_men`, `all_women`, `mixed`, or
-`unknown`. The deal rate
-within a category is a conditional probability, $P(D\mid \text{category})$,
-with the category as reference class. The code computes the three rates for
-the pitches with a known category:
+[Shark Tank data]{.shark-tag} Founders and investors often compare groups:
+do pitches by some kinds of teams reach deals more often than others? Such a
+comparison is a set of conditional probabilities, one for each group. The
+variable `pitcher_gender_group` in the Shark Tank file puts each team that
+pitches into one of four groups: `all_men`, `all_women`, `mixed`, or
+`unknown`. The deal rate within a category is a conditional probability,
+$P(D\mid \text{category})$, with the category as reference class.
+
+The code keeps the pitches with a known category. `table()` counts the
+pitches in each category with and without a deal. `tapply()` splits the
+deal indicator by category and takes the mean within each category, which
+is the share of deals in that category:
 
 ```{r}
 #| label: b04-team-deal-rates
@@ -664,14 +852,17 @@ sharks <- read.csv("data/shark_tank_teaching.csv", stringsAsFactors = FALSE)
 D <- sharks$deal_on_show == 1
 known_gender <- sharks$pitcher_gender_group != "unknown"
 gender_labels <- c("all_men", "all_women", "mixed")
+team <- factor(sharks$pitcher_gender_group[known_gender],
+               levels = gender_labels)
 
-gender_deal_rates <- tapply(
-  sharks$deal_on_show[known_gender],
-  factor(sharks$pitcher_gender_group[known_gender], levels = gender_labels),
-  mean
-)
+table(team = team, deal = D[known_gender])
+gender_deal_rates <- tapply(sharks$deal_on_show[known_gender], team, mean)
 gender_deal_rates
 ```
+
+Adding each row of the table, all-men teams made $324+449=773$ pitches,
+all-women teams $140+245=385$, and mixed teams $93+183=276$. The rates are 58.1% for all-men, 63.6% for all-women,
+and 66.3% for mixed teams.
 
 ```{r}
 #| label: fig-b04-team-deal-rates
@@ -719,9 +910,17 @@ ggplot(rates_df, aes(x = team, y = deal_rate)) +
 
 @fig-b04-team-deal-rates shows three conditional proportions, each with its
 own denominator. The 63.6% bar means that 63.6% of the 385 pitches by
-all-women teams reached an on-air deal. The three bars use three different
-reference classes. They can still be compared, because each rate is a share
-within its own group.
+all-women teams reached an on-air deal.
+
+Why compare shares and not simply the numbers of deals? The counts table
+shows 449 deals for all-men teams, 245 for all-women teams and 183 for mixed
+teams. Mixed teams have the fewest deals, but only because they made the
+fewest pitches. Their share of deals is the highest. Dividing by the size of
+each group puts all three groups on the same scale: deals per 100 pitches of
+that group. On this scale, mixed teams reached a deal 8.2 percentage points
+more often than all-men teams, and all-women teams 5.6 percentage points
+more often. Relative to the all-men rate of 58.1%, these differences are
+about 14% and 10%.
 
 ::: {.caveat-box}
 <span class="label">What a conditional probability can and cannot say</span>
@@ -731,21 +930,38 @@ within its own group.
   seasons cause deals.
 - The team comparison uses the broad groups of presenters that the data
   source defined. It also uses only pitches that the producers selected.
-- The classifier numbers are invented for the example.
+- The numbers for the AI tool of the venture fund are invented. If they were
+  realistic for a real fund, the fund should conclude that about two out of
+  three flagged pitches never lead to a deal. A real fund would need its own
+  base rate and its own flag rates to draw this conclusion.
 
-**What you can do with it:** before you act on a signal, ask how often the
-outcome that you look for happens. With a low base rate, most signals are
-false alarms, so a cheap second check is worth its cost.
+**What you can do with it:** before you act on a signal, look up the base
+rate, the share of all cases that have the outcome you are looking for. In
+the venture fund example only 10% of pitches reach a deal. The 900
+non-deals then produce 180 false flags, more than the 80 true flags from
+the 100 deals. Whenever the base rate is low, many signals are false
+alarms. So treat a signal as a reason for a closer look, for example a
+short call with the founder, and not as a final decision.
 :::
 
 ### Answering the driving question
 
-Sentence A answers your question. It is $P(D\mid L)=505/734\approx0.688$,
-with the late-season pitches as reference class: about 69% of them reached a
-deal. Sentence B is $P(L\mid D)=505/882\approx0.573$, with the deals as
-reference class. Both sentences are correct and use the same 505 records,
+The driving question asked which sentence tells you how likely a deal is
+when you pitch in a late season. The answer is Sentence A. It is
+$P(D\mid L)=505/734\approx0.688$, with the late-season pitches as reference
+class: about 69% of them reached a deal. Sentence B is
+$P(L\mid D)=505/882\approx0.573$, with the deals as reference class. It
+tells you how the deals are split over the seasons, not how likely a deal
+is for your pitch. Both sentences are correct and use the same 505 records,
 but they answer different questions. The typical error is to use the number
 of one sentence in the other.
+
+As a founder who pitches in a late season, you might expect a chance of
+about 69% to leave with an on-air deal. That is 7.6 percentage points above
+the 61.2% for all seasons together. This expectation rests on two
+assumptions: that your pitch is like a typical late-season pitch in the
+file, and that the show keeps selecting and judging pitches as it did in
+Seasons 9--16. It does not say that pitching later causes a deal.
 
 The venture fund example shows the same trap with a signal. A flag from the
 fund's AI tool tells less than its 80% sensitivity suggests. With a 10%
@@ -779,7 +995,7 @@ Try it yourself first.
 1. Of 1,000 trial customers, 100 become subscribers and 900 do not. Of the
    100 subscribers, $0.80\times100=80$ open the email. Of the 900 others,
    $0.20\times900=180$ open it. So $80+180=260$ customers open the email
-   and 740 do not.
+   and 740 do not. @fig-b04-subscriber-tree shows the tree.
 2. Among the openers, $80/260\approx0.31$ become subscribers. Among the 740
    who did not open, $100-80=20$ become subscribers: $20/740\approx0.03$.
 3. A call to an opener is worth $(80/260)\times30\approx9.23$ euros on
@@ -787,13 +1003,37 @@ Try it yourself first.
    did not open is worth $(20/740)\times30\approx0.81$ euros on average, less
    than the 2 euros.
 
+```{r}
+#| label: fig-b04-subscriber-tree
+#| code-fold: true
+#| code-summary: "See the drawing code (optional, not exam material)"
+#| fig-width: 8
+#| fig-height: 4.6
+#| fig-cap: "Tree of counts for 1,000 imaginary trial customers. Orange boxes are the customers who opened the follow-up email: 80 + 180 = 260 in total, of which 80 become subscribers, so P(subscriber | opened) = 80/260, about 31%."
+#| fig-alt: "A tree that starts with 1,000 trial customers, splits into 100 subscribers and 900 non-subscribers, and then into opened and not opened: 80 opened and 20 not opened among subscribers, 180 opened and 720 not opened among non-subscribers. The 80 and 180 boxes are highlighted in orange, with 260 opened in total."
+# draw_count_tree() is defined in the code of the tree of 1,000 pitches
+draw_count_tree(
+  root = "1,000", root_label = "trial customers",
+  mid = c("100", "900"), mid_labels = c("subscriber", "no subscriber"),
+  ends = c("80", "20", "180", "720"),
+  end_labels = c("opened", "not opened", "opened", "not opened"),
+  branch_labels = c("10% subscribe", "90% do not", "80% open", "20% not",
+                    "20% open", "80% not"),
+  side_text = "260\nopened\nin total"
+)
+```
+
 The decision: call the openers and nobody else. This is Bayes' rule at
 work: the signal moves the chance of a subscriber from 10% to 31%.
 :::
 :::
 
 **Next:** You can now update the probability of one event when another
-event is known. Lecture 5 looks at two random variables at the same time,
+event is known. In practice you are rarely interested in one variable
+alone. A founder wants to know how sales move with advertising spending, or
+how the equity offered relates to the size of the investment. Such
+questions are about relationships between variables. Lecture 5 therefore
+looks at two random variables at the same time,
 for example the season of a pitch and the equity offered. It introduces two
 numbers that measure how two variables change together, the covariance and the
 correlation. It also shows what a correlation can and cannot tell you.
@@ -851,8 +1091,28 @@ rate).
 *Step 1 (given).* Start with 1,000 imaginary pitches: 200 deals, 800
 non-deals.
 
-*Step 2 (you).* Fill in the four boxes at the end of the tree: the flagged
-and the unflagged counts in each branch.
+*Step 2 (you).* Fill in the four boxes with a question mark at the end of
+the tree in @fig-b04-tree-exercise: the flagged and the unflagged counts in
+each branch.
+
+```{r}
+#| label: fig-b04-tree-exercise
+#| code-fold: true
+#| code-summary: "See the drawing code (optional, not exam material)"
+#| fig-width: 8
+#| fig-height: 4.6
+#| fig-cap: "Tree of counts for 1,000 imaginary pitches with the new classifier. The first split is given. Fill in the four boxes on the right. The orange boxes are the flagged pitches."
+#| fig-alt: "A tree that starts with 1,000 pitches and splits into 200 deals and 800 non-deals. The branches then split into flagged and not flagged, with 90 percent and 10 percent for deals and 30 percent and 70 percent for non-deals. The four end boxes show question marks."
+# draw_count_tree() is defined in the code of the tree of 1,000 pitches
+draw_count_tree(
+  root = "1,000", root_label = "pitches",
+  mid = c("200", "800"), mid_labels = c("deal", "no deal"),
+  ends = c("?", "?", "?", "?"),
+  end_labels = c("flagged", "not flagged", "flagged", "not flagged"),
+  branch_labels = c("20% deal", "80% no deal", "90% flagged", "10% not",
+                    "30% flagged", "70% not")
+)
+```
 
 *Step 3 (you).* Collect the flagged pitches and compute
 $P(\text{deal}\mid\text{flag})$.
@@ -974,7 +1234,7 @@ The AI turned the condition around. 68.8% is the share of deals among late-seaso
 :::: {.utility-prompt}
 <span class="label">Two sentences about your own venture</span>
 
-Think of your EiA venture, or any business you know well. Name one signal
+Think of your own venture, or any business you know well. Name one signal
 it receives about customers or partners, for example a positive review, a
 signed letter of intent, or a click on an ad. Sentence 1: which conditional
 probability does the signal make you want to know? Write it with the
@@ -984,7 +1244,29 @@ you need to know before you trust the signal? There is no wrong answer.
 ::: {.callout-note collapse="true"}
 ## See an example, then write your own
 
-Take a student-run venture that sells boxes of prepared meals on campus. "I want $P(\text{becomes a paying customer} \mid \text{clicked the ad})$, where the reference class is the students who clicked the ad this month. Before I trust a high number of clicks, I would need the base rate of buyers among all students who saw the ad. With a very low base rate, most students who click still never buy, as the tree of 1,000 cases shows."
+Take a student-run venture that sells boxes of prepared meals on campus. "I want $P(\text{becomes a paying customer} \mid \text{clicked the ad})$, where the reference class is the students who clicked the ad this month. Before I trust a high number of clicks, I would need the base rate of buyers among all students who saw the ad. With a very low base rate, most students who click still never buy."
+
+@fig-b04-ad-tree shows why, with invented numbers. Suppose 2% of the students who see the ad become buyers. Half of the buyers click the ad, and 5% of the other students click it too. Of 1,000 students, 20 are buyers and 10 of them click. Of the 980 others, 49 click. So only $10/59\approx 17\%$ of the students who click become buyers, and about 83% of the clicks come from students who never buy.
+
+```{r}
+#| label: fig-b04-ad-tree
+#| code-fold: true
+#| code-summary: "See the drawing code (optional, not exam material)"
+#| fig-width: 8
+#| fig-height: 4.6
+#| fig-cap: "Tree of counts for 1,000 imaginary students who see the ad (invented numbers). Orange boxes are the students who click: 10 + 49 = 59 in total, of which only 10 become buyers, so P(buyer | click) = 10/59, about 17%."
+#| fig-alt: "A tree that starts with 1,000 students, splits into 20 buyers and 980 non-buyers, and then into clicked and no click: 10 clicked and 10 no click among buyers, 49 clicked and 931 no click among non-buyers. The 10 and 49 clicked boxes are highlighted in orange, with 59 clicks in total."
+# draw_count_tree() is defined in the code of the tree of 1,000 pitches
+draw_count_tree(
+  root = "1,000", root_label = "students",
+  mid = c("20", "980"), mid_labels = c("buyer", "no buyer"),
+  ends = c("10", "10", "49", "931"),
+  end_labels = c("clicked", "no click", "clicked", "no click"),
+  branch_labels = c("2% buy", "98% do not", "50% click", "50% not",
+                    "5% click", "95% not"),
+  side_text = "59\nclicked\nin total"
+)
+```
 :::
 
 You can discuss this task, and any other task in this chapter, with
